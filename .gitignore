@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+out/scenes/
+out/stills/
+out/_*
+out/*.part.mp4

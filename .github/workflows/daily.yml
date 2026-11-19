@@ -1,0 +1,129 @@
+name: daily-videos
+
+# Makes the day's 5 long lessons + 5 Shorts (voice and music in sync, nothing sped up) and publishes them on the
+# orphan "media" branch. A scheduled task on the channel owner's computer then uploads them to YouTube at 21:00.
+on:
+  schedule:
+    - cron: "17 11 * * *"        # 11:17 UTC = 14:17 in Istanbul
+  workflow_dispatch:
+    inputs:
+      day:
+        description: "Day number (empty = today in Istanbul; day 1 = 2026-11-20)"
+        required: false
+      only:
+        description: "Only these ids, e.g. d001-L1,d001-S2 (empty = all 10)"
+        required: false
+      force:
+        description: "Render again even if that day is already on the media branch"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bibi-daily
+  cancel-in-progress: false
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install tools, font
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+          pip install pillow numpy edge-tts gTTS
+          mkdir -p assets
+          curl -fL --retry 4 -o assets/Fredoka-Variable.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/fredoka/Fredoka%5Bwdth%2Cwght%5D.ttf"
+          ls -la assets
+
+      - uses: actions/cache@v4
+        with:
+          path: assets/emoji
+          key: emoji-${{ hashFiles('bibi_buzz/vocab.py') }}
+          restore-keys: emoji-
+
+      - uses: actions/cache@v4
+        with:
+          path: out/tts-cache
+          key: tts-${{ github.run_id }}
+          restore-keys: tts-
+
+      - name: Day and date
+        id: d
+        env:
+          IN_DAY: ${{ github.event.inputs.day }}
+        run: |
+          START=2026-11-20
+          if [ -n "$IN_DAY" ]; then
+            DAY=$IN_DAY
+            DATE=$(date -d "$START + $((DAY-1)) days" +%F)
+          else
+            DATE=$(TZ=Europe/Istanbul date +%F)
+            DAY=$(( ( $(date -d "$DATE" +%s) - $(date -d "$START" +%s) ) / 86400 + 1 ))
+          fi
+          echo "day=$DAY" >> "$GITHUB_OUTPUT"
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          echo "Day $DAY ($DATE)"
+
+      - name: Restore the media branch
+        run: |
+          mkdir -p /tmp/pub
+          if git ls-remote --exit-code --heads origin media >/dev/null 2>&1; then
+            git clone --quiet --depth 1 --branch media "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" /tmp/pub-old
+            cp -r /tmp/pub-old/. /tmp/pub/ && rm -rf /tmp/pub/.git
+          fi
+          ls -la /tmp/pub
+
+      - name: Render
+        id: render
+        continue-on-error: true
+        env:
+          DAY: ${{ steps.d.outputs.day }}
+          DATE: ${{ steps.d.outputs.date }}
+          ONLY: ${{ github.event.inputs.only }}
+          FORCE: ${{ github.event.inputs.force }}
+        run: |
+          if [ -f "/tmp/pub/$DATE/manifest.json" ] && [ "$FORCE" != "true" ] && [ -z "$ONLY" ]; then
+            echo "Day $DAY ($DATE) is already on the media branch - nothing to render."
+            exit 0
+          fi
+          ARGS=""
+          if [ -n "$ONLY" ]; then ARGS="--only $ONLY"; fi
+          python make_batch.py --day "$DAY" --date "$DATE" --out "/tmp/pub/$DATE" --sheet $ARGS
+
+      - name: Publish the media branch
+        if: always()
+        env:
+          DAY: ${{ steps.d.outputs.day }}
+          DATE: ${{ steps.d.outputs.date }}
+        run: |
+          cd /tmp/pub
+          # keep the newest two days only
+          ls -d 20??-??-?? 2>/dev/null | sort | head -n -2 | xargs -r rm -rf
+          python3 - <<'PY'
+          import json, os
+          dates = sorted(d for d in os.listdir(".") if len(d) == 10 and d[:2] == "20")
+          json.dump({"dates": dates}, open("index.json", "w"))
+          PY
+          du -sh . ; ls -la
+          git init -q -b media
+          git config user.name "bibi-bot"
+          git config user.email "bibi-bot@users.noreply.github.com"
+          git add -A
+          git commit -q -m "media: day $DAY ($DATE)"
+          git push -q --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" media
+
+      - name: Fail the run if rendering failed
+        if: steps.render.outcome == 'failure'
+        run: |
+          echo "At least one video failed to render - see the Render step."
+          exit 1

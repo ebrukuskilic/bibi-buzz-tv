@@ -84,6 +84,8 @@ def bez(p0, p1, p2, n=16):
 
 # ---------------------------------------------------------------------- fonts
 FONT_CANDIDATES = [
+    "assets/Fredoka-Variable.ttf",
+    "assets/FredokaOne-Regular.ttf",
     "assets/Fredoka-Bold.ttf",
     "assets/font.ttf",
     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
@@ -93,19 +95,32 @@ FONT_CANDIDATES = [
 ]
 
 
-@lru_cache(None)
 def font(size):
+    """Font of `size` layout pixels. Sizes are quantised to 1 layout px so animated (growing) text does not
+    create thousands of font objects."""
+    return _font(max(8, int(size * SS) // SS * SS))
+
+
+@lru_cache(None)
+def _font(px):
     for p in FONT_CANDIDATES:
         full = p if os.path.isabs(p) else os.path.join(ROOT, p)
         if os.path.exists(full):
-            return ImageFont.truetype(full, int(size * SS))
-    return ImageFont.load_default(int(size * SS))
+            f = ImageFont.truetype(full, px)
+            try:  # variable fonts (Fredoka): pick the bold weight
+                axes = f.get_variation_axes()
+                f.set_variation_by_axes([700 if "eight" in str(a.get("name")) else a.get("default", 100) for a in axes])
+            except Exception:
+                pass
+            return f
+    return ImageFont.load_default(px)
 
 
 # --------------------------------------------------------------------- canvas
 class Canvas:
-    def __init__(self, img=None, ox=0, oy=0):
-        self.img = img if img is not None else Image.new("RGB", (W * SS, H * SS), "white")
+    def __init__(self, img=None, ox=0, oy=0, w=None, h=None):
+        self.w, self.h = w or W, h or H
+        self.img = img if img is not None else Image.new("RGB", (self.w * SS, self.h * SS), "white")
         self.d = ImageDraw.Draw(self.img)
         self.ox, self.oy = ox, oy
 
@@ -166,7 +181,26 @@ class Canvas:
         self.img.paste(layer, box[:2], mask)
 
     def final(self):
-        return self.img.resize((W, H), Image.BOX)
+        return self.img.resize((self.w, self.h), Image.BOX)
+
+    # ---- helpers used by the lesson engine
+    def text_width(self, s, size):
+        return font(size).getlength(s) / SS
+
+    def text_fit(self, x, y, s, size, fill, max_w, anchor="mm", stroke=0, stroke_fill=None):
+        """Like text() but shrinks the font until the string fits max_w (layout pixels)."""
+        while size > 12 and self.text_width(s, size) + 2 * stroke > max_w:
+            size *= 0.94
+        self.text(x, y, s, size, fill, anchor=anchor, stroke=stroke, stroke_fill=stroke_fill)
+        return size
+
+    def sprite(self, spr, cx, cy, angle=0.0):
+        """Paste an RGBA image (already scaled to layout pixels * SS) centred on (cx, cy)."""
+        if angle:
+            spr = spr.rotate(angle, resample=Image.BICUBIC, expand=True)
+        px = int(round((cx - self.ox) * SS - spr.width / 2))
+        py = int(round((cy - self.oy) * SS - spr.height / 2))
+        self.img.paste(spr, (px, py), spr)
 
 
 # ------------------------------------------------------------ face primitives
@@ -195,11 +229,11 @@ def cheeks(c, x, y, k, spread, color="#FF9DB0"):
         c.ellipse(x + s * spread * k, y, 10 * k, 7 * k, fill=color)
 
 
-def mouth(c, x, y, k, kind="smile", t=0.0, color=INK):
+def mouth(c, x, y, k, kind="smile", t=0.0, color=INK, amt=None):
     if kind == "smile":
         c.arc(x, y, 15 * k, 11 * k, 15, 165, color, 3.5 * k)
     elif kind == "open":
-        ry = (6 + 5 * abs(math.sin(t * 9))) * k
+        ry = (6 + 5 * abs(math.sin(t * 9))) * k if amt is None else (3 + 10 * clamp(amt)) * k
         c.ellipse(x, y + 8 * k, 13 * k, ry, fill="#B8283C", outline=INK, width=2.5 * k)
         c.ellipse(x, y + 8 * k + ry * 0.45, 7 * k, ry * 0.4, fill="#FF8FA3")
     elif kind == "wow":
@@ -241,9 +275,9 @@ def flower(c, x, ground, height, color, grow=1.0, t=0.0, phase=0.0, face=True, d
 
 
 # ------------------------------------------------------------------ characters
-def bibi(c, x, y, k=1.0, t=0.0, mood="smile", look=(0, 0), flower_color=None, flower_pop=1.0):
+def bibi(c, x, y, k=1.0, t=0.0, mood="smile", look=(0, 0), flower_color=None, flower_pop=1.0, bob=None, mouth_amt=None):
     """Bibi the baby bee - the star of Bibi Buzz TV."""
-    y = y + math.sin(t * 3.2) * 6 * k
+    y = y + (math.sin(t * 3.2) * 6 * k if bob is None else bob * k)
     flap = 0.8 + 0.25 * math.sin(t * 16)
     for s in (-1, 1):
         c.poly(ellipse_pts(x + s * 42 * k, y - 62 * k, 30 * k, 50 * k * flap, ang=s * 28),
@@ -262,7 +296,7 @@ def bibi(c, x, y, k=1.0, t=0.0, mood="smile", look=(0, 0), flower_color=None, fl
            fill="#3E8EDE", outline=INK, width=2.5 * k)
     eyes(c, x, y - 10 * k, k, 25, 15, 18, look, blinking(t, 3.4, 0.4))
     cheeks(c, x, y + 12 * k, k, 44)
-    mouth(c, x, y + 4 * k, k, mood, t)
+    mouth(c, x, y + 4 * k, k, mood, t, amt=mouth_amt)
     if flower_color:
         mini_flower(c, x + 40 * k, y - 66 * k, 26 * k * flower_pop, flower_color, t)
 

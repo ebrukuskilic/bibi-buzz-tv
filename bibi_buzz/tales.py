@@ -31,7 +31,9 @@ def _outro(t, moral, bye="The End. Thank you for watching!", bg="meadow_open", c
 # own "Like / Subscribe" card (buttons drawn by storyprops.cta; the pointer presses them while the narrator says the words).
 CTA_LINE = "If you liked this story, please like and subscribe! See you at the next story. Bye bye!"
 CTA_CAPTION = "Like and subscribe for more stories!"
-CTA_CLICKS = {"en": (2.3, 3.2), "tr": (2.1, 3.1)}      # seconds after the scene's narration beat starts (voice starts 0.25 s later)
+# seconds after the scene's narration beat starts (the voice starts 0.25 s later): the pointer presses Like on the end of the word
+# "like" / "beğen" and Subscribe on the end of "subscribe" / "abone ol" (measured on a test render with the real voices)
+CTA_CLICKS = {"en": (1.95, 2.7), "tr": (2.05, 2.6)}
 
 
 def _cta(t, bg):

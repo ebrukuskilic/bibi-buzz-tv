@@ -587,7 +587,7 @@ def r_cta(X, c, seg):
     if L.v:
         D.pip(c, 150, y + 250, 0.95, X.t, mood, (4, -2))
         D.mo(c, 570, y + 250, 0.85, X.t, mood, (-4, -2))
-        D.lila(c, 360, y + 520, 0.9, X.t, mood, (0, -2))
+        D.lila(c, 360, y + 255, 0.85, X.t, mood, (0, -2))
         bibi_at(X, c, 360, y + 20, 1.5)
     else:
         D.pip(c, 330, y + 100, 1.05, X.t, "smile", (4, -2))

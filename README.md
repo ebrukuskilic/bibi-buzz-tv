@@ -107,3 +107,13 @@ bibi_buzz/thumbnail.py    YouTube kapak görseli
 - Günlük plan: `curriculum.TALE_QUEUE` listesindeki masallar 2. günden itibaren sırayla 5. uzun dersin yerine geçer
   (video kimliği `dNNN-T1`). Yeni masal eklemek için fonksiyonu yazıp `tales.TALES` ve `TALE_QUEUE` listelerine ekleyin.
 - Deneme: `python make_batch.py --day 2 --only d002-T1 --sheet --out out/test` (kapak: `out/test/d002-T1.jpg`).
+- Türkçe sürümler: her masalın Türkçe versiyonu bir gün sonra yayınlanır (`dNNN-T2`): aynı çizimler, Türkçe sesler (Emel, Ahmet),
+  metinler, başlık ve açıklama. Türkçe satırlar `bibi_buzz/tales_tr.py` içindedir; yeni masalda her İngilizce satırın karşılığı `TR`
+  sözlüğüne eklenmelidir (eksik çeviri hata verir, yarım çevrilmiş video asla üretilmez). Türkçe yazılar Baloo 2 ile çizilir
+  (Fredoka'da ğ, ş, İ yoktur).
+- Bitiş kartı: videolar "çocuklara özel" olduğu için YouTube yorumları, bitiş ekranlarını ve abone ol filigranını kapatır. Bu yüzden her
+  uzun dersin ve masalın sonuna "Beğen / Abone ol" düğmeleri çizilir, bir fare imleci önce Beğen'e sonra Abone ol'a basar
+  (`draw.cta`; derslerde `cta` bölümü, masallarda son sahne). Açıklamaların başına tıklanabilir abone ol bağlantısı eklenir
+  (`curriculum.SUBSCRIBE_URL`).
+- Deneme (gerçek yazı tipi ve gerçek seslerle): Actions → "test-render" → Run workflow (masal, dil, saniye). Kapak, sahne sayfası,
+  satır listesi ve kısa bir klip `test-output` dalına yazılır; günlük videolara dokunmaz.

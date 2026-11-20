@@ -286,6 +286,57 @@ def near_race(c, w, seed=6, road=True):
         tuft(c, rng.uniform(0, w), rng.uniform(530, 556), 0.9, "#4FAE35")
 
 
+def river_x(y, w=1280):
+    """Left and right bank of the river on the ground row y (it gets wider toward the viewer)."""
+    u = (y - 540.0) / 180.0
+    return w * (0.36 - 0.06 * u), w * (0.64 + 0.06 * u)
+
+
+def near_river(c, w, seed=8):
+    rng = random.Random(seed)
+    vgrad(c, [(0, "#85DA58"), (0.4, "#6BC84A"), (1, "#54B13B")], 520, WH)
+    round_tree(c, 70, 560, 250, "#3FAE49")
+    round_tree(c, w - 80, 556, 270, "#46B650")
+    bush(c, 235, 548, 1.0)
+    bush(c, w - 250, 546, 1.1)
+    ys = list(range(534, WH + 13, 12))
+    c.poly([(river_x(y, w)[0] - 18 - (y - 540) * 0.06, y) for y in ys] + [(river_x(y, w)[1] + 18 + (y - 540) * 0.06, y) for y in reversed(ys)], fill="#EAD7A0")
+    c.poly([(river_x(y, w)[0] - 8 - (y - 540) * 0.03, y) for y in ys] + [(river_x(y, w)[1] + 8 + (y - 540) * 0.03, y) for y in reversed(ys)], fill="#D9BE82")
+    for y in range(540, WH + 1, 5):                                                    # the water: light at the far end, deeper toward us
+        u = (y - 540) / 180.0
+        col = mix("#8FDBFF", "#3E9BE8", min(1.0, u))
+        a, b = river_x(y, w), river_x(y + 6, w)
+        c.poly([(a[0], y), (a[1], y), (b[1], y + 6), (b[0], y + 6)], fill=col)
+    for _ in range(26):                                                                # little waves
+        y = rng.uniform(552, 708)
+        xl, xr = river_x(y, w)
+        x = rng.uniform(xl + 30, xr - 70)
+        c.line([(x + i * 8, y + 3 * math.sin(i * 1.6)) for i in range(7)], "#D5F1FF", 2.4)
+    for lx, ly in ((w * 0.45, 600), (w * 0.57, 668)):                                   # lily pads
+        c.ellipse(lx, ly, 24, 8, fill="#3FAE49")
+        c.poly([(lx, ly), (lx + 24, ly - 3), (lx + 24, ly + 3)], fill="#3E9BE8")
+        c.ellipse(lx - 6, ly - 4, 5, 3, fill="#FF8FB0")
+    for side in (0, 1):                                                                # reeds on both banks
+        for i in range(7):
+            y = 548 + i * 24 + rng.uniform(-4, 4)
+            xb = river_x(y, w)[side] + (-26 if side == 0 else 26) + rng.uniform(-10, 10)
+            c.line([(xb, y), (xb + rng.uniform(-8, 8), y - 54)], "#3E9B3A", 3)
+            c.ellipse(xb, y - 58, 4.5, 11, fill="#8B5A2B")
+    cols = ["#FF6B8B", "#FFD23F", "#FFFFFF", "#B58CFF", "#FF9A3D"]
+    for _ in range(34):
+        x, y = rng.uniform(0, w), rng.uniform(540, 705)
+        xl, xr = river_x(y, w)
+        if xl - 50 < x < xr + 50:
+            continue
+        flower_dot(c, x, y, 0.7 + (y - 520) / 300, rng.choice(cols))
+    for _ in range(26):
+        x, y = rng.uniform(0, w), rng.uniform(530, 710)
+        xl, xr = river_x(y, w)
+        if xl - 40 < x < xr + 40:
+            continue
+        tuft(c, x, y, 0.8 + rng.random() * 0.6, rng.choice(["#4FAE35", "#5BBE3E"]))
+
+
 def far_sunset(c, w):
     vgrad(c, [(0, "#5A6FD0"), (0.45, "#E88FB0"), (1, "#FFD8A0")], 0, 580)
     sun_shape(c, 640, 400, 70, "#FFB347", "#FFD9A0")
@@ -303,6 +354,7 @@ BACKDROPS = {
     "room": (far_room, near_room),
     "room_night": (lambda c, w: far_room(c, w, night=True), near_room),
     "race": (far_race, near_race),
+    "river": (far_meadow, near_river),
     "sunset": (far_sunset, lambda c, w: near_meadow(c, w, path=False, trees=False, fence_on=False, flowers=20)),
 }
 

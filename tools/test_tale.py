@@ -44,12 +44,14 @@ def test_tale(a, ffmpeg, key):
     chapters_text = "\n".join(f"{SY.fmt_time(s)} {label}" for s, label in ch)
     meta = CU.metadata(t, chapters_text)
     with open(base + ".txt", "w", encoding="utf-8") as f:
+        f.write("sync problems: %s\nduration %.1fs, voice %.1fs\n\n" % ("none" if not problems else "\n  " + "\n  ".join(str(p) for p in problems),
+                                                                       st["duration"], st["voice_seconds"]))
         for sc in t.scenes:
             for b in sc.beats:
                 if b.text:
-                    f.write("%6.1fs  %-5s %-22s %s\n" % (sc.t_start + b.v0, b.who or "nar", t.voice_of(b.who)[0], b.text))
+                    f.write("%6.1fs  %-5s %-22s %s\n" % (sc.t_start + b.v0, b.who or "nar", t.voice_of(b.voice or b.who)[0], b.text))
         f.write("\n" + chapters_text + "\n\n" + json.dumps(meta, ensure_ascii=False, indent=1) + "\n")
-    print("voices used:", sorted({t.voice_of(b.who)[0] for sc in t.scenes for b in sc.beats if b.text}), flush=True)
+    print("voices used:", sorted({t.voice_of(b.voice or b.who)[0] for sc in t.scenes for b in sc.beats if b.text}), flush=True)
 
     if a.seconds > 0:
         info = SY.render(t, base + "-clip.mp4", ffmpeg, a.cache, t_range=(0.0, a.seconds), quiet=True)

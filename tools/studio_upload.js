@@ -3,19 +3,24 @@
 // the browser must already be signed in. It fetches each mp4 from the media branch, drops it into Studio's own
 // upload dialog, fills the form (title, description, tags, English (US), Education, made for kids = yes,
 // paid promotion = no, AI/altered content = no), publishes it as PUBLIC and records the video id.
+// Afterwards __bibi.thumbs() gives every long video its designed thumbnail (<id>.jpg on the media branch).
 //
 //   __bibi.run({ dates: ['2026-11-20'], only: ['d001-L1'], skipTitles: [...], skipIds: [...] })   // starts in the background
 //   limitWaitMin: 20   -> if the very first upload of the run hits the daily limit (YouTube counts uploads over a rolling
 //                         24 h window, so the slot of exactly one day ago may free up a few minutes later), wait and retry
 //                         every limitRetryMin (default 3) minutes for up to that long. Once a video of this run has been
 //                         published, a limit hit means the day's quota is used up and the run stops at once.
+//   __bibi.thumbs({ dates: ['2026-11-20'], only: ['d001-L1'], force: false })                    // starts in the background; start it
+//                         on the Videos list of the content page. For each long video of those days that is already in Studio it
+//                         opens the edit page (inside Studio, no page load), uploads <id>.jpg as the custom thumbnail if the video
+//                         has none yet (force: even if it has one), saves, and goes back to the list. Safe to run again any time.
 //   __bibi.status()                                                                              // poll this
 //   __bibi.scrape()                                                                              // titles already in Studio (Videos + Shorts tabs)
 //   __bibi.stop = true                                                                           // stop after the current step
 (() => {
   const BASE = 'https://raw.githubusercontent.com/ebrukuskilic/bibi-buzz-tv/media/';
   if (window.__bibi && window.__bibi.running) return 'already running';
-  const S = window.__bibi = { v: 2, running: false, stop: false, phase: 'idle', current: null, limit: false, log: [], done: [], failed: [], published: {} };
+  const S = window.__bibi = { v: 3, running: false, stop: false, phase: 'idle', current: null, limit: false, log: [], done: [], failed: [], published: {}, thumbDone: {} };
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const txt = e => ((e && (e.innerText || e.textContent)) || '').replace(/\s+/g, ' ').trim();
@@ -221,11 +226,80 @@
     } catch (e) { S.phase = 'error: ' + e.message; L(S.phase); }
     finally { S.running = false; S.current = null; }
   };
-  S.status = () => ({ phase: S.phase, running: S.running, current: S.current, done: S.done, failed: S.failed, published: S.published, limit: S.limit, last: S.log.slice(-5) });
+  // ---- designed thumbnails -----------------------------------------------------------------------------------------
+  // Inside Studio, without a page load (so this script stays alive): Videos list -> the video's edit page -> Save -> back.
+  const norm = s => (s || '').replace(/\s+/g, ' ').trim();
+  const isEdit = () => /\/video\/[\w-]{11}\/edit/.test(location.pathname);
+  const rowsNow = () => $$('ytcp-video-row');
+  async function toList() {
+    for (let i = 0; i < 3 && isEdit(); i++) {
+      history.back();
+      try { await until(() => !isEdit() && rowsNow().length, 20000, 'video list'); } catch (e) { if (S.stop) throw e; }
+    }
+    const tab = document.getElementById('video-list-uploads-tab');
+    if (tab && tab.getAttribute('aria-selected') !== 'true') { tab.click(); await sleep(3000); }
+    await until(() => rowsNow().length, 20000, 'video list (start on the Videos list of the Studio content page)');
+    await sleep(800);
+  }
+  async function thumbOne(date, v, force) {
+    await toList();
+    const row = rowsNow().find(r => norm(txt($('#video-title', r))) === norm(v.title));
+    if (!row) return 'not in Studio yet';
+    const link = $('a#video-title', row) || $('a[href*="/video/"]', row);
+    if (!link) throw new Error('no link on the video row');
+    link.click();
+    await until(() => isEdit() && $('ytcp-video-custom-still-editor input#file-loader') && $('ytcp-button#save'), 30000, 'edit page');
+    const shown = () => { const b = $('ytcp-video-custom-still-editor button#preview-button'); return !!(b && b.offsetParent); };
+    // the picker either says "Dosya yükle" (no custom thumbnail yet) or shows the picture (there is one)
+    await until(() => shown() || /Dosya yükle/.test(txt($('ytcp-video-custom-still-editor'))), 12000, 'thumbnail section');
+    await sleep(1000);
+    if (shown() && !force) { await toList(); return 'present'; }
+    const r = await fetch(BASE + date + '/' + v.id + '.jpg?t=' + Date.now());
+    if (!r.ok) throw new Error('no thumbnail file ' + v.id + '.jpg (HTTP ' + r.status + ')');
+    const file = new File([await r.blob()], v.id + '.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+    const input = $('ytcp-video-custom-still-editor input#file-loader');
+    const save = $('ytcp-button#save');
+    const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    await until(() => shown() && !/Yükleniyor/.test(txt($('ytcp-video-custom-still-editor'))) && save.getAttribute('aria-disabled') !== 'true', 30000, 'thumbnail upload');
+    await sleep(500);
+    save.click();
+    await until(() => save.getAttribute('aria-disabled') === 'true', 20000, 'save');
+    let toast = 'no confirmation toast';
+    try { await until(() => $$('*').some(e => !e.children.length && /Değişiklikler kaydedildi/.test(e.textContent || '') && !e.closest('ytcp-error-section')), 8000, 'toast'); toast = 'saved'; } catch (e) { if (S.stop) throw e; }
+    await sleep(800);
+    await toList();
+    return 'set (' + toast + ')';
+  }
+  S.thumbs = async (opts = {}) => {
+    if (S.running) return 'already running';
+    S.running = true; S.stop = false; S.phase = 'thumbnails';
+    try {
+      await S.ready;
+      if (document.visibilityState !== 'visible') throw new Error('this tab is in the background: bring the Studio tab to the front and run again');
+      for (const date of opts.dates || []) {
+        let man;
+        try { man = await (await fetch(BASE + date + '/manifest.json?t=' + Date.now())).json(); }
+        catch (e) { L('no manifest for ' + date); continue; }
+        for (const v of man.videos) {
+          if (S.stop) break;
+          if (v.type !== 'long') continue;
+          if (opts.only && !opts.only.includes(v.id)) continue;
+          S.current = v.id;
+          try { S.thumbDone[v.id] = await thumbOne(date, v, !!opts.force); L('thumbnail ' + v.id + ': ' + S.thumbDone[v.id]); }
+          catch (e) { S.thumbDone[v.id] = 'failed: ' + e.message; L('ERROR thumbnail ' + v.id + ': ' + e.message); if (S.stop) break; try { await toList(); } catch (e2) {} }
+        }
+      }
+      S.phase = S.stop ? 'stopped' : 'finished';
+    } catch (e) { S.phase = 'error: ' + e.message; L(S.phase); }
+    finally { S.running = false; S.current = null; }
+  };
+
+  S.status = () => ({ phase: S.phase, running: S.running, current: S.current, done: S.done, failed: S.failed, published: S.published, thumbs: S.thumbDone, limit: S.limit, last: S.log.slice(-5) });
   // keep ms <= 25000 per tool call; while the run is still going the answer is a short summary, the full status comes at the end
   S.wait = async ms => {
     const t0 = Date.now(); while (S.running && Date.now() - t0 < ms) await sleep(500);
-    return S.running ? { phase: S.phase, current: S.current, done: S.done.length, failed: S.failed.length, limit: S.limit, last: S.log.slice(-1) } : S.status();
+    return S.running ? { phase: S.phase, current: S.current, done: S.done.length, failed: S.failed.length, thumbs: Object.keys(S.thumbDone).length, limit: S.limit, last: S.log.slice(-1) } : S.status();
   };
   // titles that are already in Studio (Videos tab + Shorts tab, newest 30 each)
   S.scrape = async () => {

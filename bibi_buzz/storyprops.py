@@ -1,0 +1,741 @@
+"""Props (houses, furniture, banners...) and effects for the Bibi story videos.
+
+A prop is drawn with prop(view, x, y, k, t, st): (x, y) is the middle of its base on the ground, k the size,
+t the scene time in seconds and st a dict of its animated values (build, collapse, door, ...).
+Effects are fx(view, screen, x, y, dt, **kw): dt is the time since the effect started.
+"""
+import math
+import random
+
+from . import draw as D
+from .draw import INK, clamp, lerp, darker, mix, ease_out_back
+from .storyart import Rig
+
+PROPS, FX = {}, {}
+
+
+def prop(fn):
+    PROPS[fn.__name__] = fn
+    return fn
+
+
+def fx(fn):
+    FX[fn.__name__] = fn
+    return fn
+
+
+def ease(u):
+    u = clamp(u)
+    return u * u * (3 - 2 * u)
+
+
+# ================================================================================================ small helpers
+def beam_poly(r, pts, fill, ow=2.6):
+    r.poly(pts, fill, INK, ow)
+
+
+def brick_wall(r, x0, x1, y_bottom, y_top, bw=34, bh=18, colors=("#D9534F", "#C8453F", "#E0645A"), build=1.0, seed=3):
+    rng = random.Random(seed)
+    rows = int(round((y_bottom - y_top) / bh))
+    shown = rows * clamp(build)
+    for row in range(rows):
+        if row + 1 > shown + 0.0001 and row >= shown:
+            break
+        yb = y_bottom - row * bh
+        off = (bw / 2) * (row % 2)
+        x = x0 - off
+        while x < x1:
+            a, b = max(x, x0), min(x + bw, x1)
+            if b - a > 2:
+                r.rrect(a + 0.8, yb - bh + 0.8, b - 0.8, yb - 0.8, 2, rng.choice(colors), None)
+            x += bw
+    return rows
+
+
+def smoke_puffs(c, x, y, t, k=1.0, n=5, color="#F4F4F8"):
+    for i in range(n):
+        ph = ((t * 0.45 + i / n) % 1.0)
+        px = x + (math.sin(ph * 6 + i) * 14 + ph * 40) * k
+        py = y - ph * 130 * k
+        rr = (10 + ph * 26) * k
+        c.ellipse(px, py, rr, rr * 0.9, fill=mix(color, "#B8C4D8", ph * 0.5), outline="#C9D3E6", width=1.5)
+
+
+def door_arch(r, x, ytop, w, h, wood="#A8682F", openv=0.0, knob="#FFD21F"):
+    hw = w / 2
+    pts = [(-hw, 0)] + [(hw * math.cos(math.radians(a)), -(h - hw) - hw * math.sin(math.radians(a))) for a in range(0, 181, 15)][::-1] + [(hw, 0)]
+    pts = [(x + px, ytop + py) for px, py in pts]
+    r.poly([(px, py) for px, py in pts], "#3A2316", INK, 2.6)
+    if openv < 0.98:
+        lw = hw * (1 - 0.88 * openv)
+        leaf = [(x - hw, ytop)] + [(x - hw + 2 * lw * (a / 180.0), ytop - (h - hw) - hw * math.sin(math.radians(a))) for a in range(0, 181, 15)][::-1] + [(x - hw + 2 * lw, ytop)]
+        r.poly(leaf, wood, INK, 2.6)
+        for i in (1, 2):
+            fx_ = x - hw + 2 * lw * i / 3
+            r.line([(fx_, ytop - 2), (fx_, ytop - h + hw + 8)], darker(wood, 0.25), 2)
+        r.dot(x - hw + 2 * lw * 0.82, ytop - h * 0.42, 4.2, knob)
+
+
+def window(r, x, y, w, h, frame="#FFFFFF", glass="#BFE6FF", flowers=True, shutter=None, round_=False):
+    if shutter:
+        for s in (-1, 1):
+            r.rrect(x + s * (w / 2 + 3) - (0 if s > 0 else 14), y - h / 2, x + s * (w / 2 + 3) + (14 if s > 0 else 0), y + h / 2, 3, shutter, INK, 2)
+    if round_:
+        r.ell(x, y, w / 2 + 4, w / 2 + 4, frame, INK, 2.6)
+        r.ell(x, y, w / 2 - 2, w / 2 - 2, glass, INK, 1.6)
+        r.line([(x - w / 2 + 2, y), (x + w / 2 - 2, y)], INK, 2)
+        r.line([(x, y - w / 2 + 2), (x, y + w / 2 - 2)], INK, 2)
+        return
+    r.rrect(x - w / 2 - 4, y - h / 2 - 4, x + w / 2 + 4, y + h / 2 + 4, 4, frame, INK, 2.6)
+    r.rrect(x - w / 2, y - h / 2, x + w / 2, y + h / 2, 2, glass, INK, 1.6)
+    r.line([(x, y - h / 2), (x, y + h / 2)], INK, 2)
+    r.line([(x - w / 2, y), (x + w / 2, y)], INK, 2)
+    r.poly([(x - w / 2 + 5, y - h / 2 + 4), (x - w / 2 + 16, y - h / 2 + 4), (x - w / 2 + 6, y - h / 2 + 18)], "#E6F6FF", None)
+    if flowers:
+        r.rrect(x - w / 2 - 6, y + h / 2 + 2, x + w / 2 + 6, y + h / 2 + 14, 3, "#B5683A", INK, 2)
+        for i, col in enumerate(("#FF6B8B", "#FFD23F", "#FF9A3D", "#FF6B8B")):
+            fxp = x - w / 2 + 4 + i * (w - 8) / 3
+            r.dot(fxp, y + h / 2 - 1, 5.2, col)
+            r.dot(fxp, y + h / 2 - 1, 1.8, "#FFE98A")
+            r.line([(fxp, y + h / 2 + 2), (fxp, y + h / 2 + 8)], "#3E9B3A", 2)
+
+
+# ================================================================================================ cottage
+@prop
+def cottage(c, x, y, k, t, st):
+    r = Rig(c, x, y, k)
+    wall, roof = st.get("wall", "#FFF1D0"), st.get("roof", "#D9654F")
+    openv = st.get("door", 0.0)
+    r.ell(0, 0, 215, 20, mix("#79CE5D", "#2F6B2F", 0.35), None)
+    r.rrect(-165, -176, 165, 0, 8, wall, INK, 3.2)
+    for bx in (-165, -75, 75, 165):                                                   # timber frame
+        r.line([(bx, -176), (bx, 0)], "#8B5A2B", 8)
+    r.line([(-165, -176), (165, -176)], "#8B5A2B", 8)
+    r.line([(-165, -88), (-100, -88)], "#8B5A2B", 6)
+    r.line([(100, -88), (165, -88)], "#8B5A2B", 6)
+    r.rrect(95, -312, 135, -222, 4, "#B5483F", INK, 3)                                  # chimney
+    for yy in (-298, -280, -262, -244):
+        r.line([(95, yy), (135, yy)], "#8E352E", 2)
+    r.rrect(89, -322, 141, -308, 4, "#8E352E", INK, 3)
+    r.poly([(-205, -170), (205, -170), (0, -306)], roof, INK, 3.4)                      # roof
+    for i, yy in enumerate((-186, -204, -222, -240)):
+        span = 205 * (1 - (-170 - yy) / 136.0)
+        for sx in range(int(-span) + 20, int(span) - 10, 36):
+            r.arc(sx + (18 if i % 2 else 0), yy + 14, 18, 16, 20, 160, darker(roof, 0.25), 2.4)
+    door_arch(r, 0, 0, 78, 120, openv=openv)
+    window(r, -118, -108, 52, 48, shutter="#3E8EDE")
+    window(r, 118, -108, 52, 48, shutter="#3E8EDE")
+    r.rrect(-60, -2, 60, 10, 4, "#B8B2A6", INK, 2.4)                                    # door step
+    if st.get("smoke", True):
+        smoke_puffs(c, x + 115 * k, y - 322 * k, t, k)
+    return r
+
+
+# ================================================================================================ the three houses
+_PIECES = {}
+
+
+def _rng_piece(seed):
+    return random.Random(seed)
+
+
+def _pieces_straw():
+    rng = _rng_piece(11)
+    out, n = [], 0
+    cols = ["#F4CF63", "#EBBD48", "#F8DB7C", "#E6B33E"]
+    for row in range(3):
+        for col in range(7):
+            cx, cy = -120 + col * 40, -25 - row * 50
+            polys = [([(-19, -24), (19, -24), (19, 24), (-19, 24)], cols[(row + col) % 4], INK, 2.2)]
+            lines = [([(dx, -22), (dx + rng.uniform(-1, 1), 22)], darker(cols[(row + col) % 4], 0.22), 1.8) for dx in (-11, -3, 5, 13)]
+            lines.append(([(-19, 4), (19, 4)], "#B7742E", 3.0))
+            out.append(dict(cx=cx, cy=cy, polys=polys, lines=lines, s=0.04 + 0.62 * (row * 7 + col) / 21, w=40, h=50))
+    for sgn in (-1, 1):
+        pts = [(0, 18), (sgn * 178, 18), (0, -94)]
+        pts2 = [(sgn * 6, 14), (sgn * 120, 14)]
+        lines = []
+        for i in range(7):
+            f = i / 6.0
+            lines.append(([(sgn * (14 + 150 * f), 14 - 8 * f), (sgn * (4 + 6 * f), -86 + 80 * f * 0.2 - 4)], "#C99A2E", 2.2))
+        out.append(dict(cx=sgn * 0, cy=-168, polys=[(pts, "#EFC95A", INK, 3.0)], lines=lines, s=0.72 if sgn < 0 else 0.8, w=180, h=110, roof=True))
+    out.append(dict(cx=0, cy=-34, polys=[([(-27, 34), (27, 34), (27, -20), (0, -34), (-27, -20)], "#A8682F", INK, 2.6)],
+                    lines=[([(-9, 34), (-9, -26)], "#7A4A1F", 2), ([(9, 34), (9, -26)], "#7A4A1F", 2)], s=0.9, w=54, h=68, door=True))
+    out.append(dict(cx=88, cy=-96, polys=[([(-21, -21), (21, -21), (21, 21), (-21, 21)], "#BFE6FF", INK, 2.6)],
+                    lines=[([(0, -21), (0, 21)], INK, 2), ([(-21, 0), (21, 0)], INK, 2)], s=0.95, w=42, h=42))
+    for i, p in enumerate(out):
+        p["rnd"] = random.Random(100 + i)
+    return out
+
+
+def _pieces_sticks():
+    rng = _rng_piece(12)
+    out = []
+    browns = ["#9B6B3A", "#8B5A2B", "#A8794A", "#7A4A25", "#B08050"]
+    for i in range(14):
+        cx = -130 + i * 20
+        h = 150 + rng.randint(-6, 10)
+        col = browns[i % len(browns)]
+        polys = [([(-9, -h / 2), (9, -h / 2 + 3), (8, h / 2), (-8, h / 2 - 2)], col, INK, 2.2)]
+        lines = [([(-2, -h / 2 + 8), (-1, h / 2 - 8)], darker(col, 0.25), 1.6)]
+        out.append(dict(cx=cx, cy=-h / 2, polys=polys, lines=lines, s=0.03 + 0.5 * i / 14, w=20, h=h))
+    for j, yy in enumerate((-30, -80, -128)):
+        out.append(dict(cx=0, cy=yy, polys=[([(-148, -6), (148, -4), (150, 6), (-148, 8)], "#6F4421", INK, 2.2)], lines=[], s=0.5 + 0.06 * j, w=300, h=14))
+    for sgn in (-1, 1):
+        pts = [(0, 18), (sgn * 178, 18), (0, -94)]
+        lines = []
+        for i in range(8):
+            f = i / 7.0
+            lines.append(([(sgn * (12 + 160 * f), 16 - 6 * f), (sgn * (4 + 30 * f), -88 + 70 * f)], "#6F4421", 5.0))
+        for i in range(5):
+            lines.append(([(sgn * (30 + 24 * i), 8 - 14 * i), (sgn * (4 + 8 * i + 130 - 20 * i), 6 - 14 * i)], "#8B5A2B", 4.0))
+        out.append(dict(cx=0, cy=-168, polys=[(pts, "#B8885A", INK, 3.0)], lines=lines, s=0.72 if sgn < 0 else 0.8, w=180, h=110, roof=True))
+    out.append(dict(cx=0, cy=-34, polys=[([(-27, 34), (27, 34), (27, -22), (-27, -22)], "#8F5E2E", INK, 2.6)],
+                    lines=[([(-9, 34), (-9, -20)], "#5E3A19", 2), ([(9, 34), (9, -20)], "#5E3A19", 2)], s=0.9, w=54, h=68, door=True))
+    out.append(dict(cx=-84, cy=-92, polys=[([(-20, -20), (20, -20), (20, 20), (-20, 20)], "#BFE6FF", INK, 2.6)],
+                    lines=[([(0, -20), (0, 20)], INK, 2), ([(-20, 0), (20, 0)], INK, 2)], s=0.95, w=40, h=40))
+    for i, p in enumerate(out):
+        p["rnd"] = random.Random(200 + i)
+    return out
+
+
+def _draw_pieces(c, x, y, k, st, kind):
+    if kind not in _PIECES:
+        _PIECES[kind] = _pieces_straw() if kind == "straw" else _pieces_sticks()
+    b, col, d = st.get("build", 1.0), st.get("collapse", 0.0), st.get("dir", 1)
+    shake = st.get("shake", 0.0)
+    for p in _PIECES[kind]:
+        q = clamp((b - p["s"]) / 0.14)
+        if q <= 0:
+            continue
+        rnd = p["rnd"]
+        rx = d * (80 + rnd.random() * 380) + rnd.uniform(-30, 30)
+        ry_rest = -rnd.uniform(8, 20)
+        rang = rnd.uniform(-160, 160) * d
+        if p.get("roof"):
+            rang = rnd.uniform(-22, 22) + 8 * d
+        elif p["h"] > 100:
+            rang = rnd.choice((-1, 1)) * rnd.uniform(75, 105)
+        arc = 60 + rnd.random() * 190
+        cd = rnd.random() * 0.35
+        ce = clamp((col - cd) / (1 - cd)) if col > 0 else 0.0
+        px, py, ang = p["cx"], p["cy"], 0.0
+        if q < 1:
+            py -= (1 - ease_out_back(q)) * 150
+        if shake:
+            px += math.sin(shake * 60 + p["cx"]) * 2.4
+        if ce > 0:
+            e = ease(ce)
+            px = lerp(px, p["cx"] + rx, e)
+            py = lerp(py, ry_rest - (p["h"] * 0.12 if not p.get("roof") else 0), ce) - arc * 4 * ce * (1 - ce)
+            ang = rang * e
+            if p.get("roof"):
+                py = lerp(p["cy"], -22, ce) - arc * 4 * ce * (1 - ce)
+        r = Rig(c, x + px * k, y + py * k, k, 1, lean=ang)
+        for pts, fill, line, ow in p["polys"]:
+            r.poly(pts, fill, line, ow)
+        for pts, colr, w in p["lines"]:
+            r.line(pts, colr, w)
+
+
+@prop
+def house(c, x, y, k, t, st):
+    kind = st.get("kind", "straw")
+    b = st.get("build", 1.0)
+    if kind in ("straw", "sticks"):
+        if b > 0.05:
+            c.ellipse(x, y + 4 * k, 190 * k, 16 * k, fill=mix("#79CE5D", "#2F6B2F", 0.32))
+        _draw_pieces(c, x, y, k, st, kind)
+        return
+    # bricks
+    r = Rig(c, x, y, k)
+    sh = st.get("shake", 0.0)
+    if sh:
+        r.x0 += math.sin(sh * 70) * 2.2 * k
+    if b > 0.05:
+        c.ellipse(x, y + 4 * k, 200 * k, 16 * k, fill=mix("#79CE5D", "#2F6B2F", 0.32))
+    wall_top = -170
+    r.rrect(-150, wall_top, 150, 0, 4, "#B5483F", INK, 3.2) if b > 0.98 else None
+    brick_wall(r, -150, 150, 0, wall_top, build=b * 1.12)
+    if b > 0.98:
+        r.rrect(-150, wall_top, 150, 0, 3, None, INK, 3.2)
+    if b > 0.9:                                                                    # chimney
+        r.rrect(84, -310, 124, -214, 3, "#B5483F", INK, 3)
+        for yy in (-296, -278, -260, -242, -224):
+            r.line([(84, yy), (124, yy)], "#8E352E", 2)
+        r.rrect(78, -320, 130, -306, 3, "#8E352E", INK, 3)
+        if b > 0.98 and st.get("smoke", True):
+            smoke_puffs(c, x + 104 * k, y - 322 * k, t, k)
+    if b > 0.86:
+        slide = (1 - ease(clamp((b - 0.86) / 0.12))) * -180
+        r.poly([(-190, -166 + slide), (190, -166 + slide), (0, -300 + slide)], "#5F7BB5", INK, 3.4)
+        for i, yy in enumerate((-182, -200, -218, -236, -254)):
+            span = 190 * (1 - (-166 - yy) / 134.0)
+            for sx in range(int(-span) + 20, int(span) - 10, 32):
+                r.arc(sx + (16 if i % 2 else 0), yy + 13 + slide, 16, 14, 20, 160, "#3E5A94", 2.2)
+    if b > 0.9:
+        door_arch(r, 0, 0, 84, 124, wood="#3F6FB5", openv=st.get("door", 0.0), knob="#FFD21F")
+        window(r, -100, -104, 50, 46, shutter="#FFFFFF", flowers=True)
+        window(r, 100, -104, 50, 46, shutter="#FFFFFF", flowers=True)
+        r.rrect(-64, -2, 64, 10, 4, "#B8B2A6", INK, 2.4)
+        r.rrect(-80, 8, 80, 20, 4, "#C9C3B6", INK, 2.4)
+
+
+# ================================================================================================ furniture
+@prop
+def table(c, x, y, k, t, st):
+    r = Rig(c, x, y, k)
+    r.ell(0, 2, 230, 18, mix("#C98A52", "#5A3A1A", 0.5), None)
+    for sx in (-190, 190):
+        r.poly([(sx - 12, -92), (sx + 12, -92), (sx + 9, 0), (sx - 9, 0)], "#9B5C2E", INK, 2.6)
+    for sx in (-150, 150):
+        r.poly([(sx - 8, -128), (sx + 8, -128), (sx + 6, -96), (sx - 6, -96)], "#7B4723", INK, 2.2)
+    r.poly([(-176, -150), (176, -150), (222, -112), (-222, -112)], "#D9A066", INK, 3)
+    r.rrect(-222, -112, 222, -92, 6, "#B8733A", INK, 3)
+    for i in range(0, 7, 2):                                                              # check cloth
+        r.poly([(-176 + i * 50, -150), (-136 + i * 50, -150), (-142 + i * 55, -112), (-190 + i * 56, -112)], "#FF8FA3", None)
+    sizes = (("big", -118, 50, st.get("bowl1", 1.0), "#FF6B8B"), ("mid", 0, 40, st.get("bowl2", 1.0), "#3E8EDE"), ("small", 108, 30, st.get("bowl3", 1.0), "#FFD21F"))
+    for name, bx, rr, left, colr in sizes:
+        by = -126
+        r.ell(bx, by + 2, rr * 1.12, rr * 0.22, "#B07A44", None)
+        pts = [(bx + rr * math.cos(math.radians(a)), by - 4 + rr * 0.62 * math.sin(math.radians(a))) for a in range(0, 181, 15)]
+        r.poly(pts, colr, INK, 2.6)
+        r.ell(bx, by - 4, rr, rr * 0.25, darker(colr, 0.1), INK, 2.4)
+        if left > 0.02:
+            r.ell(bx, by - 5, rr * 0.86, rr * 0.19, "#FFE9A8", None)
+            r.ell(bx - rr * 0.2, by - 6, rr * 0.25, rr * 0.05, "#FFF8DB", None)
+        else:
+            r.ell(bx, by - 5, rr * 0.86, rr * 0.19, "#D9C8A0", None)
+        if name == "small" and st.get("spoon", False):
+            r.line([(bx + rr * 0.4, by - 8), (bx + rr * 1.2, by - 40)], "#B0B0B8", 4)
+    return r
+
+
+@prop
+def chair(c, x, y, k, t, st):
+    size = {"big": 1.35, "mid": 1.0, "small": 0.7}[st.get("size", "mid")]
+    col = {"big": "#8B4F26", "mid": "#B8733A", "small": "#D9954F"}[st.get("size", "mid")]
+    cushion = {"big": "#3E8EDE", "mid": "#3DB54A", "small": "#FF6B8B"}[st.get("size", "mid")]
+    br = clamp(st.get("broken", 0.0))
+    r = Rig(c, x, y, k * size, 1, lean=br * 28)
+    r.ell(0, 3, 74 + 20 * br, 8, mix("#C98A52", "#5A3A1A", 0.5), None)
+    spread = 1 + br * 0.7
+    for sx in (-52, 52):                                                                    # legs
+        r.poly([(sx * spread - 7, -64 + br * 28), (sx * spread + 7, -64 + br * 28), (sx * spread * 1.15 + 5, 0), (sx * spread * 1.15 - 5, 0)], col, INK, 2.4)
+    r.rrect(-66, -86 + br * 28, 66, -62 + br * 28, 6, col, INK, 2.8)                        # seat
+    r.rrect(-60, -102 + br * 28, 60, -86 + br * 28, 6, cushion, INK, 2.6)
+    back_x = 52 + br * 14
+    for sx in (-back_x, back_x):
+        r.poly([(sx - 6, -102 + br * 28), (sx + 6, -102 + br * 28), (sx + 5 + br * 14, -200 + br * 34), (sx - 5 + br * 14, -200 + br * 34)], col, INK, 2.4)
+    for yy in (-130, -166):
+        r.rrect(-back_x, yy - 8 + br * 30, back_x, yy + 8 + br * 30, 5, col, INK, 2.4)
+    return r
+
+
+@prop
+def bed(c, x, y, k, t, st):
+    size = {"big": 1.35, "mid": 1.0, "small": 0.72}[st.get("size", "mid")]
+    quilt = {"big": "#3E8EDE", "mid": "#3DB54A", "small": "#FF6B8B"}[st.get("size", "mid")]
+    wood = {"big": "#8B4F26", "mid": "#B8733A", "small": "#D9954F"}[st.get("size", "mid")]
+    r = Rig(c, x, y, k * size)
+    r.ell(0, 3, 150, 12, mix("#C98A52", "#5A3A1A", 0.5), None)
+    r.rrect(-136, -128, -112, 0, 6, wood, INK, 2.8)                                           # headboard
+    r.rrect(122, -78, 142, 0, 6, wood, INK, 2.8)
+    r.rrect(-122, -66, 134, -28, 8, "#FFFFFF", INK, 2.8)                                      # mattress
+    r.rrect(-122, -50, 134, -8, 8, quilt, INK, 2.8)
+    for i in range(5):
+        r.line([(-96 + i * 50, -48), (-96 + i * 50, -10)], mix(quilt, "#FFFFFF", 0.4), 3)
+    r.ell(-84, -78, 44, 18, "#FFFFFF", INK, 2.6)                                              # pillow
+    if st.get("girl", 0.0) > 0.5:
+        r.ell(-82, -92, 28, 26, "#FFDDBF", INK, 2.8)
+        for i in range(7):
+            r.ell(-102 + i * 6.5, -108 + abs(i - 3) * 2.4, 9, 9, "#FFC83D", INK, 2)
+        r.ell(-106, -86, 10, 22, "#FFC83D", INK, 2)
+        r.arc(-90, -92, 6, 4, 22, 158, INK, 2.6)
+        r.arc(-72, -92, 6, 4, 22, 158, INK, 2.6)
+        r.dot(-98, -82, 4.4, "#FF9DB0")
+        r.dot(-66, -82, 4.4, "#FF9DB0")
+        r.arc(-82, -82, 6, 4, 20, 160, INK, 2.4)
+        r.rrect(-72, -64, 134, -8, 10, quilt, INK, 2.8)
+        for i in range(5):
+            r.line([(-50 + i * 44, -62), (-50 + i * 44, -10)], mix(quilt, "#FFFFFF", 0.4), 3)
+    return r
+
+
+@prop
+def fireplace(c, x, y, k, t, st):
+    r = Rig(c, x, y, k)
+    r.rrect(-150, -300, 150, 0, 10, "#B8B2A6", INK, 3.4)
+    for row in range(6):
+        for col in range(5):
+            xx = -140 + col * 58 + (29 if row % 2 else 0)
+            r.rrect(xx, -292 + row * 48, xx + 52, -250 + row * 48, 6, "#C9C3B6" if (row + col) % 2 else "#A9A397", INK, 1.6)
+    r.rrect(-96, -190, 96, 0, 4, "#2B1B14", INK, 3)
+    r.poly([(-120, -300), (120, -300), (96, -190), (-96, -190)], "#9B958A", INK, 3)
+    for i, (fx_, h, colr) in enumerate(((-52, 80, "#FF8A3D"), (0, 110, "#FF6B2D"), (52, 76, "#FFB03D"), (-20, 70, "#FFD23F"), (26, 64, "#FFE98A"))):
+        wob = math.sin(t * 9 + i * 2) * 5
+        r.poly([(fx_ - 24, -2), (fx_ + wob - 4, -h - math.sin(t * 7 + i) * 8), (fx_ + 24, -2)], colr, None)
+    r.line([(-110, -176), (110, -176)], "#3A3A3A", 5)
+    pot_y = -112
+    r.line([(0, -176), (0, pot_y - 44)], "#3A3A3A", 4)
+    r.ell(0, pot_y, 62, 52, "#4A4A55", INK, 3)
+    r.ell(0, pot_y - 44, 56, 12, "#2E2E38", INK, 3)
+    r.ell(0, pot_y - 42, 50, 9, "#7CC8FF", None)
+    for i in range(4):                                                                    # bubbles
+        ph = (t * 1.6 + i * 0.27) % 1.0
+        r.ell(-30 + i * 20, pot_y - 42 - ph * 8, 5 * (1 - ph) + 1, 3 * (1 - ph) + 1, "#E6F6FF", None)
+    return r
+
+
+@prop
+def finish_line(c, x, y, k, t, st):
+    r = Rig(c, x, y, k)
+    tape = clamp(st.get("tape", 0.0))
+    for sx in (-250, 250):
+        r.rrect(sx - 9, -330, sx + 9, 0, 4, "#E8E8F0", INK, 3)
+        r.dot(sx, -334, 13, "#FFD21F")
+    r.rrect(-262, -330, 262, -258, 10, "#FFFFFF", INK, 3.4)
+    cols = 16
+    for i in range(cols):
+        for j in range(3):
+            if (i + j) % 2 == 0:
+                r.rrect(-258 + i * 32.25, -326 + j * 22, -258 + (i + 1) * 32.25, -326 + (j + 1) * 22, 0, INK, None)
+    r.rrect(-160, -318, 160, -270, 14, "#FF5C8A", INK, 3)
+    c.text(*r.P(0, -294), "FINISH", 54 * k, "#FFFFFF", stroke=3 * k, stroke_fill=INK)
+    for i in range(8):
+        r.poly([(-250 + i * 62, -258), (-220 + i * 62, -258), (-235 + i * 62, -236)], ["#FF5C8A", "#FFD21F", "#3E8EDE", "#3DB54A"][i % 4], INK, 2)
+    if tape < 0.02:
+        r.line([(-250, -40), (250, -40)], "#FF3D5A", 7)
+        r.line([(-250, -40), (250, -40)], "#FFFFFF", 2.4)
+    else:
+        sag = tape * 90
+        r.line([(-250, -40), (-250 + 90, -40 + sag), (-250 + 150, 0)], "#FF3D5A", 7)
+        r.line([(250, -40), (250 - 90, -40 + sag), (250 - 150, 0)], "#FF3D5A", 7)
+    return r
+
+
+@prop
+def start_line(c, x, y, k, t, st):
+    r = Rig(c, x, y, k)
+    for sx in (-170, 170):
+        r.rrect(sx - 8, -250, sx + 8, 0, 4, "#E8E8F0", INK, 3)
+    r.rrect(-182, -276, 182, -214, 10, "#3DB54A", INK, 3.4)
+    c.text(*r.P(0, -245), "START", 50 * k, "#FFFFFF", stroke=3 * k, stroke_fill=INK)
+    for i in range(7):
+        r.poly([(-168 + i * 56, -214), (-142 + i * 56, -214), (-155 + i * 56, -194)], ["#FF5C8A", "#FFD21F", "#3E8EDE", "#FF9A3D"][i % 4], INK, 2)
+    r.rrect(-200, -4, 200, 6, 3, "#FFFFFF", INK, 2.4)
+    return r
+
+
+@prop
+def bigtree(c, x, y, k, t, st):
+    r = Rig(c, x, y, k)
+    r.ell(0, 4, 190, 20, mix("#79CE5D", "#2F6B2F", 0.4), None)
+    r.poly([(-48, 0), (-34, -150), (-20, -260), (20, -260), (34, -150), (48, 0)], "#8B5A2B", INK, 3.4)
+    for yy in (-60, -140, -210):
+        r.arc(0, yy, 24, 20, 200, 340, "#6E4524", 4)
+    r.ell(-20, -64, 20, 26, "#3A2316", INK, 2.6)
+    for dx, dy, rx, ry in ((-120, -290, 120, 90), (120, -290, 120, 90), (0, -350, 150, 110), (-60, -250, 110, 80), (70, -255, 110, 80)):
+        r.ell(dx, dy, rx, ry, "#2F9A45", INK, 3)
+    for dx, dy, rx, ry in ((-130, -300, 100, 70), (112, -300, 100, 70), (0, -360, 130, 90), (-54, -262, 90, 64), (66, -266, 90, 64)):
+        r.ell(dx, dy, rx, ry, "#46B650", None)
+    r.ell(-70, -380, 50, 22, "#7ED47A", None)
+    return r
+
+
+@prop
+def signpost(c, x, y, k, t, st):
+    r = Rig(c, x, y, k)
+    r.rrect(-6, -170, 6, 0, 2, "#8B5A2B", INK, 2.6)
+    r.poly([(-70, -170), (56, -170), (80, -146), (56, -122), (-70, -122)], "#D9A066", INK, 3)
+    c.text(*r.P(-6, -146), st.get("text", "HOME"), 28 * k, INK)
+    return r
+
+
+@prop
+def bundle(c, x, y, k, t, st):
+    kind = st.get("kind", "straw")
+    r = Rig(c, x, y, k)
+    if kind == "straw":
+        r.ell(0, 2, 70, 9, mix("#79CE5D", "#2F6B2F", 0.35), None)
+        for i, (bx, rot) in enumerate(((-30, -8), (0, 0), (30, 8))):
+            r.rrect(bx - 20, -62, bx + 20, 0, 8, ["#F4CF63", "#EBBD48", "#F8DB7C"][i], INK, 2.6)
+            for dx in (-10, 0, 10):
+                r.line([(bx + dx, -56), (bx + dx, -6)], "#C99A2E", 1.8)
+        r.line([(-44, -30), (44, -30)], "#B7742E", 5)
+    elif kind == "sticks":
+        r.ell(0, 2, 70, 9, mix("#79CE5D", "#2F6B2F", 0.35), None)
+        for i, (a, col) in enumerate(((-18, "#8B5A2B"), (-6, "#A8794A"), (6, "#7A4A25"), (18, "#9B6B3A"), (0, "#B08050"))):
+            r.limb((a * 1.6, -2), (a * 0.4, -92 + i * 4), 9, col)
+        r.line([(-30, -38), (30, -38)], "#B7742E", 5)
+    else:                                                                                   # bricks
+        r.ell(0, 2, 80, 9, mix("#79CE5D", "#2F6B2F", 0.35), None)
+        for row in range(4):
+            for col in range(4 - row % 2):
+                xx = -60 + col * 32 + (16 if row % 2 else 0)
+                r.rrect(xx, -(row + 1) * 20, xx + 30, -row * 20 - 1, 3, ["#D9534F", "#C8453F", "#E0645A"][(row + col) % 3], INK, 2)
+    return r
+
+
+@prop
+def pie(c, x, y, k, t, st):
+    r = Rig(c, x, y, k)
+    r.ell(0, 2, 60, 8, "#B07A44", None)
+    r.ell(0, -14, 56, 22, "#E0A458", INK, 2.8)
+    r.ell(0, -22, 44, 14, "#F2C57C", INK, 2.4)
+    for dx in (-24, 0, 24):
+        r.line([(dx - 8, -26), (dx + 8, -20)], "#C98A3A", 3)
+    for dx, dy in ((-14, -34), (10, -32)):
+        r.dot(dx, dy, 3, "#E2574C")
+    return r
+
+
+@prop
+def rock(c, x, y, k, t, st):
+    r = Rig(c, x, y, k)
+    r.ell(0, 2, 52, 8, mix("#79CE5D", "#2F6B2F", 0.35), None)
+    r.ell(0, -22, 48, 28, "#A9A8B4", INK, 2.8)
+    r.ell(-12, -30, 18, 10, "#C9C8D4", None)
+    return r
+
+
+@prop
+def basket(c, x, y, k, t, st):
+    r = Rig(c, x, y, k)
+    r.arc(0, -36, 36, 36, 180, 360, "#9B5C2E", 6)
+    r.rrect(-42, -40, 42, 0, 10, "#D9A066", INK, 2.8)
+    for i in range(5):
+        r.line([(-34 + i * 17, -36), (-34 + i * 17, -4)], "#B8733A", 2)
+    r.line([(-42, -20), (42, -20)], "#B8733A", 2.4)
+    for i, col in enumerate(st.get("flowers", ("#FF6B8B", "#FFD23F", "#B58CFF"))):
+        r.dot(-20 + i * 20, -48 + (i % 2) * 6, 9, col)
+        r.dot(-20 + i * 20, -48 + (i % 2) * 6, 3.4, "#FFE98A")
+    return r
+
+
+# ================================================================================================ effects
+@fx
+def wind(c, s, x, y, dt, dir=1, power=1.0, dx=0, **_):
+    """Huff-and-puff: wavy white streaks, bits of straw and leaves blowing along."""
+    x = x + dir * dx
+    n = 7
+    for i in range(n):
+        ph = (dt * 1.6 + i * 0.37) % 1.0
+        yy = y + (i - n / 2) * 24 * power + math.sin(dt * 5 + i) * 6
+        x0 = x + dir * ph * 150
+        pts = [(x0 + dir * j * 24, yy + math.sin(j * 0.9 + dt * 9 + i) * 9) for j in range(0, 10)]
+        c.line(pts, "#D6EEFF", 7)
+        c.line(pts, "#FFFFFF", 3.4)
+    for i in range(6):
+        ph = (dt * 0.9 + i * 0.19) % 1.0
+        bx = x + dir * (40 + ph * 520)
+        by = y - 60 + math.sin(ph * 12 + i * 2) * 50 + i * 12
+        c.ellipse(bx, by, 7, 3.2, fill=["#F4CF63", "#7ED47A", "#E8A33A"][i % 3])
+
+
+@fx
+def dust(c, s, x, y, dt, size=1.0, **_):
+    if dt > 0.9:
+        return
+    u = dt / 0.9
+    for i in range(7):
+        a = i * 0.9 + 0.3
+        px = x + math.cos(a) * (14 + 70 * u) * size
+        py = y - 8 - abs(math.sin(a)) * (10 + 38 * u) * size
+        rr = (9 + 22 * u) * (1 - u * 0.6) * size
+        c.ellipse(px, py, rr, rr, fill="#FFF8EA", outline="#D9CBB0", width=2)
+
+
+@fx
+def sparkle(c, s, x, y, dt, r=90, n=7, **_):
+    for i in range(n):
+        ph = (dt * 1.4 + i / n) % 1.0
+        a = i * 2.4
+        px, py = x + math.cos(a) * r * (0.4 + 0.6 * ((i * 37) % 10) / 10), y + math.sin(a) * r * 0.8
+        sz = 14 * math.sin(ph * math.pi)
+        if sz > 1:
+            D.star(c, px, py, sz, "#FFE066")
+            D.star(c, px, py, sz * 0.5, "#FFFFFF")
+
+
+@fx
+def hearts(c, s, x, y, dt, **_):
+    for i in range(4):
+        ph = (dt * 0.7 + i * 0.25) % 1.0
+        D.heart(c, x + math.sin(i * 2.1 + ph * 4) * 36, y - ph * 110, 10 + 8 * math.sin(ph * math.pi), "#FF5C8A")
+
+
+@fx
+def zzz(c, s, x, y, dt, **_):
+    for i in range(3):
+        ph = (dt * 0.5 + i / 3) % 1.0
+        c.text(x + ph * 46 + i * 6, y - ph * 90, "Z", (20 + 22 * ph) * 1.0, "#6B7BFF", stroke=3, stroke_fill="#FFFFFF")
+
+
+@fx
+def steam(c, s, x, y, dt, **_):
+    for i in range(3):
+        ph = (dt * 0.55 + i / 3) % 1.0
+        c.ellipse(x + math.sin(ph * 7 + i) * 8, y - ph * 70, 7 + 10 * ph, 7 + 10 * ph, fill=mix("#FFFFFF", "#DCE8F4", ph), outline="#E6EEF6", width=1.5)
+
+
+@fx
+def sweat(c, s, x, y, dt, **_):
+    for i, (dx, dy) in enumerate(((-52, -18), (54, -26), (-40, -50))):
+        ph = (dt * 1.2 + i * 0.33) % 1.0
+        if ph < 0.7:
+            px, py = x + dx, y + dy + ph * 38
+            c.poly([(px, py - 15), (px - 7, py + 2), (px, py + 8), (px + 7, py + 2)], fill="#8FD3FF", outline="#3E8EDE", width=1.6)
+
+
+@fx
+def dizzy(c, s, x, y, dt, **_):
+    for i in range(3):
+        a = dt * 4 + i * 2.1
+        D.star(c, x + math.cos(a) * 62, y + math.sin(a) * 14, 12, "#FFD21F")
+
+
+@fx
+def notes(c, s, x, y, dt, **_):
+    for i in range(3):
+        ph = (dt * 0.6 + i / 3) % 1.0
+        px, py = x + math.sin(i * 2 + ph * 5) * 26 + i * 20, y - ph * 100
+        c.text(px, py, "♪", 34, ["#FF5C8A", "#3E8EDE", "#3DB54A"][i], stroke=2, stroke_fill="#FFFFFF")
+
+
+@fx
+def splash(c, s, x, y, dt, **_):
+    if dt > 1.0:
+        return
+    u = dt
+    for i in range(9):
+        a = math.radians(200 + i * 17)
+        px = x + math.cos(a) * 120 * u
+        py = y + math.sin(a) * 170 * u + 260 * u * u
+        rr = 9 * (1 - u * 0.5)
+        c.ellipse(px, py, rr, rr * 1.3, fill="#8FD3FF", outline="#3E8EDE", width=2)
+    c.ellipse(x, y + 30, 56 + 60 * u, 12 + 10 * u, fill="#BFE6FF", outline="#3E8EDE", width=2) if u < 0.7 else None
+
+
+@fx
+def speed(c, s, x, y, dt, dir=1, **_):
+    for i in range(5):
+        ph = (dt * 3 + i * 0.21) % 1.0
+        yy = y - 120 + i * 40
+        x0 = x - dir * (40 + ph * 40 + i * 6)
+        c.line([(x0, yy), (x0 - dir * (50 + 30 * ph), yy)], "#FFFFFF", 5)
+
+
+@fx
+def burst(c, s, x, y, dt, text="CRASH!", color="#FF5C3A", size=1.0, **_):
+    u = clamp(dt / 0.25)
+    sc = ease_out_back(u) * (1.0 + 0.04 * math.sin(dt * 18)) * size
+    if dt > 1.5:
+        sc *= clamp(1 - (dt - 1.5) / 0.25)
+    if sc <= 0.02:
+        return
+    pts = []
+    for i in range(28):
+        rr = (96 if i % 2 == 0 else 62) * sc
+        a = math.pi * 2 * i / 28 + 0.1
+        pts.append((x + math.cos(a) * rr * 1.5, y + math.sin(a) * rr))
+    c.poly(pts, fill="#FFE066", outline=INK, width=4)
+    pts2 = [(x + (px - x) * 0.82, y + (py - y) * 0.82) for px, py in pts]
+    c.poly(pts2, fill=color)
+    c.text(x, y, text, 48 * sc, "#FFFFFF", stroke=5 * sc, stroke_fill=INK)
+
+
+@fx
+def mark(c, s, x, y, dt, text="?", color="#FF5C3A", **_):
+    u = clamp(dt / 0.25)
+    sc = ease_out_back(u)
+    if sc <= 0.02:
+        return
+    c.ellipse(x, y, 30 * sc, 30 * sc, fill="#FFFFFF", outline=INK, width=3)
+    c.text(x, y + 2, text, 46 * sc, color, stroke=0)
+
+
+@fx
+def confetti(c, s, x, y, dt, **_):
+    rng = random.Random(5)
+    for i in range(70):
+        sx = rng.uniform(0, 1280)
+        vy = rng.uniform(90, 200)
+        py = -30 + ((dt * vy + rng.uniform(0, 700)) % 800)
+        px = sx + math.sin(dt * 3 + i) * 24
+        ang = dt * rng.uniform(2, 6) + i
+        w, h = 14, 8
+        pts = [(px + math.cos(ang) * w - math.sin(ang) * h, py + math.sin(ang) * w + math.cos(ang) * h),
+               (px - math.cos(ang) * w - math.sin(ang) * h, py - math.sin(ang) * w + math.cos(ang) * h),
+               (px - math.cos(ang) * w + math.sin(ang) * h, py - math.sin(ang) * w - math.cos(ang) * h),
+               (px + math.cos(ang) * w + math.sin(ang) * h, py + math.sin(ang) * w - math.cos(ang) * h)]
+        s.poly(pts, fill=["#FF5C8A", "#FFD21F", "#3E8EDE", "#3DB54A", "#B58CFF", "#FF9A3D"][i % 6])
+
+
+@fx
+def leaves(c, s, x, y, dt, **_):
+    rng = random.Random(8)
+    for i in range(10):
+        sx = rng.uniform(0, 1280)
+        vy = rng.uniform(40, 80)
+        py = -20 + ((dt * vy + rng.uniform(0, 700)) % 760)
+        px = sx + math.sin(dt * 1.6 + i) * 40
+        s.ellipse(px, py, 11, 5, fill=["#E8A33A", "#D9783A", "#7ED47A"][i % 3])
+
+
+@fx
+def glow(c, s, x, y, dt, r=60, color="#FFF3A8", **_):
+    p = 1.0 + 0.08 * math.sin(dt * 5)
+    for i, a in enumerate((1.8, 1.4, 1.0)):
+        c.ellipse(x, y, r * a * p, r * a * p, fill=mix("#FFFFFF", color, 0.25 + 0.3 * i))
+
+
+# ---- full-screen cards (drawn on the screen canvas `s`, not in the world)
+def _fit_text(s, x, y, text, size, fill, max_w, stroke=0, stroke_fill=None):
+    return s.text_fit(x, y, text, size, fill, max_w, stroke=stroke, stroke_fill=stroke_fill)
+
+
+@fx
+def title(c, s, x, y, dt, lines=("THE STORY",), sub="Story Time with Bibi Buzz TV", top=88, size=124, gap=132, pill=38, still=False, **_):
+    """The poster title of a tale. top = centre of the pill, size / gap = height and spacing of the lines; still = no animation (covers)."""
+    u = 1.0 if still else ease_out_back(clamp(dt / 0.8))
+    if u <= 0.02:
+        return
+    top = top - (1 - u) * 260
+    ph = pill * 1.0
+    s.rrect(220, top - ph - 2, 1060, top + ph - 2, 30, fill="#FF5C8A", outline=D.INK, width=5)
+    s.text(640, top, sub.upper(), 38 if pill >= 38 else 30, "#FFFFFF", stroke=0)
+    cols = ["#FFD21F", "#FFFFFF", "#9BE8FF"]
+    base = top + (70 if pill >= 38 else 52)
+    for i, line in enumerate(lines):
+        yy = base + size * 0.53 + i * gap
+        sc = 1.0 if still else 0.96 + 0.03 * math.sin(dt * 3 + i)
+        _fit_text(s, 640, yy + 6 * sc, line, size * sc, D.INK, 1120, stroke=size * 0.113, stroke_fill=D.INK)
+        _fit_text(s, 640, yy, line, size * sc, cols[i % 3], 1120, stroke=size * 0.073, stroke_fill=D.INK)
+
+
+@fx
+def the_end(c, s, x, y, dt, text="The End", sub="", **_):
+    u = ease_out_back(clamp(dt / 0.8))
+    if u <= 0.02:
+        return
+    s.text(640, 250, text, 170 * u, D.INK, stroke=16, stroke_fill=D.INK)
+    s.text(640, 244, text, 170 * u, "#FFD21F", stroke=11, stroke_fill=D.INK)
+    for i in range(7):
+        a = i * 0.9 + dt * 0.8
+        D.star(s, 640 + math.cos(a) * 420, 250 + math.sin(a * 1.3) * 90, 18 + 6 * math.sin(dt * 4 + i), ["#FFD21F", "#FF5C8A", "#9BE8FF"][i % 3])
+    if sub:
+        s.rrect(190, 372, 1090, 452, 38, fill="#FFFFFF", outline=D.INK, width=5)
+        _fit_text(s, 640, 412, sub, 44, D.INK, 840)
+
+
+@fx
+def caption(c, s, x, y, dt, text="", color="#FFFFFF", **_):
+    u = clamp(dt / 0.35)
+    if u <= 0.02:
+        return
+    size = 46
+    w = min(1180, s.text_width(text, size) + 90)
+    yy = 650 + (1 - ease(u)) * 90
+    s.rrect(640 - w / 2 + 4, yy - 38 + 6, 640 + w / 2 + 4, yy + 38 + 6, 36, fill="#00000030")
+    s.rrect(640 - w / 2, yy - 38, 640 + w / 2, yy + 38, 36, fill="#FFF3A8", outline=D.INK, width=4.5)
+    _fit_text(s, 640, yy + 2, text, size, D.INK, w - 70)

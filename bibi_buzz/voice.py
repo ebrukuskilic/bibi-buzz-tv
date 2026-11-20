@@ -135,3 +135,85 @@ def synth_all(texts, ffmpeg, cache_dir, voice=VOICE):
             except Exception as e2:
                 sys.exit(f"[voice] no text-to-speech engine worked ({e2!r}). Check the internet connection.")
     return {t: _read_wav(os.path.join(cache_dir, _key(t, voice) + ".wav")) for t in texts}
+
+
+# ---------------------------------------------------------------------------------------------------------- stories
+# Fairy-tale videos use several voices (narrator + one per character): items are (text, voice, rate, pitch).
+def _key2(item):
+    text, voice, rate, pitch = item
+    return hashlib.sha1(f"v2|{voice}|{rate}|{pitch}|{text}".encode()).hexdigest()[:20]
+
+
+def _gen_edge2(todo, cache_dir):
+    import edge_tts
+
+    async def one(sem, item):
+        text, voice, rate, pitch = item
+        mp3 = os.path.join(cache_dir, _key2(item) + ".mp3")
+        async with sem:
+            for attempt in range(5):
+                v = voice if attempt < 3 else VOICE            # a voice that is not available -> the default voice
+                try:
+                    await asyncio.wait_for(edge_tts.Communicate(text, v, rate=rate, pitch=pitch).save(mp3), 60)
+                    if os.path.getsize(mp3) > 800:
+                        return
+                except Exception:
+                    pass
+                await asyncio.sleep(1.5 * (attempt + 1))
+            raise RuntimeError("text-to-speech failed for: " + text)
+
+    async def run():
+        sem = asyncio.Semaphore(4)
+        await asyncio.gather(*(one(sem, it) for it in todo))
+
+    asyncio.run(run())
+
+
+def _convert2(ffmpeg, cache_dir, item):
+    base = os.path.join(cache_dir, _key2(item))
+    raw = base + ".raw.wav"
+    subprocess.run([ffmpeg, "-y", "-loglevel", "error", "-i", base + ".mp3", "-ar", str(SR), "-ac", "1", raw], check=True)
+    y = trim(_read_wav(raw))
+    peak = float(np.max(np.abs(y))) if len(y) else 1.0
+    if peak > 1e-4:
+        y = y * (0.9 / peak)
+    _write_wav(base + ".wav", y)
+    os.remove(raw)
+
+
+def synth_items(items, ffmpeg, cache_dir):
+    """Returns {item: float array (mono, 44.1 kHz)} for every (text, voice, rate, pitch) of ONE story video."""
+    items = sorted({it for it in items if it[0]})
+    os.makedirs(cache_dir, exist_ok=True)
+    todo = [it for it in items if not os.path.exists(os.path.join(cache_dir, _key2(it) + ".wav"))]
+    remap = {}
+    if todo:
+        try:
+            _gen_edge2(todo, cache_dir)
+            for it in todo:
+                _convert2(ffmpeg, cache_dir, it)
+        except Exception as e:
+            print(f"[voice] edge-tts failed ({e!r}); falling back to gTTS (one voice) for this video", flush=True)
+            for it in todo:
+                alt = (it[0], "gtts-en-us", "", "")
+                remap[it] = alt
+            alt_todo = [a for a in set(remap.values()) if not os.path.exists(os.path.join(cache_dir, _key2(a) + ".wav"))]
+            try:
+                from gtts import gTTS
+                for a in alt_todo:
+                    mp3 = os.path.join(cache_dir, _key2(a) + ".mp3")
+                    for attempt in range(4):
+                        try:
+                            gTTS(a[0], lang="en", tld="us").save(mp3)
+                            if os.path.getsize(mp3) > 800:
+                                break
+                        except Exception:
+                            pass
+                        import time
+                        time.sleep(1.5 * (attempt + 1))
+                    else:
+                        raise RuntimeError("gTTS failed for: " + a[0])
+                    _convert2(ffmpeg, cache_dir, a)
+            except Exception as e2:
+                sys.exit(f"[voice] no text-to-speech engine worked ({e2!r}). Check the internet connection.")
+    return {it: _read_wav(os.path.join(cache_dir, _key2(remap.get(it, it)) + ".wav")) for it in items}

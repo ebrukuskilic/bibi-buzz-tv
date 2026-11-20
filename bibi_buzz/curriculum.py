@@ -32,6 +32,17 @@ QUEUES = [
 ]
 
 
+# One fairy tale per day replaces the 5th long lesson (the channel can only upload ~10 videos per day), one day after the other.
+# The 5th lesson queue simply waits during those days and carries on afterwards. Append a key of tales.TALES to add more tales.
+TALE_QUEUE = ["three-little-pigs", "tortoise-and-hare", "goldilocks"]
+TALE_FIRST_DAY = 2
+
+
+def tale_key(day):
+    i = day - TALE_FIRST_DAY
+    return TALE_QUEUE[i] if 0 <= i < len(TALE_QUEUE) else None
+
+
 def day_number(date):
     return (date - START_DATE).days + 1
 
@@ -118,8 +129,18 @@ def build_short(slot, id, day, seed):
 
 def _raw_plan(day):
     out = []
+    tale = tale_key(day)
     for q, queue in enumerate(QUEUES):
-        idx = day - 1
+        if q == len(QUEUES) - 1:
+            if tale:                                            # today's 5th long video is a fairy tale
+                from . import tales as TL
+                t = TL.TALES[tale]()
+                t.id = f"d{day:03d}-T1"
+                out.append(t)
+                continue
+            idx = day - 1 - sum(1 for d in range(1, day) if tale_key(d))     # the lesson queue waited during the tale days
+        else:
+            idx = day - 1
         spec = queue[idx % len(queue)]
         out.append(build_long(spec, f"d{day:03d}-L{q + 1}", day * 100 + q, idx // len(queue)))
     for slot in range(5):
@@ -166,15 +187,21 @@ def plan(day):
 def metadata(lesson, chapters_text=""):
     """Title / description / tags exactly as they will be typed into YouTube Studio."""
     short = lesson.fmt == "short"
+    tale = getattr(lesson, "kind", "") == "tale"
     lines = [lesson.blurb, ""]
     if lesson.items and len(lesson.items) <= 30:
         lines.append("In this video: " + ", ".join(lesson.items) + ".")
         lines.append("")
     if chapters_text and not short:
         lines += ["Chapters", chapters_text, ""]
-    lines += ["New learning videos for toddlers and preschoolers on Bibi Buzz TV!",
-              "Narrated with a text-to-speech voice. Emoji artwork: Google Noto Emoji (Apache License 2.0).", ""]
-    tags_line = "#kidslearning #learnenglish #preschool #toddlers #BibiBuzzTV" + (" #Shorts" if short else "")
+    if tale:
+        lines += ["New fairy tales and learning videos for toddlers and preschoolers on Bibi Buzz TV!",
+                  "Narrated with text-to-speech voices. All the artwork and music were made for Bibi Buzz TV.", ""]
+    else:
+        lines += ["New learning videos for toddlers and preschoolers on Bibi Buzz TV!",
+                  "Narrated with a text-to-speech voice. Emoji artwork: Google Noto Emoji (Apache License 2.0).", ""]
+    tags_line = ("#fairytales #storiesforkids #kidsstories #bedtimestories #BibiBuzzTV" if tale
+                 else "#kidslearning #learnenglish #preschool #toddlers #BibiBuzzTV") + (" #Shorts" if short else "")
     lines.append(tags_line)
     desc = "\n".join(lines).replace("<", "").replace(">", "")
     seen, tags, total = set(), [], 0

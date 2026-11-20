@@ -144,6 +144,11 @@ def _key2(item):
     return hashlib.sha1(f"v2|{voice}|{rate}|{pitch}|{text}".encode()).hexdigest()[:20]
 
 
+def _fallback_voice(voice):
+    """The voice to use when `voice` does not work: another voice of the same language."""
+    return "tr-TR-EmelNeural" if voice.startswith("tr-") else VOICE
+
+
 def _gen_edge2(todo, cache_dir):
     import edge_tts
 
@@ -152,7 +157,7 @@ def _gen_edge2(todo, cache_dir):
         mp3 = os.path.join(cache_dir, _key2(item) + ".mp3")
         async with sem:
             for attempt in range(5):
-                v = voice if attempt < 3 else VOICE            # a voice that is not available -> the default voice
+                v = voice if attempt < 3 else _fallback_voice(voice)     # a voice that is not available -> the language's default voice
                 try:
                     await asyncio.wait_for(edge_tts.Communicate(text, v, rate=rate, pitch=pitch).save(mp3), 60)
                     if os.path.getsize(mp3) > 800:
@@ -195,7 +200,7 @@ def synth_items(items, ffmpeg, cache_dir):
         except Exception as e:
             print(f"[voice] edge-tts failed ({e!r}); falling back to gTTS (one voice) for this video", flush=True)
             for it in todo:
-                alt = (it[0], "gtts-en-us", "", "")
+                alt = (it[0], "gtts-tr" if it[1].startswith("tr-") else "gtts-en-us", "", "")
                 remap[it] = alt
             alt_todo = [a for a in set(remap.values()) if not os.path.exists(os.path.join(cache_dir, _key2(a) + ".wav"))]
             try:
@@ -204,7 +209,10 @@ def synth_items(items, ffmpeg, cache_dir):
                     mp3 = os.path.join(cache_dir, _key2(a) + ".mp3")
                     for attempt in range(4):
                         try:
-                            gTTS(a[0], lang="en", tld="us").save(mp3)
+                            if a[1] == "gtts-tr":
+                                gTTS(a[0], lang="tr").save(mp3)
+                            else:
+                                gTTS(a[0], lang="en", tld="us").save(mp3)
                             if os.path.getsize(mp3) > 800:
                                 break
                         except Exception:

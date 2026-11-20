@@ -6,6 +6,8 @@
 Writes <out>/<key>-<lang>-cover.jpg, <key>-<lang>-sheet.png (two frames of every scene), <key>-<lang>.txt (the lines with their voice
 and duration, the chapters, the metadata) and a short clip <key>-<lang>-clip.mp4 with real voices (the first --seconds seconds).
 It uses the real text-to-speech voices, so it also shows whether a voice of the language works on the machine.
+With --tail 22 it also writes <key>-<lang>-tail.mp4: the last 22 seconds (the end and the "Like / Subscribe" card, to check that the
+pointer clicks on the words).
 """
 import argparse
 import json
@@ -26,6 +28,7 @@ def main():
     ap.add_argument("lang", choices=["en", "tr"])
     ap.add_argument("--out", default="out/test")
     ap.add_argument("--seconds", type=float, default=40.0, help="length of the clip with real voices (0 = no clip)")
+    ap.add_argument("--tail", type=float, default=0.0, help="also render the LAST n seconds (the end card) with real voices (0 = no)")
     ap.add_argument("--cache", default=os.path.join("out", "tts-cache"))
     a = ap.parse_args()
 
@@ -61,6 +64,9 @@ def main():
     if a.seconds > 0:
         info = SY.render(t, base + "-clip.mp4", ffmpeg, a.cache, t_range=(0.0, a.seconds), quiet=True)
         print("clip:", info["file"], "(first %.0f s, with the real voices) rendered in %ss" % (a.seconds, info["seconds_to_render"]), flush=True)
+    if a.tail > 0:
+        info = SY.render(t, base + "-tail.mp4", ffmpeg, a.cache, t_range=(max(0.0, t.duration - a.tail), t.duration), quiet=True)
+        print("tail clip:", info["file"], "(the last %.0f s, with the real voices) rendered in %ss" % (a.tail, info["seconds_to_render"]), flush=True)
 
 
 if __name__ == "__main__":

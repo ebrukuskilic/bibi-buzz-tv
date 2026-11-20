@@ -84,6 +84,11 @@ SFX_TAGS = {"reveal": "pop", "count": "count", "item": "pop", "letter": "pop", "
             "celebrate": "sparkle", "total": "sparkle", "result": "sparkle", "a": "pop", "b": "pop", "bubble": "pop"}
 
 
+def cta_times(lesson):
+    """When (seconds after the 'Like and subscribe' card starts) the pointer presses Like and then Subscribe: on beats of the music."""
+    return 1.5 * lesson.beat, 3.0 * lesson.beat
+
+
 def sfx_events(lesson):
     """[(time, kind, arg)] synchronised with the pictures: sounds sit exactly on the cue (= beat) times."""
     ev = []
@@ -92,6 +97,10 @@ def sfx_events(lesson):
             ev += [(0.0, "sparkle", 0), (lesson.beat * 2, "pop", 0)]
         if seg.kind == "outro":
             ev.append((seg.t0, "sparkle", 0))
+        if seg.kind == "cta":
+            t_like, t_sub = cta_times(lesson)
+            ev += [(seg.t0, "pop", 0), (seg.t0 + 0.25, "pop", 0), (seg.t0 + t_like, "ding", 3), (seg.t0 + t_like, "pop", 0),
+                   (seg.t0 + t_sub, "ding", 5), (seg.t0 + t_sub, "pop", 0), (seg.t0 + t_sub + 0.1, "sparkle", 0)]
         for c in seg.cues:
             kind = SFX_TAGS.get(c.tag)
             if kind == "count":

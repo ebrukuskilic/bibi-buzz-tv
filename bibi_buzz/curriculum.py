@@ -43,6 +43,17 @@ def tale_key(day):
     return TALE_QUEUE[i] if 0 <= i < len(TALE_QUEUE) else None
 
 
+# Every tale also gets a Turkish version (same pictures, Turkish voices, texts, title and description) ONE DAY AFTER its English
+# premiere: the id dNNN-T2. Long videos per day: 4 lessons + the English tale + the Turkish tale; the channel can only upload
+# ~10 videos per 24 hours, so a day with a Turkish tale has one Short fewer (see _raw_plan).
+def tr_tale_key(day):
+    return tale_key(day - 1)
+
+
+DAILY_UPLOADS = 10
+SUBSCRIBE_URL = "https://www.youtube.com/channel/UCfiz1ZdIyjFtTYkzFOUqqWQ?sub_confirmation=1"      # opens the channel with the "Subscribe?" question
+
+
 def day_number(date):
     return (date - START_DATE).days + 1
 
@@ -134,7 +145,7 @@ def _raw_plan(day):
         if q == len(QUEUES) - 1:
             if tale:                                            # today's 5th long video is a fairy tale
                 from . import tales as TL
-                t = TL.TALES[tale]()
+                t = TL.build(tale, "en")
                 t.id = f"d{day:03d}-T1"
                 out.append(t)
                 continue
@@ -143,7 +154,13 @@ def _raw_plan(day):
             idx = day - 1
         spec = queue[idx % len(queue)]
         out.append(build_long(spec, f"d{day:03d}-L{q + 1}", day * 100 + q, idx // len(queue)))
-    for slot in range(5):
+    tr = tr_tale_key(day)
+    if tr:                                                      # the Turkish version of yesterday's tale
+        from . import tales as TL
+        t = TL.build(tr, "tr")
+        t.id = f"d{day:03d}-T2"
+        out.append(t)
+    for slot in range(DAILY_UPLOADS - len(out)):                # the rest of the day's 10 uploads are Shorts (5, or 4 with a Turkish tale)
         out.append(build_short(slot, f"d{day:03d}-S{slot + 1}", day, day * 100 + 50 + slot))
     return out
 
@@ -188,19 +205,26 @@ def metadata(lesson, chapters_text=""):
     """Title / description / tags exactly as they will be typed into YouTube Studio."""
     short = lesson.fmt == "short"
     tale = getattr(lesson, "kind", "") == "tale"
+    turkish = getattr(lesson, "lang", "en") == "tr"
+    if turkish:
+        from . import tales_tr as TT
     lines = [lesson.blurb, ""]
+    # YouTube switches the subscribe watermark and the end screens off for videos made for kids: a link in the description does the job
+    lines += [("Abone ol: " if turkish else "Subscribe to Bibi Buzz TV: ") + SUBSCRIBE_URL, ""]
     if lesson.items and len(lesson.items) <= 30:
         lines.append("In this video: " + ", ".join(lesson.items) + ".")
         lines.append("")
     if chapters_text and not short:
-        lines += ["Chapters", chapters_text, ""]
-    if tale:
+        lines += [TT.CHAPTERS if turkish else "Chapters", chapters_text, ""]
+    if turkish:
+        lines += TT.FOOTER + [""]
+    elif tale:
         lines += ["New fairy tales and learning videos for toddlers and preschoolers on Bibi Buzz TV!",
                   "Narrated with text-to-speech voices. All the artwork and music were made for Bibi Buzz TV.", ""]
     else:
         lines += ["New learning videos for toddlers and preschoolers on Bibi Buzz TV!",
                   "Narrated with a text-to-speech voice. Emoji artwork: Google Noto Emoji (Apache License 2.0).", ""]
-    tags_line = ("#fairytales #storiesforkids #kidsstories #bedtimestories #BibiBuzzTV" if tale
+    tags_line = (TT.HASHTAGS if turkish else "#fairytales #storiesforkids #kidsstories #bedtimestories #BibiBuzzTV" if tale
                  else "#kidslearning #learnenglish #preschool #toddlers #BibiBuzzTV") + (" #Shorts" if short else "")
     lines.append(tags_line)
     desc = "\n".join(lines).replace("<", "").replace(">", "")

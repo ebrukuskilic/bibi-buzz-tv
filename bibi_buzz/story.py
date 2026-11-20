@@ -198,7 +198,8 @@ AUTO_SFX = {"wind": "wind", "burst": "boom", "splash": "splash", "confetti": "ch
 
 class Scene:
     def __init__(self, tale, name, bg, world=1280, mood="happy", title=None, drift=0.03, clouds=True):
-        self.tale, self.name, self.bg, self.world, self.mood, self.title = tale, name, bg, world, mood, title
+        self.tale, self.name, self.bg, self.world, self.mood = tale, name, bg, world, mood
+        self.title = tale.T(title) if title else title                   # the chapter name, in the tale's language
         self.drift, self.clouds = drift, clouds
         self.actors, self.props, self.beats = {}, {}, []
         self.cams = []
@@ -219,11 +220,11 @@ class Scene:
         return self
 
     def nar(self, text, *acts, lead=0.25, tail=0.45, dur=0.0):
-        self.beats.append(Beat("nar", None, text, acts, lead, tail, dur))
+        self.beats.append(Beat("nar", None, self.tale.T(text), acts, lead, tail, dur))
         return self
 
     def say(self, who, text, *acts, lead=0.2, tail=0.4, dur=0.0):
-        self.beats.append(Beat("say", who, text, acts, lead, tail, dur))
+        self.beats.append(Beat("say", who, self.tale.T(text), acts, lead, tail, dur))
         return self
 
     def wait(self, dur, *acts):
@@ -332,7 +333,7 @@ class Scene:
         elif verb == "fx":
             kind, x, y = a[0], a[1], a[2]
             dur = o.get("dur", a[3] if len(a) > 3 and not isinstance(a[3], dict) else 2.0)
-            kw = {k: v for k, v in o.items() if k not in ("at", "dur")}
+            kw = self.tale.fx_args(kind, {k: v for k, v in o.items() if k not in ("at", "dur")})
             self.fxs.append(dict(t0=ta, t1=ta + dur, kind=kind, x=x, y=y, kw=kw))
             sfx = o.get("sfx", AUTO_SFX.get(kind))
             if sfx and o.get("sfx", True) is not False:
@@ -377,11 +378,37 @@ class Tale:
     segs = ()
     items = ()
 
-    def __init__(self, id, title, blurb, tags, voices, cover=None):
+    def __init__(self, id, title, blurb, tags, voices, cover=None, lang="en"):
         self.id, self.title, self.blurb, self.tags, self.voices = id, title, blurb, list(tags), voices
         self.cover = cover
+        self.lang = lang                    # "en" or "tr": the scripts are written in English, tales_tr.py has the Turkish lines
         self.scenes = []
         self.duration = 0.0
+
+    # ---- language
+    def T(self, text):
+        """`text` (an English line of a script) in this tale's language. A line without a Turkish translation is an error,
+        so a half translated video can never be rendered."""
+        if self.lang == "en" or not text:
+            return text
+        from . import tales_tr
+        return tales_tr.lookup(text)
+
+    def fx_args(self, kind, kw):
+        """Translates the words that a screen effect writes (title card, caption, 'The End' card, burst, mark)."""
+        if self.lang == "en":
+            return kw
+        kw = dict(kw)
+        if kind == "title":
+            kw["lines"] = tuple(self.T(l) for l in kw.get("lines", ("THE STORY",)))
+            kw["sub"] = self.T(kw.get("sub", "Story Time with Bibi Buzz TV"))
+        elif kind == "the_end":
+            kw["text"] = self.T(kw.get("text", "The End"))
+            if kw.get("sub"):
+                kw["sub"] = self.T(kw["sub"])
+        elif kind in ("caption", "burst", "mark") and kw.get("text"):
+            kw["text"] = self.T(kw["text"])
+        return kw
 
     def scene(self, name, bg, **kw):
         sc = Scene(self, name, bg, **kw)
@@ -435,7 +462,7 @@ def chapters(tale, min_len=10.5):
     """[(start_seconds, label)]. YouTube only shows chapters when every one lasts >= 10 s, so a short scene is folded into its neighbour."""
     ch = list(tale.chapters_list)
     if not ch or ch[0][0] > 0.01:
-        ch.insert(0, (0.0, "Intro"))
+        ch.insert(0, (0.0, tale.T("Intro")))
     out = []
     for i, (t, label) in enumerate(ch):
         end = ch[i + 1][0] if i + 1 < len(ch) else tale.duration
@@ -572,6 +599,7 @@ def _fx_pos(scene, f, ts):
 
 
 def draw_scene(tale, si, ts, scale_out=1.0):
+    D.set_language(getattr(tale, "lang", "en"))                 # the font of the tale's language (also in every worker process)
     scene = tale.scenes[si]
     ss = D.SS
     far, near, wf = B.backdrop(scene.bg, scene.world)
@@ -767,7 +795,7 @@ def make_cover(tale, path):
     """Designed thumbnail of a tale (1280x720 JPEG): the story's backdrop, its stars drawn big, and the poster title.
     `tale.cover` = dict(bg, title=(line1, line2), actors=[(id, kind, x, y, k, face, pose, style)], props=[(id, kind, x, y, k, state)])."""
     sp = tale.cover
-    ct = Tale(tale.id + "-cover", tale.title, "", [], {"nar": ("", "", "")})
+    ct = Tale(tale.id + "-cover", tale.title, "", [], {"nar": ("", "", "")}, lang=getattr(tale, "lang", "en"))
     sc = ct.scene("cover", sp["bg"], mood="happy", drift=0.0, clouds=True)
     for (pid, ptype, x, y, k, st) in sp.get("props", ()):
         sc.prop(pid, ptype, x, y, k, **st)

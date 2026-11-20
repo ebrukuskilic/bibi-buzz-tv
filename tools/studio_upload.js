@@ -14,13 +14,16 @@
 //                         on the Videos list of the content page. For each long video of those days that is already in Studio it
 //                         opens the edit page (inside Studio, no page load), uploads <id>.jpg as the custom thumbnail if the video
 //                         has none yet (force: even if it has one), saves, and goes back to the list. Safe to run again any time.
+//                         Without the "Gelişmiş özellikler" tier Studio throttles custom thumbnails: when it asks for its one-time
+//                         verification the dialog is cancelled ("İptal", never "İleri"), the pass ends (status().thumbLimit = true)
+//                         and running it again a few minutes (or the next day) later goes on where it stopped.
 //   __bibi.status()                                                                              // poll this
 //   __bibi.scrape()                                                                              // titles already in Studio (Videos + Shorts tabs)
 //   __bibi.stop = true                                                                           // stop after the current step
 (() => {
   const BASE = 'https://raw.githubusercontent.com/ebrukuskilic/bibi-buzz-tv/media/';
   if (window.__bibi && window.__bibi.running) return 'already running';
-  const S = window.__bibi = { v: 3, running: false, stop: false, phase: 'idle', current: null, limit: false, log: [], done: [], failed: [], published: {}, thumbDone: {} };
+  const S = window.__bibi = { v: 3, running: false, stop: false, phase: 'idle', current: null, limit: false, log: [], done: [], failed: [], published: {}, thumbDone: {}, thumbLimit: false };
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const txt = e => ((e && (e.innerText || e.textContent)) || '').replace(/\s+/g, ' ').trim();
@@ -251,7 +254,7 @@
     await until(() => rowsNow().length, 20000, 'video list (start on the Videos list of the Studio content page)');
     await sleep(800);
   }
-  async function thumbOne(date, v, force) {
+  async function thumbOne(date, v, force, dry) {
     await toList();
     const row = rowsNow().find(r => norm(txt($('#video-title', r))) === norm(v.title));
     if (!row) return 'not in Studio yet';
@@ -261,10 +264,16 @@
     await until(() => isEdit() && $('ytcp-video-custom-still-editor input#file-loader') && $('ytcp-button#save'), 30000, 'edit page');
     const shown = () => { const b = $('ytcp-video-custom-still-editor button#preview-button'); return !!(b && b.offsetParent); };
     const seen = () => ((($('ytcp-video-custom-still-editor') || {}).innerText) || '').replace(/\s+/g, ' ').trim();   // visible text only (txt() falls back to hidden text)
-    // the picker either says "Dosya yükle" (no custom thumbnail yet) or shows the picture (there is one)
-    await until(() => shown() || /Dosya yükle/.test(seen()), 12000, 'thumbnail section');
-    await sleep(500);
+    // Settled states: the picture is shown (there is a custom thumbnail) or the picker says exactly "Dosya yükle" (none yet).
+    // While the page loads it shows tips ("Öneriler: ...") that also contain "Dosya yükle"; the picture follows after ~2 s.
+    let noneSince = 0;
+    await until(() => {
+      if (shown()) return true;
+      if (seen() === 'Dosya yükle') { noneSince = noneSince || Date.now(); return Date.now() - noneSince > 1500; }
+      noneSince = 0; return false;
+    }, 15000, 'thumbnail section');
     if (shown() && !force) { await toList(); return 'present'; }
+    if (dry) { await toList(); return 'missing (dry run, nothing changed)'; }
     const r = await fetch(BASE + date + '/' + v.id + '.jpg?t=' + Date.now());
     if (!r.ok) throw new Error('no thumbnail file ' + v.id + '.jpg (HTTP ' + r.status + ')');
     const file = new File([await r.blob()], v.id + '.jpg', { type: 'image/jpeg', lastModified: Date.now() });
@@ -272,7 +281,15 @@
     const save = $('ytcp-button#save');
     const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
     input.dispatchEvent(new Event('change', { bubbles: true }));
-    await until(() => shown() && !/Yükleniyor/.test(seen()) && save.getAttribute('aria-disabled') !== 'true', 30000, 'thumbnail upload');
+    // without the "Gelişmiş özellikler" tier Studio shows a one-time verification dialog once the daily custom-thumbnail quota is used up
+    const wizard = () => { const w = $('yt-trust-tiers-wizard-dialog'); return !!(w && $('h2', w) && $('ytcp-button#cancel-button', w)); };
+    await until(() => (shown() && !/Yükleniyor/.test(seen()) && save.getAttribute('aria-disabled') !== 'true') || wizard(), 30000, 'thumbnail upload');
+    if (wizard()) {
+      const cancel = $('yt-trust-tiers-wizard-dialog ytcp-button#cancel-button');
+      if (norm(txt(cancel)) === 'İptal') cancel.click();     // never "İleri": the verification is the channel owner's own step
+      await sleep(1500);
+      const e = new Error('Studio asks for its one-time verification (daily custom-thumbnail limit); cancelled it'); e.thumbLimit = true; throw e;
+    }
     await sleep(500);
     save.click();
     await until(() => save.getAttribute('aria-disabled') === 'true', 20000, 'save');
@@ -280,25 +297,31 @@
     try { await until(() => $$('tp-yt-paper-toast').some(e => /Değişiklikler kaydedildi/.test(e.textContent || '')), 8000, 'toast'); toast = 'saved'; } catch (e) { if (S.stop) throw e; }
     await sleep(800);
     await toList();
+    await sleep(12000);                                      // a pause between uploads: Studio throttles bursts of custom thumbnails
     return 'set (' + toast + ')';
   }
   S.thumbs = async (opts = {}) => {
     if (S.running) return 'already running';
-    S.running = true; S.stop = false; S.phase = 'thumbnails';
+    S.running = true; S.stop = false; S.phase = 'thumbnails'; S.thumbLimit = false;
     try {
       await S.ready;
       if (document.visibilityState !== 'visible') throw new Error('this tab is in the background: bring the Studio tab to the front and run again');
+      const jobs = [];
       for (const date of opts.dates || []) {
         let man;
         try { man = await (await fetch(BASE + date + '/manifest.json?t=' + Date.now())).json(); }
         catch (e) { L('no manifest for ' + date); continue; }
-        for (const v of man.videos) {
+        for (const v of man.videos) if (v.type === 'long' && (!opts.only || opts.only.includes(v.id))) jobs.push([date, v]);
+      }
+      for (const [date, v] of jobs) {
+        if (S.stop || S.thumbLimit) break;
+        S.current = v.id;
+        try { S.thumbDone[v.id] = await thumbOne(date, v, !!opts.force, !!opts.dry); L('thumbnail ' + v.id + ': ' + S.thumbDone[v.id]); }
+        catch (e) {
+          S.thumbDone[v.id] = (e.thumbLimit ? 'limit: ' : 'failed: ') + e.message; L('ERROR thumbnail ' + v.id + ': ' + e.message);
+          if (e.thumbLimit) S.thumbLimit = true;
           if (S.stop) break;
-          if (v.type !== 'long') continue;
-          if (opts.only && !opts.only.includes(v.id)) continue;
-          S.current = v.id;
-          try { S.thumbDone[v.id] = await thumbOne(date, v, !!opts.force); L('thumbnail ' + v.id + ': ' + S.thumbDone[v.id]); }
-          catch (e) { S.thumbDone[v.id] = 'failed: ' + e.message; L('ERROR thumbnail ' + v.id + ': ' + e.message); if (S.stop) break; try { await toList(); } catch (e2) {} }
+          try { await toList(); } catch (e2) {}
         }
       }
       S.phase = S.stop ? 'stopped' : 'finished';
@@ -306,7 +329,7 @@
     finally { S.running = false; S.current = null; }
   };
 
-  S.status = () => ({ phase: S.phase, running: S.running, current: S.current, done: S.done, failed: S.failed, published: S.published, thumbs: S.thumbDone, limit: S.limit, last: S.log.slice(-5) });
+  S.status = () => ({ phase: S.phase, running: S.running, current: S.current, done: S.done, failed: S.failed, published: S.published, thumbs: S.thumbDone, thumbLimit: S.thumbLimit, limit: S.limit, last: S.log.slice(-5) });
   // keep ms <= 25000 per tool call; while the run is still going the answer is a short summary, the full status comes at the end
   S.wait = async ms => {
     const t0 = Date.now(); while (S.running && Date.now() - t0 < ms) await sleep(500);

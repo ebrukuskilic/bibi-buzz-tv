@@ -400,7 +400,7 @@ def finish_line(c, x, y, k, t, st):
             if (i + j) % 2 == 0:
                 r.rrect(-258 + i * 32.25, -326 + j * 22, -258 + (i + 1) * 32.25, -326 + (j + 1) * 22, 0, INK, None)
     r.rrect(-160, -318, 160, -270, 14, "#FF5C8A", INK, 3)
-    c.text(*r.P(0, -294), "FINISH", 54 * k, "#FFFFFF", stroke=3 * k, stroke_fill=INK)
+    c.text(*r.P(0, -294), D.word("FINISH"), 54 * k, "#FFFFFF", stroke=3 * k, stroke_fill=INK)
     for i in range(8):
         r.poly([(-250 + i * 62, -258), (-220 + i * 62, -258), (-235 + i * 62, -236)], ["#FF5C8A", "#FFD21F", "#3E8EDE", "#3DB54A"][i % 4], INK, 2)
     if tape < 0.02:
@@ -419,7 +419,7 @@ def start_line(c, x, y, k, t, st):
     for sx in (-170, 170):
         r.rrect(sx - 8, -250, sx + 8, 0, 4, "#E8E8F0", INK, 3)
     r.rrect(-182, -276, 182, -214, 10, "#3DB54A", INK, 3.4)
-    c.text(*r.P(0, -245), "START", 50 * k, "#FFFFFF", stroke=3 * k, stroke_fill=INK)
+    c.text(*r.P(0, -245), D.word("START"), 50 * k, "#FFFFFF", stroke=3 * k, stroke_fill=INK)
     for i in range(7):
         r.poly([(-168 + i * 56, -214), (-142 + i * 56, -214), (-155 + i * 56, -194)], ["#FF5C8A", "#FFD21F", "#3E8EDE", "#FF9A3D"][i % 4], INK, 2)
     r.rrect(-200, -4, 200, 6, 3, "#FFFFFF", INK, 2.4)
@@ -447,7 +447,7 @@ def signpost(c, x, y, k, t, st):
     r = Rig(c, x, y, k)
     r.rrect(-6, -170, 6, 0, 2, "#8B5A2B", INK, 2.6)
     r.poly([(-70, -170), (56, -170), (80, -146), (56, -122), (-70, -122)], "#D9A066", INK, 3)
-    c.text(*r.P(-6, -146), st.get("text", "HOME"), 28 * k, INK)
+    c.text(*r.P(-6, -146), D.word(st.get("text", "HOME")), 28 * k, INK)
     return r
 
 
@@ -596,10 +596,17 @@ def dizzy(c, s, x, y, dt, **_):
 
 @fx
 def notes(c, s, x, y, dt, **_):
+    """Floating music notes, drawn with shapes (the note glyph is missing from the fonts)."""
     for i in range(3):
         ph = (dt * 0.6 + i / 3) % 1.0
         px, py = x + math.sin(i * 2 + ph * 5) * 26 + i * 20, y - ph * 100
-        c.text(px, py, "♪", 34, ["#FF5C8A", "#3E8EDE", "#3DB54A"][i], stroke=2, stroke_fill="#FFFFFF")
+        col = ["#FF5C8A", "#3E8EDE", "#3DB54A"][i]
+        c.line([(px + 9, py), (px + 9, py - 32)], "#FFFFFF", 9)
+        c.poly([(px + 9, py - 33), (px + 27, py - 23), (px + 25, py - 10), (px + 9, py - 19)], fill="#FFFFFF", outline="#FFFFFF", width=3)
+        c.ellipse(px, py, 12.5, 9.5, fill="#FFFFFF")
+        c.line([(px + 9, py), (px + 9, py - 32)], col, 4)
+        c.poly([(px + 9, py - 32), (px + 24, py - 23), (px + 22, py - 13), (px + 9, py - 20)], fill=col)
+        c.ellipse(px, py, 9.5, 6.5, fill=col)
 
 
 @fx
@@ -703,7 +710,7 @@ def title(c, s, x, y, dt, lines=("THE STORY",), sub="Story Time with Bibi Buzz T
     top = top - (1 - u) * 260
     ph = pill * 1.0
     s.rrect(220, top - ph - 2, 1060, top + ph - 2, 30, fill="#FF5C8A", outline=D.INK, width=5)
-    s.text(640, top, sub.upper(), 38 if pill >= 38 else 30, "#FFFFFF", stroke=0)
+    s.text(640, top, D.upper(sub), 38 if pill >= 38 else 30, "#FFFFFF", stroke=0)
     cols = ["#FFD21F", "#FFFFFF", "#9BE8FF"]
     base = top + (70 if pill >= 38 else 52)
     for i, line in enumerate(lines):
@@ -726,6 +733,13 @@ def the_end(c, s, x, y, dt, text="The End", sub="", **_):
     if sub:
         s.rrect(190, 372, 1090, 452, 38, fill="#FFFFFF", outline=D.INK, width=5)
         _fit_text(s, 640, 412, sub, 44, D.INK, 840)
+
+
+@fx
+def cta(c, s, x, y, dt, like=2.3, sub=3.2, k=1.0, **_):
+    """The "Like" / "Subscribe" card of the last scene (YouTube turns its own end screens and subscribe watermark off on kids videos):
+    two buttons around y, a pointer presses Like at `like` seconds and Subscribe at `sub` seconds after the effect started."""
+    D.cta(s, 640, y, dt, k, like, sub)
 
 
 @fx

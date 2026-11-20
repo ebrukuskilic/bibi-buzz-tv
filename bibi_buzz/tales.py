@@ -454,7 +454,166 @@ def goldilocks(lang="en"):
     return t
 
 
-TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_and_hare, "goldilocks": goldilocks}
+# ================================================================================================ little red riding hood
+RED_C = dict(dress="#FFFFFF", hair="#7B4A2A", hood="#E2574C")
+MAMA_R = dict(dress="#5BC27A", hair="#6B3E1E")
+GRAN = dict(dress="#B58CFF", hair="#E4E4EC", granny="#FF9DB0")
+WOODC = dict(fur="#8B5A2B", extra="tie", outfit="#3DB54A", hat_kind="cap", hat_color="#8B4F26")
+NIGHTCAP = dict(fur="#8E9AB0", cap="#F3E9FF", glasses=True)
+GRANNY_HOUSE = dict(wall="#EAF4FF", roof="#7B5EA7")
+
+
+def red_riding_hood(lang="en"):
+    t = Tale("tale-red-riding-hood", "Little Red Riding Hood | Fairy Tale Story for Kids | Bibi Buzz TV",
+             "Stay on the path! Watch the classic fairy tale of Little Red Riding Hood and the big gray wolf: a little girl in a bright red hood takes a basket of cake "
+             "to her grandma, and meets a sneaky wolf in the forest. A gentle, colorful animated story in simple English for toddlers and preschoolers.",
+             TAGS + ["little red riding hood", "red riding hood", "big bad wolf", "grandma and the wolf"],
+             {"nar": NAR, "red": (ANA, "-2%", "+12Hz"), "mama": (ARIA, "-4%", "+0Hz"), "granny": (ARIA, "-14%", "-16Hz"),
+              "wolf": (GUY, "-10%", "-6Hz"), "wolfg": (GUY, "-2%", "+34Hz"), "wood": ("en-US-ChristopherNeural", "-6%", "-8Hz")}, lang=lang)
+    t.bubble_tint = {"red": "#FFE0DC", "mama": "#DDF5E4", "granny": "#EDE3FF", "wolf": "#E8ECF6", "wolfb": "#E8ECF6", "wood": "#EADBC8"}
+    t.cover = dict(bg="meadow", title=("LITTLE RED", "RIDING HOOD"), size=112, gap=110,
+                   actors=[("red", "girl", 330, 706, 1.7, 1, "happy", dict(RED_C, hold="basket")), ("wolf", "wolf", 930, 712, 1.42, -1, "sly", WOLF)])
+    _intro(t, ("LITTLE RED", "RIDING HOOD"), "Today's story is... Little Red Riding Hood!")
+
+    # ---------------------------------------------------------------- 1 mama and little red
+    s = t.scene("Little Red and Mama", "meadow", mood="happy", title="Little Red Riding Hood")
+    s.prop("home", "cottage", 300, 566, 0.95)
+    s.actor("mama", "girl", 650, 620, 1.2, face=-1, **MAMA_R).actor("red", "girl", 880, 636, 1.05, face=-1, **RED_C)
+    s.nar("Once upon a time, a little girl lived in a small house, near a big green forest.", ("pose", "red", "happy"), ("pose", "mama", "happy"))
+    s.nar("She always wore a bright red hood, so everybody called her Little Red Riding Hood.", ("pose", "red", "cheer"), ("hop", "red", {"at": "50%"}), ("fx", "sparkle", "red", 0, {"at": "40%", "dur": 3.0, "r": 110}))
+    s.say("mama", "Little Red, Grandma is not feeling well today.", ("pose", "red", "idle"), ("pose", "mama", "sad"))
+    s.say("mama", "Please take her this basket of cake and honey.", ("pose", "mama", "happy"), ("hold", "red", "basket", {"at": "30%"}), ("pose", "red", "happy", {"at": "30%"}))
+    s.say("mama", "Walk straight along the path, and do not talk to strangers!", ("pose", "mama", "proud"), ("fx", "mark", "mama", 0, {"at": "30%", "dur": 2.2, "text": "!"}), ("pose", "red", "idle"))
+    s.say("red", "I will, Mama! I will be very careful!", ("pose", "red", "cheer"), ("hop", "red", {"at": "40%"}), ("pose", "mama", "idle"))
+    s.nar("So Little Red took her basket, and off she went, down the path.", ("pose", "mama", "wave", {"at": "30%"}), ("pose", "red", "idle"),
+          ("walk", "red", 1500, 636, {"at": 0.4, "speed": 135}))
+
+    # ---------------------------------------------------------------- 2 into the forest
+    s = t.scene("Into the forest", "forest", mood="calm", title="Into the forest")
+    s.prop("tree", "bigtree", 1120, 640, 1.0)
+    s.actor("red", "girl", -150, 640, 1.0, hold="basket", **RED_C).actor("wolf", "wolf", 1030, 636, 0.9, face=-1, show=False, zy=600, **WOLF)
+    s.nar("The forest was green and quiet. Little Red walked, and walked, and walked.", ("walk", "red", 470, 640, {"fit": True, "pose": "walk"}), ("fx", "leaves", 0, 0, {"dur": 60.0}))
+    s.say("red", "La la la! What a lovely day for a walk!", ("pose", "red", "happy"), ("fx", "notes", "red", 0, {"dur": 3.5}))
+    s.nar("But somebody was watching her, from behind a big tree.", ("pose", "red", "idle"), ("walk", "red", 640, 640, {"at": 0.3, "speed": 70}),
+          ("show", "wolf", {"at": "35%"}), ("pose", "wolf", "sly", {"at": "35%"}), ("fx", "mark", "wolf", 0, {"at": "50%", "dur": 2.0, "text": "!"}), tail=0.7)
+
+    # ---------------------------------------------------------------- 3 the wolf
+    s = t.scene("The big gray wolf", "forest", mood="sneaky", title="The big gray wolf")
+    s.actor("red", "girl", 400, 640, 1.05, face=1, hold="basket", **RED_C).actor("wolf", "wolf", -250, 626, 0.92, face=1, **WOLF)
+    s.nar("Just then, a big gray wolf stepped out onto the path.", ("walk", "wolf", 820, 626, {"speed": 140}), ("pose", "red", "surprised", {"at": "60%"}), ("pose", "wolf", "sly", {"at": "70%"}))
+    s.say("wolf", "Good morning, little girl. Where are you going, so early?", ("pose", "wolf", "sly"), ("pose", "red", "idle"))
+    s.say("red", "Good morning, Mr. Wolf. I am going to my grandma's house.", ("pose", "red", "happy"), ("pose", "wolf", "idle"))
+    s.say("red", "She is not feeling well, so I am bringing her some cake.", ("pose", "red", "happy"))
+    s.say("wolf", "How nice! And where does your grandma live?", ("pose", "wolf", "sly"), ("cam", 760, 400, 1.1, {"dur": 2.5}))
+    s.say("red", "In the little house, at the end of this path.", ("pose", "red", "idle"), ("pose", "wolf", "idle"))
+    s.say("wolf", "I see... Why do you not pick some pretty flowers for her? She would love them!", ("pose", "wolf", "sly"), ("fx", "mark", "wolf", 0, {"at": "20%", "dur": 2.0, "text": "!"}))
+    s.nar("And the wolf had a sneaky plan. He ran off through the trees, as fast as he could.", ("cam", 640, 360, 1.0, {"dur": 1.5}), ("pose", "wolf", "sly"),
+          ("walk", "wolf", 1560, 626, {"at": 0.9, "speed": 460}), ("fx", "dust", "wolf", 0, {"at": 0.9, "dur": 1.0}), ("fx", "speed", "wolf", 0, {"at": 1.0, "dur": 2.0, "dir": 1}))
+    s.say("red", "That is a good idea! Grandma loves flowers.", ("pose", "red", "cheer"), ("hop", "red", {"at": "40%"}), tail=0.5)
+
+    # ---------------------------------------------------------------- 4 picking flowers
+    s = t.scene("Picking flowers", "meadow_open", mood="happy", title="Picking flowers")
+    s.prop("bsk", "basket", 360, 676, 1.0, show=False)
+    s.actor("red", "girl", -150, 650, 1.05, hold="basket", **RED_C)
+    s.nar("So Little Red left the path, and she found a meadow, full of flowers.", ("walk", "red", 520, 650, {"fit": True, "pose": "walk"}))
+    s.say("red", "Red flowers, yellow flowers, and blue flowers! Grandma will love them!", ("hold", "red", "flowers", {"at": "10%"}), ("show", "bsk", {"at": "10%"}), ("pose", "red", "happy"), ("fx", "sparkle", "red", 0, {"dur": 3.5, "r": 110}))
+    s.nar("She picked, and she picked, and she picked. She forgot all about the time.", ("walk", "red", 700, 660, {"at": 0.3, "speed": 60}), ("hop", "red", {"at": "40%"}), ("hop", "red", {"at": "75%"}), ("fx", "notes", "red", 0, {"dur": 4.0}))
+    s.nar("At last, she picked up her basket, and she hurried to Grandma's house.", ("hold", "red", "basket", {"at": 0.2}), ("hide", "bsk", {"at": 0.2}), ("walk", "red", 1500, 650, {"at": 0.5, "speed": 190}), tail=0.6)
+
+    # ---------------------------------------------------------------- 5 grandma's house: the wolf knocks
+    s = t.scene("Grandma's little house", "meadow", mood="sneaky", title="Grandma's little house")
+    s.prop("home", "cottage", 900, 566, 1.05, **GRANNY_HOUSE)
+    s.actor("granny", "girl", 900, 604, 1.0, face=-1, show=False, **GRAN).actor("wolf", "wolf", -250, 620, 0.92, face=1, **WOLF)
+    s.nar("Meanwhile, the wolf ran all the way to Grandma's little house.", ("walk", "wolf", 770, 620, {"speed": 400}), ("fx", "dust", "wolf", 0, {"at": 0.2, "dur": 1.0}), ("pose", "wolf", "sly", {"at": "80%"}))
+    s.nar("Knock, knock, knock!", ("sfx", "knock", {"at": 0.15}), ("pose", "wolf", "knock"))
+    s.say("granny", "Who is it?", ("pose", "wolf", "idle"))
+    s.say("wolf", "It is me, Little Red Riding Hood! Please open the door!", ("pose", "wolf", "sly"), voice="wolfg")
+    s.say("granny", "Oh my! That does not sound like my Little Red!", ("pose", "wolf", "sly"))
+    s.nar("The wolf pushed the door open, and Grandma hid in the big wardrobe, quick as a flash!", ("set", "home", "door", 1.0, {"at": "20%", "dur": 1.0}), ("walk", "wolf", 890, 604, {"at": 1.2, "speed": 160}),
+          ("hide", "wolf", {"at": 2.6}), ("fx", "mark", 900, 330, {"at": 0.6, "dur": 2.0, "text": "!"}), tail=0.6)
+
+    # ---------------------------------------------------------------- 6 the wolf in grandma's bed
+    s = t.scene("The wolf in Grandma's bed", "room", mood="sneaky", title="The wolf in Grandma's bed")
+    s.prop("bed", "bed", 360, 650, 1.0, size="big").prop("wd", "wardrobe", 980, 640, 1.0, door=0.0)
+    s.actor("wolf", "wolf", 1180, 640, 0.92, face=-1, **WOLF).actor("wolfb", "wolf", 290, 626, 0.86, face=1, show=False, zy=640, **NIGHTCAP)
+    s.nar("Inside, the wolf found Grandma's nightcap, and her glasses.", ("walk", "wolf", 700, 640, {"at": 0.2, "speed": 150}), ("pose", "wolf", "sly", {"at": "60%"}))
+    s.nar("He put them on, and he jumped into Grandma's bed. Hee, hee, hee!", ("walk", "wolf", 400, 640, {"at": 0.2, "speed": 220}), ("hide", "wolf", {"at": 1.4}), ("show", "wolfb", {"at": 1.4}),
+          ("fx", "sparkle", 300, 500, {"at": 1.4, "dur": 2.5, "r": 120}), ("pose", "wolfb", "laugh", {"at": 1.8}), tail=0.6)
+    s.nar("And he pulled the blanket up, and he waited for Little Red.", ("pose", "wolfb", "sly"), ("cam", 420, 470, 1.12, {"dur": 3.0}), tail=0.7)
+
+    # ---------------------------------------------------------------- 7 little red arrives
+    s = t.scene("At Grandma's door", "meadow", mood="calm", title="At Grandma's door")
+    s.prop("home", "cottage", 900, 566, 1.05, **GRANNY_HOUSE)
+    s.actor("red", "girl", -150, 628, 1.05, hold="basket", **RED_C)
+    s.nar("At last, Little Red came to Grandma's house, with her basket full of cake and flowers.", ("walk", "red", 800, 628, {"fit": True, "pose": "walk"}))
+    s.say("red", "That is strange. The door is open.", ("pose", "red", "think"), ("set", "home", "door", 1.0, {"at": 0.1, "dur": 1.0}))
+    s.say("red", "Grandma? It is me, Little Red!", ("pose", "red", "idle"))
+    s.nar("And she went inside.", ("walk", "red", 905, 606, {"dur": 1.0}), ("hide", "red", {"at": 1.05}), ("set", "home", "door", 0.0, {"at": 1.4, "dur": 0.6}))
+
+    # ---------------------------------------------------------------- 8 what big ears, eyes, teeth
+    s = t.scene("What big eyes you have", "room", mood="tense", title="What big eyes you have!")
+    s.prop("bed", "bed", 360, 650, 1.0, size="big").prop("wd", "wardrobe", 980, 640, 1.0, door=0.0)
+    s.actor("wolfb", "wolf", 290, 626, 0.86, face=1, zy=640, **NIGHTCAP).actor("wolf", "wolf", 300, 640, 0.92, face=1, show=False, **WOLF)
+    s.actor("red", "girl", 1150, 650, 1.1, face=-1, hold="basket", **RED_C)
+    s.nar("Little Red walked up to the bed. Grandma looked very strange!", ("walk", "red", 700, 650, {"fit": True, "pose": "walk"}), ("pose", "wolfb", "sly", {"at": "50%"}))
+    s.say("red", "Grandma, what big ears you have!", ("pose", "red", "surprised"))
+    s.say("wolfb", "All the better to hear you with, my dear!", ("pose", "wolfb", "sly"), ("pose", "red", "idle"), voice="wolfg")
+    s.say("red", "Grandma, what big eyes you have!", ("pose", "red", "surprised"), ("walk", "red", 640, 650, {"speed": 60}))
+    s.say("wolfb", "All the better to see you with, my dear!", ("pose", "wolfb", "sly"), ("pose", "red", "idle"), voice="wolfg", )
+    s.say("red", "Grandma, what big teeth you have!", ("pose", "red", "scared"), ("fx", "mark", "red", 0, {"dur": 2.2, "text": "!"}), ("cam", 520, 470, 1.15, {"dur": 2.0}))
+    s.say("wolfb", "All the better to...", ("pose", "wolfb", "sly"), ("pose", "red", "scared"), voice="wolfg")
+    s.say("wolf", "GOBBLE you up!", ("hide", "wolfb", {"at": 0.0}), ("show", "wolf", {"at": 0.0}), ("pose", "wolf", "laugh", {"at": 0.0}), ("hop", "wolf", {"at": 0.05}),
+          ("fx", "burst", 370, 205, {"at": 0.0, "dur": 2.0, "text": "GRRR!"}), ("cam", 640, 360, 1.0, {"at": 0.0, "dur": 1.2}), voice="wolf")
+    s.nar("Little Red screamed, and she ran out of the house, as fast as she could!", ("pose", "red", "scared"), ("walk", "red", -300, 650, {"at": 0.2, "speed": 520}),
+          ("pose", "wolf", "laugh", {"at": 0.2}), ("walk", "wolf", -400, 640, {"at": 1.0, "speed": 360}), tail=0.5)
+
+    # ---------------------------------------------------------------- 9 the woodcutter
+    s = t.scene("The kind woodcutter", "meadow", mood="chase", title="The kind woodcutter")
+    s.prop("home", "cottage", 300, 566, 0.95, **GRANNY_HOUSE)
+    s.actor("wood", "bear", 1120, 628, 1.0, face=-1, **WOODC)
+    s.actor("red", "girl", 330, 612, 1.05, face=1, show=False, hold="basket", **RED_C).actor("wolf", "wolf", 300, 612, 0.92, face=1, show=False, **WOLF)
+    s.nar("Little Red ran out of the house, and the big gray wolf ran after her!", ("show", "red", {"at": 0.1}), ("walk", "red", 780, 628, {"at": 0.2, "speed": 360}),
+          ("show", "wolf", {"at": 0.9}), ("walk", "wolf", 560, 626, {"at": 1.0, "speed": 300}), ("pose", "wolf", "sly", {"at": 2.0}))
+    s.say("red", "Help! Help! A wolf!", ("pose", "red", "scared"), ("hop", "red"), ("fx", "sweat", "red", 0, {"dur": 2.5}))
+    s.nar("A kind woodcutter was working nearby, and he heard her cry.", ("pose", "wood", "surprised"), ("walk", "wood", 940, 628, {"at": 0.4, "speed": 150}), ("fx", "mark", "wood", 0, {"at": 0.3, "dur": 2.0, "text": "!"}))
+    s.say("wood", "Stop right there, you big gray wolf!", ("pose", "wood", "proud"), ("pose", "wolf", "scared"), ("fx", "burst", 900, 300, {"dur": 1.8, "text": "STOP!", "color": "#3DB54A"}))
+    s.say("wood", "Leave Little Red alone! Go away, and never come back!", ("pose", "wood", "proud"), ("cam", 760, 400, 1.1, {"dur": 2.0}))
+    s.nar("The wolf was so scared, he ran away over the hills. And he never came back again!", ("cam", 640, 360, 1.0, {"dur": 1.5}), ("pose", "wolf", "scared"), ("face", "wolf", -1, {"at": 0.2}),
+          ("walk", "wolf", -400, 626, {"at": 0.3, "speed": 560}), ("fx", "speed", "wolf", 0, {"at": 0.4, "dur": 2.2, "dir": -1}), ("pose", "red", "cheer", {"at": 1.0}), ("pose", "wood", "happy", {"at": 1.0}), tail=0.6)
+
+    # ---------------------------------------------------------------- 10 grandma is safe
+    s = t.scene("Grandma is safe", "room", mood="happy", title="Grandma is safe")
+    s.prop("bed", "bed", 360, 650, 1.0, size="big").prop("wd", "wardrobe", 980, 640, 1.0, door=0.0)
+    s.actor("granny", "girl", 980, 628, 1.0, face=-1, show=False, zy=700, **GRAN)                      # zy: drawn in front of the wardrobe she steps out of
+    s.actor("red", "girl", -150, 650, 1.05, face=1, hold="basket", **RED_C).actor("wood", "bear", -330, 646, 1.0, face=1, zy=700, **WOODC)
+    s.nar("Little Red and the woodcutter went back inside. But where was Grandma?", ("walk", "red", 740, 650, {"fit": True, "pose": "walk"}), ("walk", "wood", 600, 646, {"fit": True, "pose": "walk"}), ("pose", "red", "sad", {"at": "80%"}))
+    s.say("red", "Grandma? Grandma, where are you?", ("pose", "red", "sad"), ("pose", "wood", "think"))
+    s.nar("Then they heard a little noise, from the wardrobe. Knock, knock, knock!", ("sfx", "knock", {"at": "70%"}), ("fx", "mark", 980, 300, {"at": "70%", "dur": 2.0, "text": "?"}),
+          ("pose", "red", "surprised", {"at": "70%"}), ("pose", "wood", "surprised", {"at": "70%"}))
+    s.nar("Little Red opened the big wardrobe, and there was Grandma, safe and sound!", ("walk", "red", 790, 650, {"at": 0.8, "speed": 100}), ("set", "wd", "door", 1.0, {"at": 1.8, "dur": 1.0}),
+          ("show", "granny", {"at": 2.8}), ("pose", "granny", "happy", {"at": 2.8}), ("fx", "sparkle", 980, 400, {"at": 2.8, "dur": 3.0, "r": 150}), ("pose", "wood", "happy", {"at": 2.8}))
+    s.say("granny", "Oh, my dear Little Red! I was so scared!", ("walk", "granny", 940, 640, {"speed": 90}), ("pose", "granny", "scared"), ("pose", "red", "happy"),
+          ("walk", "red", 850, 650, {"speed": 60}), ("walk", "wood", 700, 646, {"speed": 100}))
+    s.say("red", "Grandma! I am so glad that you are safe!", ("pose", "red", "cheer"), ("hop", "red", {"at": "40%"}), ("pose", "granny", "happy"), ("pose", "wood", "happy"),
+          ("fx", "hearts", "red", 0, {"at": "40%", "dur": 4.0}))
+
+    # ---------------------------------------------------------------- 11 happy ending
+    s = t.scene("Happily ever after", "meadow_dusk", mood="triumph", title="Happily ever after")
+    s.prop("home", "cottage", 300, 566, 0.95, **GRANNY_HOUSE).prop("cake", "pie", 700, 700, 1.3)
+    s.actor("red", "girl", 560, 640, 1.05, face=1, **RED_C).actor("granny", "girl", 860, 640, 1.0, face=-1, **GRAN).actor("wood", "bear", 1080, 636, 1.0, face=-1, **WOODC)
+    s.nar("Then they all sat down together, and they ate the cake, and the honey. Yum, yum, yum!", ("pose", "red", "eat"), ("pose", "granny", "eat"), ("pose", "wood", "eat"), ("fx", "confetti", 0, 0, {"dur": 20.0}))
+    s.say("red", "I am sorry that I talked to a stranger, and that I left the path.", ("pose", "red", "sad"), ("pose", "granny", "idle"), ("pose", "wood", "idle"))
+    s.say("granny", "That is all right, my dear. Now you know what to do.", ("pose", "granny", "happy"), ("pose", "red", "idle"), ("fx", "hearts", "granny", 0, {"dur": 3.5}))
+    s.say("wood", "And remember, if a stranger talks to you, tell a grown-up right away!", ("pose", "wood", "proud"), ("pose", "granny", "idle"))
+    s.say("red", "I will, I promise!", ("pose", "red", "cheer"), ("hop", "red", {"at": "40%"}), ("pose", "wood", "happy"), ("pose", "granny", "happy"))
+    s.nar("And Little Red Riding Hood never forgot. And they all lived happily ever after.", ("pose", "red", "happy"), ("fx", "sparkle", 700, 460, {"dur": 4.0, "r": 330}), tail=0.8)
+
+    _outro(t, "Remember, little ones: stay on the path, and never talk to strangers.", caption="Stay on the path, and stay safe!")
+    return t
+
+
+TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_and_hare, "goldilocks": goldilocks,
+         "red-riding-hood": red_riding_hood}
 
 
 def build(key, lang="en"):

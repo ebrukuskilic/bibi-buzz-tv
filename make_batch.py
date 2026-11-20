@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Makes one day of Bibi Buzz TV videos (5 long lessons + 5 Shorts) and a manifest.json for the uploader.
+"""Makes one day of Bibi Buzz TV videos (long lessons / a fairy tale + 5 Shorts) and a manifest.json for the uploader.
+A day normally has 5 long lessons; on the days listed in curriculum.TALE_QUEUE the 5th one is an animated fairy tale (id dNNN-T1).
 
   python make_batch.py --day 1 --out out/2026-11-20
   python make_batch.py --day 1 --only d001-S1 --sheet         # one video + a contact sheet to check the layout
@@ -17,6 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from bibi_buzz import curriculum as CU          # noqa: E402
 from bibi_buzz import pipeline as PL            # noqa: E402
+from bibi_buzz import story as SY               # noqa: E402
 from bibi_buzz import voice as VO               # noqa: E402
 
 
@@ -76,29 +78,52 @@ def main():
     manifest = dict(day=day, date=str(date), videos=[])
     failures = []
     for les in lessons:
+        tale = getattr(les, "kind", "") == "tale"
         print(f"== {les.id}  {les.fmt}  {les.title}", flush=True)
         try:
             if a.thumbs_only:
                 if les.fmt == "long":
-                    make_thumb(les, a.out)
+                    if tale:
+                        SY.make_cover(les, os.path.join(a.out, les.id + ".jpg"))
+                    else:
+                        make_thumb(les, a.out)
                     print("   thumbnail ok", flush=True)
                 continue
             if a.dry:
-                PL.prepare(les, ffmpeg, a.cache, a.voice)
-                problems, st = PL.sync_report(les)
+                if tale:
+                    SY.prepare(les, ffmpeg, a.cache)
+                    problems, st = SY.sync_report(les)
+                else:
+                    PL.prepare(les, ffmpeg, a.cache, a.voice)
+                    problems, st = PL.sync_report(les)
                 print(f"   {st['duration']:.1f}s  bpm {les.bpm}  cues {st['cues']}  problems: {problems or 'none'}")
                 continue
             path = os.path.join(a.out, les.id + ".mp4")
-            st = PL.render(les, path, ffmpeg, a.cache, a.voice, workers=a.workers or None)
-            if a.sheet:
-                PL.contact_sheet(les, os.path.join(a.out, les.id + "-sheet.png"))
+            if tale:
+                SY.prepare(les, ffmpeg, a.cache)
+                problems, _st = SY.sync_report(les)
+                if problems:
+                    raise RuntimeError("sync problems in %s: %s" % (les.id, "; ".join(problems[:5])))
+                st = SY.render(les, path, ffmpeg, a.cache, workers=a.workers or None)
+                if a.sheet:
+                    SY.contact_sheet(les, os.path.join(a.out, les.id + "-sheet.png"), cols=6, thumb=300, times=SY.sample_times(les, 2))
+            else:
+                st = PL.render(les, path, ffmpeg, a.cache, a.voice, workers=a.workers or None)
+                if a.sheet:
+                    PL.contact_sheet(les, os.path.join(a.out, les.id + "-sheet.png"))
             if les.fmt == "long":  # designed thumbnail; if that fails, a still of the first lesson picture
                 try:
-                    make_thumb(les, a.out)
+                    if tale:
+                        SY.make_cover(les, os.path.join(a.out, les.id + ".jpg"))
+                    else:
+                        make_thumb(les, a.out)
                 except Exception as e:
                     print(f"   thumbnail failed ({e!r}) - using a still instead", flush=True)
-                    from bibi_buzz import stage as ST
-                    ST.render_frame(les, ST.sample_times(les)[1]).convert("RGB").save(os.path.join(a.out, les.id + ".jpg"), quality=92)
+                    if tale:
+                        SY.render_frame(les, les.duration * 0.25).convert("RGB").save(os.path.join(a.out, les.id + ".jpg"), quality=92)
+                    else:
+                        from bibi_buzz import stage as ST
+                        ST.render_frame(les, ST.sample_times(les)[1]).convert("RGB").save(os.path.join(a.out, les.id + ".jpg"), quality=92)
             meta = CU.metadata(les, st.pop("chapters_text"))
             manifest["videos"].append(dict(id=les.id, type=les.fmt, file=st["file"], duration=round(st["duration"], 1),
                                            chapters=st["chapters"], **meta))

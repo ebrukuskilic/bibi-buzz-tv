@@ -92,3 +92,18 @@ bibi_buzz/thumbnail.py    YouTube kapak görseli
 - YouTube'un "değiştirilmiş/sentetik içerik" sorusunu dürüstçe yanıtlayın. Bu video çizgi film tarzıdır
   ve gerçekçi bir kişi, yer ya da olayı taklit etmez.
 - Başlık, açıklama, bölümler (chapters) ve etiketler için `BIBI_KIT.md` dosyasına bakın.
+
+## Masallar (hikâyeli uzun videolar)
+
+`bibi_buzz/story*.py` ve `bibi_buzz/tales.py`: çocuk masallarını sahne sahne yazıp animasyonlu, çok sesli videoya çeviren motor.
+
+- Her masal `tales.py` içinde bir fonksiyondur: `Tale(...)`, `tale.scene(ad, arka_plan)`, `sc.actor(...)`, `sc.prop(...)`,
+  `sc.nar("anlatıcı metni", *eylemler)`, `sc.say("karakter", "replik", *eylemler)`. Her cümlenin süresi sesin uzunluğundan çıkar
+  (hiçbir şey hızlandırılmaz), böylece ses, hareket ve müzik hep birlikte kalır.
+- Eylemler: `walk`, `pose`, `face`, `hold`, `fx`, `sfx`, `cam`, `follow`, `set`, `show` / `hide`. Poz adlarına `sit@84`
+  (gövdeyi 84 piksel yukarı al, ayaklar sarksın) ve `sit+sad` (aynı poz, başka yüz ifadesi) eklenebilir.
+- Kadro: domuz, kurt, ayı, tavşan, kaplumbağa, kız ve Bibi, Pip, Mo, Lila. Yeni karakter ve dekorlar `storyart.py`,
+  `storyart2.py`, `storyprops.py` içindedir.
+- Günlük plan: `curriculum.TALE_QUEUE` listesindeki masallar 2. günden itibaren sırayla 5. uzun dersin yerine geçer
+  (video kimliği `dNNN-T1`). Yeni masal eklemek için fonksiyonu yazıp `tales.TALES` ve `TALE_QUEUE` listelerine ekleyin.
+- Deneme: `python make_batch.py --day 2 --only d002-T1 --sheet --out out/test` (kapak: `out/test/d002-T1.jpg`).

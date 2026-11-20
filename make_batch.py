@@ -17,6 +17,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from bibi_buzz import curriculum as CU          # noqa: E402
+from bibi_buzz import draw as D                 # noqa: E402
 from bibi_buzz import pipeline as PL            # noqa: E402
 from bibi_buzz import story as SY               # noqa: E402
 from bibi_buzz import voice as VO               # noqa: E402
@@ -79,6 +80,7 @@ def main():
     failures = []
     for les in lessons:
         tale = getattr(les, "kind", "") == "tale"
+        D.set_language(getattr(les, "lang", "en"))          # Turkish tales are drawn with the Turkish font (Baloo 2)
         print(f"== {les.id}  {les.fmt}  {les.title}", flush=True)
         try:
             if a.thumbs_only:
@@ -125,8 +127,8 @@ def main():
                         from bibi_buzz import stage as ST
                         ST.render_frame(les, ST.sample_times(les)[1]).convert("RGB").save(os.path.join(a.out, les.id + ".jpg"), quality=92)
             meta = CU.metadata(les, st.pop("chapters_text"))
-            manifest["videos"].append(dict(id=les.id, type=les.fmt, file=st["file"], duration=round(st["duration"], 1),
-                                           chapters=st["chapters"], **meta))
+            manifest["videos"].append(dict(id=les.id, type=les.fmt, lang=getattr(les, "lang", "en"), file=st["file"],
+                                           duration=round(st["duration"], 1), chapters=st["chapters"], **meta))
             print(f"   ok  {st['duration']:.1f}s  rendered in {st['seconds_to_render']}s", flush=True)
         except Exception as e:                      # one bad video must not stop the others
             failures.append((les.id, repr(e)))

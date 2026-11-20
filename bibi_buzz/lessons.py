@@ -1,7 +1,7 @@
 """Lesson templates: vocabulary -> Lesson (segments + spoken cues). Pure data, nothing is drawn here.
 
 Segment kinds (drawn by stage.py): title, card, count, number, color, letter, shape, pair, phrase, review,
-quiz, outro.  Icon references used by review / quiz options: an emoji code ("1f34e"), "#rrggbb" (colour dot),
+quiz, cta, outro.  Icon references used by review / quiz options: an emoji code ("1f34e"), "#rrggbb" (colour dot),
 "n:5" (number), "L:A" (letter), "S:circle" (shape).
 """
 import random
@@ -81,6 +81,16 @@ def title_seg(title, sub, codes, rng, topic):
 
 def outro_seg(rng):
     return Seg("outro", {}, [Cue(rng.choice(OUTROS), "outro")], chapter="Goodbye")
+
+
+# YouTube switches the comments, end screens and the subscribe watermark off for videos made for kids, so every long video carries
+# its own reminder: a "Like / Subscribe" card (buttons drawn by stage.r_cta, a pointer presses them) right before the goodbye.
+CTA_LINE = "Please like and subscribe, so you never miss a video!"
+
+
+def cta_segs(rng):
+    """The end of every long video: the Like / Subscribe card, then the goodbye. (Draws no random numbers of its own.)"""
+    return [Seg("cta", {}, [Cue(CTA_LINE, "outro", min_beats=8)]), outro_seg(rng)]
 
 
 def card_seg(cat_key, item, ring, chapter=None):
@@ -265,7 +275,7 @@ def cat_lesson(id, cat_key, items, seed, part=None, fmt="long"):
         segs.append(card_seg(cat_key, it, RINGS[(ring0 + k) % len(RINGS)], chapter=f"Let's learn {cat['title']}" if k == 0 else None))
     segs.append(review_seg([(Cap(w), c, Cap(w) + "!") for w, c, *_ in items]))
     segs += _quiz_set(cat_key, items, rng, 3)
-    segs.append(outro_seg(rng))
+    segs += cta_segs(rng)
     title = mk_title(f"Learn {head} for Kids", words)
     blurb = f"Let's learn about {cat['topic']} with Bibi the bee! Kids will see each picture, hear the word and a simple sentence, and then play a fun quiz."
     return _lesson(id, fmt, title, cat["topic"], cat["tags"], seed, segs, [Cap(w) for w in words], blurb,
@@ -295,7 +305,7 @@ def numbers_lesson(id, lo, hi, seed, fmt="long"):
     q = [quiz_count(rng, nmax=hi) for _ in range(3)]
     q[0].chapter = "Quiz time"
     segs += q
-    segs.append(outro_seg(rng))
+    segs += cta_segs(rng)
     title = f"Learn to Count {lo} to {hi} | Numbers for Kids | {BRAND}"
     blurb = f"Let's count from {lo} to {hi} with Bibi the bee! Kids count fun objects, see each number, and play a counting quiz."
     return _lesson(id, fmt, title, topic, ["counting", "numbers", f"count to {hi}", "math for kids"], seed, segs,
@@ -311,7 +321,7 @@ def colors_lesson(id, names, seed, fmt="long"):
     q = [quiz_color(rng, color=names[i % len(names)]) for i in range(5)]
     q[0].chapter = "Quiz time"
     segs += q
-    segs.append(outro_seg(rng))
+    segs += cta_segs(rng)
     cn = ", ".join(Cap(n) for n in names[:4]) + (" & More" if len(names) > 4 else "")
     title = f"Learn Colors for Kids | {cn} | {BRAND}"
     blurb = "Let's learn colors with Bibi the bee! Kids see each color on fun everyday things and play a color quiz."
@@ -331,7 +341,7 @@ def letters_lesson(id, letters, seed, fmt="long"):
     q = [quiz_letter(rng, letters=letters) for _ in range(5)]
     q[0].chapter = "Quiz time"
     segs += q
-    segs.append(outro_seg(rng))
+    segs += cta_segs(rng)
     title = f"ABC Letters {first} to {last} | Learn the Alphabet for Kids | {BRAND}"
     blurb = f"Let's learn the alphabet with Bibi the bee! Today: letters {first} to {last}. Kids see each letter, hear its name and a word that starts with it."
     return _lesson(id, fmt, title, f"the letters {first} to {last}", ["alphabet", "abc", "letters", "phonics"], seed,
@@ -344,7 +354,7 @@ def letters_game(id, seed, fmt="long", rounds=9):
     segs = [title_seg("ABC Quiz", "Find the letter", [V.LETTERS[L][3] for L in "ABCDE"], rng, "a fun ABC guessing game")]
     for k in range(rounds):
         segs.append(quiz_letter(rng, chapter="Let's play" if k == 0 else None))
-    segs.append(outro_seg(rng))
+    segs += cta_segs(rng)
     title = f"ABC Quiz for Kids | Which Letter Does It Start With | {BRAND}"
     blurb = "Let's play an ABC guessing game with Bibi the bee! Which picture starts with the letter?"
     return _lesson(id, fmt, title, "a fun ABC guessing game", ["alphabet", "abc quiz", "letters", "phonics"], seed, segs,
@@ -360,7 +370,7 @@ def shapes_lesson(id, names, seed, fmt="long"):
     q = [quiz_shape(rng, shapes=names) for _ in range(4)]
     q[0].chapter = "Quiz time"
     segs += q
-    segs.append(outro_seg(rng))
+    segs += cta_segs(rng)
     sn = ", ".join(Cap(n) for n in names[:4]) + (" & More" if len(names) > 4 else "")
     title = f"Learn Shapes for Kids | {sn} | {BRAND}"
     blurb = "Let's learn shapes with Bibi the bee! Kids see each shape, count its sides and find it in the real world."
@@ -384,7 +394,7 @@ def opposites_lesson(id, pairs, seed, fmt="long"):
         others = rng.sample([x for x in allitems if x[0] not in (p[0], p[2])], 2)
         segs.append(quiz_seg(f"Which one shows {word}?", [(word, code)] + [(w, c) for w, c, *_ in others], 0,
                              f"Yes! This is {word}!", rng, chapter="Quiz time" if k == 0 else None))
-    segs.append(outro_seg(rng))
+    segs += cta_segs(rng)
     words = [p[0] for p in pairs] + [p[2] for p in pairs]
     title = mk_title("Learn Opposites for Kids", words, n=4)
     blurb = "Let's learn opposites with Bibi the bee! Big and small, hot and cold, and more."
@@ -399,7 +409,7 @@ def phrases_lesson(id, key, items, seed, fmt="long"):
     for k, it in enumerate(items):
         segs.append(phrase_seg(it, chapter="Let's practice speaking" if k == 0 else None))
     segs.append(review_seg([(i[0].rstrip("!."), i[1], i[0]) for i in items][:8], chapter="Say them all"))
-    segs.append(outro_seg(rng))
+    segs += cta_segs(rng)
     title = f"{ph['title']} | English Speaking for Kids | {BRAND}"
     blurb = f"Let's practice speaking English with Bibi the bee! Today: {ph['topic']}. Kids listen, then say each sentence out loud."
     return _lesson(id, fmt, title, ph["topic"], ph["tags"], seed, segs, [i[0] for i in items], blurb)
@@ -429,7 +439,7 @@ def game_lesson(id, seed, fmt="long", rounds=10):
             segs.append(quiz_letter(rng, chapter=ch))
         else:
             segs.append(quiz_shape(rng, chapter=ch))
-    segs.append(outro_seg(rng))
+    segs += cta_segs(rng)
     title = f"Quiz Game for Kids | Animals, Colors, Numbers & More | {BRAND}"
     blurb = "Let's play a guessing game with Bibi the bee! Animal sounds, colors, counting, letters and shapes."
     return _lesson(id, fmt, title, "a super fun guessing game", ["quiz for kids", "guessing game", "kids quiz",

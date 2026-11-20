@@ -1,0 +1,66 @@
+name: test-render
+
+# A test render of ONE fairy tale in ONE language (real fonts, real voices): cover, a contact sheet of every scene, the script with the
+# voice of every line, and a short clip with sound. It touches neither the daily videos nor the "media" branch: the result goes to the
+# "test-output" branch (raw files: https://raw.githubusercontent.com/<owner>/<repo>/test-output/<tale>-<lang>-sheet.png ...).
+on:
+  workflow_dispatch:
+    inputs:
+      tale:
+        description: "Tale key: three-little-pigs, tortoise-and-hare or goldilocks"
+        default: "three-little-pigs"
+      lang:
+        description: "Language: en or tr"
+        default: "tr"
+      seconds:
+        description: "Length of the clip with real voices in seconds (0 = no clip)"
+        default: "45"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bibi-test-render
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install tools, fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+          pip install pillow numpy edge-tts gTTS
+          mkdir -p assets
+          curl -fL --retry 4 -o assets/Fredoka-Variable.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/fredoka/Fredoka%5Bwdth%2Cwght%5D.ttf"
+          curl -fL --retry 4 -o assets/Baloo2-Variable.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/baloo2/Baloo2%5Bwght%5D.ttf"
+          ls -la assets
+
+      - name: Test render
+        env:
+          TALE: ${{ github.event.inputs.tale }}
+          LANG_: ${{ github.event.inputs.lang }}
+          SECONDS_: ${{ github.event.inputs.seconds }}
+        run: |
+          python tools/test_tale.py "$TALE" "$LANG_" --out out/test --seconds "$SECONDS_"
+          ls -la out/test
+
+      - name: Publish the result on the test-output branch
+        if: always()
+        run: |
+          mkdir -p out/test
+          cd out/test
+          git init -q -b test-output
+          git config user.name "bibi-bot"
+          git config user.email "bibi-bot@users.noreply.github.com"
+          git add -A
+          git commit -q --allow-empty -m "test render: ${{ github.event.inputs.tale }} ${{ github.event.inputs.lang }}"
+          git push -q --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" test-output

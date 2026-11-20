@@ -362,6 +362,33 @@ def bed(c, x, y, k, t, st):
 
 
 @prop
+def wardrobe(c, x, y, k, t, st):
+    """A tall wooden wardrobe; st["door"] goes from 0 (shut) to 1 (both doors wide open, dark inside)."""
+    r = Rig(c, x, y, k)
+    op = clamp(st.get("door", 0.0))
+    wood, dark = "#B8733A", "#8B4F26"
+    r.ell(0, 3, 106, 10, mix("#C98A52", "#5A3A1A", 0.5), None)
+    r.rrect(-88, -270, 88, 0, 8, dark, INK, 3.2)                                             # body
+    r.rrect(-102, -288, 102, -262, 7, wood, INK, 3)                                          # cornice
+    r.rrect(-96, -8, 96, 8, 5, wood, INK, 2.8)                                               # plinth
+    if op > 0.02:
+        r.rrect(-74, -254, 74, -14, 4, "#3B2A1C", INK, 2.6)                                  # the dark inside
+        r.line([(-74, -214), (74, -214)], "#6B5236", 5)                                      # clothes rail
+        for i, col in enumerate(("#FF8FA3", "#6CB7FF", "#FFD23F")):
+            r.rrect(-58 + i * 44, -212, -34 + i * 44, -150, 6, darker(col, 0.25), None)      # a few clothes in the dark
+    wd = 74 * (1.0 - 0.84 * op)                                                              # each door narrows as it swings open
+    for s in (-1, 1):
+        xa, xb = s * 74, s * (74 - wd)
+        lo, hi = min(xa, xb), max(xa, xb)
+        r.rrect(lo, -254, hi, -14, 4, wood, INK, 2.8)
+        if wd > 30:
+            r.rrect(lo + 9, -238, hi - 9, -138, 5, mix(wood, "#FFFFFF", 0.16), INK, 2)       # panels
+            r.rrect(lo + 9, -122, hi - 9, -32, 5, mix(wood, "#FFFFFF", 0.16), INK, 2)
+        r.dot(xb + s * 9, -130, 5.5, "#FFD21F")                                              # knob at the free edge
+    return r
+
+
+@prop
 def fireplace(c, x, y, k, t, st):
     r = Rig(c, x, y, k)
     r.rrect(-150, -300, 150, 0, 10, "#B8B2A6", INK, 3.4)

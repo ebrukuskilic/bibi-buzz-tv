@@ -7,6 +7,8 @@ Effects are fx(view, screen, x, y, dt, **kw): dt is the time since the effect st
 import math
 import random
 
+from PIL import Image, ImageDraw
+
 from . import draw as D
 from .draw import INK, clamp, lerp, darker, mix, ease_out_back
 from .storyart import Rig
@@ -537,6 +539,94 @@ def basket(c, x, y, k, t, st):
         r.dot(-20 + i * 20, -48 + (i % 2) * 6, 9, col)
         r.dot(-20 + i * 20, -48 + (i % 2) * 6, 3.4, "#FFE98A")
     return r
+
+
+# ================================================================================================ the gingerbread man's world
+@prop
+def oven(c, x, y, k, t, st):
+    """A cosy red stove; st["door"] goes from 0 (shut, the little window glows) to 1 (wide open, orange and hot inside)."""
+    r = Rig(c, x, y, k)
+    op = clamp(st.get("door", 0.0))
+    red, cream = "#E2574C", "#F6EBD2"
+    flick = 0.5 + 0.5 * math.sin(t * 5.0)
+    r.ell(0, 3, 132, 11, mix("#C98A52", "#5A3A1A", 0.5), None)
+    r.rrect(-110, -204, 110, -8, 10, red, INK, 3.2)                                           # body
+    r.rrect(-118, -222, 118, -196, 8, cream, INK, 3)                                          # top plate
+    r.rrect(-102, -12, 102, 4, 5, darker(red, 0.22), INK, 2.6)                                # plinth
+    for kx in (-66, 0, 66):                                                                   # knobs
+        r.ell(kx, -178, 11, 11, cream, INK, 2.4)
+        r.line([(kx, -178), (kx + 5, -185)], INK, 2.6)
+    if op > 0.02:                                                                             # the hot inside
+        r.rrect(-82, -154, 82, -30, 7, "#5A2410", INK, 2.8)
+        r.ell(0, -92, 66, 46, mix("#5A2410", "#FF9A3D", 0.45 + 0.3 * op + 0.1 * flick), None)
+        r.ell(0, -88, 40, 26, mix("#5A2410", "#FFD27A", 0.5 + 0.2 * flick), None)
+        r.line([(-80, -64), (80, -64)], "#B8B8C4", 4.4)                                       # the rack
+    th = op * 1.75                                                                            # the door is hinged at the bottom
+    yf = -30 - 124 * math.cos(th)
+    hw = 86 + 14 * math.sin(th)
+    r.poly([(-86, -30), (86, -30), (hw, yf), (-hw, yf)], cream, INK, 2.8)
+    gl = mix("#8A4A1E", "#FFB347", 0.5 + 0.3 * flick)
+    wy0, wy1 = -30 + (yf + 30) * 0.2, -30 + (yf + 30) * 0.84
+    if abs(wy1 - wy0) > 6:
+        r.rrect(-62, min(wy0, wy1), 62, max(wy0, wy1), 6, gl if op < 0.5 else "#7A3A18", INK, 2.4)
+    hy = yf + 8 * math.cos(th)
+    r.rrect(-62, hy - 4, 62, hy + 4, 3, "#C9C8D4", INK, 2.2)                                  # the handle on the free edge
+    return r
+
+
+@prop
+def counter(c, x, y, k, t, st):
+    """A kitchen counter with a rolling pin and a bowl; things stand on its top at y - 146."""
+    r = Rig(c, x, y, k)
+    r.ell(0, 3, 200, 14, mix("#C98A52", "#5A3A1A", 0.5), None)
+    r.rrect(-176, -128, 176, 0, 6, "#D9A066", INK, 3)
+    for sx in (-88, 88):
+        r.rrect(sx - 72, -112, sx + 72, -14, 6, "#E8B87C", INK, 2.4)
+        r.dot(sx + (-56 if sx > 0 else 56), -66, 5, "#FFD21F")
+    r.rrect(-192, -148, 192, -122, 6, "#F6EBD2", INK, 3)
+    r.ell(-30, -148, 84, 6, "#FFFFFF", None)                                                  # a dusting of flour
+    r.rrect(78, -164, 160, -150, 6, "#C98A52", INK, 2.4)                                      # rolling pin
+    for hx in (62, 160):
+        r.rrect(hx - 8, -168, hx + 8, -146, 5, "#8B4F26", INK, 2.2)
+    pts = [(-146 + 40 * math.cos(math.radians(a)), -158 + 26 * math.sin(math.radians(a))) for a in range(0, 181, 15)]
+    r.poly(pts, "#FF6B8B", INK, 2.6)                                                          # mixing bowl
+    r.ell(-146, -158, 40, 9, darker("#FF6B8B", 0.1), INK, 2.4)
+    r.ell(-146, -159, 33, 6, "#FFF4DA", None)
+    return r
+
+
+def _tint(view, pts, color, alpha):
+    """Lays a see-through colour over whatever is already drawn inside the polygon (world coordinates)."""
+    cv = view.c
+    pp = [cv._p(*view.P(px, py)) for px, py in pts]
+    x0, y0 = max(0, int(min(p[0] for p in pp))), max(0, int(min(p[1] for p in pp)))
+    x1, y1 = min(cv.img.width, int(max(p[0] for p in pp)) + 2), min(cv.img.height, int(max(p[1] for p in pp)) + 2)
+    if x1 <= x0 or y1 <= y0:
+        return
+    mask = Image.new("L", (x1 - x0, y1 - y0), 0)
+    ImageDraw.Draw(mask).polygon([(px - x0, py - y0) for px, py in pp], fill=int(255 * alpha))
+    col = D.hex2rgb(color)
+    cv.img.paste(col + (255,) if cv.img.mode == "RGBA" else col, (x0, y0), mask)
+
+
+@prop
+def water(c, x, y, k, t, st):
+    """The front of the river: see-through water that hides the feet of whoever wades in it. Put it at y = 700, in front of everyone."""
+    from .storyart2 import river_x
+    w, top = st.get("world", 1280), st.get("top", 628.0)
+    xl0, xr0 = river_x(top, w)
+    xl1, xr1 = river_x(706, w)
+    n = 40
+    wave = [(lerp(xl0, xr0, i / n), top + 3.5 * math.sin(lerp(xl0, xr0, i / n) / 30.0 + t * 2.1) + 2.0 * math.sin(lerp(xl0, xr0, i / n) / 13.0 - t * 2.9)) for i in range(n + 1)]
+    _tint(c, wave + [(xr1, 706), (xl1, 706)], "#3E9BE8", 0.58)
+    c.line(wave, "#E9F7FF", 3.2)
+    for i in range(5):                                                                        # a few ripples
+        ph = (t * 0.5 + i * 0.2) % 1.0
+        yy = top + 14 + i * 14
+        xa, xb = river_x(yy, w)
+        cx = lerp(xa + 40, xb - 40, (i * 0.37 + ph * 0.3) % 1.0)
+        c.line([(cx - 22, yy), (cx - 8, yy - 3), (cx + 8, yy + 3), (cx + 22, yy)], "#D5F1FF", 2.4)
+    return None
 
 
 # ================================================================================================ effects

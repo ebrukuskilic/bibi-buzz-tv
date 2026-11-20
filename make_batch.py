@@ -5,6 +5,7 @@
   python make_batch.py --day 1 --only d001-S1 --sheet         # one video + a contact sheet to check the layout
   python make_batch.py --day 1 --dry                          # only print the plan with durations (needs the voice)
   python make_batch.py --day 1 --thumbs-only                  # only the designed thumbnails of the long videos (fast)
+  python make_batch.py --day 1 --only ep1                     # only the cover of episode 1 (ep1.png)
 """
 import argparse
 import datetime
@@ -38,6 +39,13 @@ def make_thumb(les, out_dir):
     make_lesson_thumbnail(les, os.path.join(out_dir, les.id + ".jpg"))
 
 
+def make_ep1_thumb(out_dir):
+    """Cover of episode 1 (COLORS!) as ep1.png; it can be set on that video by hand in Studio."""
+    from bibi_buzz.draw import make_background
+    from bibi_buzz.thumbnail import make_thumbnail
+    make_thumbnail(make_background(), os.path.join(out_dir, "ep1.png"))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--day", type=int)
@@ -59,6 +67,11 @@ def main():
     ffmpeg = get_ffmpeg()
     os.makedirs(a.out, exist_ok=True)
     only = set(a.only.split(",")) if a.only else None
+    if only and "ep1" in only:                      # --only ep1: the cover of episode 1 (no lessons are rendered for it)
+        make_ep1_thumb(a.out)
+        only.discard("ep1")
+        if not only:
+            return
     lessons = [l for l in CU.plan(day) if not only or l.id in only]
     manifest = dict(day=day, date=str(date), videos=[])
     failures = []

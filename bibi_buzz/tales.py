@@ -18,11 +18,31 @@ def _intro(t, title_lines, line2, mood="title"):
     return sc
 
 
-def _outro(t, moral, bye="The End. Thank you for watching! See you at the next story. Bye bye!", bg="meadow_open", caption=None):
+def _outro(t, moral, bye="The End. Thank you for watching!", bg="meadow_open", caption=None):
     sc = t.scene("The End", bg, mood="triumph", title="The End", drift=0.0)
     sc.actor("bibi", "bibi", 230, 600, 1.1).actor("pip", "pip", 520, 610, 1.0).actor("mo", "mo", 800, 612, 1.0).actor("lila", "lila", 1060, 604, 1.0)
     sc.nar(moral, ("fx", "caption", 0, 0, {"at": 0.4, "dur": 60.0, "text": caption or moral_caption(moral)}), ("fx", "sparkle", 640, 300, {"at": 0.3, "dur": 4.0, "r": 360}), tail=0.6)
-    sc.nar(bye, ("fx", "the_end", 0, 0, {"at": 0.0, "dur": 60.0, "sub": "Bibi Buzz TV"}), ("fx", "confetti", 0, 0, {"at": 0.4, "dur": 60.0}), tail=1.6)
+    sc.nar(bye, ("fx", "the_end", 0, 0, {"at": 0.0, "dur": 60.0, "sub": "Bibi Buzz TV"}), ("fx", "confetti", 0, 0, {"at": 0.4, "dur": 60.0}), tail=1.2)
+    _cta(t, bg)
+    return sc
+
+
+# YouTube switches the comments, end screens and the subscribe watermark off for videos made for kids, so every tale ends with its
+# own "Like / Subscribe" card (buttons drawn by storyprops.cta; the pointer presses them while the narrator says the words).
+CTA_LINE = "If you liked this story, please like and subscribe! See you at the next story. Bye bye!"
+CTA_CAPTION = "Like and subscribe for more stories!"
+CTA_CLICKS = {"en": (2.3, 3.2), "tr": (2.1, 3.1)}      # seconds after the scene's narration beat starts (voice starts 0.25 s later)
+
+
+def _cta(t, bg):
+    sc = t.scene("Like and subscribe", bg, mood="happy", drift=0.0)          # no title = no chapter of its own
+    sc.actor("bibi", "bibi", 230, 600, 1.1).actor("pip", "pip", 520, 610, 1.0).actor("mo", "mo", 800, 612, 1.0).actor("lila", "lila", 1060, 604, 1.0)
+    like, sub = CTA_CLICKS.get(t.lang, CTA_CLICKS["en"])
+    sc.nar(CTA_LINE, ("fx", "confetti", 0, 0, {"at": sub, "dur": 60.0}),                      # (drawn first, so the buttons stay on top)
+           ("fx", "cta", 640, 215, {"at": 0.0, "dur": 60.0, "like": like, "sub": sub}),
+           ("fx", "caption", 0, 0, {"at": 0.3, "dur": 60.0, "text": CTA_CAPTION}),
+           ("sfx", "pop", {"at": 0.05}), ("sfx", "pop", {"at": 0.3}), ("sfx", "ding", {"at": like + 0.05}), ("sfx", "pop", {"at": like}),
+           ("sfx", "ding", {"at": sub + 0.05}), ("sfx", "pop", {"at": sub}), ("sfx", "sparkle", {"at": sub + 0.1}), tail=1.8)
     return sc
 
 
@@ -38,13 +58,13 @@ MAMA = dict(outfit="#FF8FB0", apron=True, hat_kind="bonnet", skin="#FFC1D2")
 WOLF = dict(fur="#8E9AB0", scarf="#E2574C")
 
 
-def three_little_pigs():
+def three_little_pigs(lang="en"):
     t = Tale("tale-three-little-pigs", "The Three Little Pigs | Fairy Tale Story for Kids | Bibi Buzz TV",
              "Huff, puff, and a house that will not fall! Watch the classic fairy tale of The Three Little Pigs and the Big Bad Wolf: "
              "one pig builds with straw, one with sticks and one with strong bricks. A gentle, colorful animated story in simple English for toddlers and preschoolers.",
              TAGS + ["three little pigs", "the three little pigs", "big bad wolf", "huff and puff"],
              {"nar": NAR, "mama": (ARIA, "-4%", "+0Hz"), "pig1": (ANA, "-4%", "+18Hz"), "pig2": (ANA, "-4%", "+8Hz"),
-              "pig3": (ANA, "-6%", "+0Hz"), "wolf": (GUY, "-10%", "-6Hz")})
+              "pig3": (ANA, "-6%", "+0Hz"), "wolf": (GUY, "-10%", "-6Hz")}, lang=lang)
     t.bubble_tint = {"wolf": "#E8ECF6", "pig1": "#FFE3E0", "pig2": "#DDECFF", "pig3": "#DDF5DE", "mama": "#FFE9F2"}
     t.cover = dict(bg="meadow", title=("THE THREE", "LITTLE PIGS"), size=122, gap=122,
                    actors=[("p1", "pig", 170, 702, 1.45, 1, "surprised", PIG1), ("p2", "pig", 395, 708, 1.45, 1, "scared", PIG2),
@@ -198,13 +218,13 @@ def three_little_pigs():
 BEAR_J = dict(fur="#8B5A2B", extra="tie", outfit="#E2574C", hat_kind="cap", hat_color="#3E8EDE")
 
 
-def tortoise_and_hare():
+def tortoise_and_hare(lang="en"):
     t = Tale("tale-tortoise-and-hare", "The Tortoise and the Hare | Fairy Tale Story for Kids | Bibi Buzz TV",
              "Slow and steady wins the race! Watch the classic fable of The Tortoise and the Hare: a speedy hare boasts that nobody can beat him, "
              "but a slow, kind tortoise has a plan. A colorful animated story in simple English for toddlers and preschoolers.",
              TAGS + ["tortoise and the hare", "the tortoise and the hare", "slow and steady wins the race", "aesop fables"],
              {"nar": NAR, "hare": ("en-US-EricNeural", "+2%", "+6Hz"), "tort": ("en-US-ChristopherNeural", "-16%", "-4Hz"),
-              "bear": (GUY, "-8%", "-10Hz"), "pig1": (ANA, "-4%", "+18Hz"), "pig2": (ANA, "-4%", "+8Hz"), "pig3": (ANA, "-6%", "+0Hz")})
+              "bear": (GUY, "-8%", "-10Hz"), "pig1": (ANA, "-4%", "+18Hz"), "pig2": (ANA, "-4%", "+8Hz"), "pig3": (ANA, "-6%", "+0Hz")}, lang=lang)
     t.bubble_tint = {"hare": "#FFF0DC", "tort": "#E2F7DC", "bear": "#EADBC8", "pig1": "#FFE3E0", "pig2": "#DDECFF", "pig3": "#DDF5DE"}
     t.cover = dict(bg="race", title=("THE TORTOISE", "AND THE HARE"), size=106, gap=104,
                    props=[("fin", "finish_line", 900, 650, 0.9, {})],
@@ -311,12 +331,12 @@ BABY = dict(fur="#C98A52", hat_kind="cap", hat_color="#FFD21F")
 GOLD = dict(dress="#6CB7FF", hair="#FFC83D")
 
 
-def goldilocks():
+def goldilocks(lang="en"):
     t = Tale("tale-goldilocks", "Goldilocks and the Three Bears | Fairy Tale Story for Kids | Bibi Buzz TV",
              "Too hot, too cold, just right! Watch the classic fairy tale of Goldilocks and the Three Bears: a curious little girl finds a cozy cottage, "
              "tries the porridge, the chairs and the beds, and meets Papa Bear, Mama Bear and Baby Bear. A colorful animated story in simple English for toddlers and preschoolers.",
              TAGS + ["goldilocks and the three bears", "goldilocks", "three bears", "too hot too cold just right"],
-             {"nar": NAR, "gold": (ANA, "-4%", "+6Hz"), "papa": (GUY, "-10%", "-14Hz"), "mama": (ARIA, "-4%", "+0Hz"), "baby": (ANA, "-2%", "+22Hz")})
+             {"nar": NAR, "gold": (ANA, "-4%", "+6Hz"), "papa": (GUY, "-10%", "-14Hz"), "mama": (ARIA, "-4%", "+0Hz"), "baby": (ANA, "-2%", "+22Hz")}, lang=lang)
     t.bubble_tint = {"gold": "#FFF5C8", "papa": "#DCE9FF", "mama": "#FFE3EE", "baby": "#FFF0C8"}
     t.cover = dict(bg="meadow", title=("GOLDILOCKS", "& THE 3 BEARS"), size=112, gap=112,
                    actors=[("gold", "girl", 300, 706, 1.6, 1, "surprised", dict(GOLD, hold="basket")), ("papa", "bear", 700, 710, 1.42, -1, "happy", PAPA),
@@ -433,3 +453,12 @@ def goldilocks():
 
 
 TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_and_hare, "goldilocks": goldilocks}
+
+
+def build(key, lang="en"):
+    """A fresh Tale of TALES[key] in `lang` ("en", or "tr" = the Turkish lines, voices, title and description of tales_tr.py)."""
+    t = TALES[key](lang)
+    if lang != "en":
+        from . import tales_tr
+        tales_tr.localize(t, key)
+    return t

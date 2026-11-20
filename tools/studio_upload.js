@@ -5,13 +5,17 @@
 // paid promotion = no, AI/altered content = no), publishes it as PUBLIC and records the video id.
 //
 //   __bibi.run({ dates: ['2026-11-20'], only: ['d001-L1'], skipTitles: [...], skipIds: [...] })   // starts in the background
+//   limitWaitMin: 20   -> if the very first upload of the run hits the daily limit (YouTube counts uploads over a rolling
+//                         24 h window, so the slot of exactly one day ago may free up a few minutes later), wait and retry
+//                         every limitRetryMin (default 3) minutes for up to that long. Once a video of this run has been
+//                         published, a limit hit means the day's quota is used up and the run stops at once.
 //   __bibi.status()                                                                              // poll this
 //   __bibi.scrape()                                                                              // titles already in Studio (Videos + Shorts tabs)
 //   __bibi.stop = true                                                                           // stop after the current step
 (() => {
   const BASE = 'https://raw.githubusercontent.com/ebrukuskilic/bibi-buzz-tv/media/';
   if (window.__bibi && window.__bibi.running) return 'already running';
-  const S = window.__bibi = { v: 1, running: false, stop: false, phase: 'idle', current: null, limit: false, log: [], done: [], failed: [], published: {} };
+  const S = window.__bibi = { v: 2, running: false, stop: false, phase: 'idle', current: null, limit: false, log: [], done: [], failed: [], published: {} };
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const txt = e => ((e && (e.innerText || e.textContent)) || '').replace(/\s+/g, ' ').trim();
@@ -64,7 +68,12 @@
       try { return await until(() => $('ytcp-uploads-dialog input[type=file][name=Filedata]'), 8000, 'file input'); }
       catch (e) {
         const t = txt(dlg());
-        if (/sınır|limit/i.test(t)) { S.limit = true; throw new Error('upload limit: ' + t.slice(0, 200)); }
+        if (/sınır|limit/i.test(t)) {
+          S.limit = true;
+          const x = $('#ytcp-uploads-dialog-close-button'); if (x) x.click();
+          await sleep(1500);
+          throw new Error('daily upload limit reached: ' + t.slice(0, 160));
+        }
         L('open attempt ' + (k + 1) + ' failed'); await sleep(600);
       }
     }
@@ -183,6 +192,8 @@
       await S.ready;
       // typing into Studio's fields only works while this tab is the one shown in the browser pane
       if (document.visibilityState !== 'visible') throw new Error('this tab is in the background: bring the Studio tab to the front and run again');
+      const t0 = Date.now(), waitMs = (opts.limitWaitMin || 0) * 60000, gap = (opts.limitRetryMin || 3) * 60000;
+      let published = 0;                                     // videos published by this run
       for (const date of opts.dates || []) {
         let man;
         try { man = await (await fetch(BASE + date + '/manifest.json?t=' + Date.now())).json(); }
@@ -192,8 +203,18 @@
           if (S.done.includes(v.id) || (opts.skipIds || []).includes(v.id) || (opts.skipTitles || []).includes(v.title)) continue;
           if (opts.only && !opts.only.includes(v.id)) continue;
           S.current = v.id;
-          try { await one(date, v); S.done.push(v.id); }
-          catch (e) { S.failed.push(v.id + ': ' + e.message); L('ERROR ' + v.id + ': ' + e.message); S.stop = true; }
+          for (;;) {
+            try { await one(date, v); S.done.push(v.id); published++; break; }
+            catch (e) {
+              const retry = S.limit && !S.stop && published === 0 && Date.now() + gap <= t0 + waitMs;
+              if (!retry) { S.failed.push(v.id + ': ' + e.message); L('ERROR ' + v.id + ': ' + e.message); S.stop = true; break; }
+              L('upload limit: no free slot yet, trying ' + v.id + ' again in ' + gap / 60000 + ' min');
+              S.phase = 'waiting for an upload slot'; S.limit = false;
+              for (let i = 0; i < gap / 1000 && !S.stop; i++) await sleep(1000);
+              S.phase = 'running';
+              if (S.stop) break;
+            }
+          }
         }
       }
       S.phase = S.stop ? 'stopped' : 'finished';
@@ -201,7 +222,11 @@
     finally { S.running = false; S.current = null; }
   };
   S.status = () => ({ phase: S.phase, running: S.running, current: S.current, done: S.done, failed: S.failed, published: S.published, limit: S.limit, last: S.log.slice(-5) });
-  S.wait = async ms => { const t0 = Date.now(); while (S.running && Date.now() - t0 < ms) await sleep(500); return S.status(); };   // keep ms <= 25000 per tool call
+  // keep ms <= 25000 per tool call; while the run is still going the answer is a short summary, the full status comes at the end
+  S.wait = async ms => {
+    const t0 = Date.now(); while (S.running && Date.now() - t0 < ms) await sleep(500);
+    return S.running ? { phase: S.phase, current: S.current, done: S.done.length, failed: S.failed.length, limit: S.limit, last: S.log.slice(-1) } : S.status();
+  };
   // titles that are already in Studio (Videos tab + Shorts tab, newest 30 each)
   S.scrape = async () => {
     await S.ready;

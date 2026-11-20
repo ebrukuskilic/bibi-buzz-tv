@@ -85,7 +85,10 @@ SFX_TAGS = {"reveal": "pop", "count": "count", "item": "pop", "letter": "pop", "
 
 
 def cta_times(lesson):
-    """When (seconds after the 'Like and subscribe' card starts) the pointer presses Like and then Subscribe: on beats of the music."""
+    """When (seconds after the 'Like and subscribe' card starts) the pointer presses Like and then Subscribe: on beats of the music.
+    A Short has a much shorter line ("Like and subscribe for more!"), so its clicks come earlier."""
+    if lesson.fmt == "short":
+        return 1.0 * lesson.beat, 2.4 * lesson.beat
     return 1.5 * lesson.beat, 3.0 * lesson.beat
 
 

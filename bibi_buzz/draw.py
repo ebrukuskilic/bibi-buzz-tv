@@ -93,26 +93,72 @@ FONT_CANDIDATES = [
     "/Library/Fonts/Arial Rounded Bold.ttf",
     "C:/Windows/Fonts/arialbd.ttf",
 ]
+# Turkish: Fredoka has no ğ Ğ İ ş Ş, so Turkish text is set in Baloo 2 (same friendly rounded look; downloaded next to Fredoka).
+FONT_CANDIDATES_TR = [
+    "assets/Baloo2-Variable.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+    "C:/Windows/Fonts/arialbd.ttf",
+    "/Library/Fonts/Arial Rounded Bold.ttf",
+]
+# (size scale, downward shift in em of the drawn font) that make a font sit like Fredoka (the layout was drawn with it).
+# Baloo 2: cap height 0.60 em / x-height 0.46 em against Fredoka's 0.70 / 0.50, and its centre line lies higher.
+FONT_FIX = {"Baloo2-Variable.ttf": (1.12, 0.055)}
+LANG = "en"
+
+
+def set_language(lang):
+    """"en" = Fredoka, "tr" = Baloo 2. Call it again in every worker process (the setting is a module global)."""
+    global LANG
+    lang = lang if lang in ("en", "tr") else "en"
+    if lang != LANG:
+        LANG = lang
+        _font.cache_clear()
+        _face.cache_clear()
+
+
+def upper(s):
+    """Upper case in the current language (Turkish i -> İ and ı -> I)."""
+    return s.replace("i", "İ").replace("ı", "I").upper() if LANG == "tr" else s.upper()
+
+
+WORDS_TR = {"FINISH": "BİTİŞ", "START": "BAŞLA", "HOME": "EV",          # words written on signs in the world
+            "LIKE": "BEĞEN", "SUBSCRIBE": "ABONE OL", "SUBSCRIBED": "ABONE OLUNDU"}      # the buttons of the end card (cta)
+
+
+def word(s):
+    """A sign's word in the current language."""
+    return WORDS_TR.get(s, s) if LANG == "tr" else s
+
+
+@lru_cache(None)
+def _face():
+    """(path of the font file, size scale, downward shift in em) for the current language; path None = Pillow's default font."""
+    for p in (FONT_CANDIDATES_TR if LANG == "tr" else FONT_CANDIDATES):
+        full = p if os.path.isabs(p) else os.path.join(ROOT, p)
+        if os.path.exists(full):
+            sc, dy = FONT_FIX.get(os.path.basename(p), (1.0, 0.0))
+            return full, sc, dy
+    return None, 1.0, 0.0
 
 
 def font(size):
     """Font of `size` layout pixels. Sizes are quantised to 1 layout px so animated (growing) text does not
     create thousands of font objects."""
-    return _font(max(8, int(size * SS) // SS * SS))
+    return _font(max(8, int(size * _face()[1] * SS) // SS * SS))
 
 
 @lru_cache(None)
 def _font(px):
-    for p in FONT_CANDIDATES:
-        full = p if os.path.isabs(p) else os.path.join(ROOT, p)
-        if os.path.exists(full):
-            f = ImageFont.truetype(full, px)
-            try:  # variable fonts (Fredoka): pick the bold weight
-                axes = f.get_variation_axes()
-                f.set_variation_by_axes([700 if "eight" in str(a.get("name")) else a.get("default", 100) for a in axes])
-            except Exception:
-                pass
-            return f
+    full = _face()[0]
+    if full:
+        f = ImageFont.truetype(full, px)
+        try:  # variable fonts (Fredoka, Baloo 2): pick the bold weight
+            axes = f.get_variation_axes()
+            f.set_variation_by_axes([700 if "eight" in str(a.get("name")) else a.get("default", 100) for a in axes])
+        except Exception:
+            pass
+        return f
     return ImageFont.load_default(px)
 
 
@@ -163,7 +209,10 @@ class Canvas:
 
     def text(self, x, y, s, size, fill, anchor="mm", stroke=0, stroke_fill=None):
         px, py = self._p(x, y)
-        self.d.text((px, py), s, font=font(size), fill=fill, anchor=anchor,
+        f = font(size)
+        if anchor[1:2] == "m":                                    # other fonts: keep the centre line where Fredoka's was
+            py += _face()[2] * getattr(f, "size", 0)
+        self.d.text((px, py), s, font=f, fill=fill, anchor=anchor,
                     stroke_width=int(stroke * SS), stroke_fill=stroke_fill)
 
     @contextmanager
@@ -469,3 +518,121 @@ def lyric_line(c, text, progress, cy=655, size=40):
     for i, (w, wd) in enumerate(zip(words, widths)):
         c.text(x, cy, w, size, "#FF4F86" if i <= idx else "#2B3A55", anchor="lm")
         x += wd
+
+
+# ------------------------------------------------------------------------- "Like" and "Subscribe" end card
+# YouTube switches its comments, end screens and subscribe watermark off for videos made for kids, so the videos carry their own
+# reminder: the two buttons are drawn into the last seconds, and a mouse pointer presses them.
+def _rot(pts, cx, cy, ang):
+    if not ang:
+        return pts
+    a = math.radians(ang)
+    ca, sa = math.cos(a), math.sin(a)
+    return [(cx + (x - cx) * ca - (y - cy) * sa, cy + (x - cx) * sa + (y - cy) * ca) for x, y in pts]
+
+
+def thumb_icon(c, x, y, s, fill="#FFFFFF", ang=0.0):
+    """A flat thumbs-up icon, s px tall, centred on (x, y); it tilts by `ang` degrees around its middle."""
+    u = s / 24.0
+    ox, oy = x - 12 * u, y - 12 * u
+    cuff = [(1.2, 10.2), (5.8, 10.2), (5.8, 21.8), (1.2, 21.8)]
+    hand = [(7.6, 10.6), (11.6, 4.4), (12.9, 1.8), (15.0, 1.5), (16.3, 3.2), (15.6, 8.4), (21.0, 8.4), (22.9, 10.0), (22.9, 11.8),
+            (22.2, 12.8), (22.9, 14.2), (22.5, 15.8), (21.5, 16.6), (21.9, 17.8), (21.1, 19.6), (19.2, 21.8), (8.4, 21.8), (7.6, 21.2)]
+    for pts in (cuff, hand):
+        c.poly(_rot([(ox + px * u, oy + py * u) for px, py in pts], x, y, ang), fill=fill, outline=fill, width=1.2 * u)
+
+
+def bell_icon(c, x, y, s, fill="#FFFFFF", ang=0.0):
+    """A flat notification bell, s px tall, centred on (x, y); it swings by `ang` degrees around its top (so it can ring)."""
+    u = s / 24.0
+    px_, py_ = x, y - 12 * u                                                    # pivot: where the bell hangs
+    dome = [(x + px * u, y + py * u) for px, py in ellipse_pts(0, -3.0, 6.9, 7.4, 0, 30)]
+    flare = [(-6.9, -3.0), (-7.6, 3.5), (-10.2, 8.0), (10.2, 8.0), (7.6, 3.5), (6.9, -3.0)]
+    parts = [dome, [(x + px * u, y + py * u) for px, py in flare],
+             [(x + px * u, y + py * u) for px, py in ellipse_pts(0, -10.6, 1.6, 1.6, 0, 14)],
+             [(x + px * u, y + py * u) for px, py in ellipse_pts(0, 10.4, 2.5, 2.5, 0, 16)]]
+    for pts in parts:
+        c.poly(_rot(pts, px_, py_, ang), fill=fill, outline=fill, width=1.0 * u)
+
+
+def cursor_icon(c, x, y, k=1.0):
+    """A mouse pointer whose tip is at (x, y)."""
+    pts = [(0, 0), (0, 30), (7.5, 23.5), (12.5, 34.5), (18.5, 31.8), (13.4, 21.2), (23, 21)]
+    c.poly([(x + px * k * 1.15, y + py * k * 1.15) for px, py in pts], fill="#FFFFFF", outline=INK, width=3.2 * k)
+
+
+def _path(t, keys):
+    """Piece-wise smooth position: keys = [(time, (x, y)), ...]."""
+    if t <= keys[0][0]:
+        return keys[0][1]
+    for (t0, p0), (t1, p1) in zip(keys, keys[1:]):
+        if t <= t1:
+            u = smooth((t - t0) / (t1 - t0))
+            return lerp(p0[0], p1[0], u), lerp(p0[1], p1[1], u)
+    return keys[-1][1]
+
+
+def cta(c, cx, cy, t, k=1.0, t_like=0.9, t_sub=1.9):
+    """"LIKE" and "SUBSCRIBE" buttons centred on (cx, cy) (t = seconds since the card appeared). A pointer presses Like at t_like
+    and Subscribe at t_sub; Subscribe turns grey ("SUBSCRIBED") and its bell rings. k scales it (1.0 = 810 px wide)."""
+    if t <= 0.02:
+        return
+    lw, sw, h, gap = 330 * k, 450 * k, 112 * k, 34 * k
+    total = lw + gap + sw
+    lx, sx = cx - total / 2 + lw / 2, cx + total / 2 - sw / 2
+    RED, BLUE, GREY = "#E8383D", "#3E8EDE", "#CDD3DE"
+
+    def button(x, w, p, fill, label, tcol, stroke_col, text_dx, text_w):
+        if p <= 0.02:
+            return
+        hw, hh = w / 2 * min(p, 1.12), h / 2 * min(p, 1.12)
+        c.rrect(x - hw, cy - hh + 9 * k, x + hw, cy + hh + 9 * k, hh, fill=darker(fill, 0.45))
+        c.rrect(x - hw, cy - hh, x + hw, cy + hh, hh, fill=fill, outline=INK, width=5 * k)
+        if p >= 0.6:
+            c.text_fit(x + text_dx, cy + 2 * k, label, 52 * k * min(p, 1.0), tcol, max_w=text_w, stroke=(3 * k if stroke_col else 0), stroke_fill=stroke_col)
+
+    # ---- Like
+    pl = pop(t, 0.0, 0.55)
+    dl = t - t_like
+    liked = dl >= 0
+    bl = 1.0 + (0.16 * math.exp(-dl * 7.0) * math.sin(dl * 24.0) if liked else 0.0)
+    fill_l = BLUE if liked else "#FFFFFF"
+    col_l = "#FFFFFF" if liked else BLUE
+    button(lx, lw * bl, pl, fill_l, word("LIKE"), col_l, darker(BLUE, 0.5) if liked else None, 40 * k, lw - 130 * k)
+    if pl >= 0.6:
+        tilt = -14 * math.exp(-dl * 6.0) * math.cos(dl * 18.0) if liked else 0.0
+        thumb_icon(c, lx - lw / 2 + 62 * k, cy - 3 * k, 56 * k * min(pl, 1.0) * (1.0 + 0.1 * math.sin(clamp(dl * 2.5) * math.pi) if liked else 1.0),
+                   col_l, ang=tilt)
+
+    # ---- Subscribe
+    ps = pop(t, 0.25, 0.55)
+    ds = t - t_sub
+    subbed = ds >= 0
+    bs = 1.0 + (0.12 * math.exp(-ds * 7.0) * math.sin(ds * 24.0) if subbed else 0.0)
+    fill_s = GREY if subbed else RED
+    col_s = "#3B4A63" if subbed else "#FFFFFF"
+    button(sx, sw * bs, ps, fill_s, word("SUBSCRIBED" if subbed else "SUBSCRIBE"), col_s, None if subbed else darker(RED, 0.5), -30 * k, sw - 150 * k)
+    if ps >= 0.6:
+        ring = 24 * math.exp(-ds * 2.6) * math.sin(ds * 17.0) if subbed else 0.0
+        bell_icon(c, sx + sw / 2 - 60 * k, cy + 3 * k, 56 * k * min(ps, 1.0), col_s, ang=ring)
+
+    # ---- the pointer, a ripple and a few stars on every click
+    ptl = (lx + 74 * k, cy + 34 * k)
+    pts_ = (sx + 40 * k, cy + 36 * k)
+    start = (cx + total / 2 + 80 * k, cy + 230 * k)
+    out = (cx + total / 2 + 140 * k, cy + 215 * k)
+    t_in = max(0.3, t_like - 0.9)
+    pos = _path(t, [(t_in, start), (t_like, ptl), (t_sub, pts_), (t_sub + 1.1, out)])
+    if t_in <= t <= t_sub + 1.15:
+        press = 0.84 if min(abs(t - t_like), abs(t - t_sub)) < 0.1 else 1.0
+        cursor_icon(c, pos[0], pos[1], k * press)
+    for tc, (px_, py_), col in ((t_like, ptl, BLUE), (t_sub, pts_, RED)):
+        u = (t - tc) / 0.55
+        if 0 < u < 1:
+            r = 16 * k + 80 * k * u
+            c.ellipse(px_, py_, r, r, outline=mix(col, "#FFFFFF", 0.25), width=max(1.0, 6 * k * (1 - u)))
+            bx = lx if tc == t_like else sx
+            for i, sc in enumerate(["#FFD21F", "#FF5C8A", "#9BE8FF", "#FFD21F", "#FF5C8A", "#9BE8FF"]):
+                a = math.radians(-90 + 60 * i + 14)
+                rr = (h * 0.62 + 90 * k * u)
+                star(c, bx + math.cos(a) * rr * 1.5, cy + math.sin(a) * rr * 0.9, 10 * k * (1 - u) + 3, sc, ang=u * 120 + i * 20)

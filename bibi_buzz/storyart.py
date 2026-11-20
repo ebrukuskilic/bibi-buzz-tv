@@ -407,7 +407,7 @@ def pig(c, x, y, k=1.0, t=0.0, P=None, skin="#FFB3C7", outfit="#3E8EDE", hat_kin
 
 
 # ------------------------------------------------------------------------------------------------ wolf
-def wolf(c, x, y, k=1.0, t=0.0, P=None, fur="#8E9AB0", scarf=None, **_):
+def wolf(c, x, y, k=1.0, t=0.0, P=None, fur="#8E9AB0", scarf=None, cap=None, glasses=False, **_):
     P = P or Pose()
     r = Rig(c, x + P.dx * k, y - P.bob * k, k, P.face, P.lean, P.sq)
     dark, light = darker(fur, 0.28), "#E8ECF4"
@@ -428,9 +428,14 @@ def wolf(c, x, y, k=1.0, t=0.0, P=None, fur="#8E9AB0", scarf=None, **_):
     r.ell(0, -200, 57, 47, fur, INK, 3.2)                                                # head
     for s in (-1, 1):                                                                    # cheek fur
         r.poly([(s * 54, -212), (s * 74, -198), (s * 56, -192), (s * 70, -178), (s * 52, -176), (s * 58, -160), (s * 40, -170)], fur, INK, 3)
+    if cap:                                                                              # Grandma's nightcap (the ears stick out in front of it)
+        r.poly([(-52, -232), (52, -232), (50, -262), (30, -300), (4, -322), (-22, -312), (-44, -276)], cap, INK, 3.2)
+        r.ell(-26, -324, 11, 11, "#FF7AA8", INK, 2.6)
     for s in (-1, 1):                                                                    # pointed ears
         r.poly([(s * 24, -234), (s * 34, -280), (s * 62, -226)], fur, INK, 3.2)
         r.poly([(s * 33, -236), (s * 37, -266), (s * 53, -232)], "#FFB3C7", None)
+    if cap:
+        r.rrect(-56, -240, 56, -222, 8, mix(cap, "#FF8FB0", 0.55), INK, 3)               # the frilly brim
     sh = P.face * 5
     r.ell(sh, -186, 33, 25, light, INK, 3)                                               # muzzle
     r.ell(sh, -198, 13, 9, "#2B2B3B", INK, 2.4)                                          # nose
@@ -439,6 +444,10 @@ def wolf(c, x, y, k=1.0, t=0.0, P=None, fur="#8E9AB0", scarf=None, **_):
     f_mouth(r, sh, -176, P, 17, teeth=True)
     if P.puff:
         f_cheeks(r, sh, -184, 47, "#FF9DB0", 10, P.puff)
+    if glasses:
+        for s in (-1, 1):
+            r.ell(sh * 1.4 + s * 25, -212, 18, 18, None, "#7A5A3A", 3)
+        r.line([(sh * 1.4 - 8, -212), (sh * 1.4 + 8, -212)], "#7A5A3A", 3)
     return r
 
 
@@ -562,7 +571,7 @@ def tortoise(c, x, y, k=1.0, t=0.0, P=None, shell="#4FB05A", hold=None, **_):
 
 
 # ------------------------------------------------------------------------------------------------ girl
-def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=None, **_):
+def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=None, hood=None, granny=None, **_):
     P = P or Pose()
     r = Rig(c, x + P.dx * k, y - P.bob * k + P.lower * k, k, P.face, P.lean, P.sq)
     skin = "#FFDDBF"
@@ -574,30 +583,60 @@ def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=No
         r.limb(hip, foot, 14, skin)
         r.limb((foot[0], foot[1] + 6), (foot[0], foot[1] + 18), 15, "#FFFFFF", INK, 2.4)
         r.ell(foot[0] + s * 2, foot[1] + 22, 17, 9, "#E2574C", INK, 2.6)
-    for s in (-1, 1):                                                                    # long hair behind
-        r.ell(s * 50, -148, 21, 38, hair, INK, 3)
-    r.poly([(-28, -140), (28, -140), (60, -52), (-60, -52)], dress, INK, 3.2)           # dress
-    r.ell(0, -52, 60, 9, darker(dress, 0.1), INK, 2.6)
-    r.poly([(-22, -138), (22, -138), (36, -66), (-36, -66)], "#FFFFFF", INK, 2.6)       # apron
-    r.rrect(-12, -108, 12, -90, 4, "#FFE3EC", INK, 2)
+    if not hood and not granny:
+        for s in (-1, 1):                                                                # long hair behind
+            r.ell(s * 50, -148, 21, 38, hair, INK, 3)
+    if hood:                                                                             # a red hooded cloak instead of the dress
+        r.poly([(-30, -142), (30, -142), (72, -50), (-72, -50)], hood, INK, 3.2)
+        r.ell(0, -50, 72, 9, darker(hood, 0.12), INK, 2.6)
+        r.line([(0, -136), (0, -56)], darker(hood, 0.22), 2.6)
+        dress = hood
+    else:
+        r.poly([(-28, -140), (28, -140), (60, -52), (-60, -52)], dress, INK, 3.2)       # dress
+        r.ell(0, -52, 60, 9, darker(dress, 0.1), INK, 2.6)
+        r.poly([(-22, -138), (22, -138), (36, -66), (-36, -66)], "#FFFFFF", INK, 2.6)   # apron
+        r.rrect(-12, -108, 12, -90, 4, "#FFE3EC", INK, 2)
     hands = f_arms(r, P, 30, -134, 40, 14, skin, hand=skin, sleeve=dress)
     held(r, hold, hands[1])
     for s in (-1, 1):
         r.ell(s * 34, -140, 14, 11, dress, INK, 2.6)                                      # puffed sleeves
+    if granny:                                                                           # a shawl over the shoulders
+        r.poly([(-46, -148), (46, -148), (54, -112), (0, -84), (-54, -112)], granny, INK, 3)
+        r.line([(-30, -112), (0, -92), (30, -112)], darker(granny, 0.2), 2.4)
+    if hood:                                                                             # the hood behind the head, the clasp at the neck
+        r.ell(0, -179, 61, 57, hood, INK, 3.2)
+        r.ell(0, -142, 46, 17, hood, INK, 3)
+        r.dot(0, -138, 6.5, "#FFD21F")
     r.ell(0, -176, 45, 42, skin, INK, 3.2)                                               # head
-    for i, a in enumerate(range(200, 341, 22)):                                          # curly fringe + top
-        r.ell(52 * math.cos(math.radians(a)) * 0.92, -176 + 47 * math.sin(math.radians(a)), 14, 13, hair, INK, 2.8)
-    for s in (-1, 1):
-        r.ell(s * 49, -172, 14, 14, hair, INK, 2.8)
-        r.ell(s * 53, -150, 13, 13, hair, INK, 2.8)
-        r.ell(s * 49, -128, 13, 13, hair, INK, 2.8)
-    r.poly([(-40, -190), (-10, -204), (30, -200), (42, -184), (28, -178), (10, -190), (-12, -184), (-34, -178)], hair, None)
-    for a in range(0, 5):
-        r.ell(-32 + a * 16, -192 + (a % 2) * 3, 10, 9, hair, None)
+    if hood:                                                                             # a little fringe under the hood
+        for i, a in enumerate(range(-28, 29, 14)):
+            r.ell(a * 0.9, -196 + abs(a) * 0.12, 12, 11, hair, INK, 2.6)
+        r.arc(0, -176, 51, 49, 168, 372, INK, 20)                                        # the hood's rim around the face
+        r.arc(0, -176, 51, 49, 168, 372, hood, 14.5)
+    elif granny:
+        r.ell(0, -224, 20, 17, hair, INK, 3)                                             # the bun
+        for i, a in enumerate(range(200, 341, 18)):
+            r.ell(50 * math.cos(math.radians(a)) * 0.92, -176 + 46 * math.sin(math.radians(a)), 13, 12, hair, INK, 2.6)
+        for s in (-1, 1):
+            r.ell(s * 46, -168, 12, 16, hair, INK, 2.6)
+    else:
+        for i, a in enumerate(range(200, 341, 22)):                                      # curly fringe + top
+            r.ell(52 * math.cos(math.radians(a)) * 0.92, -176 + 47 * math.sin(math.radians(a)), 14, 13, hair, INK, 2.8)
+        for s in (-1, 1):
+            r.ell(s * 49, -172, 14, 14, hair, INK, 2.8)
+            r.ell(s * 53, -150, 13, 13, hair, INK, 2.8)
+            r.ell(s * 49, -128, 13, 13, hair, INK, 2.8)
+        r.poly([(-40, -190), (-10, -204), (30, -200), (42, -184), (28, -178), (10, -190), (-12, -184), (-34, -178)], hair, None)
+        for a in range(0, 5):
+            r.ell(-32 + a * 16, -192 + (a % 2) * 3, 10, 9, hair, None)
     sh = P.face * 3
     f_eyes(r, sh, -172, 17, 9.5, 12, P, pupil="#2A6FD4")
     f_cheeks(r, sh, -156, 29, "#FF9DB0", 8, 0)
     f_mouth(r, sh, -145, P, 11)
+    if granny:                                                                           # round glasses
+        for s in (-1, 1):
+            r.ell(sh + s * 17, -172, 14.5, 15, None, "#7A5A3A", 2.8)
+        r.line([(sh - 3, -172), (sh + 3, -172)], "#7A5A3A", 2.6)
     return r
 
 

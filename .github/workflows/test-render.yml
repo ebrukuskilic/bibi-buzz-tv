@@ -1,16 +1,16 @@
 name: test-render
 
-# A test render of ONE fairy tale in ONE language (real fonts, real voices): cover, a contact sheet of every scene, the script with the
-# voice of every line, and a short clip with sound. It touches neither the daily videos nor the "media" branch: the result goes to the
+# A test render of ONE fairy tale in ONE language, or of lessons (real fonts, real voices): cover, a contact sheet of every scene, the
+# script with the voice of every line, and short clips with sound. It touches neither the daily videos nor the "media" branch: the result goes to the
 # "test-output" branch (raw files: https://raw.githubusercontent.com/<owner>/<repo>/test-output/<tale>-<lang>-sheet.png ...).
 on:
   workflow_dispatch:
     inputs:
       tale:
-        description: "Tale key: three-little-pigs, tortoise-and-hare or goldilocks"
+        description: "Tale key (three-little-pigs, tortoise-and-hare, goldilocks) or lesson ids like d003-L1,d003-L4 (comma separated)"
         default: "three-little-pigs"
       lang:
-        description: "Language: en or tr"
+        description: "Language of a tale: en or tr (lessons are English)"
         default: "tr"
       seconds:
         description: "Length of the clip with real voices in seconds (0 = no clip)"

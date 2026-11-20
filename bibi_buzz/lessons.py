@@ -447,7 +447,13 @@ def game_lesson(id, seed, fmt="long", rounds=10):
 
 
 # --------------------------------------------------------------------------------- shorts
+# Every Short also ends with a few seconds of the Like / Subscribe card (see CTA_LINE above): the buttons are baked into the picture
+# because YouTube has no subscribe watermark for videos made for kids. Draws no random numbers.
+SHORT_CTA_LINE = "Like and subscribe for more!"
+
+
 def _short(id, title_head, topic, tags, seed, segs, items, blurb, theme=None):
+    segs = list(segs) + [Seg("cta", {}, [Cue(SHORT_CTA_LINE, "outro", min_beats=8)])]
     title = f"{title_head} | {BRAND} #Shorts"
     if len(title) > 98:
         title = f"{title_head} #Shorts"

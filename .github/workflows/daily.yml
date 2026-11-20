@@ -1,7 +1,8 @@
 name: daily-videos
 
-# Makes the day's 5 long lessons + 5 Shorts (voice and music in sync, nothing sped up) and publishes them on the
-# orphan "media" branch. A scheduled task on the channel owner's computer then uploads them to YouTube at 21:00.
+# Makes the day's 10 videos (long lessons, the English fairy tale, the Turkish version of yesterday's tale, and 4-5 Shorts;
+# voice and music in sync, nothing sped up) and publishes them on the orphan "media" branch.
+# A scheduled task then uploads them to YouTube at 20:42 (Istanbul).
 on:
   schedule:
     - cron: "17 11 * * *"        # 11:17 UTC = 14:17 in Istanbul
@@ -43,6 +44,8 @@ jobs:
           pip install pillow numpy edge-tts gTTS
           mkdir -p assets
           curl -fL --retry 4 -o assets/Fredoka-Variable.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/fredoka/Fredoka%5Bwdth%2Cwght%5D.ttf"
+          # Turkish text (ğ ş İ ı are missing in Fredoka) is set in Baloo 2
+          curl -fL --retry 4 -o assets/Baloo2-Variable.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/baloo2/Baloo2%5Bwght%5D.ttf"
           ls -la assets
 
       - uses: actions/cache@v4

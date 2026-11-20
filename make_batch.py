@@ -4,6 +4,7 @@
   python make_batch.py --day 1 --out out/2026-11-20
   python make_batch.py --day 1 --only d001-S1 --sheet         # one video + a contact sheet to check the layout
   python make_batch.py --day 1 --dry                          # only print the plan with durations (needs the voice)
+  python make_batch.py --day 1 --thumbs-only                  # only the designed thumbnails of the long videos (fast)
 """
 import argparse
 import datetime
@@ -26,6 +27,17 @@ def get_ffmpeg():
         return "ffmpeg"
 
 
+def make_thumb(les, out_dir):
+    """Designed thumbnail <id>.jpg of a long lesson (the uploader sets it as the custom thumbnail)."""
+    from bibi_buzz import emoji as E
+    from bibi_buzz.thumbnail import make_lesson_thumbnail
+    refs = [c for c in les.segs[0].data["codes"][:3] if not c.startswith(("#", "n:", "L:", "S:"))]
+    missing = E.prefetch(refs)
+    if missing:
+        raise RuntimeError(f"emoji sprites not available: {missing}")
+    make_lesson_thumbnail(les, os.path.join(out_dir, les.id + ".jpg"))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--day", type=int)
@@ -36,6 +48,7 @@ def main():
     ap.add_argument("--workers", type=int, default=0)
     ap.add_argument("--sheet", action="store_true", help="also write a contact sheet PNG per video")
     ap.add_argument("--dry", action="store_true", help="plan only: build the timeline, no video")
+    ap.add_argument("--thumbs-only", action="store_true", help="only (re)make the thumbnails of the long videos")
     ap.add_argument("--cache", default=os.path.join("out", "tts-cache"))
     a = ap.parse_args()
 
@@ -52,6 +65,11 @@ def main():
     for les in lessons:
         print(f"== {les.id}  {les.fmt}  {les.title}", flush=True)
         try:
+            if a.thumbs_only:
+                if les.fmt == "long":
+                    make_thumb(les, a.out)
+                    print("   thumbnail ok", flush=True)
+                continue
             if a.dry:
                 PL.prepare(les, ffmpeg, a.cache, a.voice)
                 problems, st = PL.sync_report(les)
@@ -61,9 +79,13 @@ def main():
             st = PL.render(les, path, ffmpeg, a.cache, a.voice, workers=a.workers or None)
             if a.sheet:
                 PL.contact_sheet(les, os.path.join(a.out, les.id + "-sheet.png"))
-            if les.fmt == "long":  # a still of the first lesson picture (handy as a thumbnail)
-                from bibi_buzz import stage as ST
-                ST.render_frame(les, ST.sample_times(les)[1]).convert("RGB").save(os.path.join(a.out, les.id + ".jpg"), quality=92)
+            if les.fmt == "long":  # designed thumbnail; if that fails, a still of the first lesson picture
+                try:
+                    make_thumb(les, a.out)
+                except Exception as e:
+                    print(f"   thumbnail failed ({e!r}) - using a still instead", flush=True)
+                    from bibi_buzz import stage as ST
+                    ST.render_frame(les, ST.sample_times(les)[1]).convert("RGB").save(os.path.join(a.out, les.id + ".jpg"), quality=92)
             meta = CU.metadata(les, st.pop("chapters_text"))
             manifest["videos"].append(dict(id=les.id, type=les.fmt, file=st["file"], duration=round(st["duration"], 1),
                                            chapters=st["chapters"], **meta))
@@ -71,7 +93,7 @@ def main():
         except Exception as e:                      # one bad video must not stop the others
             failures.append((les.id, repr(e)))
             print(f"   FAILED: {e!r}", flush=True)
-    if not a.dry:
+    if not a.dry and not a.thumbs_only:
         mpath = os.path.join(a.out, "manifest.json")
         if os.path.exists(mpath):                   # partial re-run: keep what is already there
             try:

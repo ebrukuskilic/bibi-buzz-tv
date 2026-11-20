@@ -178,9 +178,10 @@ class PropTL:
 
 
 class Beat:
-    def __init__(self, kind, who, text, acts, lead, tail, dur):
+    def __init__(self, kind, who, text, acts, lead, tail, dur, voice=None):
         self.kind, self.who, self.text, self.acts = kind, who, text, acts
         self.lead, self.tail, self.dur = lead, tail, dur
+        self.voice = voice                  # an entry of Tale.voices other than the speaker's own (a wolf talking like Grandma)
         self.t0 = self.t1 = self.v0 = self.v1 = 0.0
         self.key = None
 
@@ -223,8 +224,8 @@ class Scene:
         self.beats.append(Beat("nar", None, self.tale.T(text), acts, lead, tail, dur))
         return self
 
-    def say(self, who, text, *acts, lead=0.2, tail=0.4, dur=0.0):
-        self.beats.append(Beat("say", who, self.tale.T(text), acts, lead, tail, dur))
+    def say(self, who, text, *acts, lead=0.2, tail=0.4, dur=0.0, voice=None):
+        self.beats.append(Beat("say", who, self.tale.T(text), acts, lead, tail, dur, voice))
         return self
 
     def wait(self, dur, *acts):
@@ -424,7 +425,7 @@ class Tale:
         for sc in self.scenes:
             for b in sc.beats:
                 if b.text:
-                    v, r, p = self.voice_of(b.who)
+                    v, r, p = self.voice_of(b.voice or b.who)
                     b.key = (b.text, v, r, p)
                     out.append(b.key)
         return out

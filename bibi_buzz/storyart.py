@@ -571,7 +571,7 @@ def tortoise(c, x, y, k=1.0, t=0.0, P=None, shell="#4FB05A", hold=None, **_):
 
 
 # ------------------------------------------------------------------------------------------------ girl
-def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=None, hood=None, granny=None, **_):
+def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=None, hood=None, granny=None, gramps=None, **_):
     P = P or Pose()
     r = Rig(c, x + P.dx * k, y - P.bob * k + P.lower * k, k, P.face, P.lean, P.sq)
     skin = "#FFDDBF"
@@ -580,10 +580,14 @@ def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=No
         hip, foot = (s * 17, -58), (s * 18 + sw, -14 - lift)
         if P.sit:
             foot = (s * 30, -30)
+        if gramps:                                                                       # brown trousers and sturdy shoes
+            r.limb(hip, foot, 20, "#7A5A3A", INK, 2.6)
+            r.ell(foot[0] + s * 2, foot[1] + 22, 19, 10, "#3B2A1E", INK, 2.6)
+            continue
         r.limb(hip, foot, 14, skin)
         r.limb((foot[0], foot[1] + 6), (foot[0], foot[1] + 18), 15, "#FFFFFF", INK, 2.4)
         r.ell(foot[0] + s * 2, foot[1] + 22, 17, 9, "#E2574C", INK, 2.6)
-    if not hood and not granny:
+    if not hood and not granny and not gramps:
         for s in (-1, 1):                                                                # long hair behind
             r.ell(s * 50, -148, 21, 38, hair, INK, 3)
     if hood:                                                                             # a red hooded cloak instead of the dress
@@ -591,6 +595,14 @@ def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=No
         r.ell(0, -50, 72, 9, darker(hood, 0.12), INK, 2.6)
         r.line([(0, -136), (0, -56)], darker(hood, 0.22), 2.6)
         dress = hood
+    elif gramps:                                                                         # a cardigan over a white shirt
+        dress = gramps
+        r.poly([(-30, -142), (30, -142), (40, -62), (-40, -62)], dress, INK, 3.2)
+        r.poly([(-13, -142), (13, -142), (0, -102)], "#FFFFFF", INK, 2.4)
+        r.line([(0, -102), (0, -62)], darker(dress, 0.25), 2.6)
+        for yy in (-92, -78):
+            r.dot(0, yy, 4.2, "#FFD21F")
+        r.ell(0, -62, 40, 8, darker(dress, 0.1), INK, 2.6)
     else:
         r.poly([(-28, -140), (28, -140), (60, -52), (-60, -52)], dress, INK, 3.2)       # dress
         r.ell(0, -52, 60, 9, darker(dress, 0.1), INK, 2.6)
@@ -613,6 +625,10 @@ def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=No
             r.ell(a * 0.9, -196 + abs(a) * 0.12, 12, 11, hair, INK, 2.6)
         r.arc(0, -176, 51, 49, 168, 372, INK, 20)                                        # the hood's rim around the face
         r.arc(0, -176, 51, 49, 168, 372, hood, 14.5)
+    elif gramps:                                                                         # white tufts above the ears, bald on top
+        for s in (-1, 1):
+            r.ell(s * 44, -186, 14, 16, hair, INK, 2.6)
+            r.ell(s * 47, -164, 11, 15, hair, INK, 2.6)
     elif granny:
         r.ell(0, -224, 20, 17, hair, INK, 3)                                             # the bun
         for i, a in enumerate(range(200, 341, 18)):
@@ -632,11 +648,52 @@ def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=No
     sh = P.face * 3
     f_eyes(r, sh, -172, 17, 9.5, 12, P, pupil="#2A6FD4")
     f_cheeks(r, sh, -156, 29, "#FF9DB0", 8, 0)
+    if gramps:                                                                           # bushy brows and a big white moustache
+        for s in (-1, 1):
+            r.ell(sh + s * 17, -192, 12, 5.5, hair, INK, 2.2)
+            r.ell(sh + s * 10, -152, 14, 8, hair, INK, 2.4)
     f_mouth(r, sh, -145, P, 11)
     if granny:                                                                           # round glasses
         for s in (-1, 1):
             r.ell(sh + s * 17, -172, 14.5, 15, None, "#7A5A3A", 2.8)
         r.line([(sh - 3, -172), (sh + 3, -172)], "#7A5A3A", 2.6)
+    return r
+
+
+# ------------------------------------------------------------------------------------------------ gingerbread man
+def ginger(c, x, y, k=1.0, t=0.0, P=None, dough="#C98A4B", icing="#FFF8EC", **_):
+    P = P or Pose()
+    r = Rig(c, x + P.dx * k, y - P.bob * k, k, P.face, P.lean, P.sq)
+    light = mix(dough, "#FFFFFF", 0.2)
+    for s in (-1, 1):                                                                    # stubby legs with white icing cuffs
+        sw, lift = P.leg(s)
+        hip, foot = (s * 20, -62), (s * 25 + sw, -16 - lift - (4 if P.sit else 0))
+        r.limb(hip, foot, 25, dough)
+        r.limb((hip[0] + (foot[0] - hip[0]) * 0.58, hip[1] + (foot[1] - hip[1]) * 0.58),
+               (hip[0] + (foot[0] - hip[0]) * 0.8, hip[1] + (foot[1] - hip[1]) * 0.8), 27, icing, None, 0)
+        r.ell(foot[0] + s * 4, foot[1] + 4, 19, 11, dough, INK, 2.8)
+    r.rrect(-44, -148, 44, -50, 36, dough, INK, 3.2)                                     # the round, puffy body
+    r.rrect(-34, -140, 28, -96, 24, light, None)
+    for yy, col in ((-120, "#E2574C"), (-98, "#3DB54A"), (-76, "#3E8EDE")):             # three gumdrop buttons
+        r.ell(0, yy, 8.2, 8.2, col, INK, 2)
+        r.dot(-2.6, yy - 3, 2.4, "#FFFFFF")
+    for s, ang in ((-1, P.arm_l), (1, P.arm_r)):                                         # arms with icing cuffs
+        a = math.radians(ang)
+        sx, sy = s * 42, -126
+        ex, ey = sx + s * math.sin(a) * 44, sy + math.cos(a) * 44
+        r.limb((sx, sy), (ex, ey), 23, dough)
+        r.limb((sx + (ex - sx) * 0.58, sy + (ey - sy) * 0.58), (sx + (ex - sx) * 0.8, sy + (ey - sy) * 0.8), 25, icing, None, 0)
+        r.ell(ex, ey, 14, 14, dough, INK, 2.8)
+    for i in range(5):                                                                   # scalloped icing collar
+        r.ell(-24 + i * 12, -142, 7.6, 6.6, icing, INK, 2)
+    r.ell(0, -178, 57, 49, dough, INK, 3.2)                                              # head
+    r.ell(-8, -187, 40, 30, light, None)
+    sh = P.face * 4
+    for dx in (-22, 0, 22):                                                              # icing dots on the forehead
+        r.dot(sh + dx, -213 + abs(dx) * 0.14, 3.8, icing)
+    f_eyes(r, sh * 1.5, -183, 22, 11, 13.5, P)
+    f_cheeks(r, sh, -165, 39, "#FF9DB0", 9, P.puff)
+    f_mouth(r, sh, -149, P, 14)
     return r
 
 
@@ -646,4 +703,4 @@ def friend(c, which, x, y, k, t, mood="smile"):
     f(c, x, y, k, t=t, mood=mood, look=(4, -2))
 
 
-CHARACTERS = {"pig": pig, "wolf": wolf, "bear": bear, "hare": hare, "tortoise": tortoise, "girl": girl}
+CHARACTERS = {"pig": pig, "wolf": wolf, "bear": bear, "hare": hare, "tortoise": tortoise, "girl": girl, "ginger": ginger}

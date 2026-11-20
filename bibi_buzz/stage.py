@@ -14,6 +14,7 @@ from PIL import Image
 
 from . import draw as D
 from . import emoji as E
+from . import schedule as SCH
 from . import vocab as V
 from .draw import Canvas, SS, INK, clamp, lerp, pop, darker, mix
 
@@ -576,10 +577,32 @@ def r_outro(X, c, seg):
         D.heart(c, cx + math.sin(k * 2.3 + t * 1.3) * L.w * 0.38, L.sy1 - u * 520, 16 + 6 * math.sin(k), "#FF5C8A")
 
 
+def r_cta(X, c, seg):
+    """The Like / Subscribe card right before the goodbye (YouTube has no comments, end screens or subscribe watermark on kids videos)."""
+    L, t = X.L, X.t - seg.t0
+    t_like, t_sub = SCH.cta_times(X.lesson)
+    D.cta(c, L.w / 2, L.sy0 + (150 if L.v else 130), t, min(1.0, (L.w - 70) / 820.0), t_like, t_sub)
+    mood = "open" if X.amp is not None else "smile"
+    y = L.sy0 + 330
+    if L.v:
+        D.pip(c, 150, y + 250, 0.95, X.t, mood, (4, -2))
+        D.mo(c, 570, y + 250, 0.85, X.t, mood, (-4, -2))
+        D.lila(c, 360, y + 520, 0.9, X.t, mood, (0, -2))
+        bibi_at(X, c, 360, y + 20, 1.5)
+    else:
+        D.pip(c, 330, y + 100, 1.05, X.t, "smile", (4, -2))
+        D.mo(c, 960, y + 120, 0.95, X.t, "smile", (-4, -2))
+        D.lila(c, 1130, y + 90, 0.95, X.t, "smile", (-4, -2))
+        bibi_at(X, c, 640, y + 70, 1.5)
+    for k in range(6):
+        u = ((X.t - seg.t0) * 0.35 + k / 6.0) % 1.0
+        D.heart(c, L.w / 2 + math.sin(k * 2.3 + X.t * 1.3) * L.w * 0.38, L.sy1 - u * 520, 16 + 6 * math.sin(k), "#FF5C8A")
+
+
 RENDERERS = {"title": r_title, "card": r_card, "count": r_count, "number": r_number, "color": r_color,
              "letter": r_letter, "shape": r_shape, "pair": r_pair, "phrase": r_phrase, "review": r_review,
-             "quiz": r_quiz, "outro": r_outro}
-OWN_BIBI = {"title", "outro"}
+             "quiz": r_quiz, "cta": r_cta, "outro": r_outro}
+OWN_BIBI = {"title", "cta", "outro"}
 
 
 # --------------------------------------------------------------------------------- caption

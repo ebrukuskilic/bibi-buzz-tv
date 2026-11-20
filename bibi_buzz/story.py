@@ -27,9 +27,9 @@ from .storyview import View
 FPS = 24
 SR = VO.SR
 XFADE = 0.55
-HEAD = {"pig": 236, "wolf": 292, "bear": 254, "hare": 294, "tortoise": 118, "girl": 238,
+HEAD = {"pig": 236, "wolf": 292, "bear": 254, "hare": 294, "tortoise": 118, "girl": 238, "ginger": 232,
         "bibi": 150, "pip": 120, "mo": 130, "lila": 130}
-HEADW = {"pig": 62, "wolf": 66, "bear": 72, "hare": 56, "tortoise": 112, "girl": 60, "bibi": 70, "pip": 60, "mo": 60, "lila": 60}
+HEADW = {"pig": 62, "wolf": 66, "bear": 72, "hare": 56, "tortoise": 112, "girl": 60, "ginger": 58, "bibi": 70, "pip": 60, "mo": 60, "lila": 60}
 FAMILY = ("bibi", "pip", "mo", "lila")
 
 
@@ -584,7 +584,7 @@ def _draw_actor(view, scene, tl, ts, near, far, tale, amp_of):
     P.look = (face * 3.0, -1.0) if P.look == (0.0, 0.0) and name in ("idle", "talk", "walk", "wave") else P.look
     P.lower = _lower_at(tl, ts)
     sh = _shadow_color(near, far, x, y)
-    rx = {"pig": 70, "wolf": 66, "bear": 82, "hare": 62, "tortoise": 110, "girl": 66}.get(d.kind, 70) * kk
+    rx = {"pig": 70, "wolf": 66, "bear": 82, "hare": 62, "tortoise": 110, "girl": 66, "ginger": 56}.get(d.kind, 70) * kk
     view.ellipse(x, y + 3, rx * (1 - 0.18 * min(1.0, hop / 46.0)), rx * 0.16, fill=sh)
     A.CHARACTERS[d.kind](view, x, y - hop, kk, ts, P, **style)
 

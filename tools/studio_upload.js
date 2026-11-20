@@ -232,9 +232,19 @@
   const isEdit = () => /\/video\/[\w-]{11}\/edit/.test(location.pathname);
   const rowsNow = () => $$('ytcp-video-row');
   async function toList() {
-    for (let i = 0; i < 3 && isEdit(); i++) {
-      history.back();
-      try { await until(() => !isEdit() && rowsNow().length, 20000, 'video list'); } catch (e) { if (S.stop) throw e; }
+    if (isEdit()) {
+      const back = $('a#back-button');                       // Studio's own "Kanal içeriği" arrow (history.back() can leave the app)
+      if (!back) throw new Error('no back button on the edit page');
+      back.click();
+      try { await until(() => !isEdit() && rowsNow().length, 6000, 'video list'); }
+      catch (e) {
+        if (S.stop) throw e;
+        // unsaved changes can keep the page open: undo them (only a thumbnail staged by this script can be pending), then leave
+        const undo = $$('button[aria-label="Değişiklikleri geri al"]').find(b => b.offsetParent);
+        if (undo) { undo.click(); await sleep(1500); }
+        back.click();
+        await until(() => !isEdit() && rowsNow().length, 30000, 'video list');
+      }
     }
     const tab = document.getElementById('video-list-uploads-tab');
     if (tab && tab.getAttribute('aria-selected') !== 'true') { tab.click(); await sleep(3000); }
@@ -250,9 +260,10 @@
     link.click();
     await until(() => isEdit() && $('ytcp-video-custom-still-editor input#file-loader') && $('ytcp-button#save'), 30000, 'edit page');
     const shown = () => { const b = $('ytcp-video-custom-still-editor button#preview-button'); return !!(b && b.offsetParent); };
+    const seen = () => ((($('ytcp-video-custom-still-editor') || {}).innerText) || '').replace(/\s+/g, ' ').trim();   // visible text only (txt() falls back to hidden text)
     // the picker either says "Dosya yükle" (no custom thumbnail yet) or shows the picture (there is one)
-    await until(() => shown() || /Dosya yükle/.test(txt($('ytcp-video-custom-still-editor'))), 12000, 'thumbnail section');
-    await sleep(1000);
+    await until(() => shown() || /Dosya yükle/.test(seen()), 12000, 'thumbnail section');
+    await sleep(500);
     if (shown() && !force) { await toList(); return 'present'; }
     const r = await fetch(BASE + date + '/' + v.id + '.jpg?t=' + Date.now());
     if (!r.ok) throw new Error('no thumbnail file ' + v.id + '.jpg (HTTP ' + r.status + ')');
@@ -261,12 +272,12 @@
     const save = $('ytcp-button#save');
     const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
     input.dispatchEvent(new Event('change', { bubbles: true }));
-    await until(() => shown() && !/Yükleniyor/.test(txt($('ytcp-video-custom-still-editor'))) && save.getAttribute('aria-disabled') !== 'true', 30000, 'thumbnail upload');
+    await until(() => shown() && !/Yükleniyor/.test(seen()) && save.getAttribute('aria-disabled') !== 'true', 30000, 'thumbnail upload');
     await sleep(500);
     save.click();
     await until(() => save.getAttribute('aria-disabled') === 'true', 20000, 'save');
     let toast = 'no confirmation toast';
-    try { await until(() => $$('*').some(e => !e.children.length && /Değişiklikler kaydedildi/.test(e.textContent || '') && !e.closest('ytcp-error-section')), 8000, 'toast'); toast = 'saved'; } catch (e) { if (S.stop) throw e; }
+    try { await until(() => $$('tp-yt-paper-toast').some(e => /Değişiklikler kaydedildi/.test(e.textContent || '')), 8000, 'toast'); toast = 'saved'; } catch (e) { if (S.stop) throw e; }
     await sleep(800);
     await toList();
     return 'set (' + toast + ')';

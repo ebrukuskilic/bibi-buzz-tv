@@ -612,8 +612,166 @@ def red_riding_hood(lang="en"):
     return t
 
 
+# ================================================================================================ the gingerbread man
+OLD_W = dict(dress="#7BC67B", hair="#E4E4EC", granny="#FFD27A")
+OLD_M = dict(gramps="#8C6BC8", hair="#E4E4EC")
+FARM_PIG = dict(outfit="#F2B632", hat_kind="straw")
+BERRY_BEAR = dict(fur="#7A4A25", extra="bib", outfit="#3E8EDE", hold="basket")
+FOX = dict(fur="#E8893A")
+GM_COTTAGE = dict(wall="#FFF1D0", roof="#5FA8D3")
+REFRAIN = "Run, run, as fast as you can! You cannot catch me, I am the Gingerbread Man!"
+
+
+def gingerbread_man(lang="en"):
+    t = Tale("tale-gingerbread-man", "The Gingerbread Man | Fairy Tale Story for Kids | Bibi Buzz TV",
+             "Run, run, as fast as you can! Watch the classic fairy tale of The Gingerbread Man: a little cookie jumps out of the oven and runs away from an old woman, "
+             "an old man, a pig and a bear, until he meets a sly fox at the river. A gentle, colorful animated story in simple English for toddlers and preschoolers.",
+             TAGS + ["gingerbread man", "the gingerbread man", "run run as fast as you can", "gingerbread man story"],
+             {"nar": NAR, "gm": ("en-US-EricNeural", "+2%", "+20Hz"), "woman": (ARIA, "-12%", "-10Hz"), "man": ("en-US-ChristopherNeural", "-10%", "-14Hz"),
+              "pig": (ARIA, "+2%", "+18Hz"), "bear": (GUY, "-14%", "-22Hz"), "fox": (GUY, "-4%", "+12Hz")}, lang=lang)
+    t.bubble_tint = {"gm": "#FFE9C8", "woman": "#E4F6E4", "man": "#EADBC8", "pig": "#FFE3EE", "bear": "#EADBC8", "fox": "#FFE4CC"}
+    t.cover = dict(bg="meadow", title=("THE GINGERBREAD", "MAN"), size=104, gap=108,
+                   actors=[("old", "girl", 170, 704, 1.3, 1, "surprised", OLD_W), ("gm", "ginger", 520, 712, 1.65, 1, "cheer", {}),
+                           ("fox", "wolf", 1010, 712, 1.32, -1, "sly", FOX)])
+    _intro(t, ("THE GINGERBREAD", "MAN"), "Today's story is... The Gingerbread Man!")
+
+    # ---------------------------------------------------------------- 1 the old woman and the old man
+    s = t.scene("A little cottage", "meadow", mood="happy", title="The old woman and the old man")
+    s.prop("home", "cottage", 300, 566, 0.95, **GM_COTTAGE)
+    s.actor("woman", "girl", 700, 622, 1.1, face=1, **OLD_W).actor("man", "girl", 900, 632, 1.12, face=-1, **OLD_M)
+    s.nar("Once upon a time, a kind old woman and a kind old man lived in a little cottage.", ("pose", "woman", "happy"), ("pose", "man", "happy"))
+    s.say("woman", "Oh, how I wish we had a little child to play with!", ("pose", "woman", "sad"), ("pose", "man", "idle"))
+    s.say("man", "I have an idea! Let us bake a gingerbread man!", ("pose", "man", "cheer"), ("hop", "man", {"at": "40%"}), ("pose", "woman", "surprised"))
+    s.say("woman", "What a wonderful idea! Let us go to the kitchen!", ("pose", "woman", "cheer"), ("hop", "woman", {"at": "40%"}), ("pose", "man", "happy"))
+    s.nar("So the old woman and the old man went into the cottage, to bake.", ("pose", "woman", "idle"), ("pose", "man", "idle"), ("set", "home", "door", 1.0, {"at": 0.2, "dur": 0.9}),
+          ("walk", "woman", 305, 606, {"at": 0.4, "speed": 190}), ("hide", "woman", {"at": 2.7}), ("walk", "man", 305, 612, {"at": 0.9, "speed": 190}), ("hide", "man", {"at": 4.2}),
+          ("set", "home", "door", 0.0, {"at": 4.4, "dur": 0.6}), tail=0.5)
+
+    # ---------------------------------------------------------------- 2 baking
+    s = t.scene("The kitchen", "room", mood="happy", title="Baking a gingerbread man")
+    s.prop("oven", "oven", 290, 650, 1.35, door=0.0).prop("cnt", "counter", 960, 650, 1.0)
+    s.actor("woman", "girl", -150, 664, 1.1, face=1, **OLD_W).actor("man", "girl", -330, 668, 1.12, face=1, **OLD_M)
+    s.actor("dough", "ginger", 945, 504, 0.42, face=-1, show=False, flat=True, zy=900)
+    s.actor("gm", "ginger", 290, 624, 0.55, face=1, show=False, flat=True, zy=900)
+    s.nar("In the kitchen, the old woman mixed the flour, and the sugar, and the ginger.",
+          ("walk", "woman", 770, 664, {"fit": True, "pose": "walk"}), ("walk", "man", 560, 668, {"fit": True, "pose": "walk"}), ("fx", "dust", 880, 500, {"at": 3.4, "dur": 1.0, "size": 1.2}))
+    s.nar("Then she rolled out the dough, and she cut out a little man. She gave him two eyes, a big smile, and three sweet buttons.",
+          ("show", "dough", {"at": "35%"}), ("pose", "dough", "sleep", {"at": "35%"}), ("fx", "sparkle", 945, 440, {"at": "35%", "dur": 3.0, "r": 90}), ("pose", "woman", "happy", {"at": "40%"}), ("pose", "man", "think", {"at": "40%"}))
+    s.say("woman", "There you go, my little gingerbread man!", ("pose", "woman", "happy"), ("pose", "man", "happy"))
+    s.nar("Into the oven he went! The old woman closed the door, and they waited.",
+          ("hide", "dough", {"at": 0.3}), ("set", "oven", "door", 1.0, {"at": 0.3, "dur": 0.7}), ("show", "gm", {"at": 1.1}), ("pose", "gm", "sleep", {"at": 1.1}),
+          ("set", "oven", "door", 0.0, {"at": 3.0, "dur": 0.6}), ("hide", "gm", {"at": 3.0}), ("pose", "woman", "idle"), ("pose", "man", "idle"), tail=0.4)
+    s.nar("Soon, the whole kitchen smelled so good. Mmm! Yum!", ("fx", "steam", 340, 440, {"dur": 6.0}), ("pose", "woman", "eat", {"at": "40%"}), ("pose", "man", "eat", {"at": "40%"}))
+    s.nar("Ding! The oven was ready. The old man opened the oven door, and... pop!",
+          ("sfx", "ding", {"at": 0.2}), ("set", "oven", "door", 1.0, {"at": 2.6, "dur": 0.4}), ("show", "gm", {"at": 3.2}), ("pose", "gm", "cheer", {"at": 3.2}),
+          ("fx", "burst", 300, 330, {"at": 3.2, "dur": 1.6, "text": "POP!"}), ("pose", "woman", "surprised", {"at": 3.2}), ("pose", "man", "surprised", {"at": 3.2}))
+    s.say("gm", REFRAIN, ("scale", "gm", 1.4, {"at": 0.0, "dur": 0.5}), ("hop", "gm", {"at": 0.05}), ("walk", "gm", 440, 690, {"at": 0.05, "dur": 0.5}), ("pose", "gm", "laugh", {"at": 0.6}),
+          ("hop", "gm", {"at": "50%"}), ("pose", "woman", "surprised"), ("pose", "man", "surprised"))
+    s.say("woman", "Oh my! Stop, little gingerbread man!", ("walk", "gm", 1500, 690, {"at": 0.15, "speed": 430}), ("pose", "woman", "wave"), ("pose", "man", "wave"), tail=0.4)
+
+    # ---------------------------------------------------------------- 3 the chase begins
+    s = t.scene("The chase begins", "meadow", mood="chase", title="Run, run, as fast as you can!")
+    s.prop("home", "cottage", 260, 566, 0.95, **GM_COTTAGE)
+    s.actor("gm", "ginger", 262, 612, 0.75, face=1, show=False, zy=900)
+    s.actor("woman", "girl", 262, 606, 1.1, face=1, show=False, **OLD_W).actor("man", "girl", 262, 612, 1.12, face=1, show=False, **OLD_M)
+    s.nar("Out of the cottage door he ran, and down the road! The old woman and the old man ran after him.",
+          ("set", "home", "door", 1.0, {"at": 0.1, "dur": 0.6}), ("show", "gm", {"at": 0.5}), ("walk", "gm", 900, 650, {"at": 0.6, "speed": 360}),
+          ("show", "woman", {"at": 1.3}), ("walk", "woman", 560, 640, {"at": 1.4, "speed": 300}), ("show", "man", {"at": 1.9}), ("walk", "man", 430, 644, {"at": 2.0, "speed": 280}),
+          ("set", "home", "door", 0.0, {"at": 3.0, "dur": 0.6}), ("fx", "dust", 300, 620, {"at": 0.7, "dur": 1.0}))
+    s.say("woman", "Stop, stop! Come back, little one!", ("pose", "woman", "wave"), ("pose", "man", "idle"), ("pose", "gm", "idle"))
+    s.say("man", "Come back! It is not safe to run away!", ("pose", "man", "wave"), ("pose", "woman", "idle"))
+    s.say("gm", REFRAIN, ("face", "gm", -1), ("pose", "gm", "laugh"), ("hop", "gm", {"at": "50%"}), ("pose", "woman", "scared"), ("pose", "man", "scared"))
+    s.nar("But the gingerbread man ran, and ran, and ran. The old woman and the old man could not catch him.",
+          ("walk", "gm", 1500, 650, {"at": 0.1, "speed": 430}), ("pose", "woman", "tired", {"at": 0.6}), ("pose", "man", "tired", {"at": 0.6}),
+          ("fx", "sweat", "woman", 0, {"at": 0.6, "dur": 4.0}), ("fx", "sweat", "man", 0, {"at": 0.6, "dur": 4.0}), tail=0.5)
+
+    # ---------------------------------------------------------------- 4 the pig
+    s = t.scene("The little pig", "meadow", mood="chase", title="The little pig")
+    s.actor("pig", "pig", 860, 640, 1.0, face=-1, **FARM_PIG).actor("gm", "ginger", -200, 650, 0.75, face=1, zy=900)
+    s.nar("The gingerbread man ran past a little farm. A little pig was playing in the yard.", ("pose", "pig", "happy"), ("hop", "pig", {"at": "60%"}))
+    s.nar("Along came the gingerbread man, running as fast as the wind!", ("walk", "gm", 520, 650, {"speed": 400}), ("fx", "dust", "gm", 0, {"at": 1.0, "dur": 1.0}), ("pose", "pig", "surprised", {"at": "60%"}))
+    s.say("gm", REFRAIN, ("face", "gm", 1), ("pose", "gm", "laugh"), ("hop", "gm", {"at": "50%"}), ("pose", "pig", "surprised"))
+    s.say("pig", "Oh my! Stop, little cookie! The old woman is looking for you!", ("walk", "gm", 1500, 650, {"at": 0.1, "speed": 430}), ("pose", "pig", "wave"), ("walk", "pig", 1500, 644, {"at": "35%", "speed": 300}),
+          ("fx", "mark", "pig", 0, {"dur": 2.0, "text": "!"}), tail=0.3)
+
+    # ---------------------------------------------------------------- 5 the bear
+    s = t.scene("The big bear", "forest", mood="chase", title="The big bear")
+    s.actor("bear", "bear", 900, 640, 1.1, face=-1, **BERRY_BEAR).actor("gm", "ginger", -200, 650, 0.75, face=1, zy=900)
+    s.nar("Deep in the forest, a big bear was picking berries.", ("pose", "bear", "happy"), ("fx", "leaves", 0, 0, {"dur": 60.0}))
+    s.nar("Along came the gingerbread man, running past the trees.", ("walk", "gm", 520, 650, {"speed": 400}), ("fx", "dust", "gm", 0, {"at": 1.0, "dur": 1.0}), ("pose", "bear", "surprised", {"at": "60%"}))
+    s.say("gm", REFRAIN, ("face", "gm", 1), ("pose", "gm", "laugh"), ("hop", "gm", {"at": "50%"}), ("pose", "bear", "surprised"))
+    s.say("bear", "Stop, little cookie! It is not safe to run so far away!", ("walk", "gm", 1500, 650, {"at": 0.1, "speed": 430}), ("pose", "bear", "wave"), ("walk", "bear", 1500, 644, {"at": "35%", "speed": 280}),
+          ("fx", "mark", "bear", 0, {"dur": 2.0, "text": "!"}), tail=0.3)
+
+    # ---------------------------------------------------------------- 6 the river and the fox
+    s = t.scene("The wide river", "river", mood="sneaky", title="The wide river")
+    s.prop("wat", "water", 640, 700, 1.0)
+    s.actor("gm", "ginger", -200, 650, 0.75, face=1, flat=True, zy=900)
+    s.actor("fox", "wolf", 430, 650, 0.95, face=-1, show=False, **FOX)
+    s.nar("The gingerbread man ran, and ran, until he came to a wide, blue river.", ("walk", "gm", 250, 650, {"speed": 330, "pose": "run"}), ("pose", "gm", "scared", {"at": 2.4}))
+    s.say("gm", "Oh no! A river! I cannot swim. I will get all soggy!", ("pose", "gm", "scared"), ("fx", "sweat", "gm", 0, {"dur": 3.0}))
+    s.nar("Just then, a sly fox stepped out from behind the reeds.", ("show", "fox", {"at": 0.9}), ("pose", "fox", "sly", {"at": 0.9}), ("fx", "mark", 430, 300, {"at": 1.0, "dur": 2.0, "text": "!"}), ("pose", "gm", "surprised", {"at": 1.0}))
+    s.say("fox", "Hello, little gingerbread man. Why are you in such a hurry?", ("pose", "fox", "sly"), ("pose", "gm", "idle"))
+    s.say("gm", "I ran away from an old woman, an old man, a pig, and a bear. And I can run away from you!", ("pose", "gm", "proud"), ("pose", "fox", "idle"))
+    s.say("fox", "Oh, I do not want to chase you. I want to help you cross the river.", ("pose", "fox", "sly"), ("pose", "gm", "think"))
+    s.say("fox", "Hop on my tail, and I will carry you across.", ("face", "fox", 1), ("pose", "fox", "sly"), ("fx", "sparkle", 430, 420, {"at": "50%", "dur": 2.5, "r": 100}))
+    s.say("gm", "Hmm... All right! But please do not let me get wet!", ("pose", "gm", "happy"), ("walk", "gm", 348, 548, {"at": "55%", "dur": 0.6, "pose": "jump"}), ("hop", "gm", {"at": "55%"}), ("scale", "gm", 0.72, {"at": "55%", "dur": 0.5}), tail=0.4)
+
+    # ---------------------------------------------------------------- 7 across the river
+    s = t.scene("Across the river", "river", mood="sneaky", title="Across the river")
+    s.prop("wat", "water", 640, 700, 1.0)
+    s.actor("fox", "wolf", 430, 650, 0.95, face=1, **FOX)
+    s.actor("gm", "ginger", 348, 548, 0.54, face=1, flat=True, zy=900)
+    s.nar("So the gingerbread man sat on the fox's tail, and the fox began to swim.", ("walk", "fox", 510, 650, {"at": 0.3, "dur": 3.6}), ("walk", "gm", 428, 548, {"at": 0.3, "dur": 3.6, "pose": "idle"}),
+          ("fx", "splash", 450, 640, {"at": 0.4, "dur": 1.0}), ("pose", "fox", "sly"), ("pose", "gm", "happy", {"at": 1.0}))
+    s.say("fox", "The water is getting deeper! Hop on my head, so you do not get wet!", ("walk", "fox", 650, 650, {"at": 0.2, "dur": 4.0}), ("walk", "gm", 540, 392, {"at": 0.2, "dur": 2.0, "pose": "jump"}),
+          ("walk", "gm", 650, 418, {"at": 2.2, "dur": 2.0, "pose": "jump"}), ("hop", "gm", {"at": 0.3}), ("hop", "gm", {"at": 2.3}), ("pose", "fox", "sly"))
+    s.nar("Now the gingerbread man sat on top of the fox's head. The river was wide, and the other side was far away.", ("pose", "gm", "happy"), ("pose", "fox", "idle"), ("cam", 650, 470, 1.12, {"at": 1.0, "dur": 3.0}))
+    s.say("fox", "Hmm. You are so small, and I am so hungry. And you smell so yummy!", ("pose", "fox", "laugh"), ("pose", "gm", "scared", {"at": "40%"}), ("fx", "mark", "gm", 0, {"at": "45%", "dur": 2.0, "text": "!"}), ("cam", 650, 440, 1.3, {"dur": 3.0}))
+    s.say("gm", "Oh no! Help! Help!", ("pose", "gm", "scared"), ("hop", "gm", {"at": "20%"}), ("hop", "gm", {"at": "60%"}), ("fx", "sweat", "gm", 0, {"dur": 3.0}), tail=0.4)
+
+    # ---------------------------------------------------------------- 8 just in time
+    s = t.scene("Just in time", "river", mood="chase", title="Just in time")
+    s.prop("wat", "water", 640, 700, 1.0)
+    s.actor("fox", "wolf", 650, 650, 0.95, face=1, **FOX)
+    s.actor("gm", "ginger", 650, 418, 0.54, face=1, flat=True, zy=900)
+    s.actor("woman", "girl", -150, 650, 1.1, face=1, **OLD_W).actor("man", "girl", -300, 654, 1.12, face=1, **OLD_M)
+    s.actor("pig", "pig", -450, 648, 1.0, face=1, **FARM_PIG).actor("bear", "bear", -600, 652, 1.1, face=1, **BERRY_BEAR)
+    s.nar("Just then, the old woman, the old man, the pig, and the bear came running to the river!",
+          ("pose", "fox", "sly"), ("pose", "gm", "scared"), ("walk", "woman", 380, 650, {"at": 0.3, "speed": 330}), ("walk", "man", 285, 654, {"at": 0.3, "speed": 330}),
+          ("walk", "pig", 195, 648, {"at": 0.3, "speed": 330}), ("walk", "bear", 90, 652, {"at": 0.3, "speed": 330}), ("fx", "dust", 200, 660, {"at": 1.5, "dur": 1.0}))
+    s.say("woman", "Stop, Mr. Fox! Please do not eat our gingerbread man!", ("pose", "woman", "scared"), ("pose", "man", "scared"), ("pose", "pig", "scared"), ("pose", "bear", "scared"),
+          ("face", "fox", -1), ("pose", "fox", "surprised"), ("pose", "gm", "wave"))
+    s.say("man", "Wait, Mr. Fox! You must be so hungry!", ("pose", "man", "think"), ("pose", "woman", "idle"), ("pose", "pig", "idle"), ("pose", "bear", "idle"))
+    s.say("fox", "Oh... Yes, I am very, very hungry. I am sorry that I tried to trick him.", ("pose", "fox", "sad"), ("pose", "gm", "idle"), ("pose", "man", "idle"))
+    s.say("woman", "Bring our gingerbread man back to us, and we will bake you a big apple pie!", ("pose", "woman", "happy"), ("pose", "fox", "idle"))
+    s.say("fox", "Really? Oh, thank you! You are so kind!", ("pose", "fox", "happy"), ("fx", "hearts", "fox", 0, {"at": "30%", "dur": 3.0}), ("walk", "fox", 470, 650, {"at": "40%", "speed": 90}),
+          ("walk", "gm", 470, 418, {"at": "40%", "speed": 90, "pose": "idle"}), ("pose", "gm", "happy"), ("pose", "woman", "happy"))
+    s.nar("The fox carried the gingerbread man safely back across the river. And the gingerbread man hopped down, into the old woman's arms.",
+          ("walk", "fox", 440, 650, {"at": 0.3, "dur": 1.2}), ("walk", "gm", 440, 418, {"at": 0.3, "dur": 1.2, "pose": "idle"}), ("walk", "gm", 392, 646, {"at": 2.2, "dur": 0.7, "pose": "jump"}), ("hop", "gm", {"at": 2.2}),
+          ("scale", "gm", 1.39, {"at": 2.2, "dur": 0.6}), ("pose", "woman", "cheer", {"at": 3.0}), ("fx", "hearts", "woman", 0, {"at": 3.0, "dur": 4.0}), ("pose", "gm", "happy", {"at": 3.0}), tail=0.5)
+
+    # ---------------------------------------------------------------- 9 pie for everyone
+    s = t.scene("Pie for everyone", "meadow_dusk", mood="triumph", title="A pie for everyone")
+    s.prop("home", "cottage", 230, 566, 0.9, **GM_COTTAGE).prop("pie", "pie", 740, 684, 1.6, show=False)
+    s.actor("woman", "girl", 440, 636, 1.05, face=1, **OLD_W).actor("man", "girl", 330, 632, 1.05, face=1, **OLD_M).actor("gm", "ginger", 590, 654, 0.78, face=1)
+    s.actor("fox", "wolf", 900, 640, 0.9, face=-1, **FOX).actor("pig", "pig", 1020, 648, 0.95, face=-1, **FARM_PIG).actor("bear", "bear", 1140, 636, 1.05, face=-1, **BERRY_BEAR)
+    s.nar("Back at the cottage, the old woman baked a big, warm apple pie, for everyone.", ("show", "pie", {"at": 0.6}), ("fx", "sparkle", 740, 600, {"at": 0.6, "dur": 3.0, "r": 150}), ("fx", "steam", 740, 622, {"at": 1.0, "dur": 20.0}),
+          ("pose", "gm", "happy"), ("pose", "woman", "happy"))
+    s.say("gm", "I am sorry that I ran away. Home is the best place to be!", ("pose", "gm", "sad"), ("pose", "woman", "idle"))
+    s.say("woman", "We love you, little one! We were so worried about you!", ("pose", "woman", "happy"), ("pose", "gm", "idle"), ("fx", "hearts", "woman", 0, {"dur": 3.5}))
+    s.say("fox", "And I am sorry that I tried to trick you, little one.", ("pose", "fox", "sad"), ("pose", "woman", "idle"))
+    s.say("gm", "That is all right, Mr. Fox. Let us share the pie!", ("pose", "gm", "cheer"), ("hop", "gm", {"at": "40%"}), ("pose", "fox", "happy"), ("fx", "confetti", 0, 0, {"dur": 30.0}))
+    s.nar("And they all ate the yummy pie together. Yum, yum, yum!", ("pose", "gm", "eat"), ("pose", "woman", "eat"), ("pose", "man", "eat"), ("pose", "fox", "eat"), ("pose", "pig", "eat"), ("pose", "bear", "eat"))
+    s.nar("And the gingerbread man never ran away again. And they all lived happily ever after.", ("pose", "gm", "happy"), ("pose", "woman", "happy"), ("pose", "man", "happy"), ("pose", "fox", "happy"),
+          ("fx", "sparkle", 700, 460, {"dur": 4.0, "r": 330}), tail=0.8)
+
+    _outro(t, "Remember, little ones: stay close to the people who love you.", caption="Stay close to the people who love you!")
+    return t
+
+
 TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_and_hare, "goldilocks": goldilocks,
-         "red-riding-hood": red_riding_hood}
+         "red-riding-hood": red_riding_hood, "gingerbread-man": gingerbread_man}
 
 
 def build(key, lang="en"):

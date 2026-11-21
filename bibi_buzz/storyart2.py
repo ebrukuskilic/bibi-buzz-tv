@@ -426,20 +426,29 @@ def far_sunset(c, w):
 
 
 # ---------------------------------------------------------------- the night garden, the castle and the ballroom (Cinderella)
-def far_night(c, w, castle=False, seed=7):
-    """A starry night with a big moon over dark hills (castle=True: a palace with lit windows on the hill)."""
+def far_night(c, w, castle=False, seed=7, storm=False):
+    """A starry night with a big moon over dark hills (castle=True: a palace with lit windows on the hill; storm=True: no stars and no moon,
+    but a heavy, dark sky full of rain clouds)."""
     rng = random.Random(seed)
-    vgrad(c, [(0, "#0F1A4C"), (0.55, "#2A3B88"), (1, "#5B5FAA")], 0, 580)
-    for i in range(80):
-        D.star(c, rng.uniform(0, w), rng.uniform(10, 420), rng.choice((3, 4, 5, 6)), rng.choice(("#FFF3A8", "#FFFFFF", "#CFE3FF")))
-    mx = w * 0.82 if w < 1500 else 1120
-    for i, a in enumerate((2.3, 1.75, 1.35)):
-        c.ellipse(mx, 125, 58 * a, 58 * a, fill=mix("#2A3B88", "#FFF3B0", 0.1 + 0.12 * i))
-    c.ellipse(mx, 125, 58, 58, fill="#FFF8D0")
-    c.ellipse(mx - 17, 113, 10, 10, fill="#F0E6B0")
-    c.ellipse(mx + 14, 140, 8, 8, fill="#F0E6B0")
-    c.ellipse(mx + 18, 106, 6, 6, fill="#F0E6B0")
-    hills(c, w, 470, 54, 190, 0.6, "#34558A")
+    if storm:
+        vgrad(c, [(0, "#1B2236"), (0.55, "#36405C"), (1, "#5A6486")], 0, 580)
+        for i in range(14):
+            cloud_shape(c, rng.uniform(-40, w + 40), rng.uniform(20, 300), rng.uniform(1.9, 3.1), "#4B5476", "#363E5A")
+        for i in range(8):
+            cloud_shape(c, rng.uniform(-40, w + 40), rng.uniform(30, 200), rng.uniform(2.0, 3.0), "#3C4463", "#2B3250")
+        hills(c, w, 470, 54, 190, 0.6, "#2D3D5E")
+    else:
+        vgrad(c, [(0, "#0F1A4C"), (0.55, "#2A3B88"), (1, "#5B5FAA")], 0, 580)
+        for i in range(80):
+            D.star(c, rng.uniform(0, w), rng.uniform(10, 420), rng.choice((3, 4, 5, 6)), rng.choice(("#FFF3A8", "#FFFFFF", "#CFE3FF")))
+        mx = w * 0.82 if w < 1500 else 1120
+        for i, a in enumerate((2.3, 1.75, 1.35)):
+            c.ellipse(mx, 125, 58 * a, 58 * a, fill=mix("#2A3B88", "#FFF3B0", 0.1 + 0.12 * i))
+        c.ellipse(mx, 125, 58, 58, fill="#FFF8D0")
+        c.ellipse(mx - 17, 113, 10, 10, fill="#F0E6B0")
+        c.ellipse(mx + 14, 140, 8, 8, fill="#F0E6B0")
+        c.ellipse(mx + 18, 106, 6, 6, fill="#F0E6B0")
+        hills(c, w, 470, 54, 190, 0.6, "#34558A")
     if castle:
         cx = w * 0.5
         roof, wall, lit = "#6C5FC7", "#C9CCE8", "#FFE27A"
@@ -565,6 +574,7 @@ BACKDROPS = {
     "meadow": (far_meadow, near_meadow),
     "garden_night": (far_night, near_night),
     "castle_night": (lambda c, w: far_night(c, w, castle=True), near_castle),
+    "storm_castle": (lambda c, w: far_night(c, w, castle=True, storm=True), near_castle),
     "ballroom": (far_ballroom, near_ballroom),
     "ballroom_day": (lambda c, w: far_ballroom(c, w, day=True), near_ballroom),
     "meadow_dawn": (lambda c, w: far_meadow(c, w, "dawn"), near_meadow),

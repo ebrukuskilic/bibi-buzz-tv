@@ -29,10 +29,10 @@ FPS = 24
 SR = VO.SR
 XFADE = 0.55
 HEAD = {"pig": 236, "wolf": 292, "bear": 254, "hare": 294, "tortoise": 118, "girl": 238, "ginger": 232, "goat": 290, "troll": 300,
-        "bibi": 150, "pip": 120, "mo": 130, "lila": 130, "mirror": 400, "hen": 228, "chick": 118,
+        "bibi": 150, "pip": 120, "mo": 130, "lila": 130, "mirror": 400, "harp": 430, "hen": 228, "chick": 118,
         "cat": 232, "dog": 214, "mouse": 226, "lion": 236, "fox": 242, "sheep": 218, "cow": 222}
 HEADW = {"pig": 62, "wolf": 66, "bear": 72, "hare": 56, "tortoise": 112, "girl": 60, "ginger": 58, "goat": 64, "troll": 80,
-         "bibi": 70, "pip": 60, "mo": 60, "lila": 60, "mirror": 114, "hen": 52, "chick": 50,
+         "bibi": 70, "pip": 60, "mo": 60, "lila": 60, "mirror": 114, "harp": 110, "hen": 52, "chick": 50,
          "cat": 56, "dog": 58, "mouse": 62, "lion": 70, "fox": 56, "sheep": 62, "cow": 58}
 FAMILY = ("bibi", "pip", "mo", "lila")
 
@@ -599,9 +599,7 @@ def _draw_actor(view, scene, tl, ts, near, far, tale, amp_of):
     if d.kind in FAMILY:                                    # the Bibi friends are drawn straight on the screen canvas
         f = {"bibi": D.bibi, "pip": D.pip, "mo": D.mo, "lila": D.lila}[d.kind]
         mood = "open" if amp is not None else ("wow" if name in ("scared", "surprised") else "smile")
-        kw = dict(t=ts, mood=mood, look=(3, -2))
-        if d.kind == "bibi":
-            kw["mouth_amt"] = amp
+        kw = dict(t=ts, mood=mood, look=(3, -2), mouth_amt=amp)          # (the mouth follows the loudness of the voice: tales and songs)
         f(view.c, view.X(x), view.Y(y - hop) - HEAD[d.kind] * 0.4 * kk * view.z, kk * view.z * 0.9, **kw)
         return
     P = A.pose_for(name, ts, phase=phase, moving=moving, amp=amp, face=face, seed=d.seed, speed=speed / 150.0,
@@ -694,7 +692,7 @@ def draw_scene(tale, si, ts, scale_out=1.0):
         top_ = sy_ - HEAD[atl_.d.kind] * kk_ * view.z
         heads[aid] = (sx_ - hw_, top_, sx_ + hw_, top_ + HEAD[atl_.d.kind] * kk_ * view.z * 0.5)
     for (v0, v1, who, key, text) in scene.speech:
-        if who and v0 - 0.08 <= ts <= v1 + 0.45 and who in scene.atl:
+        if who and text and v0 - 0.08 <= ts <= v1 + 0.45 and who in scene.atl:
             tl = scene.atl[who]                              # (a hidden actor speaks from where he went out of sight)
             ax, ay, *_ = tl.state(ts)
             kk = tl.d.k * (1.0 if tl.d.flat else dscale(ay)) * tl.scale_at(ts)
@@ -771,7 +769,7 @@ def render(tale, out_path, ffmpeg, cache_dir, workers=None, quiet=False, t_range
     clips = prepare(tale, ffmpeg, cache_dir)
     total = tale.duration
     t0, t1 = (0.0, total) if t_range is None else (max(0.0, t_range[0]), min(total, t_range[1]))
-    mix = SA.mix(tale, clips, voices=with_voice)
+    mix = tale.mix_audio(clips, voices=with_voice) if hasattr(tale, "mix_audio") else SA.mix(tale, clips, voices=with_voice)
     a0, a1 = int(t0 * SR), int(t1 * SR)
     wav = out_path + ".wav"
     SA.write_wav(wav, mix[a0:a1] if with_audio else mix[a0:a1] * 0)
@@ -815,7 +813,7 @@ def fmt_time(t):
 
 def sync_report(tale):
     problems = []
-    spans = sorted((v0 + sc.t_start, v1 + sc.t_start, text) for sc in tale.scenes for (v0, v1, who, key, text) in sc.speech)
+    spans = sorted((v0 + sc.t_start, v1 + sc.t_start, text) for sc in tale.scenes for (v0, v1, who, key, text) in sc.speech if text)
     for a, b in zip(spans, spans[1:]):
         if a[1] > b[0] + 0.01:
             problems.append(f"voice lines overlap: {a[2]!r} / {b[2]!r}")
@@ -829,6 +827,8 @@ def make_cover(tale, path):
     `tale.cover` = dict(bg, title=(line1, line2), actors=[(id, kind, x, y, k, face, pose, style)], props=[(id, kind, x, y, k, state)])."""
     sp = tale.cover
     ct = Tale(tale.id + "-cover", tale.title, "", [], {"nar": ("", "", "")}, lang=getattr(tale, "lang", "en"))
+    if getattr(tale, "song", False):                                    # the texts of a song are written in its own language already
+        ct.T = lambda text: text
     sc = ct.scene("cover", sp["bg"], mood="happy", drift=0.0, clouds=True)
     for (pid, ptype, x, y, k, st) in sp.get("props", ()):
         sc.prop(pid, ptype, x, y, k, **st)
@@ -837,8 +837,12 @@ def make_cover(tale, path):
         sc.actor(aid, kind, x, y, k, face=face, flat=True, **style)
         acts.append(("pose", aid, pose))
     lines = sp["title"]
-    acts.append(("fx", "title", 0, 0, {"at": 0.0, "dur": 30.0, "lines": lines, "still": True, "top": 46, "size": sp.get("size", 118),
-                                          "gap": sp.get("gap", 118), "pill": 30, "sfx": False}))
+    title_kw = {"at": 0.0, "dur": 30.0, "lines": lines, "still": True, "top": 46, "size": sp.get("size", 118), "gap": sp.get("gap", 118), "pill": 30, "sfx": False}
+    if sp.get("sub"):
+        title_kw["sub"] = sp["sub"]                                     # (the little pink pill above the title: 'Story Time with Bibi Buzz TV' unless a song says otherwise)
+    for (kind, fx_x, fx_y, kw) in sp.get("fx", ()):                     # (a song's cover has its big star: drawn under the title)
+        acts.append(("fx", kind, fx_x, fx_y, dict(kw, at=0.0, dur=30.0, sfx=False)))
+    acts.append(("fx", "title", 0, 0, title_kw))
     sc.wait(3.0, *acts)
     ct.compile({})
     ct.env = {}

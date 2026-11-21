@@ -680,6 +680,156 @@ def gorge_water(c, x, y, k, t, st):
     return None
 
 
+# ================================================================================================ the enormous turnip's world
+@prop
+def turnip(c, x, y, k, t, st):
+    """The enormous turnip in its garden bed. (x, y) = the middle of the bed on the ground.
+    st["grow"] 0..1: nothing but soil -> a tiny sprout -> an enormous turnip with a big bunch of leaves.
+    st["wobble"] 0..1: how hard it is pulled (the leaves and the root tremble, the root creeps up out of the soil).
+    st["bend"] 0..1: the leaves are gathered into one bunch that is pulled toward the puller's hands, the grip at (st["gx"], st["gy"])
+        in the prop's own units (relative to (x, y), up = negative); st["gsw"] = how far the hands swing to and fro (units) while pulling.
+    st["out"] 0..1: 0 = in the ground, 1 = out of the ground and lying in front of the hole (it jumps there in an arc)."""
+    grow = clamp(st.get("grow", 1.0))
+    wob = clamp(st.get("wobble", 0.0))
+    bend = clamp(st.get("bend", 0.0))
+    out = clamp(st.get("out", 0.0))
+    gx, gy = st.get("gx", 330.0), st.get("gy", -190.0)
+    gx += st.get("gsw", 0.0) * math.sin(t * 6.3)
+    r = Rig(c, x, y, k)
+    soil, soil_l, soil_d = "#8A5A32", "#A9733F", "#5E3A1E"
+    leaf, leaf_l, leaf_d = "#3E9B3A", "#63BE4B", "#2C7A2C"
+    hole = out > 0.02
+    rim_first = out >= 0.12                      # (the front edge of the hole hides the root while it still comes up out of it)
+
+    def front_rim():
+        r.ell(0, 12, 160, 26, soil, None)
+        r.ell(0, 8, 160, 24, soil_l, INK, 3)
+        r.ell(0, 6, 98, 15, "#3E2412", INK, 2.6)
+        for dx, dy, rr in ((-120, 10, 6), (-60, 22, 5), (122, 14, 7), (74, 26, 4)):
+            r.dot(dx, dy, rr, soil_d)
+
+    # the garden bed behind everything
+    r.ell(0, 4, 175, 26, mix("#79CE5D", "#2F6B2F", 0.35), None)
+    r.ell(0, 0, 160, 30, soil_d if hole else soil, INK, 3)
+    if hole:
+        r.ell(0, -2, 92, 15, "#3E2412", None)
+        if rim_first:
+            front_rim()
+    # where the root is now
+    shake = math.sin(t * 23.0) * 3.2 * wob
+    lift = (6.0 + 12.0 * abs(math.sin(t * 8.5))) * wob
+    rb = clamp((grow - 0.18) / 0.82) ** 0.75                 # the root's size 0..1
+    rx_, ry_ = 112.0 * rb, 118.0 * rb
+    ox = lerp(0.0, 150.0, ease(out))
+    arc = math.sin(clamp(out) * math.pi) * 200.0
+    cy_in = 26.0 * rb - ry_ - lift                           # centre height of the bulb while it is in the ground (up = negative): its bottom is buried
+    cy_ = lerp(cy_in, -ry_ * 0.94 + 30.0, ease(out)) - arc   # ... and when it lies on the ground in front of the hole
+    cx_ = ox + shake
+    if rb > 0.02:
+        # the tail root (only when the turnip is out of the ground)
+        tail = 56.0 * rb * (1.0 - ease(out))
+        if out > 0.02 and tail > 3:
+            r.poly([(cx_ - 16 * rb, cy_ + ry_ * 0.86), (cx_ + 16 * rb, cy_ + ry_ * 0.86), (cx_ + 4, cy_ + ry_ + tail)], "#F2E8D5", INK, 2.6)
+        # the bulb: cream with a purple top
+        r.ell(cx_, cy_, rx_, ry_, "#FBF3E4", INK, 3.4)
+        cap = []
+        for j in range(0, 19):
+            th = math.radians(180 + 180 * j / 18.0)
+            cap.append((cx_ + rx_ * math.cos(th), cy_ + ry_ * math.sin(th)))
+        for j in range(18, -1, -1):
+            u = j / 18.0
+            xx = cx_ - rx_ + 2 * rx_ * u
+            yy = cy_ - ry_ * 0.20 + math.sin(u * 7.0) * 7 * rb + 24 * rb * (1 - abs(2 * u - 1)) ** 2
+            cap.append((xx, yy))
+        r.poly(cap, "#C86DD7", None)
+        r.ell(cx_, cy_, rx_, ry_, None, INK, 3.4)
+        r.ell(cx_ - rx_ * 0.38, cy_ - ry_ * 0.42, rx_ * 0.2, ry_ * 0.13, "#E7B6EE", None, ang=-30)            # shine
+        r.ell(cx_ - rx_ * 0.30, cy_ + ry_ * 0.28, rx_ * 0.16, ry_ * 0.09, "#FFFFFF", None, ang=-30)
+        for dx in (-0.45, 0.35):                                                                            # a few thin root hairs
+            r.line([(cx_ + rx_ * dx, cy_ + ry_ * 0.78), (cx_ + rx_ * dx + 8, cy_ + ry_ * 0.95)], "#C9B89A", 2)
+    # leaves: a fan from the top of the bulb (or one bunch pulled toward the hands)
+    ls = clamp(grow / 0.55) ** 0.9 * (1.0 + 0.18 * clamp((grow - 0.55) / 0.45))
+    topy = cy_ - ry_ * 0.86
+    n_leaf = 7
+    be = ease(bend)
+    for i in range(n_leaf):
+        a = -78 + i * 156.0 / (n_leaf - 1)
+        sway = math.sin(t * 2.0 + i * 1.3) * 3.0 + math.sin(t * 17.0 + i) * 6.0 * wob
+        ang = math.radians(a + sway)
+        ln = (150.0 - 18.0 * abs(i - 3)) * ls
+        wd = (34.0 - 3.0 * abs(i - 3)) * ls
+        bx, by = cx_ + math.sin(ang * 0.35) * 14, topy + 6
+        tx, ty = cx_ + math.sin(ang) * ln * 0.95, topy - math.cos(ang) * ln
+        if be > 0.001:                                       # gathered into a bunch that ends in the puller's hands
+            dxg, dyg = gx - bx, gy - by
+            dl = math.hypot(dxg, dyg) or 1.0
+            ux, uy = dxg / dl, dyg / dl
+            reach = dl + 34.0 + 9.0 * (3 - abs(i - 3))
+            off = (i - 3) * 8.0 + math.sin(t * 19.0 + i) * 3.5 * wob
+            btx, bty = bx + ux * reach - uy * off, by + uy * reach + ux * off
+            tx, ty = lerp(tx, btx, be), lerp(ty, bty, be)
+            wd *= 1.0 - 0.12 * be
+        dx_, dy_ = tx - bx, ty - by
+        dl_ = math.hypot(dx_, dy_) or 1.0
+        px_, py_ = -dy_ / dl_, dx_ / dl_                     # a unit vector across the leaf
+        bow = (i - 3) * (3.0 + 6.0 * be) + 10.0 * be         # the leaves curve outward; pulled into a bunch they spread in the middle and sag a little
+        mid = [(bx + dx_ * u + px_ * bow * math.sin(math.pi * u), by + dy_ * u + py_ * bow * math.sin(math.pi * u)) for u in (j / 10.0 for j in range(11))]
+        hws = [wd * (math.sin(math.pi * j / 10.0) ** 0.75) * (1.0 - 0.3 * j / 10.0) + 0.8 for j in range(11)]
+        edge_l = [(m[0] + px_ * h, m[1] + py_ * h) for m, h in zip(mid, hws)]
+        edge_r = [(m[0] - px_ * h, m[1] - py_ * h) for m, h in zip(mid, hws)]
+        r.poly(edge_l + edge_r[::-1], leaf if i % 2 == 0 else leaf_l, INK, 3)
+        r.line(mid, leaf_d, 2.4)
+    # the front of the soil hides the buried part of the root (only while it is in the ground)
+    if not hole:
+        pts = [(-152 + 304 * i / 30.0, -4 - 6 * math.sin(i * 0.45) - 3 * math.sin(i * 1.1 + 1)) for i in range(31)]
+        pts += [(152 - 304 * i / 24.0, 8 + 24 * math.sqrt(max(0.0, 1 - (1 - 2 * i / 24.0) ** 2))) for i in range(25)]
+        r.poly(pts, soil_l, INK, 3)
+        for dx, dy, rr in ((-110, 6, 6), (-60, 20, 5), (-18, 9, 4), (32, 22, 6), (76, 8, 5), (118, 14, 4)):
+            r.dot(dx, dy, rr, soil_d)
+    elif not rim_first:
+        front_rim()
+    if grow < 0.2:                                                     # a tiny sprout of two leaves
+        s = clamp(grow / 0.2)
+        if s > 0.05:
+            r.line([(0, 4), (0, 4 - 26 * s)], leaf_d, 5)
+            for sx in (-1, 1):
+                r.ell(sx * 12 * s, 4 - 28 * s, 14 * s, 7 * s, leaf_l, INK, 2.4, ang=sx * -28)
+    return r
+
+
+@prop
+def pot(c, x, y, k, t, st):
+    """A big soup pot on a little fire (steam is a separate effect). (x, y) = the middle of the fire on the ground."""
+    r = Rig(c, x, y, k)
+    r.ell(0, 4, 150, 17, mix("#79CE5D", "#2F6B2F", 0.45), None)
+    for sx, ang in ((-1, -14), (1, 14)):                                                    # two crossed logs
+        r.ell(sx * 62, -10, 62, 12, "#8B5A2B", INK, 2.8, ang=ang)
+        r.ell(sx * 62 + sx * 52, -9 - sx * 8, 11, 10, "#C98A52", INK, 2.2)
+    for i, (fx_, fh, col) in enumerate(((-52, 58, "#FF8A3D"), (0, 78, "#FF6B2E"), (54, 56, "#FF8A3D"))):    # flames
+        fl = fh * (0.86 + 0.14 * math.sin(t * 9.0 + i * 2.1))
+        r.poly([(fx_ - 24, -14), (fx_ - 10, -14 - fl * 0.55), (fx_ + 2 * math.sin(t * 7 + i), -14 - fl), (fx_ + 12, -14 - fl * 0.5), (fx_ + 24, -14)], col, INK, 2.6)
+        r.poly([(fx_ - 11, -14), (fx_, -14 - fl * 0.55), (fx_ + 11, -14)], "#FFD54A", None)
+    r.ell(0, -120, 112, 96, "#5F6F82", INK, 3.4)                                           # the pot
+    r.ell(-38, -142, 34, 52, "#7C8EA3", None, ang=22)
+    r.rrect(-110, -150, 110, -128, 8, "#4A5868", INK, 3)
+    for sx in (-1, 1):                                                                      # handles
+        r.arc(sx * 116, -128, 24, 20, -90 if sx > 0 else 90, 90 if sx > 0 else 270, INK, 9)
+        r.arc(sx * 116, -128, 24, 20, -90 if sx > 0 else 90, 90 if sx > 0 else 270, "#4A5868", 5)
+    r.ell(0, -152, 102, 22, "#3C4856", INK, 3)                                              # the soup
+    r.ell(0, -150, 92, 16, "#F7DE9A", None)
+    for i, (bx_, by_, col) in enumerate(((-52, -151, "#C86DD7"), (-14, -147, "#FBF3E4"), (30, -152, "#C86DD7"), (60, -148, "#7ED47A"), (-76, -146, "#FBF3E4"))):
+        r.ell(bx_, by_, 11, 5, col, INK, 1.8)
+    for i in range(3):                                                                      # bubbles
+        ph = (t * 0.9 + i * 0.37) % 1.0
+        bb = 3 + 8 * ph
+        if ph < 0.85:
+            r.ell(-40 + i * 38, -152 - 4 * ph, bb, bb * 0.55, "#FFF8DB", "#E7C770", 1.6)
+    sp = math.sin(t * 2.2) * 16 * clamp(st.get("stir", 1.0))                                # the wooden spoon
+    r.line([(sp, -152), (70 + sp * 0.4, -232)], INK, 11)
+    r.line([(sp, -152), (70 + sp * 0.4, -232)], "#C98A52", 6.5)
+    return r
+
+
 # ================================================================================================ effects
 @fx
 def wind(c, s, x, y, dt, dir=1, power=1.0, dx=0, **_):

@@ -11,6 +11,28 @@ LEAD_MAX = 0.20          # the longest a consonant before a vowel may last (seco
 CODA_MAX = 0.16
 GAP = 0.035              # silence between the end of a syllable and the next one when notes touch
 LEVEL = 0.16             # the loudest 30 ms of every syllable gets this level before the line is mixed
+MAXOVER = 1.5            # no part of a syllable may be louder than this many times that level (an accent on the vowel, a burst)
+
+
+def flatten(sig, sr, ref, maxover=MAXOVER, win=0.020):
+    """Pulls the loud parts of a syllable down to at most `maxover` times `ref`.  A held note has an even loudness, but a spoken word has
+    accents (the 'la' of 'Parla' starts 12 dB above the rest of its vowel): left alone, one such peak is as loud as the whole song and
+    is heard as a thump.  The gain follows the 20 ms loudness, looks ahead and back by the same time and is smoothed, so it is no click."""
+    w = max(8, int(win * sr))
+    if len(sig) <= 2 * w:
+        return sig
+    cs = np.concatenate([[0.0], np.cumsum(sig ** 2)])
+    env = np.sqrt(np.maximum((cs[w:] - cs[:-w]) / w, 0.0))             # env[i]: the loudness of sig[i:i + w]
+    hop = max(1, w // 10)
+    g = np.minimum(1.0, maxover * ref / np.maximum(env[::hop], 1e-9))
+    if g.min() > 0.995:
+        return sig
+    k = 10                                                              # 20 ms, in hops
+    gp = np.pad(g, (k, k), mode="edge")
+    low = np.array([gp[i:i + 2 * k + 1].min() for i in range(len(g))])  # the gain never rises before the loud part is over ...
+    sm = np.convolve(np.pad(low, (k, k), mode="edge"), np.ones(2 * k + 1) / (2 * k + 1), mode="valid")   # ... and comes back gently
+    gain = np.interp(np.arange(len(sig)), np.arange(len(g)) * hop + w // 2, sm)
+    return sig * gain
 
 
 def _env_db(an):
@@ -219,7 +241,7 @@ def sing_line(chunks, notes, accents=None, sr=44100):
             env = np.sqrt(np.maximum((cs[w:] - cs[:-w]) / w, 0.0))
             top = float(env.max())
             if top > 1e-6:
-                sig = sig * (LEVEL / float(np.median(env[env > 0.35 * top])))
+                sig = flatten(sig * (LEVEL / float(np.median(env[env > 0.35 * top]))), sr, LEVEL)
         f = int(0.006 * sr)
         if len(sig) > 4 * f:
             sig[:f] *= np.linspace(0, 1, f)

@@ -18,9 +18,14 @@ engines
   kokoro      Kokoro-82M, a different voice for every character (English)
   kokoro-own / kokoro-esp   Kokoro with Turkish sounds (our own spelling rules / espeak-ng's Turkish), Italian / Spanish / English voices
   chatterbox  Chatterbox multilingual (an expressive neural voice that copies the voice of a short reference clip; slow on a CPU)
+  kokoro-tr / kokoro-tr-shift   Kokoro-Turkish (a Turkish fine-tune of Kokoro-82M: two voices, elif and emre), plain / with the pitch of the characters moved by rubberband
+  prod-kokoro  the way the daily videos would do it: bibi_buzz.tales with BIBI_KOKORO=<language> (the Kokoro voices of bibi_buzz/ktts.py, the Edge voice when Kokoro
+              cannot make a line), the WHOLE tale; every line is measured and the whole tale is written as one mp3 to listen to (<language>-full-prod.mp3)
 """
 import argparse
 import asyncio
+import contextlib
+import io
 import json
 import os
 import re
@@ -272,6 +277,137 @@ def e_kokoro_tr(g2p):
     return fn
 
 
+# ------------------------------------------------------------------------------------------------------------------------ Kokoro-Turkish (a Turkish fine-tune of Kokoro-82M, Apache 2.0: huggingface.co/empiriolabsai/kokoro-turkish)
+KTR_REPO = "empiriolabsai/kokoro-turkish"
+KTR_ROLES = {                         # role: (voice = a mix of the two voices of the model, speed, pitch ratio, 'shifted' = the formants move with the pitch: a smaller / bigger person)
+    "nar": ({"elif": 1.0}, 0.95, 1.0, "shifted"),
+    "mama": ({"elif": 0.7, "emre": 0.3}, 0.93, 0.97, "preserved"),
+    "pig1": ({"elif": 0.4, "emre": 0.6}, 1.05, 1.22, "shifted"),
+    "pig3": ({"emre": 1.0}, 0.97, 1.0, "shifted"),
+    "wolf": ({"emre": 1.0}, 0.88, 0.84, "shifted"),
+}
+
+
+def pitch_shift(y, ratio, formant="shifted"):
+    """ffmpeg's rubberband: the pitch x ratio ('preserved' keeps the size of the speaker, 'shifted' makes him smaller / bigger)."""
+    if abs(ratio - 1.0) < 0.005:
+        return y
+    src, dst = os.path.join(OUT, "_ps_in.wav"), os.path.join(OUT, "_ps_out.wav")
+    VL.write_wav(src, np.clip(y, -1, 1), KSR)
+    r = subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", src, "-af", "rubberband=pitch=%.4f:formant=%s:pitchq=quality" % (ratio, formant), dst],
+                       capture_output=True, text=True)
+    if r.returncode:
+        log("rubberband failed", r.stderr[:300])
+        return y
+    with wave.open(dst) as w:
+        z = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float64) / 32768.0
+    os.remove(src)
+    os.remove(dst)
+    return z
+
+
+def ktr():
+    """(its text-to-sounds module, the model, the voices already loaded)"""
+    if "ktr" not in _M:
+        import torch
+        from huggingface_hub import hf_hub_download, list_repo_files
+        from kokoro import KModel
+        from bibi_buzz.g2p_tr import TurkishG2P                # the text-to-sounds module is kept (and was read through) in this repository: no code of the model's page is run
+        torch.set_num_threads(os.cpu_count() or 2)
+        try:
+            log("kokoro-turkish files:", list_repo_files(KTR_REPO))
+        except Exception:
+            log("list_repo_files failed", traceback.format_exc()[-200:])
+        g2p = TurkishG2P()
+        # only data is downloaded from the model's page: its config (json), its weights (loaded by kokoro with weights_only=True) and the voices (loaded below the same way)
+        net = KModel(repo_id=KTR_REPO, config=hf_hub_download(KTR_REPO, "config.json"), model=hf_hub_download(KTR_REPO, "kokoro-turkish.pth")).eval()
+        _M["ktr"] = (g2p, net, {})
+    return _M["ktr"]
+
+
+def ktr_style(blend):
+    import torch
+    from huggingface_hub import hf_hub_download
+    cache = ktr()[2]
+    out = None
+    for name, w in blend.items():
+        if name not in cache:
+            cache[name] = torch.load(hf_hub_download(KTR_REPO, "voices/%s.pt" % name), weights_only=True)
+        out = cache[name] * w if out is None else out + cache[name] * w
+    return out
+
+
+def e_kokoro_ft(shift):
+    def fn(lang, lines):
+        import torch
+        g2p, net, _ = ktr()
+        ys = []
+        for role, text in lines:
+            blend, sp, ratio, fm = KTR_ROLES[role]
+            try:
+                ph, _ = g2p(text)
+                log("   %s %s: %s" % (role, "+".join(blend), ph))
+                st = ktr_style(blend)
+                with torch.no_grad():
+                    au = net(ph, st[len(ph) - 1], sp)
+                y = au.numpy() if hasattr(au, "numpy") else np.asarray(au)
+                ys.append(pitch_shift(y, ratio, fm) if shift else y)
+            except Exception:
+                log("kokoro-turkish failed", role, traceback.format_exc()[-500:])
+                ys.append(None)
+        return ys
+    return fn
+
+
+# ------------------------------------------------------------------------------------------------------------------------ the daily videos' way (bibi_buzz/ktts.py)
+def e_prod(lang, lines):
+    """The whole tale with the production casting (bibi_buzz.tales.cast_voices with BIBI_KOKORO set for this language and voice.synth_items, Edge as the stand-in):
+    every line is measured, per character, and the whole tale is one mp3; the ten lines of the scene are returned for the usual table."""
+    from bibi_buzz import voice as VO
+    old = os.environ.get("BIBI_KOKORO")
+    os.environ["BIBI_KOKORO"] = lang
+    try:
+        t, beats = tale_lines(lang)
+        t.voice_items()
+        keys = [b.key for b in beats]
+        who = [b.who or "nar" for b in beats]
+        log("   production casting:", {w: t.voices[w][0] for w in sorted(set(who))})
+        buf = io.StringIO()
+        t0 = time.time()
+        with contextlib.redirect_stdout(buf):
+            clips = VO.synth_items(keys, "ffmpeg", os.path.join(OUT, "_cache_prod_" + lang))
+        work = time.time() - t0
+        for ln in buf.getvalue().splitlines():
+            log("   " + ln)
+    finally:
+        if old is None:
+            os.environ.pop("BIBI_KOKORO", None)
+        else:
+            os.environ["BIBI_KOKORO"] = old
+    ys = [VL.resample(clips[k], 44100, KSR) for k in keys]
+    dur = sum(len(y) for y in ys) / float(KSR)
+    log("   %d lines, %.0f s of speech, %.0f s of work (RTF %.2f, Kokoro model loading included)" % (len(ys), dur, work, work / max(dur, 1e-9)))
+    _M["secs_override"] = work * (sum(len(ys[i]) for i in PICK) / float(KSR)) / max(dur, 1e-9)       # (the share of the ten lines)
+    VL.save("%s-full-prod" % lang, scene_of(ys), KSR)
+    agg = {}
+    for w, b, y in zip(who, beats, ys):
+        s = score(y, b.text, lang)
+        a = agg.setdefault(w, [[], [], 0.0])
+        if "mos" in s:
+            a[0].append(s["mos"])
+        if "wer" in s:
+            a[1].append(s["wer"])
+        a[2] += len(y) / float(KSR)
+        if s.get("wer", 0) > 0.25 or s.get("mos", 5) < 3.2:
+            log("   ATTENTION %-6s utmos %s words wrong %s   %r   heard: %r" % (w, ("%.2f" % s["mos"]) if "mos" in s else "-", ("%.0f%%" % (100 * s["wer"])) if "wer" in s else "-",
+                                                                          b.text[:60], s.get("heard", "")[:60]))
+    log("   per character (%s):  lines  seconds  UTMOS  words wrong" % lang)
+    for w in sorted(agg):
+        m, e, sec = agg[w]
+        log("      %-6s %3d  %6.1f   %s   %s   voice %s" % (w, len(e) or len(m), sec, ("%.2f" % np.mean(m)) if m else " - ", ("%3.0f%%" % (100 * np.mean(e))) if e else " - ", t.voices[w][0]))
+    return [ys[i] for i in PICK]
+
+
 # ------------------------------------------------------------------------------------------------------------------------ Chatterbox (runs in its own environment: tools/cbx_synth.py)
 CBX_REF_TEXT = {"en": "Once upon a time, in a little green valley, there lived a family of friendly animals. Every morning they woke up with the sun.",
                 "tr": "Evvel zaman içinde, küçük yeşil bir vadide, dostane bir hayvan ailesi yaşarmış. Her sabah güneşle birlikte uyanırlarmış."}
@@ -326,17 +462,18 @@ def cbx_collect(a):
                 secs += float(times.get(str(k), [0, 0])[0])
             else:
                 ys.append(None)
-        finish(lang, "6-chatterbox", ys, lines, secs)
+        finish(lang, "7-chatterbox", ys, lines, secs)
         for k in sorted(times, key=int):
             log("   line %s: %.1f s of audio in %.1f s of work" % (k, times[k][1], times[k][0]))
 
 
 # ------------------------------------------------------------------------------------------------------------------------ main
 ENGINES = [                                                   # (language, key, function)
-    ("en", "1-cur", e_cur), ("en", "2-edge-multi", e_edge(EDGE_MULTI)), ("en", "3-kokoro", e_kokoro),
+    ("en", "1-cur", e_cur), ("en", "2-edge-multi", e_edge(EDGE_MULTI)), ("en", "3-kokoro", e_kokoro), ("en", "4-prod-kokoro", e_prod),
     ("tr", "1-cur", e_cur), ("tr", "2-edge-mild", e_edge(EDGE_MILD)), ("tr", "3-edge-multi", e_edge(EDGE_MULTI)),
-    ("tr", "4-kokoro-own", e_kokoro_tr("own")), ("tr", "5-kokoro-esp", e_kokoro_tr("esp")),
+    ("tr", "4-kokoro-tr", e_kokoro_ft(False)), ("tr", "5-kokoro-tr-shift", e_kokoro_ft(True)), ("tr", "6-prod-kokoro", e_prod),
 ]
+# (the Italian-voice try, e_kokoro_tr("own") / e_kokoro_tr("esp"), is not an engine any more: 34 % / 74 % of its words were wrong in the first run)
 
 
 def job_main(a):
@@ -355,12 +492,13 @@ def job_main(a):
             continue
         lines = get_lines(lang)
         t0 = time.time()
+        _M.pop("secs_override", None)
         try:
             ys = fn(lang, lines)
         except Exception:
             log("ENGINE FAILED", lang, key, traceback.format_exc()[-1500:])
             continue
-        finish(lang, key, ys, lines, time.time() - t0)
+        finish(lang, key, ys, lines, _M.pop("secs_override", time.time() - t0))
     summary()
 
 

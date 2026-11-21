@@ -815,18 +815,176 @@ def pot(c, x, y, k, t, st):
     for sx in (-1, 1):                                                                      # handles
         r.arc(sx * 116, -128, 24, 20, -90 if sx > 0 else 90, 90 if sx > 0 else 270, INK, 9)
         r.arc(sx * 116, -128, 24, 20, -90 if sx > 0 else 90, 90 if sx > 0 else 270, "#4A5868", 5)
-    r.ell(0, -152, 102, 22, "#3C4856", INK, 3)                                              # the soup
-    r.ell(0, -150, 92, 16, "#F7DE9A", None)
-    for i, (bx_, by_, col) in enumerate(((-52, -151, "#C86DD7"), (-14, -147, "#FBF3E4"), (30, -152, "#C86DD7"), (60, -148, "#7ED47A"), (-76, -146, "#FBF3E4"))):
-        r.ell(bx_, by_, 11, 5, col, INK, 1.8)
-    for i in range(3):                                                                      # bubbles
-        ph = (t * 0.9 + i * 0.37) % 1.0
-        bb = 3 + 8 * ph
-        if ph < 0.85:
-            r.ell(-40 + i * 38, -152 - 4 * ph, bb, bb * 0.55, "#FFF8DB", "#E7C770", 1.6)
+    if st.get("kind", "turnip") == "stone":
+        _stone_soup(r, t, st)
+    else:
+        r.ell(0, -152, 102, 22, "#3C4856", INK, 3)                                          # the soup
+        r.ell(0, -150, 92, 16, "#F7DE9A", None)
+        for i, (bx_, by_, col) in enumerate(((-52, -151, "#C86DD7"), (-14, -147, "#FBF3E4"), (30, -152, "#C86DD7"), (60, -148, "#7ED47A"), (-76, -146, "#FBF3E4"))):
+            r.ell(bx_, by_, 11, 5, col, INK, 1.8)
+        for i in range(3):                                                                  # bubbles
+            ph = (t * 0.9 + i * 0.37) % 1.0
+            bb = 3 + 8 * ph
+            if ph < 0.85:
+                r.ell(-40 + i * 38, -152 - 4 * ph, bb, bb * 0.55, "#FFF8DB", "#E7C770", 1.6)
     sp = math.sin(t * 2.2) * 16 * clamp(st.get("stir", 1.0))                                # the wooden spoon
     r.line([(sp, -152), (70 + sp * 0.4, -232)], INK, 11)
     r.line([(sp, -152), (70 + sp * 0.4, -232)], "#C98A52", 6.5)
+    return r
+
+
+# ================================================================================================ the stone soup's world
+STONE_SLOTS = {"carrot": ((-70, -150), (-2, -153), (56, -147)), "potato": ((-32, -146), (30, -152), (76, -151)),
+               "cabbage": ((-84, -150), (12, -147), (48, -155)), "onion": ((-54, -153), (-8, -148), (68, -148)),
+               "tomato": ((-20, -153), (36, -146), (-76, -146))}
+
+
+def _soup_bit(r, kind, x, y, s, rot, broth):
+    """A little piece of a vegetable floating in the soup (s = its size, 1.0 = full size)."""
+    if kind == "carrot":                                                                   # a slice
+        r.ell(x, y, 10 * s, 6.5 * s, "#FF8A2B", INK, 1.8)
+        r.ell(x, y, 4.5 * s, 2.6 * s, "#FFC27A", None)
+    elif kind == "potato":                                                                 # a chunk
+        r.ell(x, y, 11 * s, 8 * s, "#E4BF82", INK, 1.8, ang=rot)
+        r.dot(x - 3 * s, y - 1 * s, 1.6 * s, "#B88C52")
+    elif kind == "cabbage":                                                                # a curly leaf
+        r.ell(x, y, 13 * s, 6 * s, "#7ED47A", INK, 1.8, ang=rot * 0.4 - 8)
+        r.ell(x - 2 * s, y - 1 * s, 7 * s, 2.4 * s, "#A7E89C", None, ang=rot * 0.4 - 8)
+    elif kind == "onion":                                                                  # a ring
+        r.ell(x, y, 10 * s, 6 * s, "#FFF4D8", INK, 1.8)
+        r.ell(x, y, 5.2 * s, 2.8 * s, broth, None)
+    else:                                                                                  # a piece of tomato
+        r.ell(x, y, 9 * s, 7 * s, "#EE4B3E", INK, 1.8)
+        r.ell(x - 3 * s, y - 2 * s, 3 * s, 1.8 * s, "#FF9A8F", None)
+
+
+def _stone_soup(r, t, st):
+    """The inside of the pot for the stone soup (see pot)."""
+    water, cook = clamp(st.get("water", 0.0)), clamp(st.get("cook", 0.0))
+    r.ell(0, -152, 102, 22, "#3C4856", INK, 3)                                              # the empty pot
+    broth = mix("#9ED8F2", "#F2C66B", ease(cook))
+    if water > 0.02:
+        lvl = ease(water)                                                                   # the water rises
+        r.ell(0, -150 - 2 * (1 - lvl), 92 * (0.6 + 0.4 * lvl), 16 * lvl, broth, None)
+        r.ell(-26, -153, 34 * lvl, 4.4 * lvl, mix(broth, "#FFFFFF", 0.38), None)
+    sd = clamp(st.get("stone", 0.0))                                                        # the stone drops in (it only peeks out of the water)
+    if sd > 0.02:
+        drop = (1.0 - ease(sd)) * 74
+        r.ell(-46, -154 - drop, 21, 12, "#9EA7B3", INK, 2.4)
+        r.ell(-52, -158 - drop, 7, 3.4, "#CDD3DB", None, ang=-20)
+    bits = []
+    for name, slots in STONE_SLOTS.items():
+        v = clamp(st.get(name, 0.0))
+        if v > 0.02:
+            for j, (bx_, by_) in enumerate(slots):
+                bits.append((by_, name, bx_, by_ - 2.4 * math.sin(t * 2.1 + bx_ * 0.1), ease_out_back(v), 25 * j))
+    for _y, name, bx_, by_, sc, rot in sorted(bits):
+        _soup_bit(r, name, bx_, by_, sc, rot, broth)
+    for i in range(3):                                                                      # bubbles
+        ph = (t * (0.5 + 0.7 * cook) + i * 0.37) % 1.0
+        bb = 3 + 8 * ph
+        if ph < 0.85 and water > 0.9:
+            r.ell(-40 + i * 38, -152 - 4 * ph, bb, bb * 0.55, mix(broth, "#FFFFFF", 0.7), mix(broth, "#B8872E", 0.5), 1.6)
+
+
+def _vegetable(r, kind, cx, cy, s=1.0, rot=0.0):
+    """One whole vegetable centred at (cx, cy) in r's units (s = 1.0 is about 80 units long), turned by rot degrees.
+    kind: carrot, potato, cabbage, onion, tomato or stone."""
+    co, si = math.cos(math.radians(rot)), math.sin(math.radians(rot))
+
+    def P(px, py):
+        return (cx + (px * co - py * si) * s, cy + (px * si + py * co) * s)
+
+    def E(px, py, rx, ry, fill, w=2.8, ang=0.0):
+        r.ell(*P(px, py), rx * s, ry * s, fill, INK if w else None, w, ang=ang + rot)
+
+    def Y(pts, fill, w=2.6):
+        r.poly([P(*p) for p in pts], fill, INK if w else None, w)
+
+    def L(pts, col, w=2.0):
+        r.line([P(*p) for p in pts], col, w)
+
+    if kind == "carrot":
+        for a in (-30, 0, 30):                                                              # the green top
+            ang = math.radians(a)
+            tip = (math.sin(ang) * 40, -30 - math.cos(ang) * 40)
+            Y([(-3, -30), (math.sin(ang) * 20 - 7 * math.cos(ang), -30 - math.cos(ang) * 20 - 7 * math.sin(ang)), tip,
+               (math.sin(ang) * 20 + 7 * math.cos(ang), -30 - math.cos(ang) * 20 + 7 * math.sin(ang)), (3, -30)], "#4FAE4B", 2.2)
+        Y([(-17, -26), (-9, -35), (9, -35), (17, -26), (7, 24), (0, 42), (-7, 24)], "#FF8A2B", 2.8)
+        for a, b in (((-12, -14), (-3, -12)), ((3, 0), (12, 2)), ((-6, 14), (2, 16))):
+            L([a, b], "#E0661A", 2.2)
+        E(-8, -18, 3.4, 9, "#FFB35C", 0, 8)
+    elif kind == "potato":
+        E(0, 0, 38, 26, "#C99A5E", 2.8, -10)
+        E(12, -8, 15, 9, "#D7AB6F", 0, -10)
+        E(-12, -10, 10, 5, "#E4C48C", 0, -20)
+        for ex, ey in ((-16, 2), (6, 10), (18, -4), (-4, -6)):
+            E(ex, ey, 3.2, 2.4, "#8C6A3A", 0)
+    elif kind == "cabbage":
+        E(-22, 6, 15, 22, "#8AD983", 2.4, 20)
+        E(22, 6, 15, 22, "#8AD983", 2.4, -20)
+        E(0, 0, 32, 30, "#6FC66A", 3.0)
+        E(0, -3, 22, 21, "#A7E89C", 2.2)
+        for a, b in (((0, 16), (-8, -10)), ((0, 16), (8, -10)), ((0, 16), (0, -14)), ((-6, 8), (-20, 2)), ((6, 8), (20, 2))):
+            L([a, b], "#4FA84F", 2.0)
+        E(-12, -14, 7, 4, "#D5F7CC", 0, -30)
+    elif kind == "onion":
+        L([(0, -34), (-3, -52)], "#4FAE4B", 4.6)
+        L([(0, -34), (6, -50)], "#4FAE4B", 3.6)
+        Y([(-12, -12), (-5, -38), (0, -42), (5, -38), (12, -12)], "#F0CF8E", 2.6)
+        E(0, 6, 27, 28, "#F0CF8E", 3.0)
+        for a, b in (((-13, -8), (-15, 10)), ((0, -16), (0, 20)), ((13, -8), (15, 10))):
+            L([a, b], "#D9AE60", 1.8)
+        E(-9, -6, 6, 10, "#F9E7B8", 0, 12)
+        for a, b in (((-6, 32), (-9, 42)), ((0, 33), (0, 44)), ((6, 32), (9, 42))):
+            L([a, b], "#C9B89A", 2.0)
+    elif kind == "tomato":
+        E(0, 2, 29, 26, "#EE4B3E", 3.0)
+        E(-11, -8, 9, 5, "#FF9A8F", 0, -30)
+        star = []
+        for i in range(10):
+            ang = math.radians(-90 + 36 * i)
+            rr = 15 if i % 2 == 0 else 6
+            star.append((math.cos(ang) * rr, -24 + math.sin(ang) * rr * 0.7))
+        Y(star, "#4FAE4B", 2.2)
+    else:                                                                                   # stone
+        E(0, 2, 36, 24, "#9EA7B3", 2.8, -6)
+        E(-10, -6, 12, 6, "#CDD3DB", 0, -20)
+        L([(8, 8), (20, 4)], "#7E8794", 2.2)
+
+
+@prop
+def stone(c, x, y, k, t, st):
+    """A smooth, round stone lying on the road. st["show"] 0 = it is gone (somebody picked it up)."""
+    if st.get("show", 1.0) < 0.5:
+        return None
+    r = Rig(c, x, y, k)
+    r.ell(0, 2, 44, 7, mix("#79CE5D", "#2F6B2F", 0.35), None)
+    _vegetable(r, "stone", 0, -22, 1.0)
+    return r
+
+
+@prop
+def veg(c, x, y, k, t, st):
+    """A vegetable (st["kind"]: carrot, potato, cabbage, onion, tomato or stone) with (x, y) as its middle.
+    st["u"] 0..1 = how far it has flown along its arc to (x + st["dx"], y + st["dy"]) (units of the prop; st["h"] = how high the arc is,
+    st["turns"] = how often it spins on the way). It is only seen while 0 < u < 1, unless st["rest"] = 1: then it just stays at (x, y),
+    popping up with st["pop"] 0..1 (st["size"] = its size)."""
+    u = clamp(st.get("u", 0.0))
+    rest = st.get("rest", 0.0) > 0.5
+    size = st.get("size", 0.7)
+    if rest:
+        pop = clamp(st.get("pop", 1.0))
+        if pop < 0.02:
+            return None
+        r = Rig(c, x, y, k)
+        _vegetable(r, st.get("kind", "carrot"), 0, 0, size * ease_out_back(pop))
+        return r
+    if not 0.001 < u < 0.999:
+        return None
+    r = Rig(c, x, y, k)
+    px, py = st.get("dx", 0.0) * u, st.get("dy", 0.0) * u - 4.0 * st.get("h", 160.0) * u * (1.0 - u)
+    _vegetable(r, st.get("kind", "carrot"), px, py, size, 360.0 * st.get("turns", 1.0) * u)
     return r
 
 

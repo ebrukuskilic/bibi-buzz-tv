@@ -1,7 +1,8 @@
-"""Farm backdrops for the song videos: a red barn, a silo, hay and fences under a sunny sky.
+"""Pictures for the song videos: farm backdrops (a red barn, a silo, hay and fences under a sunny sky), a sack of wool, a rainbow and a puff of wool.
 
-They are registered in storyart2.BACKDROPS when this module is imported (songs.py does that), under the names
+The backdrops are registered in storyart2.BACKDROPS when this module is imported (songs.py does that), under the names
 'farm', 'farm_dawn', 'farm_dusk' and 'farm_open' (the same farm without the fence in front, so that the friends have room).
+The props 'wool_bag' and 'rainbow' and the effects 'wool_burst' and 'word_pop' are registered in storyprops.PROPS / FX.
 """
 import math
 import random
@@ -9,7 +10,9 @@ import random
 from . import draw as D
 from . import storyart2 as B
 from . import vibe as VB
-from .draw import INK, darker, mix
+from .draw import INK, clamp, darker, mix, ease_out_back
+from .storyart import Rig
+from .storyprops import prop, fx, _tint
 
 WH = B.WH
 
@@ -120,3 +123,100 @@ B.BACKDROPS["farm_open"] = (lambda c, w: far_farm(c, w, "day", 11), lambda c, w:
 # the living layer (birds, butterflies, swaying grass in front) works by the name of the backdrop
 VB.STORY_AMBIENT.update({"farm": ("day", False), "farm_dawn": ("day", False), "farm_dusk": ("day", True), "farm_open": ("day", False)})
 VB.FG_GRASS.update({"farm": "#3FA33A", "farm_dawn": "#4CA84A", "farm_dusk": "#C98A2E", "farm_open": "#3FA33A"})
+
+
+# ================================================================================================ the rainbow sheep: a sack of wool, a rainbow, a puff of wool
+RAINBOW6 = ["#E2362F", "#FF8A1F", "#FFD21F", "#3DB54A", "#3E8EDE", "#8C5BC8"]          # red, orange, yellow, green, blue, purple
+
+
+def _colors(v, default="#FFFFFF"):
+    return [v] if isinstance(v, str) else (list(v) if v else [default])
+
+
+@prop
+def wool_bag(c, x, y, k, t, st):
+    """A cloth sack tied at the top with a fluffy puff of wool coming out of it; (x, y) = the middle of its bottom.
+    st: wool = the colour of the wool (a colour, or a list of colours for a rainbow puff), n = the number on the sack (0 = no number)."""
+    ws = _colors(st.get("wool"))
+    n = int(round(st.get("n", 0)))
+    cloth, rope = "#E9D5A1", "#C0742B"
+    r = Rig(c, x, y, k)
+    _tint(c, [r.P(52 * math.cos(2 * math.pi * i / 20), -2 + 9 * math.sin(2 * math.pi * i / 20)) for i in range(20)], "#1E4D1A", 0.26)     # the shadow on the grass
+    for i, (px, py, rr) in enumerate(((-27, -90, 19), (27, -90, 19), (-15, -107, 21), (15, -107, 21), (0, -116, 17), (0, -96, 22))):      # the puff of wool
+        r.ell(px, py, rr, rr * 0.94, ws[i % len(ws)], INK, 2.8)
+    r.ell(-13, -112, 8, 4.5, mix(ws[2 % len(ws)], "#FFFFFF", 0.5), None, ang=-25)
+    r.poly([(-21, -58), (21, -58), (15, -88), (-15, -88)], cloth, INK, 2.8)                                                             # the neck
+    r.ell(0, -36, 47, 37, cloth, INK, 3.0)                                                                                              # the belly of the sack
+    r.ell(-17, -52, 17, 9, mix(cloth, "#FFFFFF", 0.55), None, ang=-30)
+    for (sx, sy) in ((-34, -22), (30, -20), (-8, -14), (36, -44)):                                                                      # stitches
+        r.line([(sx - 5, sy - 3), (sx + 5, sy + 3)], darker(cloth, 0.22), 2.2)
+    r.poly([(-22, -73), (22, -73), (20, -64), (-20, -64)], rope, INK, 2.4)                                                              # the rope
+    r.poly([(0, -69), (-13, -80), (-6, -62)], rope, INK, 2.0)
+    r.poly([(0, -69), (13, -80), (6, -62)], rope, INK, 2.0)
+    r.dot(0, -69, 5.2, darker(rope, 0.18))
+    if n > 0:                                                                                                                            # the number, on a round patch in the colour of the wool
+        r.ell(0, -33, 21, 21, ws[0], INK, 2.8)
+        px, py = r.P(0, -32)
+        c.text(px, py, str(n), 34 * k, "#FFFFFF", stroke=3.2 * k, stroke_fill=INK)
+    return r
+
+
+@prop
+def rainbow(c, x, y, k, t, st):
+    """A rainbow of six bands in an arch (x, y = the middle of its base, on the ground behind everybody).
+    st: grow = 0..1, how much of it is painted (from left to right: it sweeps across the sky), r = outer radius, band = width of a band, clouds = 1: a cloud at both ends."""
+    grow = clamp(st.get("grow", 1.0))
+    if grow <= 0.004:
+        return None
+    R, bw = st.get("r", 330.0), st.get("band", 17.0)
+    r = Rig(c, x, y, k)
+    a_end = 180.0 - 180.0 * grow
+    steps = max(4, int(46 * grow))
+    for i, col in enumerate(RAINBOW6):
+        ro, ri = R - i * bw, R - (i + 1) * bw - (0.7 if i < 5 else 0.0)
+        pts = [(ro * math.cos(math.radians(180.0 + (a_end - 180.0) * j / steps)), -ro * math.sin(math.radians(180.0 + (a_end - 180.0) * j / steps))) for j in range(steps + 1)]
+        pts += [(ri * math.cos(math.radians(a_end + (180.0 - a_end) * j / steps)), -ri * math.sin(math.radians(a_end + (180.0 - a_end) * j / steps))) for j in range(steps + 1)]
+        r.poly(pts, col, None)
+    for rad in (R, R - 6 * bw):                                                                  # a thin outline around the whole arch
+        r.arc(0, 0, rad, rad, -180.0, -a_end, INK, 3.0, n=max(6, int(60 * grow)))
+    if st.get("clouds", 1.0) > 0.5:
+        mid = R - 3 * bw
+        if grow > 0.04:
+            B.cloud_shape(c, *r.P(-mid, -6), 1.05 * k)
+        if grow > 0.97:
+            B.cloud_shape(c, *r.P(mid, -6), 1.05 * k)
+    return r
+
+
+@fx
+def wool_burst(c, s, x, y, dt, color="#E2362F", r=210, n=14, **_):
+    """Soft puffs of wool in the given colour (or a list of colours) fly out of (x, y), slow down and float to the ground."""
+    if dt > 1.5:
+        return
+    cols = _colors(color)
+    u = dt / 1.5
+    for i in range(n):
+        ang = (i + 0.5) / n * 2 * math.pi + 0.5 * math.sin(i * 7.3)
+        sp = r * (0.5 + 0.5 * ((i * 37) % 10) / 10.0)
+        d = sp * (1.0 - (1.0 - min(1.0, dt / 0.9)) ** 2.4)
+        px, py = x + d * math.cos(ang), y + d * math.sin(ang) * 0.8 + 70.0 * u * u
+        rad = (11.0 + 9.0 * ((i * 13) % 5) / 4.0) * (1.0 - u ** 3)
+        if rad <= 1.0:
+            continue
+        col = cols[i % len(cols)]
+        for dx, dy in ((-0.6, 0.12), (0.6, 0.12), (-0.28, -0.5), (0.34, -0.46)):                  # a fluffy tuft: a ring of little puffs round a filled middle
+            c.ellipse(px + dx * rad, py + dy * rad, rad * 0.62, rad * 0.6, fill=col, outline=INK, width=1.8)
+        c.ellipse(px, py - 0.02 * rad, rad * 0.86, rad * 0.7, fill=col)
+        c.ellipse(px - rad * 0.3, py - rad * 0.3, rad * 0.34, rad * 0.22, fill=mix(col, "#FFFFFF", 0.55))
+
+
+@fx
+def word_pop(c, s, x, y, dt, text="RED", color="#E2362F", size=1.0, hold=0.8, **_):
+    """A big colour word that pops up (in its own colour) at (x, y), stays for `hold` seconds and shrinks away."""
+    sc = ease_out_back(clamp(dt / 0.22)) * size
+    if dt > hold:
+        sc *= clamp(1.0 - (dt - hold) / 0.2)
+    if sc <= 0.03:
+        return
+    wob = 1.0 + 0.04 * math.sin(dt * 14.0)
+    c.text(x, y, text, 78 * sc * wob, color, stroke=8 * sc, stroke_fill=INK)

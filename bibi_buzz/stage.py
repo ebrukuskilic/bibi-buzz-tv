@@ -431,10 +431,10 @@ def r_color(X, c, seg):
     L, d, t = X.L, seg.data, X.t
     hexc = d["hex"]
     p = X.cue_p(seg, 0, 0.55)
-    if L.v:
-        bx, by, br = L.scx, L.sy0 + 160, 150
-        slots = [(L.scx - 140, L.sy0 + 460), (L.scx + 140, L.sy0 + 460), (L.scx - 140, L.sy0 + 620), (L.scx + 140, L.sy0 + 620)]
-        isz = 150
+    if L.v:                                    # four pictures in two rows: room for each label under its picture (the caption pill starts at y 916)
+        bx, by, br = L.scx, L.sy0 + 125, 130
+        slots = [(L.scx - 140, L.sy0 + 395), (L.scx + 140, L.sy0 + 395), (L.scx - 140, L.sy0 + 585), (L.scx + 140, L.sy0 + 585)]
+        isz = 130
     else:
         bx, by, br = L.sx0 + 255, L.scy - 10, 205
         slots = [(L.sx0 + 640, L.scy - 140), (L.sx0 + 860, L.scy - 140), (L.sx0 + 640, L.scy + 120), (L.sx0 + 860, L.scy + 120)]

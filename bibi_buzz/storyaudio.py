@@ -205,6 +205,18 @@ def sfx_rumble():
     return y + band_noise(dur, 80, 320, 41) * env * 0.22
 
 
+def sfx_blub():
+    """Thick porridge bubbling: a handful of round 'blub' pops, each one gliding upwards and dying away fast."""
+    out = np.zeros(int(1.5 * SR))
+    for i, (at, f0, f1) in enumerate(((0.04, 150, 330), (0.24, 120, 270), (0.42, 170, 380), (0.66, 130, 300), (0.83, 160, 340), (1.05, 125, 280))):
+        n = int(0.19 * SR)
+        t = np.arange(n) / SR
+        f = f0 + (f1 - f0) * np.clip(t / 0.12, 0, 1)
+        blub = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 19) * np.minimum(1, t / 0.006)
+        add(out, at, blub + 0.12 * _noise(n, 51 + i) * np.exp(-t * 90), 0.55)
+    return out
+
+
 def sfx_tada():
     out = np.zeros(int(2.2 * SR))
     for i, m in enumerate((67, 72, 76, 79, 84)):
@@ -215,9 +227,9 @@ def sfx_tada():
 SFX = {"knock": sfx_knock, "wind": sfx_wind, "collapse": sfx_collapse, "boing": sfx_boing, "splash": sfx_splash,
        "sparkle": sfx_sparkle, "ding": sfx_ding, "pop": sfx_pop, "thud": sfx_thud, "hoof": sfx_hoof, "hoof2": sfx_hoof2, "boom": sfx_boom, "cheer": sfx_cheer,
        "creak": sfx_creak, "snore": sfx_snore, "dizzy": sfx_dizzy, "whoosh": sfx_whoosh, "beep3": sfx_beep3,
-       "fanfare": sfx_fanfare, "munch": sfx_munch, "gulp": sfx_gulp, "yawn": sfx_yawn, "tada": sfx_tada, "rumble": sfx_rumble}
+       "fanfare": sfx_fanfare, "munch": sfx_munch, "gulp": sfx_gulp, "yawn": sfx_yawn, "tada": sfx_tada, "rumble": sfx_rumble, "blub": sfx_blub}
 SFX_GAIN = {"wind": 0.45, "collapse": 0.55, "boom": 0.5, "cheer": 0.5, "knock": 0.55, "creak": 0.5, "snore": 0.35,
-            "fanfare": 0.4, "tada": 0.4, "beep3": 0.35, "boing": 0.4, "pop": 0.35, "sparkle": 0.45}
+            "fanfare": 0.4, "tada": 0.4, "beep3": 0.35, "boing": 0.4, "pop": 0.35, "sparkle": 0.45, "blub": 0.9}
 
 
 @lru_cache(maxsize=None)

@@ -1241,6 +1241,95 @@ def slipper(c, x, y, k, t, st):
     return r
 
 
+# ================================================================================================ the shoemaker's workbench
+SHOE_COLORS = ("#E2362F", "#3E8EDE", "#3DB54A", "#FFD21F")           # the first four pairs of shoes: red, blue, green, yellow
+
+
+def _shoe(r, x, y, s, col):
+    """One little shoe seen from the side, toe to the right; (x, y) = the middle of the sole."""
+    def P(px, py):
+        return (x + px * s, y + py * s)
+    r.poly([P(-30, 4), P(-31, -20), P(-24, -31), P(-9, -29), P(-2, -18), P(12, -13), P(28, -10), P(37, -3), P(35, 4)], col, INK, 2.4)
+    r.poly([P(-31, 4), P(35, 4), P(35, 10), P(-31, 10)], darker(col, 0.4), INK, 2.0)
+    r.poly([P(-29, -17), P(-24, -28), P(-13, -27), P(-15, -14)], mix(col, "#FFFFFF", 0.45), None)
+    r.dot(x + 12 * s, y - 15 * s, 3.6 * s, "#FFE98A")                                             # a little gold buckle
+
+
+def _pair(r, x, y, s, col):
+    """A pair of shoes: one standing a little behind the other."""
+    _shoe(r, x + 14 * s, y - 8 * s, s * 0.92, darker(col, 0.1))
+    _shoe(r, x - 12 * s, y + 3 * s, s, col)
+
+
+def _coat(r, x, y, s, col="#E2362F"):
+    """A tiny coat laid out flat with two buttons."""
+    for sd in (-1, 1):
+        r.poly([(x + sd * 22 * s, y - 36 * s), (x + sd * 40 * s, y - 14 * s), (x + sd * 30 * s, y - 6 * s), (x + sd * 17 * s, y - 28 * s)], col, INK, 2.2)
+    r.poly([(x - 20 * s, y), (x - 24 * s, y - 34 * s), (x - 12 * s, y - 46 * s), (x + 12 * s, y - 46 * s), (x + 24 * s, y - 34 * s), (x + 20 * s, y)], col, INK, 2.4)
+    r.line([(x, y - 46 * s), (x, y)], darker(col, 0.25), 2.2)
+    r.dot(x - 6 * s, y - 30 * s, 3 * s, "#FFE98A")
+    r.dot(x - 6 * s, y - 15 * s, 3 * s, "#FFE98A")
+
+
+def _trousers(r, x, y, s, col="#3E8EDE"):
+    """Tiny trousers laid out flat."""
+    r.poly([(x - 22 * s, y - 40 * s), (x + 22 * s, y - 40 * s), (x + 25 * s, y), (x + 4 * s, y), (x, y - 20 * s), (x - 4 * s, y), (x - 25 * s, y)], col, INK, 2.4)
+    r.rrect(x - 22 * s, y - 47 * s, x + 22 * s, y - 38 * s, 3, darker(col, 0.18), INK, 2.0)
+    r.dot(x, y - 43 * s, 2.4 * s, "#FFE98A")
+
+
+def _cap(r, x, y, s, col="#3DB54A"):
+    """A tiny pointed cap with a white pompom."""
+    r.poly([(x - 24 * s, y), (x + 24 * s, y), (x + 14 * s, y - 30 * s), (x + 2 * s, y - 52 * s), (x - 14 * s, y - 60 * s), (x - 22 * s, y - 50 * s), (x - 8 * s, y - 40 * s), (x - 16 * s, y - 20 * s)], col, INK, 2.4)
+    r.rrect(x - 25 * s, y - 9 * s, x + 25 * s, y + 1 * s, 3, darker(col, 0.18), INK, 2.0)
+    r.dot(x - 22 * s, y - 52 * s, 5.2 * s, "#FFFFFF")
+
+
+def _boots(r, x, y, s, col="#FFD21F"):
+    """A pair of tiny boots."""
+    for dx in (-17, 17):
+        bx = x + dx * s
+        r.poly([(bx - 10 * s, y), (bx - 10 * s, y - 32 * s), (bx + 8 * s, y - 32 * s), (bx + 8 * s, y - 14 * s), (bx + 25 * s, y - 9 * s), (bx + 25 * s, y)], col, INK, 2.4)
+        r.rrect(bx - 11 * s, y - 3 * s, bx + 26 * s, y + 4 * s, 2, darker(col, 0.4), INK, 1.8)
+        r.line([(bx - 10 * s, y - 28 * s), (bx + 8 * s, y - 28 * s)], darker(col, 0.2), 2.0)
+
+
+@prop
+def bench(c, x, y, k, t, st):
+    """A shoemaker's workbench. (x, y) = the middle of its feet on the floor; the top runs from y - 152 * k (back edge) to y - 112 * k (front edge).
+    st: leather 0..4 = pieces of cut leather piled at the left end, pairs 0..4 = finished pairs of shoes in a row (red, blue, green, yellow),
+    gifts 0..4 = tiny clothes for the elves in a row (red coat, blue trousers, green cap, yellow boots), gifts2 = a second set stands behind the first."""
+    r = Rig(c, x, y, k)
+    r.ell(0, 3, 256, 18, mix("#C98A52", "#5A3A1A", 0.5), None)
+    for sx in (-212, 212):                                                                   # thick legs and a low shelf
+        r.poly([(sx - 17, -96), (sx + 17, -96), (sx + 14, 0), (sx - 14, 0)], "#8B4F26", INK, 2.8)
+    r.rrect(-212, -54, 212, -40, 4, "#9B5C2E", INK, 2.6)
+    for i, tx in enumerate((-120, -20, 80, 170)):                                            # a few old shoes and lasts on the shelf
+        r.poly([(tx - 26, -40), (tx - 26, -54 - (i % 2) * 6), (tx + 4, -66), (tx + 28, -54), (tx + 28, -40)], "#C98A52", INK, 2.0)
+    r.poly([(-190, -152), (190, -152), (246, -112), (-246, -112)], "#D9A066", INK, 3)         # the top and its front edge
+    r.rrect(-246, -112, 246, -92, 6, "#B8733A", INK, 3)
+    for i in range(1, 5):
+        r.line([(-190 + i * 76, -152), (-246 + i * 98, -112)], "#C58E56", 2)
+    r.line([(-200, -102), (200, -102)], "#9B5C2E", 2)
+    nl = int(round(clamp(st.get("leather", 0.0), 0.0, 4.0)))                                 # cut leather, piled up
+    for i in range(nl):
+        yy = -122 - i * 8
+        r.poly([(-232, yy), (-176, yy - 6), (-160, yy + 4), (-222, yy + 12)], "#B5733D", INK, 2.2)
+        r.line([(-224, yy + 6), (-174, yy - 1)], "#E8C089", 1.6)
+    npair = int(round(clamp(st.get("pairs", 0.0), 0.0, 4.0)))                                # finished shoes
+    for i in range(npair):
+        _pair(r, -90 + i * 80, -122, 1.0, SHOE_COLORS[i])
+    ng = int(round(clamp(st.get("gifts", 0.0), 0.0, 4.0)))                                   # tiny clothes for the elves
+    two = st.get("gifts2", 0.0) > 0.5
+    makers = (_coat, _trousers, _cap, _boots)
+    for i in range(ng):
+        gx = -90 + i * 80
+        if two:
+            makers[i](r, gx + 20, -134, 0.82, darker(("#E2362F", "#3E8EDE", "#3DB54A", "#FFD21F")[i], 0.08))
+        makers[i](r, gx, -118, 1.0)
+    return r
+
+
 # ================================================================================================ effects
 @fx
 def wind(c, s, x, y, dt, dir=1, power=1.0, dx=0, **_):

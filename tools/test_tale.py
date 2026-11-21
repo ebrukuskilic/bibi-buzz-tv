@@ -10,6 +10,10 @@ It uses the real text-to-speech voices, so it also shows whether a voice of the 
 A lesson (dNNN-L1 ... dNNN-S5) gets <out>/<id>-sheet.png and <id>.txt (every segment with its cues: time, length, text).
 With --tail 22 it also writes <name>-tail.mp4: the last 22 seconds (the end and the "Like / Subscribe" card, to check that the
 pointer clicks on the words).
+
+  python tools/test_tale.py voices en --out out/test        # the key "voices": every character TYPE of tales.TYPES says a line of its own
+writes <out>/voices-<lang>.mp3 (the narrator says the type, then the character says its line, with its voice and effect) and
+<out>/voices-<lang>.txt (a table: voice, effect, pitch F0, loudness) - to listen to and to tune the character voices.
 """
 import argparse
 import json
@@ -59,6 +63,136 @@ def test_tale(a, ffmpeg, key):
     if a.tail > 0:
         info = SY.render(t, base + "-tail.mp4", ffmpeg, a.cache, t_range=(max(0.0, t.duration - a.tail), t.duration), quiet=True)
         print("tail clip:", info["file"], "(the last %.0f s, with the real voices) rendered in %ss" % (a.tail, info["seconds_to_render"]), flush=True)
+
+
+# what each character TYPE says in the "voices" check: (English, Turkish), and its name (English, Turkish)
+VOICE_LINES = {
+    "girl": ("Hello! I am a little girl. Do you want to play?", "Merhaba! Ben küçük bir kızım. Oynamak ister misin?"),
+    "teen": ("Oh, I would love to go to the ball!", "Of, baloya gitmeyi çok isterdim!"),
+    "boy": ("Look at me! I can run so fast!", "Bana bak! Çok hızlı koşabiliyorum!"),
+    "baby": ("This porridge is just right!", "Bu yulaf lapası tam kıvamında!"),
+    "woman": ("Come inside, my dears. Supper is ready.", "İçeri gelin canlarım. Yemek hazır."),
+    "granny": ("Come here, my dear. Let me tell you a story.", "Gel bakalım canım. Sana bir masal anlatayım."),
+    "fakegranny": ("Come closer, my dear, so I can see you.", "Yaklaş bakalım canım, seni göreyim."),
+    "man": ("Good morning! What a fine day for work!", "Günaydın! Çalışmak için ne güzel bir gün!"),
+    "grandpa": ("Long ago, when I was young, I planted this seed.", "Çok eskiden, ben gençken, bu tohumu ben ekmiştim."),
+    "prince": ("Please, may I have this dance?", "Lütfen, bu dansı benimle yapar mısınız?"),
+    "king": ("I am the king! Bring me my supper!", "Ben kralım! Bana yemeğimi getirin!"),
+    "lord": ("Welcome to my grand house!", "Büyük evime hoş geldiniz!"),
+    "queen": ("Magic mirror, who is the fairest of all?", "Sihirli ayna, söyle bana, en güzel kim?"),
+    "stepmother": ("Work, work, work! There is much to do!", "Çalış, çalış, çalış! Yapılacak çok iş var!"),
+    "stepsister": ("That dress is mine! It is mine!", "O elbise benim! Benim!"),
+    "witch": ("Ha, ha, ha! Take a bite of my apple, my dear.", "Ha, ha, ha! Elmamdan bir ısır bakalım canım."),
+    "fairy": ("Do not cry. I am your fairy godmother.", "Ağlama. Ben senin peri annenim."),
+    "mirror": ("You are the fairest of them all.", "Sen hepsinden daha güzelsin."),
+    "dwarf": ("Look! We found a little house in the woods!", "Bak! Ormanda küçük bir ev bulduk!"),
+    "elf": ("Snip, snap! We will make the shoes!", "Çıt çıt! Ayakkabıları biz yapacağız!"),
+    "elfgirl": ("Snip, snap! What a lovely little shoe!", "Çıt çıt! Ne güzel küçük bir ayakkabı!"),
+    "troll": ("Who is that trip-trapping over my bridge?", "Köprümün üstünde tıp tıp yürüyen kim?"),
+    "giant": ("Fee, fi, fo, fum! I smell a boy!", "Fii, fay, fo, fam! Bir çocuk kokusu alıyorum!"),
+    "pig": ("Not by the hair of my chinny chin chin!", "Asla! Çenemdeki tüylere yemin olsun!"),
+    "wolf": ("I will huff, and I will puff, and I will blow your house down!", "Üfleyeceğim, püfleyeceğim, evinizi yıkacağım!"),
+    "hare": ("I am the fastest animal in the whole wide world!", "Ben dünyanın en hızlı hayvanıyım!"),
+    "tortoise": ("Slow and steady wins the race.", "Yavaş ve sağlam, yarışı kazanır."),
+    "bear": ("Somebody has been eating my porridge!", "Biri benim yulaf lapamı yemiş!"),
+    "mamabear": ("Somebody has been sitting in my chair!", "Biri benim sandalyemde oturmuş!"),
+    "goat_little": ("Trip, trap, trip, trap! May I cross the bridge?", "Tıp tıp, tıp tıp! Köprüden geçebilir miyim?"),
+    "goat_mid": ("Trip, trap, trip, trap! Please let me cross!", "Tıp tıp, tıp tıp! Lütfen geçmeme izin ver!"),
+    "goat_big": ("I am the big billy goat! Out of my way!", "Ben koca keçiyim! Çekil yolumdan!"),
+    "hen": ("Who will help me plant the wheat?", "Buğdayı ekmeme kim yardım edecek?"),
+    "fox": ("Hello, friends. May I have a taste of your soup?", "Merhaba dostlar. Çorbanızdan tadabilir miyim?"),
+    "tiny": ("I am very small, but I can help you!", "Çok küçüğüm ama sana yardım edebilirim!"),
+    "lion": ("Roar! Who dares to wake the king of the jungle?", "Hırrr! Ormanın kralını kim uyandırmaya cesaret eder?"),
+}
+VOICE_NAMES = {
+    "girl": ("Girl", "Kız çocuğu"), "teen": ("Young woman", "Genç kız"), "boy": ("Boy", "Erkek çocuğu"), "baby": ("Baby", "Bebek"),
+    "woman": ("Mother", "Anne"), "granny": ("Granny", "Nine"), "fakegranny": ("The wolf as granny", "Nine kılığındaki kurt"),
+    "man": ("Man", "Adam"), "grandpa": ("Grandpa", "Dede"), "prince": ("Prince", "Prens"), "king": ("King", "Kral"), "lord": ("Lord", "Lord"),
+    "queen": ("Queen", "Kraliçe"), "stepmother": ("Stepmother", "Üvey anne"), "stepsister": ("Stepsister", "Üvey kız kardeş"), "witch": ("Witch", "Cadı"),
+    "fairy": ("Fairy", "Peri"), "mirror": ("Magic mirror", "Sihirli ayna"), "dwarf": ("Dwarf", "Cüce"), "elf": ("Elf", "Elf"), "elfgirl": ("Elf girl", "Elf kız"),
+    "troll": ("Troll", "Trol"), "giant": ("Giant", "Dev"), "pig": ("Pig", "Domuz"), "wolf": ("Wolf", "Kurt"), "hare": ("Hare", "Tavşan"),
+    "tortoise": ("Tortoise", "Kaplumbağa"), "bear": ("Papa bear", "Baba ayı"), "mamabear": ("Mama bear", "Anne ayı"), "goat_little": ("Little goat", "Küçük keçi"),
+    "goat_mid": ("Middle goat", "Orta keçi"), "goat_big": ("Big goat", "Büyük keçi"), "hen": ("Hen", "Tavuk"), "fox": ("Fox", "Tilki"), "tiny": ("Mouse", "Fare"),
+    "lion": ("Lion", "Aslan"),
+}
+
+
+def _f0(y, sr=44100):
+    """Pitch track (Hz) of the voiced frames of a clip: normalized autocorrelation by FFT, on a copy at a third of the sample rate."""
+    import numpy as np
+    n3 = len(y) // 3 * 3
+    y = y[:n3].reshape(-1, 3).mean(axis=1)
+    sr //= 3
+    fl, hop = int(0.04 * sr), int(0.01 * sr)
+    lo, hi = int(sr / 520), int(sr / 70)
+    if len(y) < fl + hop * 4:
+        return np.array([])
+    idx = np.arange(0, len(y) - fl, hop)
+    fr = np.stack([y[i:i + fl] for i in idx])
+    fr = (fr - fr.mean(axis=1, keepdims=True)) * np.hanning(fl)
+    e = np.sqrt((fr ** 2).mean(axis=1))
+    nfft = 1 << (2 * fl - 1).bit_length()
+    sp = np.fft.rfft(fr, n=nfft, axis=1)
+    ac = np.fft.irfft(sp * np.conj(sp), axis=1)[:, :hi + 1]
+    ac = ac / (ac[:, :1] + 1e-12)
+    out = []
+    thr = 0.35 * np.percentile(e, 90)
+    for k in range(len(idx)):
+        if e[k] < thr:
+            continue
+        seg = ac[k, lo:hi + 1]
+        j = int(np.argmax(seg))
+        if seg[j] > 0.55 and 0 < j < len(seg) - 1:
+            a, b, c = seg[j - 1], seg[j], seg[j + 1]
+            d = a - 2 * b + c
+            out.append(sr / (lo + j + (0.5 * (a - c) / d if abs(d) > 1e-12 else 0.0)))
+    return np.array(out)
+
+
+def test_voices(a, ffmpeg):
+    """Every character type of tales.TYPES says a line with its voice and effect; a table of the pitch and loudness and one mp3 to listen to."""
+    import wave
+    import numpy as np
+    from bibi_buzz import voice as VO
+    i = 0 if a.lang == "en" else 1
+    nar = tuple(TL.TYPES["nar"][i])
+    rows = []
+    for typ, spec in TL.TYPES.items():
+        if typ in VOICE_LINES:
+            v, r, p, fx = spec[i]
+            rows.append((typ, VOICE_NAMES[typ][i], (VOICE_LINES[typ][i], v, r, p, fx), (VOICE_NAMES[typ][i],) + nar))
+    clips = VO.synth_items([it for row in rows for it in row[2:]], ffmpeg, a.cache)
+    sr = VO.SR
+    gap1, gap2 = np.zeros(int(0.35 * sr)), np.zeros(int(1.0 * sr))
+    lines, parts = [], []
+    lines.append("%-12s %-24s %-5s %-6s %-34s %5s  %6s %6s %6s %7s %5s" % ("type", "voice", "rate", "pitch", "effect", "sec", "F0 med", "p10", "p90", "rms dB", "peak"))
+    for typ, name, item, lab in rows:
+        y = clips[item]
+        f = _f0(y, sr)
+        rms = 20 * math.log10(float(np.sqrt(np.mean(y ** 2))) + 1e-9)
+        if len(f) >= 8:
+            fs = "%6.1f %6.1f %6.1f" % (np.median(f), np.percentile(f, 10), np.percentile(f, 90))
+        else:
+            fs = "%6s %6s %6s" % ("-", "-", "-")
+        lines.append("%-12s %-24s %-5s %-6s %-34s %5.1f  %s %7.1f %5.2f" % (typ, item[1], item[2], item[3], item[4] or "-", len(y) / sr, fs, rms, float(np.max(np.abs(y)))))
+        parts += [clips[lab], gap1, y, gap2]
+    y = np.concatenate(parts)
+    base = os.path.join(a.out, "voices-" + a.lang)
+    with wave.open(base + ".wav", "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(sr)
+        w.writeframes((np.clip(y, -1, 1) * 32767).astype(np.int16).tobytes())
+    r = subprocess.run([ffmpeg, "-y", "-loglevel", "error", "-i", base + ".wav", "-c:a", "libmp3lame", "-b:a", "128k", base + ".mp3"], capture_output=True, text=True)
+    if r.returncode:
+        print("mp3 failed:", r.stderr[:300], flush=True)
+    else:
+        os.remove(base + ".wav")
+    lines.append("")
+    lines.append("%d voices, %.0f seconds" % (len(rows), len(y) / sr))
+    with open(base + ".txt", "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+    print("\n".join(lines), flush=True)
 
 
 def render_lesson_range(les, clips, path, ffmpeg, t0, t1):
@@ -115,7 +249,7 @@ def test_lesson(a, ffmpeg, lid):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("key", help="a tale key (%s) or lesson ids like d003-L1,d003-L4" % ", ".join(sorted(TL.TALES)))
+    ap.add_argument("key", help="a tale key (%s), lesson ids like d003-L1,d003-L4, or 'voices' (every character type says a line)" % ", ".join(sorted(TL.TALES)))
     ap.add_argument("lang", nargs="?", default="en", choices=["en", "tr"], help="language of a tale")
     ap.add_argument("--out", default="out/test")
     ap.add_argument("--seconds", type=float, default=40.0, help="length of the clip with real voices (0 = no clip; tales only)")
@@ -130,7 +264,9 @@ def main():
         ffmpeg = "ffmpeg"
     os.makedirs(a.out, exist_ok=True)
     for key in [k.strip() for k in a.key.split(",") if k.strip()]:
-        if key in TL.TALES:
+        if key == "voices":
+            test_voices(a, ffmpeg)
+        elif key in TL.TALES:
             test_tale(a, ffmpeg, key)
         elif re.fullmatch(r"d\d{3}-[LS]\d+", key):
             test_lesson(a, ffmpeg, key)

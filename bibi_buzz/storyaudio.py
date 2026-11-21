@@ -217,6 +217,18 @@ def sfx_blub():
     return out
 
 
+def sfx_bong():
+    """A big clock striking: a deep bell whose inharmonic partials ring and die away at different speeds."""
+    dur = 2.3
+    t = _t(dur)
+    y = np.zeros_like(t)
+    for ratio, amp, dec in ((1.0, 1.0, 1.6), (2.0, 0.55, 2.3), (2.76, 0.42, 3.1), (5.4, 0.22, 5.0), (8.93, 0.12, 8.0)):
+        y += amp * np.sin(2 * np.pi * 196.0 * ratio * t) * np.exp(-t * dec)
+    y += 0.35 * _noise(len(t), 61) * np.exp(-t * 90)
+    y *= np.minimum(1.0, t / 0.003)
+    return y / (np.max(np.abs(y)) + 1e-9) * 0.8
+
+
 def sfx_tada():
     out = np.zeros(int(2.2 * SR))
     for i, m in enumerate((67, 72, 76, 79, 84)):
@@ -227,9 +239,9 @@ def sfx_tada():
 SFX = {"knock": sfx_knock, "wind": sfx_wind, "collapse": sfx_collapse, "boing": sfx_boing, "splash": sfx_splash,
        "sparkle": sfx_sparkle, "ding": sfx_ding, "pop": sfx_pop, "thud": sfx_thud, "hoof": sfx_hoof, "hoof2": sfx_hoof2, "boom": sfx_boom, "cheer": sfx_cheer,
        "creak": sfx_creak, "snore": sfx_snore, "dizzy": sfx_dizzy, "whoosh": sfx_whoosh, "beep3": sfx_beep3,
-       "fanfare": sfx_fanfare, "munch": sfx_munch, "gulp": sfx_gulp, "yawn": sfx_yawn, "tada": sfx_tada, "rumble": sfx_rumble, "blub": sfx_blub}
+       "fanfare": sfx_fanfare, "munch": sfx_munch, "gulp": sfx_gulp, "yawn": sfx_yawn, "tada": sfx_tada, "rumble": sfx_rumble, "blub": sfx_blub, "bong": sfx_bong}
 SFX_GAIN = {"wind": 0.45, "collapse": 0.55, "boom": 0.5, "cheer": 0.5, "knock": 0.55, "creak": 0.5, "snore": 0.35,
-            "fanfare": 0.4, "tada": 0.4, "beep3": 0.35, "boing": 0.4, "pop": 0.35, "sparkle": 0.45, "blub": 0.9}
+            "fanfare": 0.4, "tada": 0.4, "beep3": 0.35, "boing": 0.4, "pop": 0.35, "sparkle": 0.45, "blub": 0.9, "bong": 0.55}
 
 
 @lru_cache(maxsize=None)

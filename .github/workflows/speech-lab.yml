@@ -1,0 +1,116 @@
+name: speech-lab
+
+# A laboratory for the voices of the narrator and the characters (tools/speech_lab.py): the same ten lines of a fairy tale in several engines
+# (the voices of the daily videos, plain Edge voices, Edge "Multilingual" voices, Kokoro, Chatterbox), every line measured (UTMOS naturalness,
+# Whisper word errors, seconds of work per second of speech). It touches neither the daily videos nor the "media" branch: the result goes to the
+# "speech-output" branch (raw files: https://raw.githubusercontent.com/<owner>/<repo>/speech-output/en-3-kokoro.mp3 ...; the numbers are in lab.txt).
+# It also runs by itself whenever tools/speech_lab.py, tools/cbx_synth.py or this file changes on main.
+on:
+  workflow_dispatch:
+    inputs:
+      cbx:
+        description: "Also try Chatterbox (a big neural voice in its own python 3.11 environment, slow on the CPU): yes or no"
+        default: "yes"
+  push:
+    branches: [main]
+    paths:
+      - "tools/speech_lab.py"
+      - "tools/cbx_synth.py"
+      - ".github/workflows/speech-lab.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bibi-speech-lab
+  cancel-in-progress: true
+
+jobs:
+  lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        id: py311
+        with:
+          python-version: "3.11"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install tools, fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core espeak-ng libsndfile1
+          python -m pip install --upgrade pip
+          pip install pillow numpy scipy edge-tts gTTS soundfile
+          mkdir -p assets
+          curl -fL --retry 4 -o assets/Fredoka-Variable.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/fredoka/Fredoka%5Bwdth%2Cwght%5D.ttf"
+          curl -fL --retry 4 -o assets/Baloo2-Variable.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/baloo2/Baloo2%5Bwght%5D.ttf"
+
+      - name: Install the neural models (CPU)
+        continue-on-error: true
+        run: |
+          pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+          pip install "kokoro>=0.9.4" || echo "kokoro install failed"
+          pip install faster-whisper || echo "faster-whisper install failed"
+          pip list 2>/dev/null | grep -i -E "^(torch|torchaudio|kokoro|misaki|faster-whisper|ctranslate2|transformers|numpy|scipy|spacy) " || true
+
+      - name: Speech lab (the voices of the videos, Edge, Kokoro)
+        run: |
+          python tools/speech_lab.py main --out out/speech
+          ls -la out/speech
+
+      - name: Publish what there is so far on the speech-output branch
+        if: always()
+        run: |
+          mkdir -p out/speech
+          cd out/speech
+          rm -rf *.wav *.npy _*
+          git init -q -b speech-output
+          git config user.name "bibi-bot"
+          git config user.email "bibi-bot@users.noreply.github.com"
+          git add -A
+          git commit -q --allow-empty -m "speech lab (first part)"
+          git push -q --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" speech-output
+
+      - name: Install Chatterbox in its own environment (python 3.11)
+        if: github.event.inputs.cbx != 'no'
+        continue-on-error: true
+        run: |
+          mkdir -p out/speech
+          {
+            "${{ steps.py311.outputs.python-path }}" -m venv /opt/cbx
+            /opt/cbx/bin/pip install --upgrade pip
+            /opt/cbx/bin/pip install torch==2.6.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+            /opt/cbx/bin/pip install chatterbox-tts
+            /opt/cbx/bin/pip list 2>/dev/null | grep -i -E "^(torch|torchaudio|chatterbox-tts|numpy|transformers|librosa|diffusers|safetensors|s3tokenizer|resemble-perth) " || true
+            /opt/cbx/bin/python -c "from chatterbox.mtl_tts import ChatterboxMultilingualTTS; print('chatterbox multilingual imports fine')"
+          } 2>&1 | tee out/speech/cbx_install.txt
+
+      - name: Chatterbox speaks
+        if: github.event.inputs.cbx != 'no'
+        continue-on-error: true
+        run: |
+          test -x /opt/cbx/bin/python || { echo "there is no Chatterbox environment"; exit 1; }
+          python tools/speech_lab.py cbx-prepare --out out/speech
+          for L in tr en; do
+            timeout 1700 /opt/cbx/bin/python tools/cbx_synth.py out/speech/_cbx_$L.json out/speech/_cbx_$L 2>&1 | tee out/speech/cbx_run_$L.txt || true
+          done
+          python tools/speech_lab.py cbx-collect --out out/speech
+
+      - name: Publish the result on the speech-output branch
+        if: always()
+        run: |
+          mkdir -p out/speech
+          cd out/speech
+          rm -rf *.wav *.npy _*
+          git init -q -b speech-output
+          git config user.name "bibi-bot"
+          git config user.email "bibi-bot@users.noreply.github.com"
+          git add -A
+          git commit -q --allow-empty -m "speech lab"
+          git push -q --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" speech-output

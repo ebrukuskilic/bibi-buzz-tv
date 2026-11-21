@@ -395,7 +395,7 @@ def _main(argv):
 # ("kt:af_kore"): they separate the characters better, but they mispronounce about one word in eight, which is not acceptable in a tale for children, so they are not used.
 KTYPES = {
     "nar": (("k:af_heart", "-8%", "+0Hz", ""), ("kt:elif", "-5%", "+0Hz", "")),
-    "girl": ((("k:af_jessica", "-2%", "+30Hz", ""), ("k:af_aoede", "-2%", "+30Hz", "")), (("kt:elif=0.8,emre=0.2", "-2%", "+30Hz", ""), ("kt:elif=1.25,emre=-0.25", "-2%", "+22Hz", ""))),
+    "girl": ((("k:af_sarah", "-2%", "+30Hz", ""), ("k:bf_isabella", "-2%", "+30Hz", "")), (("kt:elif=0.8,emre=0.2", "-2%", "+30Hz", ""), ("kt:elif=1.25,emre=-0.25", "-2%", "+22Hz", ""))),
     "teen": (("k:af_river", "-2%", "+0Hz", ""), ("kt:elif=0.8,emre=0.2", "-2%", "+30Hz", "")),
     "boy": ((("k:am_eric", "+4%", "+30Hz", ""), ("k:am_eric", "+4%", "+30Hz", "")), (("kt:elif=0.2,emre=0.8", "+4%", "+30Hz", ""), ("kt:elif=0.6,emre=0.4", "+4%", "+8Hz", ""))),
     "baby": (("k:bf_isabella", "+0%", "+53Hz", ""), ("kt:elif=1.25,emre=-0.25", "+0%", "+22Hz", "")),

@@ -50,6 +50,20 @@ def tr_tale_key(day):
     return tale_key(day - 1)
 
 
+# One song video a day replaces one Short: a song of songs.QUEUE in English on one day and the same song in Turkish on the next day, then the
+# next song.  When the songs have run out the slot is a Short again.  Add a song: write its spec and recipe in songs.py and append its key to QUEUE.
+SONG_FIRST_DAY = 3
+
+
+def song_key(day):
+    """(song key, language) of the day's song video, or None."""
+    from . import songs as SS
+    i = day - SONG_FIRST_DAY
+    if i < 0 or i // 2 >= len(SS.QUEUE):
+        return None
+    return SS.QUEUE[i // 2], ("en" if i % 2 == 0 else "tr")
+
+
 DAILY_UPLOADS = 10
 SUBSCRIBE_URL = "https://www.youtube.com/channel/UCfiz1ZdIyjFtTYkzFOUqqWQ?sub_confirmation=1"      # opens the channel with the "Subscribe?" question
 
@@ -160,7 +174,16 @@ def _raw_plan(day):
         t = TL.build(tr, "tr")
         t.id = f"d{day:03d}-T2"
         out.append(t)
-    for slot in range(DAILY_UPLOADS - len(out)):                # the rest of the day's 10 uploads are Shorts (5, or 4 with a Turkish tale)
+    sk = song_key(day)
+    if sk:                                                      # today's sing-along (dNNN-M1)
+        try:
+            from . import songs as SS
+            m = SS.build(sk[0], sk[1])
+            m.id = f"d{day:03d}-M1"
+            out.append(m)
+        except Exception as e:                                  # a song that cannot be built must never stop the day's other videos
+            print(f"[song] {sk}: {e!r}", flush=True)
+    for slot in range(DAILY_UPLOADS - len(out)):                # the rest of the day's 10 uploads are Shorts (5, or fewer with a Turkish tale and a song)
         out.append(build_short(slot, f"d{day:03d}-S{slot + 1}", day, day * 100 + 50 + slot))
     return out
 
@@ -204,27 +227,34 @@ def plan(day):
 def metadata(lesson, chapters_text=""):
     """Title / description / tags exactly as they will be typed into YouTube Studio."""
     short = lesson.fmt == "short"
-    tale = getattr(lesson, "kind", "") == "tale"
+    song = getattr(lesson, "song", False)
+    tale = getattr(lesson, "kind", "") == "tale" and not song
     turkish = getattr(lesson, "lang", "en") == "tr"
     if turkish:
         from . import tales_tr as TT
     lines = [lesson.blurb, ""]
     # YouTube switches the subscribe watermark and the end screens off for videos made for kids: a link in the description does the job
     lines += [("Abone ol: " if turkish else "Subscribe to Bibi Buzz TV: ") + SUBSCRIBE_URL, ""]
+    if song:                                                    # the words of the song, so that families can sing along
+        lines += ["Şarkı sözleri:" if turkish else "Lyrics:", lesson.lyrics_text(), ""]
     if lesson.items and len(lesson.items) <= 30:
         lines.append("In this video: " + ", ".join(lesson.items) + ".")
         lines.append("")
-    if chapters_text and not short:
+    if chapters_text and not short and not song:
         lines += [TT.CHAPTERS if turkish else "Chapters", chapters_text, ""]
     if turkish:
-        lines += TT.FOOTER + [""]
+        lines += (TT.SONG_FOOTER if song else TT.FOOTER) + [""]
+    elif song:
+        lines += ["New songs, fairy tales and learning videos for toddlers and preschoolers on Bibi Buzz TV!",
+                  "Sung with text-to-speech voices. All the artwork and music were made for Bibi Buzz TV.", ""]
     elif tale:
         lines += ["New fairy tales and learning videos for toddlers and preschoolers on Bibi Buzz TV!",
                   "Narrated with text-to-speech voices. All the artwork and music were made for Bibi Buzz TV.", ""]
     else:
         lines += ["New learning videos for toddlers and preschoolers on Bibi Buzz TV!",
                   "Narrated with a text-to-speech voice. Emoji artwork: Google Noto Emoji (Apache License 2.0).", ""]
-    tags_line = (TT.HASHTAGS if turkish else "#fairytales #storiesforkids #kidsstories #bedtimestories #BibiBuzzTV" if tale
+    tags_line = ((TT.SONG_HASHTAGS if song else TT.HASHTAGS) if turkish else "#nurseryrhymes #kidssongs #singalong #songsforkids #BibiBuzzTV" if song
+                 else "#fairytales #storiesforkids #kidsstories #bedtimestories #BibiBuzzTV" if tale
                  else "#kidslearning #learnenglish #preschool #toddlers #BibiBuzzTV") + (" #Shorts" if short else "")
     lines.append(tags_line)
     desc = "\n".join(lines).replace("<", "").replace(">", "")

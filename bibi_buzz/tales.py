@@ -2820,6 +2820,10 @@ BW_DX = (300, 410, 520, 630, 740)                                               
 BW_BX = 980                                                                          # the boy at dusk
 BW_FX = (700, 800, 900, 1000, 1100)                                                  # the sheep in the dark forest
 BW_VX = (150, 275, 400)                                                              # the three villagers (farmer, granny, mum), left of the boy
+# seconds after the start of the narration beat at which the five number words are SAID (measured on test renders with the real voice: the voice starts 0.25 s
+# after the beat does); the numbers pop up over the sheep on these moments
+BW_COUNT1 = {"en": (0.22, 0.75, 1.50, 2.11, 2.88), "tr": (0.35, 0.81, 1.27, 1.73, 2.19)}          # "One, two, three, four, five!"
+BW_COUNT2 = {"en": (0.22, 0.72, 1.24, 2.19, 2.88), "tr": (0.30, 0.80, 1.30, 1.80, 2.30)}          # "One, two, three, four, five! All the sheep were safe."
 
 
 def _bw_sheep(s, xs=BW_SX, face=-1, ys=BW_SY):
@@ -2863,8 +2867,10 @@ def boy_who_cried_wolf(lang="en"):
     s.nar("Once upon a time, a little shepherd boy lived near a village.", ("walk", "boy", 560, BW_Y, {"fit": True, "pose": "walk"}), ("pose", "boy", "wave", {"at": -1.0}))
     s.nar("Every day, he took his sheep to a big, green hill.", ("face", "boy", 1), ("pose", "boy", "happy", {"at": 0.3}), *[("hop", "sh%d" % (i + 1), {"at": 1.4 + 0.3 * i}) for i in range(5)])
     s.nar("He loved his sheep, and he counted them every day.", ("pose", "boy", "proud", {"at": 0.3}), *[("pose", "sh%d" % (i + 1), "happy", {"at": 1.0}) for i in range(5)], ("fx", "hearts", "boy", 0, {"at": 1.2, "dur": 2.6}), tail=0.3)
-    s.nar("One, two, three, four, five!", ("pose", "boy", "talk"), *[("fx", "mark", BW_SX[i], 500, {"at": 0.35 + 0.46 * i, "dur": 1.6, "text": str(i + 1), "color": BW_MARK[i]}) for i in range(5)],
-          *[("hop", "sh%d" % (i + 1), {"at": 0.35 + 0.46 * i}) for i in range(5)], ("sfx", "baa", {"at": 0.6, "gain": 0.35}), ("sfx", "baa", {"at": 1.9, "gain": 0.3}), tail=0.5)
+    s.nar("One, two, three, four, five!", ("pose", "boy", "talk"), *[("fx", "mark", BW_SX[i], 500, {"at": BW_COUNT1[lang][i], "dur": 1.6, "text": str(i + 1), "color": BW_MARK[i]}) for i in range(5)],
+          *[("hop", "sh%d" % (i + 1), {"at": BW_COUNT1[lang][i]}) for i in range(5)], ("sfx", "baa", {"at": 0.6, "gain": 0.35}), ("sfx", "baa", {"at": 1.9, "gain": 0.3}), tail=0.5)
+    s.nar("Their names were Fluffy, Snowy, Cloud, Cotton and Woolly.", ("pose", "boy", "talk"), *[("hop", "sh%d" % (i + 1), {"at": "%d%%" % pc}) for i, pc in enumerate((6, 26, 44, 60, 82) if lang == "en" else (14, 32, 48, 63, 82))],
+          ("sfx", "baa", {"at": 1.2, "gain": 0.3}), ("sfx", "baa", {"at": 3.0, "gain": 0.3}), tail=0.5)
 
     # ---------------------------------------------------------------- 2 a very boring day
     s = t.scene("A boring day", "meadow", mood="calm", title="A boring day")
@@ -2987,10 +2993,23 @@ def boy_who_cried_wolf(lang="en"):
     s.nar("They walked into the forest. They looked and looked.", ("walk", "boy", 380, BW_Y, {"fit": True, "pose": "walk"}), ("walk", "farmer", 240, BW_Y, {"fit": True, "pose": "walk"}), tail=0.2)
     s.nar("At last, they found the sheep. Hooray!", ("pose", "boy", "cheer", {"at": 0.6}), ("pose", "farmer", "cheer", {"at": 0.6}), *[("pose", "sh%d" % (i + 1), "happy", {"at": 0.8}) for i in range(5)],
           ("sfx", "baa", {"at": 0.9, "gain": 0.35}), ("sfx", "baa", {"at": 1.4, "gain": 0.3}), ("fx", "sparkle", 880, 520, {"at": 0.7, "dur": 3.0, "r": 300}), tail=0.3)
-    s.nar("One, two, three, four, five! All the sheep were safe.", ("pose", "boy", "happy"), *[("fx", "mark", BW_FX[i], 470, {"at": 0.3 + 0.5 * i, "dur": 1.6, "text": str(i + 1), "color": BW_MARK[i]}) for i in range(5)],
-          *[("hop", "sh%d" % (i + 1), {"at": 0.3 + 0.5 * i}) for i in range(5)], ("fx", "hearts", "boy", 0, {"at": 3.0, "dur": 3.0}), tail=0.5)
+    s.nar("One, two, three, four, five! All the sheep were safe.", ("pose", "boy", "happy"), *[("fx", "mark", BW_FX[i], 470, {"at": BW_COUNT2[lang][i], "dur": 1.6, "text": str(i + 1), "color": BW_MARK[i]}) for i in range(5)],
+          *[("hop", "sh%d" % (i + 1), {"at": BW_COUNT2[lang][i]}) for i in range(5)], ("fx", "hearts", "boy", 0, {"at": 3.0, "dur": 3.0}), tail=0.5)
 
-    # ---------------------------------------------------------------- 13 a new day
+    # ---------------------------------------------------------------- 13 saying sorry
+    s = t.scene("Saying sorry", "meadow", mood="calm", title="Saying sorry")
+    _bw_village(s, (230, 470))
+    _bw_folk(s, (800, 930, 1060), face=-1)
+    s.actor("boy", "girl", -170, BW_Y, 1.0, face=1, **BW_BOY)
+    s.wait(0.1, *_bw_poses("idle"))
+    s.nar("The next day, the boy went to the village.", ("walk", "boy", 560, BW_Y, {"fit": True, "pose": "walk"}), ("pose", "boy", "sad", {"at": -0.7}), tail=0.3)
+    s.say("boy", "I am sorry I told lies. I will always tell the truth now.", ("pose", "boy", "sad"), ("pose", "boy", "idle", {"at": "80%"}), tail=0.3)
+    s.say("granny", "We forgive you, little shepherd.", ("pose", "granny", "happy"), ("fx", "hearts", "granny", 0, {"at": "40%", "dur": 2.4}), tail=0.3)
+    s.say("mum", "Thank you for saying sorry.", ("pose", "mum", "happy"), ("pose", "boy", "happy", {"at": "50%"}), tail=0.3)
+    s.say("farmer", "Now go and play with your sheep. They miss you!", ("pose", "farmer", "happy"), ("hop", "boy", {"at": "70%"}), tail=0.4)
+    s.nar("The boy smiled a big, big smile.", ("pose", "boy", "cheer", {"at": 0.3}), ("fx", "sparkle", 560, 440, {"at": 0.5, "dur": 3.0, "r": 240}), tail=0.4)
+
+    # ---------------------------------------------------------------- 14 a new day
     s = t.scene("Always the truth", "meadow_dawn", mood="triumph", title="Always the truth")
     _bw_village(s, (230, 470))
     _bw_sheep(s)
@@ -2999,6 +3018,9 @@ def boy_who_cried_wolf(lang="en"):
     s.wait(0.1, ("pose", "boy", "happy"))
     s.nar("From that day on, the boy always told the truth.", ("pose", "boy", "proud", {"at": 0.3}), ("fx", "sparkle", 560, 440, {"at": 0.6, "dur": 3.0, "r": 240}), tail=0.3)
     s.nar("And the villagers always believed him.", *_bw_poses("wave", at=0.3), ("pose", "boy", "wave", {"at": 0.3}), ("fx", "hearts", "boy", 0, {"at": 0.6, "dur": 3.0}), ("fx", "confetti", 0, 0, {"at": 0.8, "dur": 90.0}), tail=0.6)
+    s.nar("Little ones, is it good to tell lies? Say it with me: no, no, no!", ("pose", "boy", "talk", {"at": 0.3}), ("fx", "mark", "boy", -30, {"at": 1.4, "dur": 3.2, "text": "?", "color": "#3E8EDE"}), tail=0.2)
+    s.wait(2.4, ("pose", "boy", "wave"), ("hop", "boy", {"at": 0.4}), ("hop", "boy", {"at": 1.2}))
+    s.nar("That is right! We always tell the truth!", ("pose", "boy", "cheer"), *_bw_poses("cheer", at=0.2), ("fx", "sparkle", 560, 440, {"at": 0.3, "dur": 3.0, "r": 260}), tail=0.6)
 
     _outro(t, "Remember, little ones: always tell the truth. Then people will believe you when you really need their help!", caption="Always tell the truth!")
     return t
@@ -3021,42 +3043,42 @@ TYPES = {      # type: ((English voice, rate, pitch, effect), (Turkish voice, ra
     "nar": ((_JENNY, "-6%", "+0Hz", ""), (_EMEL, "-6%", "+0Hz", "")),
     # people
     "girl": ((_ANA, "-2%", "+10Hz", ""), (_EMEL, "-2%", "+8Hz", "p@1.2")),
-    "teen": ((_ANA, "-2%", "+4Hz", "p@0.96"), (_EMEL, "-2%", "+2Hz", "p@1.1")),
-    "boy": ((_ERIC, "+2%", "+8Hz", "boy"), (_AHMET, "+4%", "+0Hz", "p@1.38")),
-    "baby": ((_ANA, "+0%", "+16Hz", "p@1.2"), (_EMEL, "+0%", "+0Hz", "p@1.36")),
+    "teen": ((_ARIA, "-2%", "+6Hz", "p@1.10"), (_EMEL, "-2%", "+2Hz", "p@1.1")),
+    "boy": ((_ANA, "+2%", "+0Hz", "boy"), (_AHMET, "+4%", "+0Hz", "p@1.65")),
+    "baby": ((_ANA, "+0%", "+16Hz", "p@1.12"), (_EMEL, "+0%", "+0Hz", "p@1.55")),
     "woman": ((_ARIA, "-4%", "+0Hz", ""), (_EMEL, "-8%", "-6Hz", "")),
     "granny": ((_ARIA, "-12%", "-10Hz", "oldwoman"), (_EMEL, "-14%", "-12Hz", "oldwoman")),
     "fakegranny": ((_ARIA, "-10%", "-8Hz", "p@0.92+trem@45,0.10"), (_EMEL, "-12%", "-12Hz", "p@0.92+trem@45,0.10")),
     "man": ((_CHRIS, "-8%", "-6Hz", ""), (_AHMET, "-6%", "+0Hz", "")),
     "grandpa": ((_CHRIS, "-12%", "-8Hz", "oldman"), (_AHMET, "-12%", "-6Hz", "oldman")),
     "prince": ((_ERIC, "+0%", "+0Hz", ""), (_AHMET, "-2%", "+4Hz", "")),
-    "king": ((_GUY, "-14%", "-20Hz", "king"), (_AHMET, "-14%", "-14Hz", "king")),
-    "lord": ((_CHRIS, "-12%", "-14Hz", "p@0.88+bass@2"), (_AHMET, "-12%", "-10Hz", "p@0.88+bass@2")),
+    "king": ((_CHRIS, "-14%", "-14Hz", "king"), (_AHMET, "-14%", "-14Hz", "king+pm@0.86")),
+    "lord": ((_CHRIS, "-12%", "-14Hz", "p@0.88+bass@2"), (_AHMET, "-12%", "-10Hz", "p@0.78+bass@2")),
     "queen": ((_ARIA, "-12%", "-14Hz", "queen"), (_EMEL, "-12%", "-14Hz", "queen")),
     "stepmother": ((_ARIA, "-8%", "-14Hz", "p@0.9+trem@38,0.08"), (_EMEL, "-10%", "-14Hz", "p@0.9+trem@38,0.08")),
-    "stepsister": ((_ANA, "+6%", "+22Hz", "p@1.08"), (_EMEL, "+6%", "+10Hz", "p@1.2")),
+    "stepsister": ((_ARIA, "+6%", "+12Hz", "p@1.14+nasal@3"), (_EMEL, "+6%", "+10Hz", "p@1.12+nasal@3")),
     "witch": ((_ARIA, "-12%", "-20Hz", "witch"), (_EMEL, "-14%", "-20Hz", "witch")),
     # magic folk
     "fairy": ((_ARIA, "-10%", "+4Hz", "fairy"), (_EMEL, "-10%", "+4Hz", "fairy")),
     "mirror": ((_GUY, "-20%", "-8Hz", "mirror"), (_AHMET, "-16%", "-8Hz", "mirror")),
-    "dwarf": ((_GUY, "+8%", "+14Hz", "dwarf"), (_AHMET, "+8%", "+14Hz", "dwarf")),
-    "elf": ((_GUY, "+12%", "+20Hz", "elf"), (_AHMET, "+10%", "+12Hz", "elf")),
-    "elfgirl": ((_ANA, "+12%", "+22Hz", "elf"), (_EMEL, "+10%", "+10Hz", "elf")),
+    "dwarf": ((_CHRIS, "+8%", "+12Hz", "dwarf+pm@1.23"), (_AHMET, "+8%", "+14Hz", "dwarf")),
+    "elf": ((_ERIC, "+12%", "+14Hz", "elf+pm@1.25"), (_AHMET, "+10%", "+12Hz", "elf")),
+    "elfgirl": ((_ANA, "+12%", "+16Hz", "elf+pm@0.8"), (_EMEL, "+10%", "+10Hz", "elf")),
     "troll": ((_CHRIS, "-16%", "-20Hz", "troll"), (_AHMET, "-16%", "-20Hz", "troll")),
-    "giant": ((_CHRIS, "-16%", "-26Hz", "giant"), (_AHMET, "-16%", "-26Hz", "giant")),
+    "giant": ((_CHRIS, "-16%", "-26Hz", "giant"), (_AHMET, "-16%", "-26Hz", "giant+pm@0.85")),
     # animals
-    "pig": ((_ERIC, "+2%", "+10Hz", "pig"), (_EMEL, "+4%", "+6Hz", "pig")),
-    "wolf": ((_GUY, "-10%", "-8Hz", "wolf"), (_AHMET, "-10%", "-10Hz", "wolf")),
-    "hare": ((_ERIC, "+8%", "+6Hz", "hare"), (_AHMET, "+8%", "+8Hz", "hare")),
+    "pig": ((_ERIC, "+2%", "+10Hz", "pig+pm@1.22"), (_AHMET, "+4%", "+6Hz", "p@1.42+nasal@6")),
+    "wolf": ((_GUY, "-10%", "-14Hz", "wolf+pm@0.80"), (_AHMET, "-10%", "-10Hz", "wolf")),
+    "hare": ((_ERIC, "+8%", "+6Hz", "hare+pm@1.25"), (_AHMET, "+8%", "+8Hz", "hare")),
     "tortoise": ((_CHRIS, "-18%", "-6Hz", "tortoise"), (_AHMET, "-18%", "-6Hz", "tortoise")),
-    "bear": ((_GUY, "-12%", "-10Hz", "bear"), (_AHMET, "-10%", "-10Hz", "bear")),
+    "bear": ((_GUY, "-12%", "-12Hz", "bear+pm@0.80"), (_AHMET, "-10%", "-10Hz", "bear+pm@0.84")),
     "mamabear": ((_ARIA, "-6%", "-8Hz", "p@0.9+bass@2"), (_EMEL, "-10%", "-10Hz", "p@0.9+bass@2")),
-    "goat_little": ((_ANA, "+4%", "+20Hz", "p@1.12+vib@8,0.45"), (_EMEL, "+4%", "+10Hz", "p@1.25+vib@8,0.45")),
-    "goat_mid": ((_ERIC, "+0%", "+4Hz", "p@1.05+vib@8,0.45"), (_AHMET, "+2%", "+10Hz", "p@1.2+vib@8,0.45")),
-    "goat_big": ((_GUY, "-12%", "-12Hz", "p@0.88+vib@7,0.45+bass@2"), (_AHMET, "-10%", "-12Hz", "p@0.88+vib@7,0.45+bass@2")),
+    "goat_little": ((_ANA, "+4%", "+20Hz", "p@1.0+vib@8,0.45"), (_EMEL, "+4%", "+10Hz", "p@1.25+vib@8,0.45")),
+    "goat_mid": ((_GUY, "+0%", "+4Hz", "p@1.15+vib@8,0.45"), (_AHMET, "+2%", "+10Hz", "p@1.2+vib@8,0.45")),
+    "goat_big": ((_CHRIS, "-14%", "-12Hz", "p@0.80+vib@7,0.45+bass@2"), (_AHMET, "-10%", "-12Hz", "p@0.7+vib@7,0.45+bass@2")),
     "hen": ((_ARIA, "+2%", "+8Hz", "hen"), (_EMEL, "+2%", "+6Hz", "hen")),
     "fox": ((_GUY, "-4%", "+4Hz", "fox"), (_AHMET, "-4%", "+4Hz", "fox")),
-    "tiny": ((_ANA, "+4%", "+20Hz", "tiny"), (_EMEL, "+8%", "+10Hz", "tiny")),          # a mouse, a ladybird, a chick
+    "tiny": ((_ANA, "+4%", "+20Hz", "tiny+pm@0.9"), (_EMEL, "+8%", "+10Hz", "tiny+pm@1.15")),          # a mouse, a ladybird, a chick
     "lion": ((_CHRIS, "-12%", "-20Hz", "lion"), (_AHMET, "-12%", "-20Hz", "lion")),
 }
 

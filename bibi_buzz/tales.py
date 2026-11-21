@@ -2282,9 +2282,10 @@ def princess_pea(lang="en"):
     s.nar("One night, there was a terrible storm.", ("fx", "rain", 0, 0, {"at": 0.0, "dur": 90.0}), ("sfx", "rain", {"at": 0.0}), ("sfx", "wind", {"at": 0.3, "gain": 0.5}), tail=0.2)
     s.nar("Whoosh, said the wind! Splash, splash, said the rain! And BOOM, said the thunder!", ("sfx", "wind", {"at": 0.2, "gain": 0.6}), ("sfx", "splash", {"at": 1.7, "gain": 0.4}),
           ("sfx", "splash", {"at": 2.2, "gain": 0.4}), ("fx", "lightning", 0, 0, {"at": 3.9, "dur": 1.0, "bx": 300}), ("sfx", "thunder", {"at": 4.0}),
-          ("fx", "lightning", 0, 0, {"at": 5.6, "dur": 1.0, "bx": 980}), ("sfx", "thunder", {"at": 5.7, "gain": 0.8}), tail=0.3)
+          ("fx", "lightning", 0, 0, {"at": 5.6, "dur": 1.0, "bx": 980}), ("sfx", "thunder", {"at": 5.7, "gain": 0.8}),
+          ("sfx", "rain", {"at": 5.3}), tail=0.3)                      # the 9 s rain sounds overlap, so the storm never goes quiet (62 s .. scene end)
     s.nar("Then, through the rain, a girl came walking up to the castle.", ("walk", "prn", 560, 690, {"at": 0.4, "speed": 150, "pose": "walk"}),
-          ("walk", "prn", 640, 650, {"at": 3.3, "speed": 150, "pose": "walk"}), ("sfx", "rain", {"at": 2.0, "gain": 0.8}), tail=0.2)
+          ("walk", "prn", 640, 650, {"at": 3.3, "speed": 150, "pose": "walk"}), ("sfx", "rain", {"at": 5.6}), tail=0.2)
     s.nar("She went up the steps, and she knocked on the big door. Knock, knock, knock!", ("move", "prn", 640, 484, {"at": 0.2, "dur": 2.2, "pose": "walk"}), ("pose", "prn", "knock", {"at": 2.6}),
           ("sfx", "knock", {"at": 3.0}), ("sfx", "knock", {"at": 3.5}), ("sfx", "knock", {"at": 4.0}), tail=0.3)
     s.nar("Who could be out in such a storm?", ("fx", "mark", 640, 340, {"at": 0.4, "dur": 2.4, "text": "?"}), ("fx", "lightning", 0, 0, {"at": 1.2, "dur": 1.0, "bx": 160}), ("sfx", "thunder", {"at": 1.4, "gain": 0.6}), tail=0.3)

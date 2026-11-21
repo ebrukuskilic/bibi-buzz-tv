@@ -203,6 +203,34 @@ def pose_for(name, t, phase=0.0, moving=False, amp=None, face=1, seed=0.0, speed
         P.eyes, P.mouth = "wide", "wow"
         P.arm_l = P.arm_r = 80
         P.bob = 4
+    elif name in ("pull", "strain", "grip"):
+        # a tug of war (everybody faces the thing they pull, so "backwards" = away from the facing side = -face): hands out in front,
+        # leaning back. pull = heave-ho, strain = the biggest heave (eyes shut, shaking), grip = holding on, getting ready.
+        # (every puller uses the same time, so a whole line of them heaves together)
+        w = s(t * 6.3)
+        if name == "pull":
+            P.eyes, P.mouth, P.puff = "angry", "puff", 1.0
+            P.lean = -face * (11.0 + 3.5 * w)
+            P.arm_r, P.arm_l = 100 + 5 * w, -48 + 5 * w
+            P.bob = 1.6 * abs(w)
+        elif name == "strain":
+            P.eyes, P.mouth, P.puff = "closed", "puff", 1.0
+            P.blink = False
+            P.lean = -face * (19.0 + 4.5 * w)
+            P.arm_r, P.arm_l = 108 + 6 * w, -40 + 6 * w
+            P.dx = s(t * 31.0) * 1.6
+            P.bob = 2.4 * abs(w)
+        else:
+            P.eyes, P.mouth = "open", "flat"
+            P.lean = -face * 6.0
+            P.arm_r, P.arm_l = 96, -52
+            P.look = (face * 3.0, 0.0)
+    elif name == "plant":                                   # bending over the garden bed to plant a seed (the bed is on the facing side)
+        P.lean = face * 11.0
+        P.arm_r = 56 + s(t * 3.0) * 24
+        P.arm_l = 20
+        P.mouth = "smile"
+        P.look = (face * 3.0, 3.0)
     if expr:
         E = pose_for(expr, t, phase, False, None, face, seed, speed)
         P.eyes, P.mouth, P.mouth_amt, P.look = E.eyes, E.mouth, E.mouth_amt, E.look

@@ -87,6 +87,22 @@ def resample(y, sr_from, sr_to):
     return resample_poly(y, int(sr_to) // g, int(sr_from) // g)
 
 
+def studio(y, sr, wet=0.25, rt60=0.9, pre=0.015):
+    """A little room around the voice (a singer is never recorded in a vacuum): a reverb made of decaying noise (its loudness = `wet` of the voice),
+    and a soft high-pass."""
+    from scipy.signal import butter, fftconvolve, sosfilt
+    rng = np.random.default_rng(5)
+    n = int(rt60 * 1.1 * sr)
+    t = np.arange(n) / sr
+    ir = rng.standard_normal(n) * np.exp(-6.9 * t / rt60)
+    ir = np.convolve(ir, np.ones(3) / 3.0, mode="same")
+    ir[:int(pre * sr)] = 0.0
+    sos = butter(2, 90.0, "highpass", fs=sr, output="sos")
+    dry = sosfilt(sos, np.asarray(y, dtype=np.float64))
+    w = fftconvolve(dry, ir)[:len(dry)]
+    return dry + wet * (np.sqrt(np.mean(dry ** 2)) / (np.sqrt(np.mean(w ** 2)) + 1e-12)) * w
+
+
 # ------------------------------------------------------------------------------------------------------------------------ phonemes
 VOWEL = set("ɑɐɒæɔəɘɚɛɜɝɞɨɪʊʌᵻᵊiyuøoeaɯɤɵœɶʉAIOQWYɩ")
 VOICED_C = set("bdvzʒðʤmnŋlɹwjɾɡɣɟʎɲrT")
@@ -265,7 +281,7 @@ def g2p_word(text):
     p = kokoro()
     r = p.g2p(text)
     ps = r[0] if isinstance(r, tuple) else r
-    return str(ps).strip()
+    return str(ps).strip().replace("ᵊ", "ə")                                   # 'twinkle': the syllabic l gets a real schwa (a note is sung on it)
 
 
 def ids_of(model, chars):
@@ -280,11 +296,14 @@ def _alignment(n_tok, dur, dev):
     return aln.unsqueeze(0)
 
 
-def sing_tokens(model, ids, ref_s, frames, f0, n_mode="token", n_smooth=3, info=None):
+def sing_tokens(model, ids, ref_s, frames, f0, n_mode="rule", n_smooth=3, info=None, kinds=None, n_off=0.0):
     """Kokoro's forward pass with the length of every sound and the pitch told by us (what the model would predict is replaced).
     ids: token ids with 0 in front and at the end; frames: frames of every id; f0: Hz at 80 Hz (2 values per frame), 0 = no voice.
     n_mode: 'pred' = the energy curve N that the model predicts for OUR lengths (the first try: a held vowel of 40 frames came out nearly silent);
-            'token' = the N the model predicts when IT chooses the lengths, one mean value for every sound, laid over our lengths."""
+            'token' = the N the model predicts when IT chooses the lengths, one mean value for every sound, laid over our lengths;
+            'rule'  = like 'token', but every vowel gets the same (high) level and every sonorant a little less (the model lets the energy
+                      fall towards the end of a phrase and for the vowels that are not stressed: a note would die away or turn into a whisper).
+    kinds: per id 'v' vowel, 's' sonorant consonant, 'c' other consonant, '-' silence / mark (only for 'rule')."""
     import torch
     dev = model.device
     input_ids = torch.LongTensor([ids]).to(dev)
@@ -303,7 +322,7 @@ def sing_tokens(model, ids, ref_s, frames, f0, n_mode="token", n_smooth=3, info=
         en = d.transpose(-1, -2) @ aln
         f0_pred, n_pred = model.predictor.F0Ntrain(en, s)
         n_use = n_pred
-        if n_mode == "token" or info is not None:
+        if n_mode in ("token", "rule") or info is not None:
             x, _ = model.predictor.lstm(d)
             dur = torch.sigmoid(model.predictor.duration_proj(x)).sum(axis=-1)
             nat = torch.round(dur).clamp(min=1).long().reshape(-1)
@@ -319,7 +338,18 @@ def sing_tokens(model, ids, ref_s, frames, f0, n_mode="token", n_smooth=3, info=
                 n_our.index_add_(0, tok_our, n_pred[0])
                 n_our = n_our / (2 * pred_dur).float()
                 info.update(nat=nat.cpu().numpy(), n_nat=n_tok.cpu().numpy(), n_our=n_our.cpu().numpy())
-            if n_mode == "token":
+            if n_mode == "rule" and kinds is not None:
+                nt = n_tok.cpu().numpy().astype(np.float64)
+                kd = np.array(list(kinds))
+                vref = (float(np.clip(np.percentile(nt[kd == "v"], 85), 7.5, 9.5)) if (kd == "v").any() else 8.5) + n_off
+                rule = nt.copy()
+                rule[kd == "v"] = vref
+                rule[kd == "s"] = vref - 1.5
+                rule[kd == "c"] = np.clip(nt[kd == "c"], 3.5, vref - 1.5)
+                n_tok = torch.from_numpy(rule).float().to(dev)
+                if info is not None:
+                    info.update(n_rule=rule)
+            if n_mode in ("token", "rule"):
                 n_use = n_tok[tok_our][None]
                 if n_smooth > 1:
                     k = torch.ones(1, 1, n_smooth, device=dev) / n_smooth
@@ -361,7 +391,7 @@ def level_notes(audio, toks, t0, strength=0.7, lo=0.5, hi=2.0):
     return audio * np.interp(np.arange(len(audio)) / KSR, cen, g)
 
 
-def sing_phrase(words_ph, counts, notes, voice, hp, seed=0, n_mode="token", split=0, level=0.7, diag=False):
+def sing_phrase(words_ph, counts, notes, voice, hp, seed=0, n_mode="rule", split=0, level=0.7, diag=False, n_off=0.0):
     """One phrase (words that follow each other without a rest) sung by one Kokoro voice. notes: [(start, end, midi)] in seconds.
     split: a vowel that lasts longer than this many frames is cut in pieces (the same sound repeated), 0 = never.
     -> (audio at 24 kHz, time in seconds of its first sample)."""
@@ -407,12 +437,14 @@ def sing_phrase(words_ph, counts, notes, voice, hp, seed=0, n_mode="token", spli
             f0[k] = curve(t * sr_c)
     if f0.max() <= 0:
         raise RuntimeError("no voiced sound")
+    kept = [chars[i] for i in keep]
+    kinds = "-" + "".join(("v" if (is_vowel(c) or c in STRESS) else "s" if c in "lɹwjmnŋɾT" else "-" if c == " " else "c") for c in kept) + "-"
     info = {} if diag else None
-    audio, _ = sing_tokens(model, ids, ref_s, frames, f0, n_mode=n_mode, info=info)
+    audio, _ = sing_tokens(model, ids, ref_s, frames, f0, n_mode=n_mode, info=info, kinds=kinds, n_off=n_off)
     if info:
-        log("      token frames(ours/natural) N(ours/natural): " + "  ".join(
-            "%s %d/%d %.2f/%.2f" % (("·" if i in (0, len(ids) - 1) else [c for c in chars if c in model.vocab][i - 1]), frames[i], info["nat"][i],
-                                    info["n_our"][i], info["n_nat"][i]) for i in range(len(ids))))
+        log("      token: frames ours/natural, N model-for-our-lengths / natural / used: " + "  ".join(
+            "%s %d/%d %.1f/%.1f/%.1f" % (("·" if i in (0, len(ids) - 1) else kept[i - 1]), frames[i], info["nat"][i], info["n_our"][i], info["n_nat"][i],
+                                         info["n_rule"][i] if "n_rule" in info else info["n_nat"][i]) for i in range(len(ids))))
     if level:
         audio = level_notes(audio, toks, t0, strength=level)
     # loudness like a person: swell and tremble of the long notes (singer.dynamics)
@@ -714,6 +746,7 @@ def job_psola(a):
     save("A-psola-choir", y, sr, expect=_first_text(t, a.lines), lang=a.lang)
     f0_report("A-psola-choir", y, sr, t0, notes)
     note_report("A-psola-choir", y, sr, t0, notes)
+    save("E-psola-choir-studio", studio(y, sr), sr, expect=_first_text(t, a.lines), lang=a.lang)
     np.save(os.path.join(OUT, "_psola.npy"), y.astype(np.float32))
     _K["psola"] = (y, t0)
 
@@ -743,9 +776,10 @@ CHOIR_TR = [dict(v="if_sara", gain=1.0, dt=0.0, cents=0.0, vib=1.0, seed=11),
             dict(v="af_heart", gain=0.48, dt=-0.010, cents=-7.0, vib=1.1, seed=37)]
 
 
-VARIANTS = [("pred", dict(n_mode="pred", split=0, level=0.0), False),                 # the first try (only reported): the model's own energy for our lengths
-            ("token", dict(n_mode="token", split=0, level=0.7), True),                  # the energy of every sound as the model would give it, laid over our lengths
-            ("token-split", dict(n_mode="token", split=12, level=0.7), True)]           # and a long vowel cut in pieces of 12 frames
+VARIANTS = [("rule", dict(n_mode="rule", split=0, level=0.7), True),                   # every vowel the same energy, as the model would give a stressed vowel
+            ("rule-loud", dict(n_mode="rule", split=0, level=0.7, n_off=1.0), True),   # the same, a little louder (if the notes are still thin or breathy)
+            ("rule-split", dict(n_mode="rule", split=12, level=0.7), True),            # a long vowel cut in pieces of 12 frames
+            ("token", dict(n_mode="token", split=0, level=0.7), False)]                # (only reported) the energy of every sound as the model gives it itself
 
 
 def job_kokoro(a):
@@ -776,6 +810,7 @@ def job_kokoro(a):
     save("D-kokoro-choir", y, KSR, expect=text, lang=a.lang)
     f0_report("D-kokoro-choir", y, KSR, t0, notes)
     note_report("D-kokoro-choir", y, KSR, t0, notes)
+    save("E-kokoro-choir-studio", studio(y, KSR), KSR, expect=text, lang=a.lang)
 
 
 # ------------------------------------------------------------------------------------------------------------------------ measuring
@@ -805,7 +840,7 @@ def job_asr(a):
             continue
         lang, ref = EXPECT[name]
         try:
-            segs, _info = m.transcribe(path, language=lang, beam_size=5, condition_on_previous_text=False)
+            segs, _info = m.transcribe(_read_audio(path, 16000), language=lang, beam_size=5, condition_on_previous_text=False)
             hyp = " ".join(sg.text.strip() for sg in segs)
             log("asr  %-34s word errors %3.0f%%   heard: %s" % (name, 100 * _wer(ref, hyp, lang), hyp))
         except Exception:

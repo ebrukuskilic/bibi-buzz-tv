@@ -34,7 +34,7 @@ QUEUES = [
 
 # One fairy tale per day replaces the 5th long lesson (the channel can only upload ~10 videos per day), one day after the other.
 # The 5th lesson queue simply waits during those days and carries on afterwards. Append a key of tales.TALES to add more tales.
-TALE_QUEUE = ["three-little-pigs", "tortoise-and-hare", "goldilocks", "red-riding-hood", "gingerbread-man", "three-billy-goats", "enormous-turnip", "stone-soup"]
+TALE_QUEUE = ["three-little-pigs", "tortoise-and-hare", "goldilocks", "red-riding-hood", "gingerbread-man", "three-billy-goats", "enormous-turnip", "stone-soup", "magic-porridge-pot"]
 TALE_FIRST_DAY = 2
 
 

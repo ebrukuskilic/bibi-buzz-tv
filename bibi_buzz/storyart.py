@@ -94,7 +94,7 @@ class Pose:
         return math.sin(ph) * 11, max(0.0, math.sin(ph)) * 11
 
 
-def pose_for(name, t, phase=0.0, moving=False, amp=None, face=1, seed=0.0, speed=1.0):
+def pose_for(name, t, phase=0.0, moving=False, amp=None, face=1, seed=0.0, speed=1.0, gesture=False):
     """Maps a pose name + time to rig parameters. `amp` is the voice loudness (0..1) while the character talks.
     Modifiers: "sit@84" lifts the body 84 px (feet dangle, e.g. on a tall chair); "sit+sad" keeps the pose but takes the face of "sad"."""
     lift, expr = 0.0, None
@@ -119,7 +119,16 @@ def pose_for(name, t, phase=0.0, moving=False, amp=None, face=1, seed=0.0, speed
             P.arm_l, P.arm_r = 60 + s(phase) * 40, 60 - s(phase) * 40
             P.lean = 9
     if name in ("idle", "walk", "run", "talk"):
-        pass
+        if gesture and not moving and name in ("idle", "talk"):      # alive even when standing still: breathing arms, a shift of weight, and while the voice is on the free arm talks with it
+            P.arm_l = 14 + 2.4 * s(t * 1.7 + seed * 2.0)
+            P.arm_r = 14 + 2.4 * s(t * 1.7 + seed * 2.0 + 1.3)
+            P.lean = 1.0 * s(t * 0.8 + seed)
+            if amp is not None:
+                g = 0.5 + 0.5 * s(t * 3.3 + seed * 3.0)
+                P.arm_r = 14 + 40 * amp * g
+                P.arm_l = 14 + 16 * amp * (1.0 - g)
+                P.lean += 2.0 * amp
+                P.bob += 2.6 * amp * abs(s(t * 5.6 + seed))
     elif name == "wave":
         P.arm_r = 150 + s(t * 9) * 22
         P.mouth = "grin"

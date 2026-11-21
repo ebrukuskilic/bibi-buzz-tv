@@ -138,6 +138,19 @@ def split_syllables(an, a, b, n, min_gap=0.075, env=None):
         mid = min(max(mid, lo + 1), hi - 1)
         cuts.append(mid)
         cuts.sort()
+    for _ in range(n):                                                  # a piece with no voice in it (the lone ş of 'kuşağı') is no syllable:
+        edges = [a] + cuts + [b]                                        # it joins the vowel that follows it (the last piece: the one before it)
+        bad = [i for i in range(n) if int(np.sum(vox[edges[i]:edges[i + 1]])) < 4]
+        if not bad:
+            break
+        cuts.pop(bad[0] if bad[0] < n - 1 else n - 2)
+        edges = [a] + cuts + [b]
+        j = max(range(len(edges) - 1), key=lambda i: edges[i + 1] - edges[i])      # ... and the longest piece is cut in the middle of its voiced part
+        lo, hi = edges[j], edges[j + 1]
+        vv = [k for k in range(lo, hi) if vox[k]]
+        mid = int(np.median(vv)) if len(vv) > 4 else (lo + hi) // 2
+        cuts.append(min(max(mid, lo + 1), hi - 1))
+        cuts.sort()
     edges = [a] + cuts + [b]
     return [(edges[i], edges[i + 1]) for i in range(n)]
 

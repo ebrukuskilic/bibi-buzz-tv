@@ -46,11 +46,16 @@ def soft_limit(x, knee=LIMIT_KNEE, ceil=LIMIT_CEIL):
 # ================================================================================================ the words of a line
 def parse_lyric(text):
     """'Twin-kle twin-kle lit-tle star' -> [dict(syl=['Twin','kle'], speak='twinkle', plain='twinkle'), ...]
-    A word may carry the way it is spoken: 'E-I-E-I-O=ee_eye_ee_eye_oh' ('_' is a space)."""
+    A word may carry the way it is spoken: 'E+I+E+I+O=ee_eye_ee_eye_oh' ('_' is a space)."""
     words = []
     for tok in text.split():
         disp, _, spoken = tok.partition("=")
-        syl = disp.split("-")
+        parts = re.split(r"([-+])", disp)                                 # '-' = a syllable break, '+' = a syllable break that is written with a hyphen (E+I+E+I+O)
+        syl = [parts[0]]
+        for sep, piece in zip(parts[1::2], parts[2::2]):
+            if sep == "+":
+                syl[-1] += "-"
+            syl.append(piece)
         speak = spoken.replace("_", " ") if spoken else re.sub(r"[^\w'’ ]", "", "".join(syl))
         words.append(dict(syl=syl, speak=speak, plain=re.sub(r"[^\w]", "", "".join(syl)).lower()))
     return words
@@ -353,7 +358,7 @@ class Song(Tale):
                 t = it["t0"]
                 for m, d in it["notes"]:
                     if m is not None:
-                        pos = (it["b0"] + (t - it["t0"]) / self.beat) % self.nbeats
+                        pos = (it["b0"] + (t - it["t0"]) / self.beat - sec.get("grid", 0.0)) % self.nbeats
                         accents.append(1.0 if abs(pos) < 1e-6 else 0.9)
                         notes.append((t, t + d * self.beat, m + self.shift))
                     t += d * self.beat
@@ -401,6 +406,7 @@ class Song(Tale):
             lead = st.get("lead", "xylo")
             lead_gain = st.get("lead_gain", 0.20 if sing else 0.40)
             lead_oct = st.get("lead_oct", 12)
+            org = sec["b0"] + sec.get("grid", 0.0)                          # where the first bar line of the section is (grid = 1: a one-beat pickup comes first)
             for it in sec["items"]:
                 t, notes = it["t0"], []
                 for m, d in it["notes"]:
@@ -414,8 +420,8 @@ class Song(Tale):
                     segs.append((sym, sec["b0"] + it["b0"] + cum, d))
                     cum += d
                 SM.play_chords(buf, segs, self.bpm, nb, st.get("chords", "strum"), st.get("chord_gain", 1.0), st.get("bass_gain", 0.7),
-                               shift=sh, origin=sec["b0"])
-            SM.play_drums(buf, sec["b0"], sec["b0"] + sec["beats"], self.bpm, nb, st.get("drums", "light"), st.get("drum_gain", 1.0), origin=sec["b0"])
+                               shift=sh, origin=org)
+            SM.play_drums(buf, sec["b0"], sec["b0"] + sec["beats"], self.bpm, nb, st.get("drums", "light"), st.get("drum_gain", 1.0), origin=org)
         return buf[:n]
 
     def mix_audio(self, clips, voices=True):

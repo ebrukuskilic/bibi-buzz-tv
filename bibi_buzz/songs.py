@@ -255,7 +255,7 @@ def _om_lines():
         tn, ts = a["tr"]["name"], a["tr"]["snd"]
         L["AN%d" % k] = dict(en="And on his farm he had a %s" % n, tr="Bu çift-lik-te bir %s var" % tn, **_AN)
         L["M1_%d" % k] = dict(en="With %s %s %s here" % (art, snd, snd), tr="Bu-ra-da %s %s" % (ts, ts), **_MO)
-        L["M2_%d" % k] = dict(en="And %s %s %s there" % (art, snd, snd), tr="Şu-ra-da %s %s" % (ts, ts), **_MO)
+        L["M2_%d" % k] = dict(en="And %s %s %s there" % (art, snd, snd), tr="Şu-ra-da=Şu_ra_da %s %s" % (ts, ts), **_MO)
         L["M3_%d" % k] = dict(en="Here %s %s" % (art, snd), tr="Bur-da %s" % ts, **_MH)
         L["M4_%d" % k] = dict(en="There %s %s" % (art, snd), tr="Şur-da %s" % ts, **_MF)
         L["M5_%d" % k] = dict(en="Eve-ry-where=everywhere %s %s %s" % (art, snd, snd), tr="Her-yer-de %s %s" % (ts, ts), **_ME)

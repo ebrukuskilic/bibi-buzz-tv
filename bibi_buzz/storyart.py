@@ -352,6 +352,9 @@ def held(r, kind, hand):
         r.line([(hx - 10, hy - 26), (hx, hy), (hx + 10, hy - 26)], "#E2574C", 4)
         r.dot(hx, hy + 6, 11, "#FFD21F")
         r.dot(hx, hy + 6, 6, "#FFE98A")
+    elif kind == "stone":                                                                # a smooth, round stone
+        r.ell(hx, hy - 8, 19, 14, "#9EA7B3", INK, 2.6, ang=-8)
+        r.ell(hx - 6, hy - 13, 7, 3.6, "#CDD3DB", None, ang=-20)
     elif kind == "club":                                                                 # the troll's big, knobbly stick
         r.line([(hx, hy + 16), (hx + 12, hy - 92)], INK, 22)
         r.line([(hx, hy + 16), (hx + 12, hy - 92)], "#8B5A2B", 15)
@@ -442,7 +445,7 @@ def pig(c, x, y, k=1.0, t=0.0, P=None, skin="#FFB3C7", outfit="#3E8EDE", hat_kin
 
 
 # ------------------------------------------------------------------------------------------------ wolf
-def wolf(c, x, y, k=1.0, t=0.0, P=None, fur="#8E9AB0", scarf=None, cap=None, glasses=False, **_):
+def wolf(c, x, y, k=1.0, t=0.0, P=None, fur="#8E9AB0", scarf=None, cap=None, glasses=False, hold=None, **_):
     P = P or Pose()
     r = Rig(c, x + P.dx * k, y - P.bob * k, k, P.face, P.lean, P.sq)
     dark, light = darker(fur, 0.28), "#E8ECF4"
@@ -456,7 +459,8 @@ def wolf(c, x, y, k=1.0, t=0.0, P=None, fur="#8E9AB0", scarf=None, cap=None, gla
     r.ell(-98, -46, 13, 17, light, None, ang=38 + sway)
     r.ell(0, -112, 50, 66, fur, INK, 3.2)                                                # body
     r.ell(0, -100, 29, 44, light, None)
-    f_arms(r, P, 46, -142, 52, 20, fur, hand=dark)
+    hands = f_arms(r, P, 46, -142, 52, 20, fur, hand=dark)
+    held(r, hold, hands[1])
     if scarf:
         r.rrect(-42, -168, 42, -150, 9, scarf, INK, 3)
         r.poly([(20, -156), (46, -156), (50, -112), (30, -112)], scarf, INK, 3)

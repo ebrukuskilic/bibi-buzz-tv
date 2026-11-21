@@ -1755,9 +1755,260 @@ def cinderella(lang="en"):
     return t
 
 
+# ================================================================================================ snow white and the seven dwarfs
+SNOW = dict(gown="#F4F8FF", hair="#231F2A", shoe="#E2574C", hat_kind="bow", hat_color="#E2362F")       # skin white as snow, hair black as night, a red bow
+QUEEN = dict(gown="#7A2E8E", hair="#B8342B", shoe="#4A1C57", hat_kind="crown")
+OLDWOMAN = dict(dress="#4A4358", granny="#8C6A4F", hair="#C9C9D2")                                     # the queen in disguise
+SW_PRINCE = dict(prince="#C8453B", hair="#8A5A2B", hat_kind="crown")
+DWARFS = (("red", "#E2574C"), ("orange", "#FF9A3D"), ("yellow", "#FFD21F"), ("green", "#3DB54A"), ("blue", "#3E8EDE"), ("purple", "#9B5CE0"), ("pink", "#FF6FA8"))
+DW_K = 0.62
+DW_IDS = ["d%d" % i for i in range(7)]
+DW_X = [470 + 120 * i for i in range(7)]       # the dwarfs in a row in front of the cottage (outside)
+DW_IN = [760 - 110 * i for i in range(7)]       # ... and inside, in a row in front of their beds (the first dwarf is the nearest to Snow White)
+DW_BACK = [760 - 95 * i for i in range(7)]      # the dwarfs around Snow White on the ground (the first is the nearest)
+FL_X = [110, 240, 370, 880, 985, 1090, 1195]       # the dwarfs around the bed of flowers (3 on the left, 4 on the right)
+BED_X = [250 + 150 * i for i in range(7)]
+MARKCOL = ["#E2362F", "#F07A12", "#D9A400", "#2E9E3A", "#2F7FD8", "#8A4FD8", "#F0508E"]       # (darker colours of the rainbow: text on a white circle)
+
+
+def _dw(i):
+    """The i-th dwarf: a cardigan and a pointed cap in his own rainbow colour, a long white beard."""
+    col = DWARFS[i][1]
+    return dict(gramps=col, hair="#F4F4F8", beard="#EEEEF4", hat_kind="pointy", hat_color=col)
+
+
+def snow_white(lang="en"):
+    t = Tale("tale-snow-white", "Snow White and the Seven Dwarfs | Fairy Tale Story for Kids | Bibi Buzz TV",
+             "Snow White is a kind princess with skin as white as snow, lips as red as a rose and hair as black as night. When the jealous queen sends her away, she runs "
+             "into the forest and finds a tiny cottage with seven little beds. Meet the seven dwarfs, one for every color of the rainbow, and count them from one to seven! "
+             "But the queen is not finished yet. Watch the classic fairy tale about kindness and about never opening the door to strangers, in a gentle, colorful animated "
+             "story in simple English for toddlers and preschoolers.",
+             TAGS + ["snow white", "snow white story", "snow white fairy tale", "seven dwarfs", "princess story", "counting story", "colors for kids", "rainbow colors"],
+             {"nar": NAR, "snow": (ANA, "+4%", "+14Hz"), "queen": (ARIA, "-14%", "-18Hz"), "mir": (GUY, "-20%", "-8Hz"), "dw": (GUY, "+12%", "+26Hz"),
+              "old": (ARIA, "-12%", "-26Hz"), "pr": (GUY, "-2%", "+0Hz")}, lang=lang)
+    t.bubble_tint = {"snow": "#E3F4FF", "queen": "#EBDDFF", "mir": "#E3F0FF", "dw": "#FFF0CF", "old": "#E7E1EE", "pr": "#DDEBFF"}
+    t.bubble_tint.update({i: "#FFF0CF" for i in DW_IDS})
+    t.cover = dict(bg="meadow", title=("SNOW WHITE",), size=124, gap=124,
+                   actors=[(DW_IDS[i], "girl", x, y, 0.8, f, "happy", dict(_dw(i))) for i, (x, y, f) in enumerate(
+                       ((95, 708, 1), (225, 714, 1), (355, 708, 1), (925, 708, -1), (1035, 714, -1), (1145, 708, -1), (1245, 714, -1)))] +
+                   [("snow", "girl", 640, 716, 1.6, 1, "happy", dict(SNOW, hold="apple"))])
+    _intro(t, ("SNOW WHITE",), "Today's story is... Snow White!")
+
+    # ---------------------------------------------------------------- 1 a princess as white as snow, and a queen with a magic mirror
+    s = t.scene("The castle", "ballroom_day", mood="calm", title="A princess as white as snow")
+    s.actor("mir", "mirror", 1120, 690, 0.8, face=-1)
+    s.actor("snow", "girl", 330, 676, 0.95, face=1, **SNOW)
+    s.actor("queen", "girl", 1560, 676, 0.95, face=-1, **QUEEN)
+    s.nar("Once upon a time, there was a kind princess named Snow White.", ("pose", "snow", "curtsy", {"at": 0.3}), ("fx", "sparkle", "snow", 0, {"at": 0.6, "dur": 3.0, "r": 130}))
+    s.nar("Her skin was as white as snow, her lips were as red as a rose, and her hair was as black as night.", ("pose", "snow", "happy", {"at": 0.3}),
+          ("fx", "sparkle", "snow", 0, {"at": 0.4, "dur": 8.0, "r": 150}), ("fx", "hearts", "snow", 0, {"at": 3.6, "dur": 3.0}))
+    s.nar("Snow White had a stepmother. She was the queen, and she had a magic mirror.", ("walk", "queen", 880, 676, {"at": 0.4, "speed": 260, "pose": "walk"}),
+          ("pose", "snow", "idle", {"at": 0.3}), ("fx", "sparkle", "mir", 130, {"at": 3.2, "dur": 3.0, "r": 120}))
+    s.say("queen", "Mirror, mirror, on the wall, who is the fairest of them all?", ("pose", "queen", "proud"), ("fx", "sparkle", "mir", 130, {"at": "50%", "dur": 3.0, "r": 120}), ("sfx", "ding", {"at": "55%"}))
+    s.say("mir", "You are fair, my queen. But Snow White is fairer still!", ("pose", "mir", "talk"), ("fx", "sparkle", "mir", 130, {"at": 0.2, "dur": 4.0, "r": 140}), ("pose", "queen", "surprised", {"at": "70%"}))
+    s.nar("The queen was so jealous and so angry that she stamped her feet!", ("pose", "queen", "angry", {"at": 0.4}), ("fx", "mark", "queen", -95, {"at": 0.6, "dur": 3.0, "text": "!"}), ("sfx", "thud", {"at": 0.7}), ("sfx", "thud", {"at": 1.2}))
+    s.say("queen", "Snow White, you must go away from my castle!", ("pose", "queen", "angry"), ("walk", "queen", 700, 676, {"at": 0.2, "speed": 150, "pose": "walk"}), ("pose", "snow", "scared", {"at": 0.4}))
+
+    # ---------------------------------------------------------------- 2 into the dark forest, and a little path
+    s = t.scene("The dark forest", "forest_dusk", mood="tense", title="Into the forest")
+    s.actor("snow", "girl", -200, 664, 0.95, face=1, **SNOW)
+    for who, x, y in (("bibi", 1520, 590), ("pip", 1680, 610), ("mo", 1840, 612), ("lila", 2000, 600)):
+        s.actor(who, who, x, y, 0.9)
+    s.nar("Snow White ran away, deep into the dark forest.", ("walk", "snow", 420, 664, {"fit": True, "pose": "run"}), ("pose", "snow", "scared", {"at": -0.05}))
+    s.nar("It was very dark, and Snow White was very scared.", ("pose", "snow", "scared"), ("fx", "mark", "snow", -95, {"at": 0.5, "dur": 3.0, "text": "!"}), ("sfx", "wind", {"at": 0.2}))
+    s.say("snow", "Oh dear! Where can I go?", ("pose", "snow", "sad"), ("pose", "snow", "think", {"at": "70%"}))
+    s.nar("Then, some little friends came to help her.", ("pose", "snow", "surprised", {"at": 0.9}),
+          ("walk", "bibi", 860, 590, {"at": 0.3, "speed": 330}), ("walk", "pip", 1010, 610, {"at": 0.5, "speed": 330}), ("walk", "mo", 1150, 612, {"at": 0.7, "speed": 330}), ("walk", "lila", 1290, 600, {"at": 0.9, "speed": 330}),
+          ("fx", "sparkle", 1050, 480, {"at": 0.8, "dur": 3.0, "r": 260}))
+    s.say("snow", "Hello, little friends! Can you show me the way?", ("pose", "snow", "happy"), ("hop", "snow", {"at": "50%"}), ("hop", "bibi", {"at": "60%"}), ("hop", "pip", {"at": "65%"}))
+    s.nar("The friends led her along a little path, to a tiny cottage.", ("pose", "snow", "happy"), ("walk", "snow", 1500, 664, {"at": 0.5, "speed": 130, "pose": "walk"}),
+          ("walk", "bibi", 1400, 590, {"at": 0.2, "speed": 140}), ("walk", "pip", 1520, 610, {"at": 0.2, "speed": 140}), ("walk", "mo", 1640, 612, {"at": 0.2, "speed": 140}), ("walk", "lila", 1760, 600, {"at": 0.2, "speed": 140}),
+          tail=0.3)
+
+    # ---------------------------------------------------------------- 3 the tiny cottage
+    s = t.scene("The tiny cottage", "meadow_dusk", mood="calm", title="The tiny cottage")
+    s.prop("home", "cottage", 930, 566, 0.85, wall="#FFF1D0", roof="#D9654F", door=0.0)
+    s.actor("snow", "girl", -220, 640, 0.95, face=1, **SNOW)
+    for who, x, y in (("bibi", -360, 590), ("pip", -500, 610), ("mo", -640, 612), ("lila", -780, 600)):
+        s.actor(who, who, x, y, 0.9)
+    s.nar("Soon, Snow White came to a tiny little cottage.", ("walk", "snow", 700, 640, {"fit": True, "pose": "walk"}), ("walk", "bibi", 330, 590, {"fit": True}), ("walk", "pip", 450, 610, {"fit": True}),
+          ("walk", "mo", 570, 612, {"fit": True}), ("walk", "lila", 190, 600, {"fit": True}))
+    s.nar("She went up to the little door. Knock, knock, knock!", ("walk", "snow", 820, 640, {"dur": 1.4}), ("pose", "snow", "knock", {"at": "58%"}), ("sfx", "knock", {"at": "58%", "gain": 0.9}))
+    s.say("snow", "Hello? Is anybody home?", ("pose", "snow", "idle"), ("hop", "bibi", {"at": "60%"}))
+    s.nar("Nobody answered. So Snow White opened the door, and she went inside.", ("set", "home", "door", 1.0, {"at": 0.4, "dur": 0.8}), ("sfx", "creak", {"at": 0.4, "gain": 0.5}), ("pose", "snow", "happy", {"at": 0.6}),
+          ("walk", "snow", 905, 608, {"at": 1.6, "dur": 1.0}), ("hide", "snow", {"at": 2.7}), ("set", "home", "door", 0.0, {"at": 3.2, "dur": 0.6}),
+          ("pose", "bibi", "wave", {"at": 3.0}), tail=0.3)
+
+    # ---------------------------------------------------------------- 4 seven tiny beds
+    s = t.scene("Seven tiny beds", "room", mood="happy", title="Seven tiny beds")
+    for i in range(7):
+        s.prop("b%d" % i, "bed", BED_X[i], 546, 0.54, size="mid", quilt=DWARFS[i][1])
+    s.actor("snow", "girl", -120, 700, 0.95, face=1, zy=900, **SNOW)
+    s.nar("Inside the cottage, everything was tiny!", ("walk", "snow", 125, 700, {"fit": True, "pose": "walk"}), ("pose", "snow", "surprised", {"at": "70%"}))
+    s.nar("There was a row of little beds. Let us count them!", ("pose", "snow", "happy"), ("fx", "sparkle", 700, 500, {"at": 0.8, "dur": 3.0, "r": 380}))
+    for i, (cname, _col) in enumerate(DWARFS):
+        art = "An" if cname[0] in "aeiou" else "A"
+        s.nar("%s! %s %s bed." % (NUMBERS[i], art, cname), ("pose", "snow", "cheer", {"at": 0.0}), ("hop", "snow", {"at": 0.35}),
+              ("fx", "mark", BED_X[i], 432, {"at": 0.15, "dur": 60.0, "text": str(i + 1), "color": MARKCOL[i]}), ("sfx", "pop", {"at": 0.15}),
+              ("fx", "sparkle", BED_X[i], 500, {"at": 0.15, "dur": 1.6, "r": 80}), tail=0.25 if i < 6 else 0.5)
+    s.nar("Snow White was so tired. She lay down across the little beds, and she fell fast asleep.", ("pose", "snow", "tired", {"at": 0.2}), ("walk", "snow", 880, 520, {"at": 0.4, "speed": 330}),
+          ("pose", "snow", "sleep", {"at": 2.0}), ("tilt", "snow", 84, {"at": 2.0, "dur": 0.9}), ("fx", "zzz", 1090, 420, {"at": 3.0, "dur": 12.0}), tail=0.3)
+
+    # ---------------------------------------------------------------- 5 the seven dwarfs come home
+    s = t.scene("The seven dwarfs", "sunset", mood="happy", title="The seven dwarfs")
+    s.prop("home", "cottage", 250, 566, 0.85, wall="#FFF1D0", roof="#D9654F", door=0.0)
+    for i in range(7):
+        s.actor(DW_IDS[i], "girl", 1500 + 120 * i, 640, DW_K, face=-1, hold="pickaxe", **_dw(i))
+    s.nar("When the sun went down, seven little men came marching home from work.", *[("walk", DW_IDS[i], DW_X[i], 640, {"fit": True, "pose": "walk"}) for i in range(7)],
+          ("fx", "notes", DW_IDS[0], -60, {"at": 0.5, "dur": 5.0}), ("fx", "notes", DW_IDS[4], -60, {"at": 1.5, "dur": 4.0}))
+    s.nar("They were the seven dwarfs! Let us count them!", *[("pose", DW_IDS[i], "happy", {"at": 0.2 + 0.1 * i}) for i in range(7)])
+    for i, (cname, _col) in enumerate(DWARFS):
+        s.nar("%s! The %s dwarf." % (NUMBERS[i], cname), ("hop", DW_IDS[i], {"at": 0.2}), ("pose", DW_IDS[i], "cheer", {"at": 0.0}), ("fx", "mark", DW_IDS[i], -105, {"at": 0.1, "dur": 60.0, "text": str(i + 1), "color": MARKCOL[i]}),
+              ("sfx", "pop", {"at": 0.1}), ("fx", "sparkle", DW_IDS[i], 30, {"at": 0.15, "dur": 1.4, "r": 70}), tail=0.22 if i < 6 else 0.5)
+    s.nar("Each dwarf had a hat in the same color as his bed!", ("pose", DW_IDS[0], "wave", {"at": 0.6}), *[("pose", DW_IDS[i], "proud", {"at": 0.3 + 0.12 * i}) for i in range(1, 7)], tail=0.3)
+
+    # ---------------------------------------------------------------- 6 somebody is sleeping in our beds
+    s = t.scene("Who is sleeping here?", "room_night", mood="sneaky", title="Somebody is sleeping here")
+    for i in range(7):
+        s.prop("b%d" % i, "bed", BED_X[i], 546, 0.54, size="mid", quilt=DWARFS[i][1])
+    s.actor("snow", "girl", 880, 520, 0.95, face=1, zy=900, **SNOW)
+    s.wait(0.05, ("pose", "snow", "sleep"), ("tilt", "snow", 84, {"at": 0.0, "dur": 0.01}))
+    for i in range(7):
+        s.actor(DW_IDS[i], "girl", -150 - 110 * i, 700, DW_K, face=1, hold="pickaxe", **_dw(i))
+    s.nar("The seven dwarfs went into their little cottage.", *[("walk", DW_IDS[i], DW_IN[i], 700, {"fit": True, "pose": "walk"}) for i in range(7)], ("fx", "zzz", 1090, 420, {"at": 0.0, "dur": 40.0}))
+    s.say("d0", "Oh my! Somebody is sleeping in our beds!", ("pose", "d0", "surprised"), *[("pose", DW_IDS[i], "surprised", {"at": 0.2}) for i in range(1, 7)],
+          ("fx", "mark", "d0", -105, {"at": 0.3, "dur": 2.6, "text": "!"}), voice="dw")
+    s.say("d4", "She is so pretty!", ("pose", "d4", "happy"), ("pose", "d0", "idle"), ("fx", "hearts", "d4", 0, {"at": "40%", "dur": 3.0}), voice="dw")
+    s.say("d2", "Shh! She looks very tired. Let her sleep.", ("pose", "d2", "sly"), ("pose", "d4", "idle"), voice="dw")
+    s.nar("So the seven dwarfs were as quiet as little mice, and Snow White slept all night long.", *[("pose", DW_IDS[i], "sly", {"at": 0.2 + 0.1 * i}) for i in range(7)], ("sfx", "snore", {"at": 1.0}),
+          ("fx", "zzz", 1090, 420, {"at": 0.0, "dur": 8.0}), tail=0.5)
+
+    # ---------------------------------------------------------------- 7 a new home
+    s = t.scene("A new home", "room", mood="happy", title="A new home")
+    for i in range(7):
+        s.prop("b%d" % i, "bed", BED_X[i], 546, 0.54, size="mid", quilt=DWARFS[i][1])
+    s.actor("snow", "girl", 880, 520, 0.95, face=1, zy=900, **SNOW)
+    s.wait(0.05, ("pose", "snow", "sleep"), ("tilt", "snow", 84, {"at": 0.0, "dur": 0.01}))
+    for i in range(7):
+        s.actor(DW_IDS[i], "girl", DW_IN[i], 700, DW_K, face=1, **_dw(i))
+    s.nar("In the morning, Snow White woke up. And she saw seven little men!", ("tilt", "snow", 0, {"at": 1.4, "dur": 0.6}), ("pose", "snow", "surprised", {"at": 1.5}), ("hop", "snow", {"at": 1.6}),
+          ("fx", "mark", "snow", -95, {"at": 1.7, "dur": 2.4, "text": "!"}), ("walk", "snow", 880, 690, {"at": 3.6, "speed": 170, "pose": "walk"}), *[("pose", DW_IDS[i], "wave", {"at": 2.6 + 0.1 * i}) for i in range(7)])
+    s.say("snow", "Oh! Hello! Who are you?", ("pose", "snow", "happy"), *[("pose", DW_IDS[i], "idle") for i in range(7)])
+    s.say("d0", "We are the seven dwarfs! Who are you?", ("pose", "d0", "happy"), ("pose", "snow", "idle"), voice="dw")
+    s.say("snow", "I am Snow White. The queen wants me to go away.", ("pose", "snow", "sad"), ("pose", "d0", "idle"))
+    s.say("d3", "Poor Snow White! Please stay with us. You will be safe here.", ("pose", "d3", "happy"), ("pose", "snow", "idle"), *[("pose", DW_IDS[i], "happy", {"at": "50%"}) for i in (0, 1, 5, 6)], voice="dw")
+    s.say("snow", "Oh, thank you! I will cook and clean for you!", ("pose", "snow", "cheer"), ("hop", "snow", {"at": "50%"}), ("fx", "hearts", "snow", 0, {"at": "30%", "dur": 3.5}))
+    s.nar("And so, Snow White lived in the little cottage, and she was very happy there.", ("pose", "snow", "happy"), *[("pose", DW_IDS[i], "cheer", {"at": 0.3 + 0.1 * i}) for i in range(7)],
+          ("fx", "sparkle", 640, 520, {"at": 0.3, "dur": 4.0, "r": 360}), tail=0.5)
+
+    # ---------------------------------------------------------------- 8 never open the door
+    s = t.scene("Be careful!", "meadow", mood="calm", title="Never open the door")
+    s.prop("home", "cottage", 300, 566, 0.85, wall="#FFF1D0", roof="#D9654F", door=0.0)
+    s.actor("snow", "girl", 440, 640, 0.95, face=1, **SNOW)
+    for i in range(7):
+        s.actor(DW_IDS[i], "girl", 570 + 100 * i, 650, DW_K, face=-1, hold="pickaxe", **_dw(i))
+    s.nar("Every morning, the dwarfs went to work.", ("pose", "d0", "wave", {"at": 0.5}), ("pose", "snow", "wave", {"at": 0.9}), ("fx", "notes", "d3", -60, {"at": 1.0, "dur": 3.0}))
+    s.say("d0", "Be careful, Snow White! The wicked queen may come to find you.", ("pose", "d0", "talk"), ("pose", "snow", "idle"), voice="dw")
+    s.say("d3", "Never open the door to strangers!", ("pose", "d3", "surprised"), ("pose", "d0", "idle"), ("fx", "mark", "d3", -105, {"at": 0.4, "dur": 2.6, "text": "!"}), ("hop", "d3", {"at": 0.3}), voice="dw")
+    s.say("snow", "I promise! I will never open the door to strangers.", ("pose", "snow", "happy"), ("hop", "snow", {"at": "40%"}), ("pose", "d3", "idle"))
+    s.nar("Then the dwarfs waved goodbye, and they marched off to work.", ("pose", "snow", "wave", {"at": 0.3}), *[("walk", DW_IDS[i], 1500 + 100 * i, 650, {"at": 0.4 + 0.05 * i, "speed": 150, "pose": "walk"}) for i in range(7)], tail=0.4)
+
+    # ---------------------------------------------------------------- 9 the queen's plan
+    s = t.scene("The queen's plan", "ballroom_day", mood="sneaky", title="The queen's plan")
+    s.actor("mir", "mirror", 1120, 690, 0.8, face=-1)
+    s.actor("queen", "girl", 1560, 676, 0.95, face=-1, **QUEEN)
+    s.actor("old", "girl", 760, 676, 0.95, face=-1, show=False, hold="apples", **OLDWOMAN)
+    s.nar("Back at the castle, the queen asked her magic mirror once more.", ("walk", "queen", 760, 676, {"fit": True, "pose": "walk"}))
+    s.say("queen", "Mirror, mirror, on the wall, who is the fairest of them all?", ("pose", "queen", "proud"), ("fx", "sparkle", "mir", 130, {"at": "50%", "dur": 3.0, "r": 120}), ("sfx", "ding", {"at": "55%"}))
+    s.say("mir", "You are fair, my queen. But Snow White, in the little cottage, is fairer still!", ("pose", "mir", "talk"), ("fx", "sparkle", "mir", 130, {"at": 0.2, "dur": 4.0, "r": 140}), ("pose", "queen", "surprised", {"at": "70%"}))
+    s.nar("The queen was so angry that she shook all over!", ("pose", "queen", "angry", {"at": 0.3}), ("fx", "mark", "queen", -95, {"at": 0.5, "dur": 3.0, "text": "!"}), ("sfx", "thud", {"at": 0.6}), ("sfx", "thud", {"at": 1.1}))
+    s.say("queen", "I will make her fall asleep, with a magic apple!", ("pose", "queen", "sly"), ("hold", "queen", "apple", {"at": "30%"}), ("fx", "glow", 714, 566, {"at": "40%", "dur": 3.0, "r": 70, "color": "#C9FFB0"}), ("fx", "sparkle", "queen", -20, {"at": "40%", "dur": 3.0, "r": 130}))
+    s.nar("She said a magic spell over the biggest, reddest apple.", ("pose", "queen", "proud"), ("fx", "glow", 714, 566, {"at": 0.4, "dur": 4.2, "r": 80, "color": "#C9FFB0"}), ("fx", "sparkle", "queen", -20, {"at": 0.5, "dur": 4.0, "r": 170}), ("sfx", "sparkle", {"at": 0.6}))
+    s.nar("Then, poof! The queen turned into a little old woman.", *_swap("queen", "old", 0.8, y=90), ("pose", "old", "sly", {"at": 1.6}), tail=0.5)
+
+    # ---------------------------------------------------------------- 10 the old woman and the red apple
+    s = t.scene("The red apple", "meadow", mood="sneaky", title="The red apple")
+    s.prop("home", "cottage", 900, 566, 0.85, wall="#FFF1D0", roof="#D9654F", door=0.0)
+    s.actor("snow", "girl", 905, 608, 0.95, face=1, show=False, **SNOW)
+    s.actor("old", "girl", -200, 640, 0.95, face=1, hold="apples", **OLDWOMAN)
+    s.nar("The next day, a little old woman came to the cottage.", ("walk", "old", 640, 640, {"fit": True, "speed": 100, "pose": "walk"}))
+    s.nar("She went up to the door. Knock, knock, knock!", ("walk", "old", 790, 640, {"dur": 1.2}), ("pose", "old", "knock", {"at": "58%"}), ("sfx", "knock", {"at": "58%", "gain": 0.9}))
+    s.say("snow", "Who is there?", ("pose", "old", "idle"))
+    s.say("old", "I am just a poor old woman. Would you like a nice, red apple, my dear?", ("pose", "old", "happy"))
+    s.nar("Snow White forgot what the dwarfs had said. She opened the door.", ("set", "home", "door", 1.0, {"at": 0.8, "dur": 0.8}), ("sfx", "creak", {"at": 0.8, "gain": 0.5}), ("show", "snow", {"at": 1.5}),
+          ("pose", "snow", "happy", {"at": 1.5}), ("fx", "mark", "snow", -95, {"at": 2.4, "dur": 2.4, "text": "!"}), tail=0.3)
+    s.say("old", "Here, try this apple! It is so sweet and juicy!", ("pose", "old", "happy"), ("hold", "old", "apple", {"at": "25%"}), ("fx", "sparkle", "old", 0, {"at": "35%", "dur": 3.0, "r": 100}))
+    s.say("snow", "Oh, it looks so yummy! Thank you!", ("pose", "snow", "happy"), ("hold", "snow", "apple", {"at": "55%"}), ("hold", "old", None, {"at": "55%"}))
+    s.nar("Snow White took one little bite...", ("pose", "snow", "eat"), ("sfx", "munch", {"at": 0.9}), tail=0.3)
+    s.nar("...and she fell fast asleep!", ("pose", "snow", "dizzy"), ("fx", "dizzy", "snow", 0, {"at": 0.2, "dur": 1.2}), ("hold", "snow", None, {"at": 0.9}), ("pose", "snow", "sleep", {"at": 1.2}),
+          ("tilt", "snow", 84, {"at": 1.2, "dur": 0.5}), ("sfx", "thud", {"at": 1.6}), ("fx", "dust", 1000, 640, {"at": 1.6, "dur": 1.0, "size": 1.1, "sfx": False}), ("fx", "zzz", 1100, 540, {"at": 2.2, "dur": 12.0}), tail=0.4)
+    s.say("old", "Hee, hee, hee! Now I am the fairest of them all!", ("pose", "old", "laugh"), ("walk", "old", -250, 640, {"at": "62%", "speed": 280, "pose": "run"}), ("fx", "mark", "old", -95, {"at": "30%", "dur": 2.0, "text": "!"}), tail=0.3)
+
+    # ---------------------------------------------------------------- 11 the dwarfs come back
+    s = t.scene("Poor Snow White", "meadow_dusk", mood="sad", title="Poor Snow White")
+    s.prop("home", "cottage", 900, 566, 0.85, wall="#FFF1D0", roof="#D9654F", door=0.0)
+    s.actor("snow", "girl", 905, 608, 0.95, face=1, **SNOW)
+    s.wait(0.05, ("pose", "snow", "sleep"), ("tilt", "snow", 84, {"at": 0.0, "dur": 0.01}), ("fx", "zzz", 1100, 540, {"at": 0.0, "dur": 40.0}))
+    for i in range(7):
+        s.actor(DW_IDS[i], "girl", -150 - 100 * i, 650, DW_K, face=1, hold="pickaxe", **_dw(i))
+    s.nar("That evening, the dwarfs came home, and they saw Snow White on the ground!", *[("walk", DW_IDS[i], DW_BACK[i], 650, {"fit": True, "pose": "run"}) for i in range(7)],
+          *[("pose", DW_IDS[i], "scared", {"at": "85%"}) for i in range(7)], ("fx", "mark", "d0", -105, {"at": "88%", "dur": 3.0, "text": "!"}))
+    s.say("d0", "Oh no! Snow White! Wake up! Please wake up!", ("pose", "d0", "scared"), *[("hold", DW_IDS[i], None) for i in range(7)], ("hop", "d0", {"at": "40%"}), voice="dw")
+    s.nar("But Snow White did not wake up.", *[("pose", DW_IDS[i], "sad", {"at": 0.4}) for i in range(7)])
+    s.nar("The seven dwarfs were so sad. They cried and cried.", *[("pose", DW_IDS[i], "sad") for i in range(7)], ("fx", "sweat", "d1", 0, {"at": 0.4, "dur": 3.0}), ("fx", "sweat", "d4", 0, {"at": 1.0, "dur": 3.0}),
+          ("fx", "sweat", "d6", 0, {"at": 1.6, "dur": 3.0}), tail=0.5)
+
+    # ---------------------------------------------------------------- 12 a bed of flowers
+    s = t.scene("A bed of flowers", "meadow", mood="calm", title="A bed of flowers")
+    s.prop("fb", "bed", 640, 650, 1.0, size="big", quilt="#E9F2FF", wood="#FFF4D6", hair="#231F2A", flowers=1.0, girl=1.0, show=False)
+    for i in range(7):
+        s.actor(DW_IDS[i], "girl", FL_X[i], 676, DW_K, face=1 if FL_X[i] < 640 else -1, **_dw(i))
+    s.nar("The dwarfs did not want to leave her alone. So they made a soft bed of flowers, and they laid Snow White on it.", ("fx", "sparkle", 640, 560, {"at": 2.0, "dur": 4.0, "r": 280}),
+          ("show", "fb", {"at": 2.0}), *[("pose", DW_IDS[i], "sad", {"at": 0.0}) for i in range(7)], ("sfx", "sparkle", {"at": 2.2}), tail=0.3)
+    s.nar("Day and night, the seven dwarfs sat beside her, and they watched over their dear Snow White.", ("cam", 640, 450, 1.18, {"at": 0.4, "dur": 5.0}), ("fx", "zzz", 700, 470, {"at": 0.0, "dur": 9.0}),
+          ("fx", "hearts", 640, 520, {"at": 3.0, "dur": 4.0}), tail=0.4)
+
+    # ---------------------------------------------------------------- 13 the prince
+    s = t.scene("The prince", "meadow", mood="happy", title="The prince")
+    s.prop("fb", "bed", 640, 650, 1.0, size="big", quilt="#E9F2FF", wood="#FFF4D6", hair="#231F2A", flowers=1.0, girl=1.0)
+    for i in range(7):
+        s.actor(DW_IDS[i], "girl", FL_X[i], 676, DW_K, face=1 if FL_X[i] < 640 else -1, **_dw(i))
+    s.actor("pr", "girl", 1560, 702, 0.95, face=-1, **SW_PRINCE)
+    s.actor("snow", "girl", 640, 676, 0.95, face=-1, show=False, **SNOW)
+    s.nar("One day, a young prince was walking through the forest.", ("walk", "pr", 1090, 702, {"fit": True, "pose": "walk"}), *[("pose", DW_IDS[i], "sad") for i in range(7)])
+    s.say("pr", "Who is that beautiful girl?", ("pose", "pr", "surprised"), ("fx", "hearts", "pr", 0, {"at": "40%", "dur": 3.0}))
+    s.say("d0", "She is Snow White. She ate a magic apple, and now she cannot wake up.", ("pose", "d0", "sad"), ("pose", "pr", "idle"), voice="dw")
+    s.say("pr", "Oh, how sad! May I try to help her?", ("pose", "pr", "think"), ("walk", "pr", 830, 702, {"at": 0.3, "speed": 170}))
+    s.say("d3", "Yes, please try!", ("pose", "d3", "happy"), ("hop", "d3", {"at": "30%"}), voice="dw")
+    s.nar("The prince bent down, and he gently kissed her hand.", ("walk", "pr", 790, 702, {"at": 0.2, "dur": 0.8}), ("pose", "pr", "curtsy", {"at": 1.2}), ("fx", "hearts", 700, 540, {"at": 2.2, "dur": 3.0}), tail=0.3)
+    s.nar("And then... sparkle, sparkle, sparkle! The magic was gone!", ("fx", "sparkle", 640, 520, {"at": 0.4, "dur": 5.0, "r": 300}), ("sfx", "tada", {"at": 0.5}),
+          ("set", "fb", "girl", 0.0, {"at": 1.2, "dur": 0.1}), ("show", "snow", {"at": 1.2}), ("pose", "snow", "surprised", {"at": 1.2}), ("hop", "snow", {"at": 1.3}),
+          *[("pose", DW_IDS[i], "cheer", {"at": 1.3 + 0.08 * i}) for i in range(7)], ("pose", "pr", "happy", {"at": 1.4}), tail=0.4)
+    s.say("snow", "Oh! Where am I? Who are you?", ("pose", "snow", "surprised"), ("face", "snow", 1, {"at": "40%"}), ("pose", "pr", "idle"))
+    s.say("pr", "I am a prince. Will you come to my castle, and be my princess?", ("pose", "pr", "happy"), ("face", "snow", 1), ("pose", "snow", "idle"))
+    s.say("snow", "Yes, I will! But my seven friends must come, too!", ("pose", "snow", "cheer"), ("hop", "snow", {"at": "55%"}), ("fx", "hearts", "snow", 0, {"at": "30%", "dur": 3.5}))
+    s.say("d0", "Hooray!", ("pose", "d0", "cheer"), *[("hop", DW_IDS[i], {"at": 0.1 + 0.07 * i}) for i in range(7)], ("fx", "confetti", 0, 0, {"at": 0.1, "dur": 6.0}), voice="dw", tail=0.5)
+
+    # ---------------------------------------------------------------- 14 happily ever after
+    s = t.scene("The royal wedding", "ballroom_day", mood="triumph", title="Happily ever after")
+    for i in range(7):
+        s.actor(DW_IDS[i], "girl", 90 + 100 * i, 700, DW_K, face=1, **_dw(i))
+    s.actor("snow", "girl", 880, 676, 0.95, face=-1, **SNOW)
+    s.actor("pr", "girl", 1060, 676, 0.95, face=-1, **SW_PRINCE)
+    s.nar("Snow White and the prince were married in the big, beautiful castle, and the seven dwarfs came to the party.", ("pose", "snow", "dance", {"at": 0.6}), ("pose", "pr", "dance", {"at": 0.6}),
+          ("fx", "hearts", "snow", 0, {"at": 1.0, "dur": 6.0}), ("fx", "sparkle", 960, 430, {"at": 0.4, "dur": 6.0, "r": 330}), *[("pose", DW_IDS[i], "happy", {"at": 1.0 + 0.1 * i}) for i in range(7)])
+    s.nar("They danced, and danced, and danced.", *[("pose", DW_IDS[i], "dance", {"at": 0.2 + 0.1 * i}) for i in range(7)], ("pose", "snow", "dance"), ("pose", "pr", "dance"), ("fx", "notes", "d3", -60, {"at": 0.4, "dur": 4.0}), tail=0.4)
+    s.nar("And the wicked queen? She never came back again.", *[("pose", DW_IDS[i], "happy", {"at": 0.2}) for i in range(7)], ("pose", "snow", "happy"), ("pose", "pr", "happy"), tail=0.4)
+    s.nar("And they all lived happily ever after.", *[("pose", DW_IDS[i], "cheer", {"at": 0.4}) for i in range(7)], ("pose", "snow", "cheer", {"at": 0.4}), ("pose", "pr", "cheer", {"at": 0.4}), ("hop", "snow", {"at": 0.9}),
+          ("hop", "pr", {"at": 1.2}), ("fx", "confetti", 0, 0, {"at": 0.4, "dur": 60.0}), ("fx", "sparkle", 640, 330, {"at": 0.3, "dur": 5.0, "r": 380}), tail=0.8)
+
+    _outro(t, "Remember, little ones: be kind, and never open the door to strangers.", caption="Never open the door to strangers!")
+    return t
+
+
 TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_and_hare, "goldilocks": goldilocks,
          "red-riding-hood": red_riding_hood, "gingerbread-man": gingerbread_man, "three-billy-goats": three_billy_goats,
-         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup, "magic-porridge-pot": magic_porridge_pot, "cinderella": cinderella}
+         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup, "magic-porridge-pot": magic_porridge_pot, "cinderella": cinderella, "snow-white": snow_white}
 
 
 def build(key, lang="en"):

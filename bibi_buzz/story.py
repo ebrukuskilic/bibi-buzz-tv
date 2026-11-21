@@ -66,6 +66,7 @@ class ActorTL:
         self.tilts = []                     # (t0, t1, d0, d1): extra lean in degrees (head to the right, like Pose.lean): falling over
         self.hops = []
         self.holds = [(-1.0, d.style.get("hold"))]
+        self.looks = []                     # (t, style name, value): ("look", who, name, value) changes how an actor is drawn from then on (a sheep's wool)
         self.free_at = 0.0
 
     def end_pos(self):
@@ -152,6 +153,14 @@ class ActorTL:
     def hold_at(self, t):
         i = bisect.bisect_right([p[0] for p in self.holds], t) - 1
         return self.holds[max(i, 0)][1]
+
+    def look_at(self, t):
+        """The style values that were changed by 'look' acts up to the time t."""
+        out = {}
+        for (t0, name, v) in self.looks:
+            if t0 <= t:
+                out[name] = v
+        return out
 
     def hop_at(self, t):
         for h in self.hops:
@@ -274,7 +283,7 @@ class Scene:
             b.t1 = end
             cursor = end
         for tl in list(atl.values()) + list(ptl.values()):                 # acts may be authored out of time order
-            for attr in ("poses", "faces", "vis", "holds"):
+            for attr in ("poses", "faces", "vis", "holds", "looks"):
                 if hasattr(tl, attr):
                     getattr(tl, attr).sort(key=lambda it: it[0])
         self.dur = cursor + 0.05
@@ -314,6 +323,8 @@ class Scene:
             self.atl[a[0]].faces.append((ta, a[1]))
         elif verb == "hold":
             self.atl[a[0]].holds.append((ta, a[1]))
+        elif verb == "look":                                            # ("look", who, "wool", "#E2362F", {"at"}): from then on the actor is drawn with this style value
+            self.atl[a[0]].looks.append((ta, a[1], a[2]))
         elif verb == "show":
             tgt = self.atl.get(a[0]) or self.ptl[a[0]]
             tgt.vis.append((ta, 1))
@@ -606,6 +617,9 @@ def _draw_actor(view, scene, tl, ts, near, far, tale, amp_of):
                    gesture=not tl.hold_at(ts))
     P.lean += tl.tilt_at(ts)
     style = d.style
+    lk = tl.look_at(ts)
+    if lk:
+        style = dict(style, **lk)
     if d.kind in ("girl", "bear", "troll", "wolf", "hen", "cat", "dog", "mouse", "lion", "fox", "sheep", "cow"):
         style = dict(style)
         style["hold"] = tl.hold_at(ts)

@@ -248,6 +248,11 @@ def pose_for(name, t, phase=0.0, moving=False, amp=None, face=1, seed=0.0, speed
         P.arm_l = P.arm_r = 18
         P.bob = abs(s(t * 8 + seed)) * 7
         P.dx = s(t * 21) * 2.4
+    elif name == "stitch":                                  # sewing: the arm goes up and down with the needle, eyes on the work
+        P.arm_r = 95 + s(t * 7 + seed) * 38
+        P.look = (3, 4)
+        P.mouth = "smile"
+        P.bob = 1.6 * s(t * 2.4 + seed) + abs(s(t * 3.5 + seed)) * 2
     elif name == "curtsy":                                  # a little curtsy: dips down and up again, the skirt widens a bit
         w = 0.5 - 0.5 * math.cos(t * 3.0)
         P.sq = 1.0 - 0.09 * w
@@ -450,6 +455,23 @@ def held(r, kind, hand):
         r.line([(hx - 6, hy + 16), (hx + 16, hy - 86)], "#A5703A", 7)
         r.poly([(hx - 34, hy - 70), (hx - 8, hy - 91), (hx + 16, hy - 95), (hx + 42, hy - 91), (hx + 66, hy - 70), (hx + 44, hy - 79), (hx + 16, hy - 80), (hx - 12, hy - 79)], "#B7C0CE", INK, 2.8)
         r.poly([(hx - 8, hy - 91), (hx + 16, hy - 95), (hx + 42, hy - 91), (hx + 16, hy - 87)], "#E4EAF2", None)
+    elif kind == "box":                                                                  # a shoe box tied with a red ribbon
+        r.rrect(hx - 36, hy - 40, hx + 36, hy + 2, 5, "#F2D9A6", INK, 2.6)
+        r.rrect(hx - 40, hy - 52, hx + 40, hy - 38, 4, "#E8C07A", INK, 2.4)
+        r.rrect(hx - 7, hy - 52, hx + 7, hy + 2, 2, "#E2362F", None)
+        r.ell(hx - 12, hy - 58, 11, 7, "#E2362F", INK, 2.0, ang=-20)
+        r.ell(hx + 12, hy - 58, 11, 7, "#E2362F", INK, 2.0, ang=20)
+        r.dot(hx, hy - 55, 3.6, "#B01E18")
+    elif kind == "hammer":                                                               # a little cobbler's hammer: a wooden handle and an iron head
+        r.line([(hx - 2, hy + 10), (hx + 14, hy - 46)], INK, 9.5)
+        r.line([(hx - 2, hy + 10), (hx + 14, hy - 46)], "#B8733A", 5.6)
+        r.rrect(hx - 8, hy - 66, hx + 42, hy - 42, 5, "#8F9CB0", INK, 2.8)
+        r.rrect(hx - 4, hy - 62, hx + 36, hy - 54, 3, "#D6DEEA", None)
+    elif kind == "needle":                                                               # a big shiny needle with a loop of red thread
+        r.arc(hx + 34, hy - 38, 20, 28, -30, 150, "#E2362F", 3.4)
+        r.line([(hx - 8, hy + 10), (hx + 22, hy - 74)], INK, 6.5)
+        r.line([(hx - 8, hy + 10), (hx + 22, hy - 74)], "#E4EAF2", 3.2)
+        r.ell(hx + 21, hy - 69, 3, 6.4, "#FFFFFF", INK, 1.8, ang=-20)
     elif kind in ("slipper", "cushion"):                                                 # a glass slipper (on a red velvet cushion with tassels)
         if kind == "cushion":
             r.rrect(hx - 44, hy - 24, hx + 44, hy - 4, 10, "#D93A52", INK, 2.8)

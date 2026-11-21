@@ -718,7 +718,7 @@ def _rainbowsheep(s):
 # ================================================================================================ the shelf
 SPECS = {"twinkle": TWINKLE, "oldmac": OLDMAC, "rainbowsheep": RAINBOWSHEEP}
 RECIPES = {"twinkle": _twinkle, "oldmac": _oldmac, "rainbowsheep": _rainbowsheep}
-QUEUE = ["twinkle", "oldmac"]            # the order in which the songs come out (one a day: curriculum.py)
+QUEUE = ["twinkle", "oldmac", "rainbowsheep"]            # the order in which the songs come out (one a day: curriculum.py)
 
 
 def build(key, lang="en"):

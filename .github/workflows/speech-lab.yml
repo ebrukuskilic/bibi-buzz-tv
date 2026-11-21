@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
-      ONLY: ${{ github.event.inputs.only || 'palette,studio' }}      # (a run started by a push does only the newest jobs: every voice at several sizes, and the studio chains)
+      ONLY: ${{ github.event.inputs.only || 'gallery' }}      # (a run started by a push does only the newest job: the gallery, the casting of some tales the way the videos make it)
       CBX: ${{ github.event.inputs.cbx || 'no' }}
       MYVOICE: ${{ github.event.inputs.myvoice || 'no' }}
     steps:

@@ -28,9 +28,9 @@ FPS = 24
 SR = VO.SR
 XFADE = 0.55
 HEAD = {"pig": 236, "wolf": 292, "bear": 254, "hare": 294, "tortoise": 118, "girl": 238, "ginger": 232, "goat": 290, "troll": 300,
-        "bibi": 150, "pip": 120, "mo": 130, "lila": 130}
+        "bibi": 150, "pip": 120, "mo": 130, "lila": 130, "mirror": 400}
 HEADW = {"pig": 62, "wolf": 66, "bear": 72, "hare": 56, "tortoise": 112, "girl": 60, "ginger": 58, "goat": 64, "troll": 80,
-         "bibi": 70, "pip": 60, "mo": 60, "lila": 60}
+         "bibi": 70, "pip": 60, "mo": 60, "lila": 60, "mirror": 114}
 FAMILY = ("bibi", "pip", "mo", "lila")
 
 

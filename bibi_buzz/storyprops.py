@@ -1330,6 +1330,124 @@ def bench(c, x, y, k, t, st):
     return r
 
 
+# ================================================================================================ the princess and the pea
+RAINBOW7 = ["#E2362F", "#FF8A1F", "#FFD21F", "#3DB54A", "#3E8EDE", "#8C5BC8", "#FF7AB6"]      # red, orange, yellow, green, blue, purple, pink
+MH = 26                                                                                      # the height of one mattress
+BASE_Y = -58                                                                                 # the top of the boards the first mattress lies on
+
+
+@prop
+def tall_bed(c, x, y, k, t, st):
+    """The princess's bed: a wooden frame with a heap of up to seven rainbow-coloured mattresses on it, and a tiny green pea on the boards underneath.
+    (x, y) = the middle of its feet on the floor. st: n 0..7 = how many mattresses lie on the bed (a fraction: the next one drops in from above),
+    pea 0..1 = the pea lies on the boards, glow 0..1 = the pea shines up through the pile, ladder 0..1 = a wooden ladder leans on the left side of the pile,
+    girl 0..1 = the princess sleeps on the top mattress, toss 0..1 = she tosses and turns."""
+    n = max(0.0, min(7.0, st.get("n", 0.0)))
+    pea, glow = clamp(st.get("pea", 1.0)), clamp(st.get("glow", 0.0))
+    ladder, girl, toss = clamp(st.get("ladder", 0.0)), clamp(st.get("girl", 0.0)), clamp(st.get("toss", 0.0))
+    r = Rig(c, x, y, k)
+    r.ell(0, 3, 214, 14, mix("#C98A52", "#5A3A1A", 0.5), None)
+    wood, wood2 = "#B8733A", "#8B4F26"
+    for sx in (-1, 1):                                                                       # the bedposts, with a round knob on top
+        h = 150 if sx < 0 else 112
+        r.rrect(sx * 196 - 12, -h, sx * 196 + 12, 0, 5, wood2, INK, 2.8)
+        r.ell(sx * 196, -h - 8, 15, 15, "#FFD21F", INK, 2.6)
+    r.rrect(-202, BASE_Y, 202, BASE_Y + 22, 6, wood, INK, 2.8)                              # the boards
+    for i in range(4):
+        r.line([(-150 + i * 100, BASE_Y + 3), (-150 + i * 100, BASE_Y + 19)], wood2, 2.4)
+    if pea > 0.02:
+        r.dot(0, BASE_Y - 9, 10, "#4DBB35")                                                   # the pea
+        r.dot(-3.2, BASE_Y - 13, 3.4, "#C9F5B0")
+    top = BASE_Y
+    whole = int(n + 1e-6)
+    for i in range(whole + (1 if n - whole > 0.01 else 0)):
+        col = RAINBOW7[i % 7]
+        dy = 0.0
+        if i >= whole:                                                                       # the next mattress drops in from above
+            f = clamp(n - whole)
+            dy = -(1.0 - f * f) * 300.0
+        yb = BASE_Y - MH * i + dy
+        yt = yb - MH
+        r.rrect(-172, yt, 172, yb + 2, 12, col, INK, 2.8)
+        r.rrect(-160, yt + 4, 160, yt + 10, 3, mix(col, "#FFFFFF", 0.5), None)
+        for j in range(5):
+            r.dot(-128 + j * 64, yt + MH * 0.58, 3.2, darker(col, 0.2))
+        if i < whole:
+            top = yt
+    if girl > 0.5:                                                                           # the princess, asleep on the top mattress (a little bigger than the bed's own scale)
+        tw = math.sin(t * 3.8) * toss
+        g = Rig(c, x + k * -84, y + k * top, k * 1.3)
+        hx, hy = tw * 4.0, -abs(tw) * 2.5
+        g.ell(0, -12, 46, 19, "#FFFFFF", INK, 2.6)                                           # the pillow
+        g.ell(2 + hx, -26 + hy, 28, 26, "#FFDDBF", INK, 2.8)                                 # her head
+        for i in range(7):
+            g.ell(-18 + hx + i * 6.5, -42 + hy + abs(i - 3) * 2.4, 9, 9, "#FFC83D", INK, 2)
+        g.ell(-22 + hx, -20 + hy, 10, 22, "#FFC83D", INK, 2)
+        if toss > 0.5:                                                                       # eyes screwed up, a worried mouth
+            g.line([(-12 + hx, -29 + hy), (0 + hx, -26 + hy)], INK, 2.6)
+            g.line([(6 + hx, -26 + hy), (18 + hx, -29 + hy)], INK, 2.6)
+            g.arc(2 + hx, -6 + hy, 6, 4, 200, 340, INK, 2.4)
+        else:
+            g.arc(-6 + hx, -26 + hy, 6, 4, 22, 158, INK, 2.6)
+            g.arc(12 + hx, -26 + hy, 6, 4, 22, 158, INK, 2.6)
+            g.arc(2 + hx, -16 + hy, 6, 4, 20, 160, INK, 2.4)
+        g.dot(-14 + hx, -16 + hy, 4.4, "#FF9DB0")
+        g.dot(18 + hx, -16 + hy, 4.4, "#FF9DB0")
+        bulge = abs(tw) * 6.0
+        g.rrect(14, -bulge, 188, 34, 12, "#FFF1C1", INK, 2.8)                                # a golden quilt
+        for i in range(4):
+            g.line([(44 + i * 40, 3 - bulge), (44 + i * 40, 30)], "#E8C46A", 3)
+    if glow > 0.02:                                                                          # a green light rises from the pea through the whole pile
+        pulse = 0.75 + 0.25 * math.sin(t * 6.0)
+        gx, gy = 0, BASE_Y - 9
+        for j, wdt in enumerate((46, 30, 16)):
+            _tint(c, [r.P(-wdt, gy), r.P(wdt, gy), r.P(wdt * 0.55, top - 10), r.P(-wdt * 0.55, top - 10)], "#B6FF9A", 0.16 * glow * pulse)
+        for j, rr in enumerate((46, 32, 20)):
+            _tint(c, _ellipse_world(r, gx, gy, rr, rr * 0.8), "#E8FFD0", 0.3 * glow * pulse)
+    if ladder > 0.5:                                                                         # a ladder leans on the left side of the pile
+        xt = 150
+        for lx0, lx1 in ((-236, -(xt + 24)), (-292, -(xt + 80))):
+            r.line([(lx0, 0), (lx1, top + 8)], INK, 14)
+            r.line([(lx0, 0), (lx1, top + 8)], "#C98A52", 9)
+        steps = max(2, int(abs(top) / 38))
+        for i in range(1, steps):
+            u = i / steps
+            ya = (top + 8) * u
+            xa0 = -236 + (236 - (xt + 24)) * u
+            xa1 = -292 + (292 - (xt + 80)) * u
+            r.line([(xa0, ya), (xa1, ya)], INK, 10)
+            r.line([(xa0, ya), (xa1, ya)], "#E0A96A", 5.5)
+    return r
+
+
+@prop
+def pea_dome(c, x, y, k, t, st):
+    """A tiny green pea on a red cushion under a glass dome on a golden stand (the museum at the end of the tale). (x, y) = the middle of the base.
+    st: shine 0..1 (default 1) = it twinkles."""
+    shine = clamp(st.get("shine", 1.0))
+    r = Rig(c, x, y, k)
+    _tint(c, _ellipse_world(r, 0, 4, 100, 12), "#000000", 0.2)
+    r.rrect(-84, -22, 84, 0, 6, "#D9A400", INK, 3)
+    r.rrect(-64, -140, 64, -22, 6, "#EDE8F6", INK, 3)
+    r.rrect(-72, -156, 72, -140, 6, "#D9A400", INK, 3)
+    for i in range(3):
+        r.line([(-40 + i * 40, -132), (-40 + i * 40, -30)], mix("#EDE8F6", "#9993B0", 0.5), 3)
+    r.ell(0, -166, 56, 12, "#C9314D", INK, 2.8)                                             # the cushion
+    r.dot(0, -182, 12, "#5CCB3E")                                                          # the pea
+    r.dot(-4, -186, 3.6, "#C9F5B0")
+    dome = [r.P(64 * math.cos(math.radians(a)), -160 - 96 * math.sin(math.radians(a))) for a in range(0, 181, 6)]
+    _tint(c, dome, "#BFE6FF", 0.32)
+    r.arc(0, -160, 64, 96, 180, 360, INK, 3.2)
+    r.line([(-52, -190), (-44, -224)], "#FFFFFF", 5)
+    r.line([(-38, -236), (-20, -246)], "#FFFFFF", 4)
+    r.ell(0, -256, 8, 8, "#FFD21F", INK, 2.4)
+    for i in range(3):
+        ph = (t * 0.8 + i * 0.33) % 1.0
+        if shine > 0.02:
+            r.poly([(px, py) for px, py in star_pts(-40 + i * 40, -214 - 20 * ph, 13 * shine * (1.0 - abs(ph - 0.5)), 4, 4)], "#FFFFFF", None)
+    return r
+
+
 # ================================================================================================ effects
 @fx
 def wind(c, s, x, y, dt, dir=1, power=1.0, dx=0, **_):
@@ -1505,6 +1623,61 @@ def leaves(c, s, x, y, dt, **_):
         py = -20 + ((dt * vy + rng.uniform(0, 700)) % 760)
         px = sx + math.sin(dt * 1.6 + i) * 40
         s.ellipse(px, py, 11, 5, fill=["#E8A33A", "#D9783A", "#7ED47A"][i % 3])
+
+
+@fx
+def rain(c, s, x, y, dt, power=1.0, **_):
+    """Heavy rain over the whole picture: slanted, pale streaks racing down, and little splashes on the ground."""
+    rng = random.Random(23)
+    for i in range(int(80 * power)):
+        sx = rng.uniform(-80, 1360)
+        vy = rng.uniform(1000, 1500)
+        py = -90 + ((dt * vy + rng.uniform(0, 1000)) % 900)
+        px = sx - py * 0.2
+        ln = rng.uniform(34, 60)
+        s.line([(px, py), (px - ln * 0.2, py - ln)], "#C8DEF6", 3.0)
+    for i in range(14):
+        ph = (dt * 2.4 + i * 0.27) % 1.0
+        sx = rng.uniform(40, 1240)
+        sy = rng.uniform(640, 710)
+        rr = 4 + 16 * ph
+        if ph < 0.8:
+            s.ellipse(sx, sy, rr * 1.6, rr * 0.45, outline="#DCEBFA", width=2.2)
+
+
+def _wash(s, color, alpha):
+    """Lays a see-through colour over the whole picture (screen space)."""
+    if alpha <= 0.01:
+        return
+    im = s.img
+    col = D.hex2rgb(color)
+    mask = Image.new("L", im.size, int(255 * clamp(alpha)))
+    im.paste(col + (255,) if im.mode == "RGBA" else col, (0, 0), mask)
+
+
+@fx
+def lightning(c, s, x, y, dt, bx=640, **_):
+    """A flash of lightning (about 0.9 s): the whole picture flashes white twice, and a zigzag bolt strikes down at bx."""
+    u = dt
+    if u < 0 or u > 0.9:
+        return
+    a = 0.0
+    if u < 0.14:
+        a = 0.85 * (1.0 - u / 0.14)
+    elif 0.2 < u < 0.5:
+        a = 0.6 * (1.0 - (u - 0.2) / 0.3)
+    _wash(s, "#F4F6FF", a)
+    if u < 0.34:
+        pts = [(bx, -10)]
+        rng = random.Random(int(bx))
+        yy = -10
+        xx = bx
+        while yy < 470:
+            yy += rng.uniform(60, 90)
+            xx += rng.uniform(-60, 60)
+            pts.append((xx, yy))
+        s.line(pts, "#FFF6B0", 14)
+        s.line(pts, "#FFFFFF", 6)
 
 
 @fx

@@ -1448,6 +1448,195 @@ def pea_dome(c, x, y, k, t, st):
     return r
 
 
+# ================================================================================================ the little red hen
+@prop
+def wheat(c, x, y, k, t, st):
+    """A patch of wheat on a strip of soil. (x, y) = the middle of the patch on the ground. st: grow 0..1 = bare soil with a few seeds -> little green sprouts -> tall golden wheat
+    with heavy ears (the stalks sway in the wind), cut 0..1 = the wheat is cut down: only stubble is left, and a golden sheaf tied with a red ribbon stands at the right,
+    sheaf 0..1 (default 1 when cut) = that sheaf is there."""
+    grow, cut = clamp(st.get("grow", 1.0)), clamp(st.get("cut", 0.0))
+    sheaf = clamp(st.get("sheaf", 1.0 if cut > 0.5 else 0.0))
+    r = Rig(c, x, y, k)
+    soil, soil2 = "#8A5A34", "#6E4325"
+    r.ell(0, 5, 206, 24, soil2, INK, 3)
+    r.ell(0, 2, 196, 19, soil, None)
+    for i in range(7):                                                                       # furrows
+        r.line([(-170 + i * 56, 0), (-150 + i * 56, 14)], soil2, 3)
+    if grow < 0.06:                                                                          # just a few golden seeds in the soil
+        for i in range(11):
+            r.ell(-150 + i * 30, 2 + (i % 3) * 5, 5.5, 3.4, "#F2C14E", INK, 1.6, ang=(i * 37) % 60 - 30)
+    n = 14
+    for row in (0, 1):
+        for i in range(n):
+            sx = -172 + i * 26.4 + (13 if row else 0) + ((i * 7 + row * 3) % 5 - 2) * 2.4
+            sy = 2 + row * 9
+            u = clamp((grow - 0.04) / 0.34)                                                  # sprouts first ...
+            v = clamp((grow - 0.38) / 0.62)                                                  # ... then they shoot up and turn golden
+            h = 8 + 34 * u + (176 + 14 * ((i * 5) % 4)) * v * v
+            if cut > 0.01:
+                h = h + (26 - h) * clamp(cut * 1.2) if h > 26 else h
+            if h < 6:
+                continue
+            col = mix("#58B947", "#E9B93F", clamp(v * 1.25) ** 1.3)
+            bend = 5.0 * math.sin(t * 1.5 + i * 0.7 + row) * min(1.0, h / 120.0)
+            pts = [(sx, sy), (sx + bend * 0.35, sy - h * 0.5), (sx + bend, sy - h)]
+            r.line(pts, INK, 7.2)
+            r.line(pts, col, 4.2)
+            tx, ty = pts[-1]
+            if v > 0.5 and cut < 0.4:                                                        # a heavy golden ear on top
+                ang = 8 + bend * 2
+                r.ell(tx + 1, ty - 17, 8.4, 24, "#F0BE44", INK, 2.2, ang=ang)
+                for g in range(4):
+                    r.line([(tx - 5 + g * 3.4, ty - 28 - g * 1.5), (tx - 8 + g * 5, ty - 52)], mix("#D9A52C", "#6B4A12", 0.2), 1.6)
+                r.line([(tx - 3, ty - 4), (tx + 5, ty - 30)], "#D9A52C", 1.8)
+            elif u > 0.3 and v < 0.4:                                                        # two little leaves on a sprout
+                r.ell(tx - 6, ty - 3, 9, 3.6, "#6FD05A", INK, 1.8, ang=-30)
+                r.ell(tx + 6, ty - 3, 9, 3.6, "#6FD05A", INK, 1.8, ang=30)
+    r.ell(0, 11, 200, 12, soil, None)
+    r.ell(0, 11, 200, 12, None, soil2, 2.4)
+    if sheaf > 0.02:                                                                         # a sheaf of cut wheat standing at the right edge
+        bx = 262
+        for i in range(10):
+            lean = (i - 4.5) * 3.4
+            r.line([(bx + (i - 4.5) * 2.4, 0), (bx + lean * 2.4, -128)], INK, 7.4)
+            r.line([(bx + (i - 4.5) * 2.4, 0), (bx + lean * 2.4, -128)], "#E9B93F", 4.4)
+        for i in range(10):
+            lean = (i - 4.5) * 3.4
+            r.ell(bx + lean * 2.4 + 1, -146, 8, 22, "#F0BE44", INK, 2.2, ang=lean * 1.6)
+        r.rrect(bx - 32, -60, bx + 32, -46, 5, "#E2362F", INK, 2.6)
+        r.ell(bx, -53, 7, 7, "#B01E18", INK, 2)
+    return r
+
+
+@prop
+def mill(c, x, y, k, t, st):
+    """A friendly windmill with a red cap and four big sails. (x, y) = the middle of its base. st: spin = turns of the sails per second (0 = they stand still),
+    flour 0..1 = white flour dust puffs out of the door, sacks 0..3 = how many full flour sacks stand beside the door."""
+    spin = st.get("spin", 0.0)
+    flour = clamp(st.get("flour", 0.0))
+    nsack = int(round(clamp(st.get("sacks", 0.0), 0.0, 3.0)))
+    r = Rig(c, x, y, k)
+    r.ell(0, 4, 150, 14, mix("#C98A52", "#5A3A1A", 0.5), None)
+    r.poly([(-96, 0), (96, 0), (62, -262), (-62, -262)], "#F6E7C8", INK, 3.4)                  # the tower
+    for i in range(1, 8):                                                                    # courses of bricks
+        yy = -i * 32
+        wd = 96 - 34 * (-yy / 262.0)
+        r.line([(-wd, yy), (wd, yy)], "#DCC79A", 2.4)
+    for i in range(-2, 3):
+        for j in range(0, 8, 2):
+            yy = -j * 32
+            wd = 96 - 34 * (-yy / 262.0)
+            r.line([(i * wd * 0.42 + (wd * 0.2 if j % 4 == 0 else 0), yy - 32), (i * wd * 0.42 + (wd * 0.2 if j % 4 == 0 else 0), yy)], "#E6D3A8", 2)
+    r.poly([(-76, -258), (76, -258), (0, -352)], "#D93A3A", INK, 3.4)                         # the red cap
+    r.rrect(-80, -268, 80, -254, 5, "#B02A2A", INK, 2.8)
+    r.line([(-34, -300), (34, -300)], "#EF6D6D", 3)
+    r.rrect(-34, -104, 34, 0, 6, "#9B5C2E", INK, 2.8)                                        # the door with a round top
+    r.ell(0, -104, 34, 24, "#9B5C2E", INK, 2.8)
+    r.rrect(-34, -104, 34, -78, 0, "#9B5C2E", None)
+    r.line([(0, -126), (0, 0)], "#7B4723", 2.4)
+    r.dot(20, -52, 4.5, "#FFD21F")
+    r.ell(0, -184, 24, 24, "#BFE6FF", INK, 3)                                               # the round window
+    r.line([(-24, -184), (24, -184)], INK, 2.4)
+    r.line([(0, -208), (0, -160)], INK, 2.4)
+    hx, hy = 0, -262
+    ang0 = (st.get("turn", 0.0) + t * spin) * 360.0
+    for i in range(4):                                                                       # the four big sails
+        a = math.radians(ang0 + i * 90)
+        ux, uy = math.cos(a), math.sin(a)
+        nx, ny = -uy, ux
+        p0 = (hx + ux * 22, hy + uy * 22)
+        p1 = (hx + ux * 196, hy + uy * 196)
+        r.line([p0, p1], INK, 12)
+        r.line([p0, p1], "#8B4F26", 7)
+        q = [(hx + ux * 54, hy + uy * 54), (hx + ux * 194, hy + uy * 194)]
+        w = 50
+        quad = [q[0], q[1], (q[1][0] + nx * w, q[1][1] + ny * w), (q[0][0] + nx * w, q[0][1] + ny * w)]
+        r.poly(quad, "#FFF8E6", INK, 3)
+        for j in range(1, 4):
+            f = j / 4.0
+            ax, ay = q[0][0] + (q[1][0] - q[0][0]) * f, q[0][1] + (q[1][1] - q[0][1]) * f
+            r.line([(ax, ay), (ax + nx * w, ay + ny * w)], "#D8C8A4", 2.2)
+        r.line([(q[0][0] + nx * w * 0.5, q[0][1] + ny * w * 0.5), (q[1][0] + nx * w * 0.5, q[1][1] + ny * w * 0.5)], "#D8C8A4", 2.2)
+    r.dot(hx, hy, 17, "#8B4F26")
+    r.dot(hx, hy, 8, "#FFD21F")
+    if flour > 0.02:                                                                         # flour dust rolls out of the door
+        for i in range(7):
+            ph = (t * 0.8 + i / 7.0) % 1.0
+            px = -50 + ph * 120 + math.sin(t * 3 + i) * 8 + (i % 3) * 8
+            py = -20 - 52 * ph
+            rr = (12 + 22 * ph) * (1.0 - 0.55 * ph) * flour
+            r.ell(px, py, rr, rr * 0.8, "#FFFFFF", "#E6E0D4", 2)
+    for i in range(nsack):                                                                   # flour sacks by the door
+        sx = 100 + i * 52
+        r.ell(sx, -30, 30, 36, "#F1E6C8", INK, 2.8)
+        r.poly([(sx - 14, -62), (sx + 14, -62), (sx + 20, -78), (sx + 6, -70), (sx - 6, -80), (sx - 20, -72)], "#F1E6C8", INK, 2.4)
+        r.line([(sx - 14, -62), (sx + 14, -62)], "#C9482F", 4)
+        r.ell(sx - 8, -34, 11, 6, "#FFFFFF", None, ang=-25)
+    return r
+
+
+@prop
+def bread(c, x, y, k, t, st):
+    """A golden, freshly baked loaf of bread on a white plate. (x, y) = the middle of the plate's bottom. st: steam 0..1 = curly steam rises from it (default 0)."""
+    steam = clamp(st.get("steam", 0.0))
+    r = Rig(c, x, y, k)
+    r.ell(0, -8, 78, 14, "#FFFFFF", INK, 2.8)
+    r.ell(0, -10, 58, 9, "#E9EEF6", None)
+    r.ell(0, -36, 56, 34, "#C97A2E", INK, 3)                                                # the loaf
+    r.ell(0, -42, 50, 26, "#E8A24A", None)
+    r.ell(-14, -50, 20, 8, "#F6C97E", None, ang=-10)
+    for i in range(3):                                                                       # three cuts on top
+        r.line([(-26 + i * 24, -58), (-12 + i * 24, -36)], "#A85E1E", 3.4)
+    if steam > 0.02:
+        for i in range(3):
+            ph = (t * 0.7 + i / 3.0) % 1.0
+            sx = -22 + i * 22
+            pts = [(sx + math.sin(ph * 9 + i * 2) * 7, -68 - ph * 70 + j * 12) for j in range(0, 5)]
+            r.line(pts, "#FFFFFF", 5 * steam * (1.0 - 0.6 * ph))
+    return r
+
+
+@prop
+def picnic(c, x, y, k, t, st):
+    """A long wooden table with a red-and-white checked cloth. (x, y) = the middle of its feet on the floor; the top is at y - 150 * k. st: bread 0..3 = how many golden loaves
+    lie on it (a fraction: the next loaf pops in), plates 0..1 = white plates and cups wait for everybody."""
+    nb, plates = max(0.0, min(3.0, st.get("bread", 0.0))), clamp(st.get("plates", 0.0))
+    r = Rig(c, x, y, k)
+    r.ell(0, 3, 360, 16, mix("#C98A52", "#5A3A1A", 0.5), None)
+    for sx in (-300, 300):
+        r.poly([(sx - 16, -80), (sx + 16, -80), (sx + 12, 0), (sx - 12, 0)], "#9B5C2E", INK, 2.8)
+
+    def tp(u, v):                                                                           # a point on the top: u -1..1 across, v 0..1 from the back to the front edge
+        return (u * (312 + 40 * v), -150 + 34 * v)
+    r.poly([tp(-1, 0), tp(1, 0), tp(1, 1), tp(-1, 1)], "#FFFFFF", INK, 3)
+    for i in range(-6, 6):
+        for j in range(2):
+            if (i + j) % 2 == 0:
+                r.poly([tp(i / 6.0, j / 2.0), tp((i + 1) / 6.0, j / 2.0), tp((i + 1) / 6.0, (j + 1) / 2.0), tp(i / 6.0, (j + 1) / 2.0)], "#F26B5E", None)
+    r.poly([tp(-1, 0), tp(1, 0), tp(1, 1), tp(-1, 1)], None, INK, 3)
+    r.rrect(-352, -116, 352, -64, 6, "#FFFFFF", INK, 3)                                            # the cloth hangs down at the front
+    for i in range(-7, 7):
+        for j in range(2):
+            if (i + j) % 2 == 0:
+                r.rrect(max(-352, i * 50 + 2), -116 + j * 26, min(352, i * 50 + 52), -90 + j * 26, 0, "#F26B5E", None)
+    r.rrect(-352, -116, 352, -64, 6, None, INK, 3)
+    if plates > 0.02:
+        for px in (-258, -172, 172, 258):
+            r.ell(px, -131, 36 * plates, 7 * plates, "#FFFFFF", INK, 2.2)
+            r.ell(px, -132, 24 * plates, 4 * plates, "#E4EAF6", None)
+        for cx in (-214, 214):
+            r.rrect(cx - 9, -158 * plates, cx + 9, -138, 3, "#6CB7FF", INK, 2.2)
+    whole = int(nb + 1e-6)
+    for i in range(whole + (1 if nb - whole > 0.01 else 0)):
+        bx = (-110, 0, 110)[i]
+        g = 1.0 if i < whole else ease_out_back(clamp(nb - whole))
+        r.ell(bx, -134, 62 * g, 11 * g, "#FFFFFF", INK, 2.4)
+        r.ell(bx, -156 * g, 52 * g, 30 * g, "#C97A2E", INK, 3)
+        r.ell(bx, -162 * g, 46 * g, 23 * g, "#E8A24A", None)
+        for j in range(3):
+            r.line([(bx - 24 + j * 24, -178 * g + 4), (bx - 10 + j * 24, -156 * g + 4)], "#A85E1E", 3)
+    return r
+
 # ================================================================================================ effects
 @fx
 def wind(c, s, x, y, dt, dir=1, power=1.0, dx=0, **_):

@@ -148,7 +148,7 @@ def synth_all(texts, ffmpeg, cache_dir, voice=VOICE):
 #   bass@3 treb@2  boost (dB) of the low / high end                         nasal@6   boost (dB) around 1.2 kHz (a snout)
 #   lp@5500 hp@120 low-pass / high-pass filter (Hz)                         hall / echo@0.4 / chorus   room, big echo, shimmer
 FX_PRESETS = {
-    "boy": "p@1.30",
+    "boy": "p@0.82",                       # (on the child voice Ana: a bit lower than the girl)
     "tiny": "p@1.32",
     "elf": "p@1.36",
     "dwarf": "p@1.12+bass@2",
@@ -173,6 +173,11 @@ FX_PRESETS = {
 }
 
 
+def _merge(out, new):
+    for k, v in new.items():
+        out[k] = [out.get(k, [1.0])[0] * v[0]] if k == "pm" else v                  # pm multiplies, every other setting is replaced by the later one
+
+
 def fx_parse(spec, _depth=0):
     """-> {setting: [numbers]} of an effect spec; raises ValueError for a name that does not exist (so a typo shows up when a tale is built)."""
     out = {}
@@ -181,9 +186,9 @@ def fx_parse(spec, _depth=0):
             continue
         if "@" in tok:
             k, v = tok.split("@", 1)
-            out[k] = [float(x) for x in v.split(",")]
+            _merge(out, {k: [float(x) for x in v.split(",")]})
         elif tok in FX_PRESETS and _depth < 4:
-            out.update(fx_parse(FX_PRESETS[tok], _depth + 1))
+            _merge(out, fx_parse(FX_PRESETS[tok], _depth + 1))
         elif tok in ("hall", "chorus"):
             out[tok] = [1.0]
         else:
@@ -225,6 +230,9 @@ def fx_chain(spec, sr=SR):
         af.append("chorus=0.7:0.9:55|65:0.4|0.3:0.25|0.35:2|2.3")
     af.append("alimiter=limit=0.9:attack=3:release=50:level=disabled")
     return ",".join(af)
+
+
+STORY_RMS = 10 ** (-17.0 / 20)                                             # the loudest a story clip may be (RMS); the quieter ones stay at their peak limit
 
 
 def _norm(item):
@@ -297,7 +305,11 @@ def _convert2(ffmpeg, cache_dir, item):
     y = trim(_read_wav(raw))
     peak = float(np.max(np.abs(y))) if len(y) else 1.0
     if peak > 1e-4:
-        y = y * (0.9 / peak)
+        gain = 0.9 / peak
+        rms = float(np.sqrt(np.mean(y ** 2)))
+        if rms > 1e-5:
+            gain = min(gain, STORY_RMS / rms)                            # a clip that is much louder than the others (a deep voice) is turned down to the same loudness
+        y = y * gain
     _write_wav(base + ".wav", y)
     os.remove(raw)
 

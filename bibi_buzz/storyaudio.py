@@ -236,12 +236,30 @@ def sfx_tada():
     return out
 
 
+def sfx_rain(dur=9.0):
+    """Steady rain on a roof: a soft hiss with a patter on top, fading in and out."""
+    t = _t(dur)
+    env = np.minimum(1.0, t / 0.6) * np.minimum(1.0, (dur - t) / 0.9)
+    return (0.55 * band_noise(dur, 3000, 9500, 21) + 0.4 * band_noise(dur, 900, 2600, 22)) * env * (0.85 + 0.15 * np.sin(2 * np.pi * 0.7 * t))
+
+
+def sfx_thunder():
+    """A thunder clap: a sharp crack and a long, low rumble that rolls away."""
+    dur = 3.2
+    t = _t(dur)
+    crack = band_noise(dur, 600, 5000, 31) * np.exp(-t * 22) * 0.9
+    roll = band_noise(dur, 40, 260, 32) * (np.exp(-t * 1.25) * (0.7 + 0.3 * np.sin(2 * np.pi * 5.0 * t)))
+    y = crack + roll * 1.0
+    y *= np.minimum(1.0, t / 0.004)
+    return y / (np.max(np.abs(y)) + 1e-9) * 0.85
+
+
 SFX = {"knock": sfx_knock, "wind": sfx_wind, "collapse": sfx_collapse, "boing": sfx_boing, "splash": sfx_splash,
        "sparkle": sfx_sparkle, "ding": sfx_ding, "pop": sfx_pop, "thud": sfx_thud, "hoof": sfx_hoof, "hoof2": sfx_hoof2, "boom": sfx_boom, "cheer": sfx_cheer,
        "creak": sfx_creak, "snore": sfx_snore, "dizzy": sfx_dizzy, "whoosh": sfx_whoosh, "beep3": sfx_beep3,
-       "fanfare": sfx_fanfare, "munch": sfx_munch, "gulp": sfx_gulp, "yawn": sfx_yawn, "tada": sfx_tada, "rumble": sfx_rumble, "blub": sfx_blub, "bong": sfx_bong}
+       "fanfare": sfx_fanfare, "munch": sfx_munch, "gulp": sfx_gulp, "yawn": sfx_yawn, "tada": sfx_tada, "rumble": sfx_rumble, "blub": sfx_blub, "bong": sfx_bong, "rain": sfx_rain, "thunder": sfx_thunder}
 SFX_GAIN = {"wind": 0.45, "collapse": 0.55, "boom": 0.5, "cheer": 0.5, "knock": 0.55, "creak": 0.5, "snore": 0.35,
-            "fanfare": 0.4, "tada": 0.4, "beep3": 0.35, "boing": 0.4, "pop": 0.35, "sparkle": 0.45, "blub": 0.9, "bong": 0.55}
+            "fanfare": 0.4, "tada": 0.4, "beep3": 0.35, "boing": 0.4, "pop": 0.35, "sparkle": 0.45, "blub": 0.9, "bong": 0.55, "rain": 0.5, "thunder": 0.7}
 
 
 @lru_cache(maxsize=None)

@@ -429,7 +429,7 @@ def _oldmac(s):
 # ================================================================================================ the shelf
 SPECS = {"twinkle": TWINKLE, "oldmac": OLDMAC}
 RECIPES = {"twinkle": _twinkle, "oldmac": _oldmac}
-QUEUE = ["twinkle"]                      # the order in which the songs come out (one a day: curriculum.py)
+QUEUE = ["twinkle", "oldmac"]            # the order in which the songs come out (one a day: curriculum.py)
 
 
 def build(key, lang="en"):

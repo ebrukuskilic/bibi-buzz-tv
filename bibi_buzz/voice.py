@@ -12,6 +12,8 @@ import wave
 
 import numpy as np
 
+from . import ktts
+
 SR = 44100
 VOICE = "en-US-AnaNeural"      # child-friendly voice
 RATE = "-8%"                   # a little slower than normal, easier for small children
@@ -313,6 +315,8 @@ def _gen_edge2(todo, cache_dir):
 def _convert2(ffmpeg, cache_dir, item):
     fx = _norm(item)[4]
     src = os.path.join(cache_dir, _tts_key(item) + ".mp3")
+    if not os.path.exists(src):                                          # (a clip of Kokoro, ktts.py, is a wav file)
+        src = os.path.join(cache_dir, _tts_key(item) + ".k.wav")
     base = os.path.join(cache_dir, _key2(item))
     raw = base + ".raw.wav"
     chain = fx_chain(fx)
@@ -339,12 +343,42 @@ def _convert2(ffmpeg, cache_dir, item):
     os.remove(raw)
 
 
+def _edge_equivalent(item):
+    """The Edge item that stands in for an item of a Kokoro voice spec: the voice (and rate, pitch) named after the bars of the spec, else the language's default voice."""
+    text, voice, rate, pitch, fx = _norm(item)
+    _eng, _body, (fv, fr, fp) = ktts.split_spec(voice)
+    return (text, fv or _fallback_voice("tr-" if ktts.language(voice) == "tr" else ""), fr or rate, fp or pitch, fx)
+
+
 def synth_items(items, ffmpeg, cache_dir):
-    """Returns {item: float array (mono, 44.1 kHz)} for every (text, voice, rate, pitch[, fx]) of ONE story video."""
+    """Returns {item: float array (mono, 44.1 kHz)} for every (text, voice, rate, pitch[, fx]) of ONE story video.
+    A voice that is a Kokoro spec ("k:af_heart|en-US-JennyNeural|-6%|+0Hz", ktts.py) is made by Kokoro first; whatever Kokoro cannot make is made by the Edge
+    voice named in the spec, and when Edge fails too, by gTTS."""
     items = sorted({it for it in items if it[0]})
     os.makedirs(cache_dir, exist_ok=True)
     todo = [it for it in items if not os.path.exists(os.path.join(cache_dir, _key2(it) + ".wav"))]
     remap = {}
+    kok = [it for it in todo if ktts.is_spec(_norm(it)[1])]
+    if kok:
+        kset = set(kok)
+        todo = [it for it in todo if it not in kset]
+        try:
+            failed = set(ktts.make(kok, lambda it: os.path.join(cache_dir, _tts_key(it) + ".k.wav"), ffmpeg, log=lambda m: print(m, flush=True)))
+        except BaseException as e:                                       # (nothing of Kokoro may stop a video)
+            print(f"[voice] Kokoro failed ({e!r}); the Edge voices are used", flush=True)
+            failed = set(kok)
+        for it in kok:
+            if it not in failed:
+                try:
+                    _convert2(ffmpeg, cache_dir, it)
+                    continue
+                except Exception as e:
+                    print(f"[voice] a Kokoro clip could not be converted ({e!r}); the Edge voice is used", flush=True)
+            alt = _edge_equivalent(it)
+            remap[it] = alt
+            if not os.path.exists(os.path.join(cache_dir, _key2(alt) + ".wav")):
+                todo.append(alt)
+        todo = list(dict.fromkeys(todo))
     if todo:
         try:
             _gen_edge2(todo, cache_dir)
@@ -355,7 +389,7 @@ def synth_items(items, ffmpeg, cache_dir):
             for it in todo:
                 alt = (it[0], "gtts-tr" if it[1].startswith("tr-") else "gtts-en-us", "", "", _norm(it)[4])
                 remap[it] = alt
-            alt_todo = [a for a in set(remap.values()) if not os.path.exists(os.path.join(cache_dir, _key2(a) + ".wav"))]
+            alt_todo = [a for a in set(remap.values()) if a[1].startswith("gtts-") and not os.path.exists(os.path.join(cache_dir, _key2(a) + ".wav"))]
             try:
                 from gtts import gTTS
                 for a in alt_todo:
@@ -377,4 +411,12 @@ def synth_items(items, ffmpeg, cache_dir):
                     _convert2(ffmpeg, cache_dir, a)
             except Exception as e2:
                 sys.exit(f"[voice] no text-to-speech engine worked ({e2!r}). Check the internet connection.")
-    return {it: _read_wav(os.path.join(cache_dir, _key2(remap.get(it, it)) + ".wav")) for it in items}
+
+    def resolve(it):                                                     # (a Kokoro item -> its Edge stand-in -> its gTTS stand-in)
+        for _ in range(4):
+            if it not in remap:
+                break
+            it = remap[it]
+        return it
+
+    return {it: _read_wav(os.path.join(cache_dir, _key2(resolve(it)) + ".wav")) for it in items}

@@ -1,6 +1,6 @@
 """Kokoro text-to-speech for the narrator and the characters of the fairy tales.
 
-English: Kokoro-82M, Turkish: the Turkish fine-tune of it (empiriolabsai/kokoro-turkish).  Both are open neural voices (Apache 2.0) that run on the CPU of the
+English: Kokoro-82M, Turkish: the Turkish fine-tune of it (empiriolabsai/canora-turkish, called kokoro-turkish until 21 Nov 2026).  Both are open neural voices (Apache 2.0) that run on the CPU of the
 render machine: no account, no paid service; only data (weights and voices) is downloaded, once, from Hugging Face.  They sound much more like people than a plain
 Edge voice that is pushed far up or down in pitch, so the tales ask for them first (voice.py) and fall back to the Edge voice of the same character whenever
 anything at all goes wrong (a library that is not installed, a download that fails, a clip of the wrong length): a video is never lost because of them.
@@ -27,7 +27,9 @@ import numpy as np
 KSR = 24000                                   # the sample rate of both models
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))     # the folder that holds the package bibi_buzz: the worker is started from there
 EN_REPO = "hexgrad/Kokoro-82M"
-TR_REPO = "empiriolabsai/kokoro-turkish"
+TR_REPOS = ("empiriolabsai/canora-turkish", "empiriolabsai/kokoro-turkish")     # (the Turkish model was called kokoro-turkish until 21 Nov 2026, when its page was renamed and its
+TR_WEIGHTS = ("canora-turkish.pth", "kokoro-turkish.pth")                       # weights file with it: the names it has had are tried one after the other, the new one first)
+TR_REPO = TR_REPOS[0]
 _S = {}                                       # what is loaded (the models), and what is known to be broken
 
 
@@ -163,13 +165,34 @@ def _speak_en(text, body, speed):
     return np.concatenate(parts).astype(np.float64)
 
 
+def _tr_fetch():
+    """-> (the repo, the path of its config.json, the path of its weights file) of the Turkish model.  The page of the model was renamed (and its weights file with it)
+    on 21 Nov 2026, so the repos and file names it has had are tried one after the other; a .pth file in the top folder of the repo is tried first (whatever it is called)."""
+    from huggingface_hub import hf_hub_download, list_repo_files
+    last = None
+    for repo in TR_REPOS:
+        names = list(TR_WEIGHTS)
+        try:
+            names = [f for f in list_repo_files(repo) if f.endswith(".pth") and "/" not in f] + names
+        except Exception as e:
+            last = e
+        for n in dict.fromkeys(names):
+            try:
+                weights = hf_hub_download(repo, n)
+                return repo, hf_hub_download(repo, "config.json"), weights
+            except Exception as e:
+                last = e
+    raise RuntimeError("the Turkish model could not be fetched: %r" % (last,))
+
+
 def _tr_model():
     if "tr" not in _S:
-        from huggingface_hub import hf_hub_download
         from kokoro import KModel
         from .g2p_tr import TurkishG2P                                          # (kept in this repository: no code of the model's page is run)
         g2p = TurkishG2P()                                                      # (fails at once when the espeak-ng program is missing)
-        net = KModel(repo_id=TR_REPO, config=hf_hub_download(TR_REPO, "config.json"), model=hf_hub_download(TR_REPO, "kokoro-turkish.pth")).eval()
+        repo, config, weights = _tr_fetch()
+        net = KModel(repo_id=repo, config=config, model=weights).eval()
+        _S["tr-repo"] = repo
         _S["tr"] = (g2p, net, {})
     return _S["tr"]
 
@@ -197,7 +220,7 @@ def _tr_pack(name):
     if name not in cache:
         import torch
         from huggingface_hub import hf_hub_download
-        repo = TR_REPO if name in ("elif", "emre") else EN_REPO
+        repo = _S.get("tr-repo", TR_REPO) if name in ("elif", "emre") else EN_REPO
         cache[name] = torch.load(hf_hub_download(repo, "voices/%s.pt" % name), weights_only=True)
     return cache[name]
 
@@ -406,12 +429,27 @@ KTYPES = {
 }
 
 
+def _pick(entry, off):
+    """The entry of a type is one (voice spec, rate, pitch, effect), or a tuple of up to three of them: (the voice of the type, the voice of a second character of the
+    same type in a tale [a positive offset in tales.CASTING], the voice of a third one [a negative offset]).  Characters of one type that speak in one tale (three pigs,
+    two grannies) are then different VOICES, not one voice a little higher or lower - that is what makes two people sound like two people.
+    -> (the entry, the pitch offset in Hz that is still to be added)."""
+    if isinstance(entry[0], str):
+        return entry, off
+    if off > 0 and len(entry) > 1 and entry[1]:
+        return entry[1], 0
+    if off < 0 and len(entry) > 2 and entry[2]:
+        return entry[2], 0
+    return entry[0], off
+
+
 def cast(typ, lang, edge, off=0):
-    """(voice spec with its Edge stand-in, rate, pitch, effect) of a character type in a language, or None when Kokoro has no voice for it.
-    `edge` is the (voice, rate, pitch, effect) the Edge casting (tales.TYPES) gives the same character, `off` a pitch offset in Hz that tells two characters of one type apart."""
+    """(voice spec with its Edge stand-in, rate, pitch, effect) of a character type in a language, or None when Kokoro has no voice for it (an Edge voice speaks then).
+    `edge` is the (voice, rate, pitch, effect) the Edge casting (tales.TYPES) gives the same character, `off` tells two characters of one type apart: a variant voice of
+    the type when KTYPES has one (see _pick), else a pitch offset in Hz."""
     if typ not in KTYPES:
         return None
-    v, r, p, fx = KTYPES[typ][0 if lang == "en" else 1]
+    (v, r, p, fx), off = _pick(KTYPES[typ][0 if lang == "en" else 1], off)
     if off:
         p = "%+dHz" % (int(p[:-2]) + off)
     return ("%s|%s|%s|%s" % (v, edge[0], edge[1], edge[2]), r, p, fx)

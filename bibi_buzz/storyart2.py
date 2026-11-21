@@ -337,6 +337,73 @@ def near_river(c, w, seed=8):
         tuft(c, x, y, 0.8 + rng.random() * 0.6, rng.choice(["#4FAE35", "#5BBE3E"]))
 
 
+def gorge_x(y, w=1280):
+    """Left and right edge of the gorge on the ground row y: the cliffs lean in toward the water at the bottom."""
+    xl = 350.0 + max(0.0, y - 472.0) * 0.34
+    return xl, w - xl
+
+
+def near_gorge(c, w, seed=11):
+    """Two grassy cliff tops (the left one is dry and bare, the right one is a lush meadow) with a gorge between them: far below, a strip of
+    valley and a stream. A wooden bridge (props.bridge) goes across at the height of the cliff tops, where the goats' feet stand (y = 440)."""
+    rng = random.Random(seed)
+    vgrad(c, [(0, "#79CE5D"), (1, "#6BC54F")], 541, 612)
+    vgrad(c, [(0, "#8FDBFF"), (1, "#3E9BE8")], 612, WH)
+    for _ in range(18):                                                                # little waves
+        y = rng.uniform(624, 714)
+        xl, xr = gorge_x(y, w)
+        x = rng.uniform(xl + 24, xr - 80)
+        c.line([(x + i * 8, y + 3 * math.sin(i * 1.6)) for i in range(7)], "#D5F1FF", 2.4)
+    for lx, ly in ((w * 0.45, 640), (w * 0.56, 696)):                                   # lily pads
+        c.ellipse(lx, ly, 24, 8, fill="#3FAE49")
+        c.poly([(lx, ly), (lx + 24, ly - 3), (lx + 24, ly + 3)], fill="#3E9BE8")
+        c.ellipse(lx - 6, ly - 4, 5, 3, fill="#FF8FB0")
+    for side in (0, 1):
+        sgn = -1 if side == 0 else 1
+        out = -14 if side == 0 else w + 14
+        edge = lambda y, s_=side: gorge_x(y, w)[s_]
+        ys = list(range(472, 734, 12))
+        c.poly([(out, 472), (edge(472), 472)] + [(edge(y), y) for y in ys[1:]] + [(out, 734)], fill="#B98B5E")         # the cliff face
+        for yy in (508, 548, 590, 632, 676):                                                                              # strata
+            c.line([(out, yy), (edge(yy) - sgn * 3, yy + rng.uniform(-3, 3))], "#9C7249", 4.5)
+            c.line([(out, yy + 7), (edge(yy + 7) - sgn * 3, yy + 7 + rng.uniform(-2, 2))], "#CFA277", 2.6)
+        for _ in range(5):
+            yy = rng.uniform(500, 700)
+            xx = (edge(yy) - rng.uniform(40, 220)) if side == 0 else (edge(yy) + rng.uniform(40, 220))
+            rx = rng.uniform(16, 30)
+            c.ellipse(xx, yy, rx, rx * 0.62, fill="#A9A8B4", outline=INK, width=2)
+            c.ellipse(xx - rx * 0.25, yy - rx * 0.2, rx * 0.5, rx * 0.2, fill="#C9C8D4")
+        c.line([(edge(y), y) for y in ys], "#D7AE82", 5)                                                                  # sunlit edge
+        for yy in (640, 668, 698, 724):                                                                                   # foam at the foot of the cliff
+            c.ellipse(edge(yy) - sgn * 6, yy, 16, 4, fill="#FFFFFF")
+        xe = edge(472) + sgn * 8                                                                                          # the cliff top
+        back = [(x, 398 + 9 * math.sin(x / 70.0 + 1.7 * side)) for x in range(int(min(out, xe)), int(max(out, xe)) + 1, 20)]
+        c.poly(back + [(max(out, xe), 478), (min(out, xe), 478)], fill="#6BC84A")
+        c.poly([(min(out, xe), 444), (max(out, xe), 444), (max(out, xe), 478), (min(out, xe), 478)], fill="#85DA58")
+        for x in range(int(min(out, xe)), int(max(out, xe)) + 1, 26):                                                     # grass hanging over the edge
+            c.ellipse(x, 480, 17, 10, fill="#4E9A38")
+            c.ellipse(x, 476, 17, 10, fill="#85DA58")
+    xl_, xr_ = gorge_x(472, w)
+    for _ in range(5):                                                                 # the left side is dry: bare earth, rocks, brown tufts
+        c.ellipse(rng.uniform(10, xl_ - 20), rng.uniform(424, 470), rng.uniform(26, 48), rng.uniform(6, 10), fill="#CDB77C")
+    for _ in range(14):
+        tuft(c, rng.uniform(6, xl_ - 10), rng.uniform(412, 472), 0.8 + rng.random() * 0.4, "#B7B15C")
+    for xx, yy, rx in ((38, 466, 26), (300, 424, 20)):
+        c.ellipse(xx, yy, rx, rx * 0.6, fill="#A9A8B4", outline=INK, width=2)
+        c.ellipse(xx - rx * 0.25, yy - rx * 0.2, rx * 0.5, rx * 0.2, fill="#C9C8D4")
+    round_tree(c, 64, 410, 190, "#A9B552", "#7A5A38")
+    bush(c, 225, 418, 0.7, "#A8B84E")
+    cols = ["#FF6B8B", "#FFD23F", "#FFFFFF", "#B58CFF", "#FF9A3D"]
+    for _ in range(46):                                                                # the right side is lush: flowers, clover, trees
+        flower_dot(c, rng.uniform(xr_ + 10, w - 6), rng.uniform(408, 466), 0.75 + rng.random() * 0.2, rng.choice(cols))
+    for _ in range(22):
+        tuft(c, rng.uniform(xr_ + 6, w - 6), rng.uniform(410, 472), 0.9 + rng.random() * 0.5, rng.choice(["#4FAE35", "#5BBE3E"]))
+    round_tree(c, w - 66, 410, 270, "#3FAE49")
+    round_tree(c, w - 262, 412, 180, "#46B650")
+    bush(c, w - 150, 424, 1.0)
+    mushroom(c, w - 345, 466, 1.0)
+
+
 def far_sunset(c, w):
     vgrad(c, [(0, "#5A6FD0"), (0.45, "#E88FB0"), (1, "#FFD8A0")], 0, 580)
     sun_shape(c, 640, 400, 70, "#FFB347", "#FFD9A0")
@@ -355,6 +422,8 @@ BACKDROPS = {
     "room_night": (lambda c, w: far_room(c, w, night=True), near_room),
     "race": (far_race, near_race),
     "river": (far_meadow, near_river),
+    "meadow_gorge": (far_meadow, near_gorge),
+    "meadow_gorge_dusk": (lambda c, w: far_meadow(c, w, "dusk"), near_gorge),
     "sunset": (far_sunset, lambda c, w: near_meadow(c, w, path=False, trees=False, fence_on=False, flowers=20)),
 }
 

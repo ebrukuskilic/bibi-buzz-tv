@@ -254,12 +254,37 @@ def sfx_thunder():
     return y / (np.max(np.abs(y)) + 1e-9) * 0.85
 
 
+def sfx_cluck():
+    """Bok-bok! two short, nasal hen clucks."""
+    out = np.zeros(int(0.7 * SR))
+    for i, t0 in enumerate((0.0, 0.2, 0.46)):
+        n = int(0.13 * SR)
+        t = np.arange(n) / SR
+        f = 560 - 240 * t / 0.13 + 30 * i
+        ph = 2 * np.pi * np.cumsum(f) / SR
+        y = (np.sin(ph) * 0.6 + np.sign(np.sin(ph)) * 0.18 + np.sin(2 * ph) * 0.2) * np.sin(np.pi * np.clip(t / 0.13, 0, 1)) ** 0.7
+        add(out, t0, y, 0.55 if i < 2 else 0.4)
+    return out
+
+
+def sfx_peep():
+    """Peep-peep: two high little chick chirps."""
+    out = np.zeros(int(0.5 * SR))
+    for t0 in (0.0, 0.17):
+        n = int(0.11 * SR)
+        t = np.arange(n) / SR
+        f = 2300 + 900 * np.sin(np.pi * t / 0.11)
+        y = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.sin(np.pi * np.clip(t / 0.11, 0, 1)) ** 0.5
+        add(out, t0, y, 0.4)
+    return out
+
+
 SFX = {"knock": sfx_knock, "wind": sfx_wind, "collapse": sfx_collapse, "boing": sfx_boing, "splash": sfx_splash,
        "sparkle": sfx_sparkle, "ding": sfx_ding, "pop": sfx_pop, "thud": sfx_thud, "hoof": sfx_hoof, "hoof2": sfx_hoof2, "boom": sfx_boom, "cheer": sfx_cheer,
        "creak": sfx_creak, "snore": sfx_snore, "dizzy": sfx_dizzy, "whoosh": sfx_whoosh, "beep3": sfx_beep3,
-       "fanfare": sfx_fanfare, "munch": sfx_munch, "gulp": sfx_gulp, "yawn": sfx_yawn, "tada": sfx_tada, "rumble": sfx_rumble, "blub": sfx_blub, "bong": sfx_bong, "rain": sfx_rain, "thunder": sfx_thunder}
+       "fanfare": sfx_fanfare, "munch": sfx_munch, "gulp": sfx_gulp, "yawn": sfx_yawn, "tada": sfx_tada, "rumble": sfx_rumble, "blub": sfx_blub, "bong": sfx_bong, "rain": sfx_rain, "thunder": sfx_thunder, "cluck": sfx_cluck, "peep": sfx_peep}
 SFX_GAIN = {"wind": 0.45, "collapse": 0.55, "boom": 0.5, "cheer": 0.5, "knock": 0.55, "creak": 0.5, "snore": 0.35,
-            "fanfare": 0.4, "tada": 0.4, "beep3": 0.35, "boing": 0.4, "pop": 0.35, "sparkle": 0.45, "blub": 0.9, "bong": 0.55, "rain": 0.5, "thunder": 0.7}
+            "fanfare": 0.4, "tada": 0.4, "beep3": 0.35, "boing": 0.4, "pop": 0.35, "sparkle": 0.45, "blub": 0.9, "bong": 0.55, "rain": 0.5, "thunder": 0.7, "cluck": 0.5, "peep": 0.45}
 
 
 @lru_cache(maxsize=None)

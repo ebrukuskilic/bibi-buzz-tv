@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       only:
-        description: "Engines to run: keys separated by commas (e.g. kokoro-tr,kokoro-tr-shift) or all"
+        description: "Engines to run: keys separated by commas (e.g. cast,prod-kokoro,kokoro-tr) or all (cast = the casting sweep of the character voices)"
         default: "all"
       cbx:
         description: "Also try Chatterbox (a big neural voice in its own python 3.11 environment, slow on the CPU): yes or no"
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
-      ONLY: ${{ github.event.inputs.only || 'prod-kokoro,kokoro-tr,kokoro-tr-shift' }}      # (a run started by a push does only the newest engines)
+      ONLY: ${{ github.event.inputs.only || 'cast,prod-kokoro' }}      # (a run started by a push does only the newest jobs: the casting sweep, and the whole tale the way the daily videos make it)
       CBX: ${{ github.event.inputs.cbx || 'no' }}
     steps:
       - uses: actions/checkout@v4

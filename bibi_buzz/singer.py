@@ -26,15 +26,69 @@ def active_range(an):
     return int(idx[0]), int(idx[-1])
 
 
-def split_syllables(an, a, b, n, min_gap=0.075):
-    """Cuts the frames a..b into `n` syllables at the deepest dips of the loudness: [(frame_a, frame_b), ...].
-    Where the voice has fewer dips than syllables, the longest syllable is cut in the middle of its voiced part."""
+def _rms30(x, sr, nfr):
+    """30 ms rms of `x` at the centres of the analysis frames of psola.analyse (one row per P.HOP)."""
+    w = int(0.03 * sr)
+    cs = np.concatenate([[0.0], np.cumsum(np.asarray(x, dtype=np.float64) ** 2)])
+    centers = (np.arange(nfr) * P.HOP * sr).astype(int)
+    lo = np.clip(centers - w // 2, 0, len(x))
+    hi = np.clip(centers + w // 2, 0, len(x))
+    return np.sqrt((cs[hi] - cs[lo]) / np.maximum(hi - lo, 1))
+
+
+def _peaks(sm, vox, a, b):
+    """The local maxima of the loudness `sm` on voiced frames a..b, with their prominence (how far the loudness falls on both sides before it
+    rises above the peak again): [(prominence, frame)], the most prominent first."""
+    out = []
+    for i in range(a + 1, b):
+        if not vox[i] or not (sm[i] >= sm[i - 1] and sm[i] > sm[i + 1]):
+            continue
+        lmin = rmin = sm[i]
+        j = i - 1
+        while j >= a and sm[j] <= sm[i]:
+            lmin = min(lmin, sm[j])
+            j -= 1
+        j = i + 1
+        while j <= b and sm[j] <= sm[i]:
+            rmin = min(rmin, sm[j])
+            j += 1
+        out.append((float(sm[i] - max(lmin, rmin)), i))
+    out.sort(reverse=True)
+    return out
+
+
+def split_syllables(an, a, b, n, min_gap=0.075, env=None):
+    """Cuts the frames a..b into `n` syllables: [(frame_a, frame_b), ...].
+    Every syllable has one vowel (a loud, voiced peak of the loudness): the `n` most prominent peaks are found and the cuts are made at the
+    deepest points of the valleys between them, so that the consonants in front of a vowel go with that vowel (a fricative at the start of a
+    word, like the s of 'seni', is not taken for a syllable of its own).  `env` is the loudness of the pre-emphasised voice (one row per frame):
+    the sonorants l, m, n, r keep the plain loudness as high as a vowel, but they take away the energy above 1 kHz that a vowel has.
+    Where the voice has fewer peaks than syllables, the cuts are made at the deepest dips of the plain loudness, and then the longest piece is
+    cut in the middle of its voiced part."""
     if n <= 1 or b - a < 4:
         return [(a, b)]
     db = _env_db(an)
     sm = np.convolve(db, np.ones(5) / 5.0, mode="same")
     vox = an["voiced"]
     mind = max(2, int(min_gap / P.HOP))
+    chosen = []
+    pk_sm = sm if env is None else np.convolve(20 * np.log10(env + 1e-5), np.ones(5) / 5.0, mode="same")
+    for prom, k in _peaks(pk_sm, vox, a, b):
+        if prom < 1.0:
+            break
+        if all(abs(k - c) >= mind for c in chosen):
+            chosen.append(k)
+        if len(chosen) == n:
+            break
+    if len(chosen) == n:
+        chosen.sort()
+        cuts = []
+        for p, q in zip(chosen, chosen[1:]):
+            seg = pk_sm[p:q + 1]
+            low = np.where(seg <= seg.min() + 0.5)[0]
+            cuts.append(p + int(low[len(low) // 2]))
+        edges = [a] + cuts + [b]
+        return [(edges[i], edges[i + 1]) for i in range(n)]
     cands = []
     for k in range(a + mind, b - mind):
         if sm[k] <= sm[k - 1] and sm[k] < sm[k + 1]:
@@ -65,16 +119,18 @@ def split_syllables(an, a, b, n, min_gap=0.075):
 
 
 def nucleus(an, fa, fb):
-    """(first, last) frame of the held part of a syllable: its loud voiced frames; None when nothing is voiced."""
+    """(first, last) frame of the held part of a syllable: its loud voiced frames (loud = within 10 dB of its loudest voiced frame, so that a
+    noisy consonant does not set the level); None when nothing is voiced."""
     vox, rms = an["voiced"], an["rms"]
     seg = np.arange(fa, fb + 1)
     seg = seg[(seg >= 0) & (seg < len(rms))]
     if not len(seg):
         return None
-    mx = rms[seg].max()
-    good = [int(k) for k in seg if vox[k] and rms[k] >= 0.30 * mx]
-    if not good:
+    vseg = [int(k) for k in seg if vox[k]]
+    if not vseg:
         return None
+    mx = max(rms[k] for k in vseg)
+    good = [k for k in vseg if rms[k] >= 0.30 * mx]
     runs, start, last = [], good[0], good[0]
     for k in good[1:]:
         if k - last > 6:                                                # holes up to 30 ms are bridged
@@ -93,7 +149,8 @@ class Chunk:
         self.an = P.analyse(y, sr)
         self.marks = P.pitch_marks(y, sr, self.an)
         a, b = active_range(self.an)
-        self.frames = split_syllables(self.an, a, b, n)
+        pre = np.append(y[0], y[1:] - 0.97 * y[:-1])
+        self.frames = split_syllables(self.an, a, b, n, env=_rms30(pre, sr, len(self.an["rms"])))
 
     def onset_len(self, i):
         """Samples of the consonants before the vowel of syllable i (natural length, at most LEAD_MAX)."""
@@ -157,11 +214,12 @@ def sing_line(chunks, notes, accents=None, sr=44100):
             limit_end = int(notes[k + 1][0] * sr) - nch.onset_len(ni) - int(0.01 * sr)
         o, sig = sing_syllable(ch, i, int(s * sr), int(e * sr), curve, limit_end)
         w = int(0.03 * sr)
-        if len(sig) > w:                                               # the same level for every syllable
+        if len(sig) > w:                                               # the same level for every syllable: that of its held vowel (not of a burst)
             cs = np.concatenate([[0.0], np.cumsum(sig ** 2)])
-            mxr = float(np.sqrt(np.max((cs[w:] - cs[:-w]) / w)))
-            if mxr > 1e-6:
-                sig = sig * (LEVEL / mxr)
+            env = np.sqrt(np.maximum((cs[w:] - cs[:-w]) / w, 0.0))
+            top = float(env.max())
+            if top > 1e-6:
+                sig = sig * (LEVEL / float(np.median(env[env > 0.35 * top])))
         f = int(0.006 * sr)
         if len(sig) > 4 * f:
             sig[:f] *= np.linspace(0, 1, f)

@@ -91,6 +91,20 @@ def sfx_thud():
     return np.sin(2 * np.pi * 72 * t) * np.exp(-t * 14) * 0.9
 
 
+def sfx_hoof():
+    """One light hoof on a wooden plank (trip ...)."""
+    n = int(0.16 * SR)
+    t = np.arange(n) / SR
+    return np.sin(2 * np.pi * (430 - 130 * t / 0.16) * t) * np.exp(-t * 36) * 0.8 + _noise(n, 7) * np.exp(-t * 160) * 0.3
+
+
+def sfx_hoof2():
+    """... and the other hoof, a little lower (trap)."""
+    n = int(0.17 * SR)
+    t = np.arange(n) / SR
+    return np.sin(2 * np.pi * (340 - 100 * t / 0.17) * t) * np.exp(-t * 34) * 0.85 + _noise(n, 9) * np.exp(-t * 150) * 0.3
+
+
 def sfx_boom():
     dur = 0.9
     t = _t(dur)
@@ -187,7 +201,7 @@ def sfx_tada():
 
 
 SFX = {"knock": sfx_knock, "wind": sfx_wind, "collapse": sfx_collapse, "boing": sfx_boing, "splash": sfx_splash,
-       "sparkle": sfx_sparkle, "ding": sfx_ding, "pop": sfx_pop, "thud": sfx_thud, "boom": sfx_boom, "cheer": sfx_cheer,
+       "sparkle": sfx_sparkle, "ding": sfx_ding, "pop": sfx_pop, "thud": sfx_thud, "hoof": sfx_hoof, "hoof2": sfx_hoof2, "boom": sfx_boom, "cheer": sfx_cheer,
        "creak": sfx_creak, "snore": sfx_snore, "dizzy": sfx_dizzy, "whoosh": sfx_whoosh, "beep3": sfx_beep3,
        "fanfare": sfx_fanfare, "munch": sfx_munch, "gulp": sfx_gulp, "yawn": sfx_yawn, "tada": sfx_tada}
 SFX_GAIN = {"wind": 0.45, "collapse": 0.55, "boom": 0.5, "cheer": 0.5, "knock": 0.55, "creak": 0.5, "snore": 0.35,

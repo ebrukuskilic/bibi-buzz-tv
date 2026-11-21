@@ -1327,9 +1327,211 @@ def stone_soup(lang="en"):
     return t
 
 
+# ================================================================================================ the magic porridge pot
+MP_X, MP_Y, MP_K = 640, 640, 1.15                # the little magic pot stands here (a bit back, so that the girls can stand in front of it)
+MAMA_P = dict(dress="#F08A3C", hair="#2E2A3A")                                 # the little girl's mother
+OLD_P = dict(dress="#9B6BD6", hair="#E4E4EC", granny="#FFD84D")                # the kind old woman of the forest
+MG_GO, MG_STOP = "Cook, little pot, cook!", "Stop, little pot, stop!"          # the magic words
+MP_HOUSES = ((190, "#FFF1D0", "#5FA8D3"), (640, "#EAF4FF", "#D9654F"), (1090, "#FFE9E0", "#7B5EA7"))
+MP_PARTY = [("kid", 300, "the little girl"), ("mama", 470, "Mama"), ("gpa", 830, "Grandpa"), ("gma", 985, "Granny"), ("nei", 1135, "the little neighbor")]      # (the party guests, left to right)
+
+
+def _mp_flood(h, l=None, r=None, at=0.0, dur=1.4):
+    """Acts that let the porridge on the floor rise to height h (and reach to l / r)."""
+    acts = [("set", "fl", "h", h, {"at": at, "dur": dur})]
+    if l is not None:
+        acts.append(("set", "fl", "l", l, {"at": at, "dur": dur}))
+    if r is not None:
+        acts.append(("set", "fl", "r", r, {"at": at, "dur": dur}))
+    return acts
+
+
+def _mp_start(at="92%"):
+    """Acts for the pot when somebody says the magic words 'Cook, little pot, cook!': it glows, rattles and starts to bubble."""
+    return [("set", "pot", "glow", 1.0, {"at": at, "dur": 0.5}), ("set", "pot", "shake", 1.0, {"at": at, "dur": 0.3}), ("sfx", "blub", {"at": at, "gain": 0.8}),
+            ("fx", "sparkle", MP_X, MP_Y - 100, {"at": at, "dur": 2.4, "r": 170})]
+
+
+def magic_porridge_pot(lang="en"):
+    t = Tale("tale-magic-porridge-pot", "The Magic Porridge Pot | Fairy Tale Story for Kids | Bibi Buzz TV",
+             "A little girl and her mama are very hungry. In the forest, a kind old woman gives the girl a magic pot that cooks warm, sweet porridge. But when Mama forgets "
+             "the magic words, the pot will not stop! The porridge fills the house, the street and the whole village. Can the little girl save the day? Watch the classic fairy "
+             "tale about listening carefully and sharing, in a gentle, colorful animated story in simple English for toddlers and preschoolers. Count the houses and the bowls of porridge, too!",
+             TAGS + ["magic porridge pot", "sweet porridge", "the magic pot", "sharing story", "listening story", "counting story", "porridge"],
+             {"nar": NAR, "kid": (ANA, "+2%", "+18Hz"), "mama": (ARIA, "-4%", "-2Hz"), "old": (ARIA, "-14%", "-10Hz"),
+              "gpa": ("en-US-ChristopherNeural", "-10%", "-14Hz"), "gma": (ARIA, "-12%", "-6Hz"), "nei": (ANA, "+10%", "+34Hz")}, lang=lang)
+    t.bubble_tint = {"kid": "#FFE3EE", "mama": "#FFE9D2", "old": "#EBDDFF", "gpa": "#E6DDF7", "gma": "#DFF4DF", "nei": "#DDEEFF"}
+    t.cover = dict(bg="meadow_dusk", title=("MAGIC", "POT"), size=118, gap=116,
+                   props=[("pot", "mpot", 330, 712, 1.95, dict(fill=1.0, over=1.0, glow=1.0))],
+                   actors=[("kid", "girl", 690, 712, 1.3, 1, "cheer", dict(KID)), ("mama", "girl", 850, 712, 1.25, -1, "surprised", dict(MAMA_P)),
+                           ("gpa", "girl", 1000, 712, 1.1, -1, "surprised", dict(OLD_M)), ("gma", "girl", 1130, 712, 1.1, -1, "happy", dict(OLD_W))])
+    _intro(t, ("MAGIC", "POT"), "Today's story is... The Magic Porridge Pot!")
+
+    # ---------------------------------------------------------------- 1 a hungry home
+    s = t.scene("A little house", "room", mood="calm", title="A hungry home")
+    s.prop("tb", "table", 640, 650, 0.85, bowl1=0.0, bowl2=0.0, bowl3=0.0)
+    s.actor("mama", "girl", 400, 652, 0.95, face=1, **MAMA_P)
+    s.actor("kid", "girl", 880, 652, 0.95, face=-1, **KID)
+    s.nar("Once upon a time, a little girl lived with her mother in a tiny house.", ("pose", "mama", "happy", {"at": 0.5}), ("pose", "kid", "happy", {"at": 0.5}),
+          ("pose", "mama", "idle", {"at": "92%"}), ("pose", "kid", "idle", {"at": "92%"}))
+    s.nar("They were very poor, and they had no food at all.", ("pose", "mama", "sad", {"at": 0.3}), ("pose", "kid", "sad", {"at": 0.3}))
+    s.nar("Their tummies went rumble, rumble, rumble!", ("sfx", "rumble", {"at": "38%", "gain": 0.9}), ("sfx", "rumble", {"at": "66%", "gain": 0.9}), tail=0.7)
+    s.say("mama", "Oh dear! We have nothing to eat.", ("pose", "mama", "sad"))
+    s.say("kid", "Do not worry, Mama! I will go and find some food.", ("pose", "kid", "cheer", {"at": "45%"}), ("pose", "kid", "idle", {"at": "95%"}), ("pose", "mama", "happy", {"at": "60%"}))
+    s.nar("So the little girl went off into the big, green forest.", ("walk", "kid", 1500, 652, {"at": 0.3, "speed": 160, "pose": "walk"}), ("pose", "mama", "wave", {"at": 0.6}))
+
+    # ---------------------------------------------------------------- 2 the kind old woman gives her a magic pot
+    s = t.scene("The big, green forest", "forest", mood="calm", title="The kind old woman")
+    s.actor("kid", "girl", -160, 652, 0.95, face=1, **KID)
+    s.actor("old", "girl", 940, 650, 0.95, face=-1, **OLD_P)
+    s.nar("She walked and walked, deep into the forest.", ("walk", "kid", 400, 652, {"fit": True}))
+    s.nar("There, she met a kind old woman.", ("pose", "old", "wave", {"at": 0.3}), ("fx", "sparkle", 940, 420, {"at": 0.4, "dur": 2.0, "r": 150}), ("pose", "old", "idle", {"at": "95%"}))
+    s.say("old", "Hello, little girl! Why do you look so sad?", ("pose", "old", "happy", {"at": "60%"}))
+    s.say("kid", "My mama and I are very hungry, and we have no food.", ("pose", "kid", "sad"))
+    s.say("old", "Do not worry, dear. I have a special gift for you.", ("pose", "old", "happy", {"at": "25%"}), ("hold", "old", "pot", {"at": "68%"}),
+          ("fx", "sparkle", 880, 470, {"at": "68%", "dur": 2.2, "r": 130}), ("sfx", "pop", {"at": "68%"}))
+    s.nar("It was a little black pot, with a golden star.", ("cam", 760, 410, 1.4, {"dur": 1.6}), ("pose", "kid", "surprised", {"at": 0.4}))
+    s.say("old", "It is a magic pot! When you say, Cook, little pot, cook, it makes yummy porridge.", ("pose", "old", "happy"), ("pose", "kid", "happy", {"at": "50%"}))
+    s.say("old", "And when you say, Stop, little pot, stop, it stops.", ("pose", "old", "talk"))
+    s.say("old", "Say it with me! " + MG_GO, ("pose", "old", "cheer", {"at": "50%"}), ("pose", "old", "happy", {"at": "95%"}), ("fx", "sparkle", 880, 470, {"at": "88%", "dur": 2.0, "r": 120}))
+    s.wait(1.9, ("pose", "kid", "cheer", {"at": 0.2}), ("pose", "kid", "happy", {"at": 1.4}))
+    s.say("old", "Now say, " + MG_STOP, ("pose", "old", "cheer", {"at": "50%"}), ("pose", "old", "happy", {"at": "95%"}))
+    s.wait(1.9, ("pose", "kid", "cheer", {"at": 0.2}), ("pose", "kid", "happy", {"at": 1.4}))
+    s.say("kid", "I will never forget the magic words!", ("pose", "kid", "cheer"), ("hop", "kid", {"at": "40%"}))
+    s.say("old", "Wonderful! Now take the pot home to your mama.", ("walk", "kid", 770, 652, {"at": 0.2, "speed": 170}), ("hold", "old", None, {"at": "62%"}),
+          ("hold", "kid", "pot", {"at": "62%"}), ("sfx", "pop", {"at": "62%"}), ("pose", "old", "happy"))
+    s.nar("The girl said thank you, and ran all the way home with her magic pot.", ("cam", 640, 360, 1.0, {"dur": 1.4}), ("walk", "kid", -220, 652, {"at": 0.3, "speed": 330, "pose": "run"}),
+          ("pose", "old", "wave", {"at": 0.5}))
+
+    # ---------------------------------------------------------------- 3 the pot cooks porridge for dinner
+    s = t.scene("Home again", "room", mood="happy", title="Magic porridge")
+    s.prop("pot", "mpot", MP_X, MP_Y, MP_K, show=False, fill=0.0)
+    s.actor("mama", "girl", 380, 652, 0.95, face=1, **MAMA_P)
+    s.actor("kid", "girl", 1500, 652, 0.95, face=-1, hold="pot", **KID)
+    s.nar("The little girl ran home, and showed the pot to her mother.", ("walk", "kid", 900, 652, {"fit": True}), ("pose", "mama", "surprised", {"at": "80%"}))
+    s.say("mama", "A little pot? But what can it do?", ("pose", "mama", "think"))
+    s.say("kid", "Watch, Mama! It is a magic pot!", ("pose", "kid", "happy"), ("hold", "kid", None, {"at": "55%"}), ("show", "pot", {"at": "55%"}),
+          ("fx", "sparkle", MP_X, MP_Y - 90, {"at": "55%", "dur": 2.0, "r": 150}))
+    s.say("kid", MG_GO, ("pose", "kid", "cheer", {"at": "40%"}), *_mp_start(), tail=0.6)
+    s.nar("Bubble, bubble, bubble! The little pot began to cook.", ("set", "pot", "fill", 1.0, {"at": 0.4, "dur": 3.0}), ("sfx", "blub", {"at": 0.3, "gain": 0.8}),
+          ("sfx", "blub", {"at": 1.8, "gain": 0.8}), ("pose", "mama", "surprised", {"at": 0.4}), ("pose", "kid", "happy", {"at": 0.4}), tail=0.5)
+    s.say("mama", "Look! The pot is full of warm, sweet porridge!", ("pose", "mama", "happy"), ("hop", "mama", {"at": "50%"}))
+    s.say("kid", MG_STOP, ("pose", "kid", "happy", {"at": "20%"}), ("set", "pot", "shake", 0.0, {"at": "92%", "dur": 0.3}), ("set", "pot", "glow", 0.0, {"at": "92%", "dur": 0.9}),
+          ("sfx", "ding", {"at": "95%"}))
+    s.nar("And the little pot stopped. Mama and the little girl ate the porridge, and it was so yummy!", ("hold", "mama", "bowl", {"at": 0.3}), ("hold", "kid", "bowl", {"at": 0.3}),
+          ("pose", "mama", "eat", {"at": 0.5}), ("pose", "kid", "eat", {"at": 0.5}), ("sfx", "munch", {"at": "60%", "gain": 0.6}), ("sfx", "munch", {"at": "78%", "gain": 0.6}),
+          ("sfx", "gulp", {"at": "93%", "gain": 0.6}))
+    s.say("mama", "Mmm, mmm, mmm! It is the best porridge in the world!", ("pose", "mama", "eat"), ("pose", "kid", "eat"))
+    s.nar("From that day on, they were never hungry again.", ("pose", "mama", "happy"), ("pose", "kid", "happy"), ("hold", "mama", None, {"at": "70%"}), ("hold", "kid", None, {"at": "70%"}),
+          ("fx", "hearts", "mama", 0, {"at": 0.4, "dur": 3.5}), ("fx", "hearts", "kid", 0, {"at": 0.6, "dur": 3.5}))
+
+    # ---------------------------------------------------------------- 4 Mama forgets the magic words
+    s = t.scene("Home alone", "room", mood="tense", title="Oh no, Mama!")
+    s.prop("pot", "mpot", MP_X, MP_Y, MP_K, fill=0.0)
+    s.prop("fl", "porridge", 640, 700, 1.0, h=0.0, l=600, r=680)
+    s.actor("mama", "girl", 400, 652, 0.95, face=1, **MAMA_P)
+    s.actor("kid", "girl", 880, 652, 0.95, face=-1, **KID)
+    s.nar("One sunny day, the little girl went out to play.", ("pose", "kid", "wave", {"at": 0.3}), ("walk", "kid", 1500, 652, {"at": "45%", "speed": 190, "pose": "walk"}),
+          ("pose", "mama", "wave", {"at": 0.4}))
+    s.nar("Mama stayed at home, and her tummy went rumble, rumble, rumble!", ("pose", "mama", "sad", {"at": 0.3}), ("sfx", "rumble", {"at": "50%", "gain": 0.9}),
+          ("sfx", "rumble", {"at": "78%", "gain": 0.9}))
+    s.say("mama", "I am so hungry! I will make some porridge with the magic pot.", ("walk", "mama", 440, 652, {"at": 0.2, "speed": 100}), ("pose", "mama", "happy", {"at": "20%"}))
+    s.say("mama", MG_GO, ("pose", "mama", "cheer", {"at": "30%"}), *_mp_start(), tail=0.6)
+    s.nar("Bubble, bubble, bubble! The pot filled up with porridge.", ("set", "pot", "fill", 1.0, {"at": 0.4, "dur": 2.4}), ("sfx", "blub", {"at": 0.3, "gain": 0.8}),
+          ("sfx", "blub", {"at": 1.7, "gain": 0.8}), ("pose", "mama", "happy", {"at": 0.4}), tail=0.4)
+    s.say("mama", "That is enough porridge for me. Now, how do I stop it?", ("pose", "mama", "think", {"at": "30%"}), ("set", "pot", "over", 0.35, {"at": 0.2, "dur": 2.4}))
+    s.nar("Oh no! Mama had forgotten the magic words!", ("pose", "mama", "surprised", {"at": 0.3}), ("fx", "mark", "mama", -95, {"at": 0.5, "dur": 3.0, "text": "?"}),
+          ("set", "pot", "over", 0.6, {"at": 0.2, "dur": 2.0}))
+    s.say("mama", "Hush, little pot, hush!", ("pose", "mama", "scared", {"at": "30%"}), ("set", "pot", "over", 0.85, {"at": "50%", "dur": 1.4}), *_mp_flood(0.12, 520, 760, at="55%", dur=1.4))
+    s.say("mama", "Quiet, little pot, quiet!", ("pose", "mama", "scared"), *_mp_flood(0.2, 400, 880, at="55%", dur=1.4), ("sfx", "blub", {"at": "70%", "gain": 0.8}))
+    s.say("mama", "Enough, little pot, enough!", ("pose", "mama", "scared"), ("hop", "mama", {"at": "70%"}), *_mp_flood(0.3, 230, 1050, at="55%", dur=1.4),
+          ("sfx", "blub", {"at": "70%", "gain": 0.8}))
+    s.nar("Do you remember the magic words? Say them out loud to help Mama!", ("pose", "mama", "scared"), *_mp_flood(0.34, 120, 1160, at=0.2, dur=3.0), ("fx", "mark", "mama", -95, {"at": 1.0, "dur": 4.0, "text": "?"}))
+    s.wait(2.4, ("pose", "mama", "scared"), *_mp_flood(0.38, -80, 1360, at=0.0, dur=2.4), ("sfx", "blub", {"at": 0.5, "gain": 0.8}))
+    s.say("mama", "Oh no! The porridge is coming out of the pot!", ("pose", "mama", "scared"), ("hop", "mama", {"at": "50%"}), *_mp_flood(0.42, at="30%", dur=2.0))
+    s.nar("It poured over the floor, and out of the door, and into the street!", ("sfx", "blub", {"at": 0.4, "gain": 0.8}), ("sfx", "whoosh", {"at": "70%", "gain": 0.6}),
+          *_mp_flood(0.46, at=0.2, dur=3.0), tail=0.6)
+
+    # ---------------------------------------------------------------- 5 porridge in the whole village
+    s = t.scene("The village", "meadow", mood="chase", title="Porridge everywhere!")
+    for i, (cx, wall, roof) in enumerate(MP_HOUSES):
+        s.prop("h%d" % i, "cottage", cx, 606, 0.8, wall=wall, roof=roof, door=0.0)
+    s.prop("fl", "porridge", 640, 700, 1.0, h=0.12, l=-80, r=300)
+    s.actor("gpa", "girl", 560, 652, 0.95, face=-1, **OLD_M)
+    s.actor("gma", "girl", 790, 652, 0.95, face=1, **OLD_W)
+    s.actor("nei", "girl", 1000, 652, 0.9, face=-1, **GOLD)
+    s.nar("Porridge poured out of Mama's house, and ran down the street.", ("set", "h0", "door", 1.0, {"at": 0.3, "dur": 0.6}), *_mp_flood(0.26, -80, 520, at=0.6, dur=3.0),
+          ("pose", "gpa", "surprised", {"at": 1.8}), ("pose", "gma", "surprised", {"at": 2.2}))
+    s.nar("Soon, there was porridge all around Mama's house. One house!", ("fx", "mark", 190, 330, {"at": 0.4, "dur": 60.0, "text": "1"}), *_mp_flood(0.34, -80, 640, at=0.4, dur=2.6),
+          ("pose", "nei", "surprised", {"at": 1.0}))
+    s.nar("Then, there was porridge all around the next house. Two houses!", ("fx", "mark", 640, 330, {"at": 0.5, "dur": 60.0, "text": "2"}), *_mp_flood(0.44, -80, 940, at=0.4, dur=2.6),
+          ("pose", "gpa", "scared", {"at": 1.0}), ("pose", "gma", "scared", {"at": 1.4}))
+    s.nar("And then, there was porridge all around the last house. Three houses!", ("fx", "mark", 1090, 330, {"at": 0.6, "dur": 60.0, "text": "3"}), *_mp_flood(0.54, -80, 1360, at=0.4, dur=2.6),
+          ("pose", "nei", "scared", {"at": 1.2}))
+    s.say("gpa", "Goodness gracious! Where is all this porridge coming from?", ("pose", "gpa", "surprised"), ("hop", "gpa", {"at": "30%"}))
+    s.say("gma", "Oh my! The porridge is up to my tummy!", ("pose", "gma", "scared"), *_mp_flood(0.64, at="40%", dur=2.0))
+    s.say("nei", "Yum! It smells so sweet!", ("pose", "nei", "eat"), ("sfx", "munch", {"at": "60%", "gain": 0.5}))
+    s.nar("Porridge in the garden! Porridge on the road! Porridge, porridge, everywhere!", ("pose", "gpa", "scared"), ("pose", "gma", "scared"), ("pose", "nei", "happy"),
+          *_mp_flood(0.7, at=0.4, dur=3.0), ("sfx", "blub", {"at": 0.6, "gain": 0.8}), ("sfx", "blub", {"at": 2.6, "gain": 0.8}))
+    s.say("gpa", "Somebody, please find the little girl!", ("pose", "gpa", "surprised"), ("hop", "gpa", {"at": "50%"}))
+    s.nar("But where was the little girl?", ("fx", "mark", "gpa", -95, {"at": 0.5, "dur": 3.0, "text": "?"}), ("fx", "mark", "gma", -95, {"at": 0.7, "dur": 3.0, "text": "?"}),
+          ("fx", "mark", "nei", -95, {"at": 0.9, "dur": 3.0, "text": "?"}), tail=0.6)
+
+    # ---------------------------------------------------------------- 6 the girl comes home and says the magic words
+    s = t.scene("Stop, little pot!", "room", mood="tense", title="Stop, little pot!")
+    s.prop("pot", "mpot", MP_X, MP_Y, MP_K, fill=1.0, over=1.0, shake=1.0, glow=0.6)
+    s.prop("fl", "porridge", 640, 700, 1.0, h=0.46, l=-80, r=1360)
+    s.actor("mama", "girl", 900, 652, 0.95, face=-1, **MAMA_P)
+    s.actor("kid", "girl", -160, 652, 0.95, face=1, **KID)
+    s.nar("Just then, the little girl came running home.", ("walk", "kid", 380, 652, {"fit": True, "pose": "run"}), ("pose", "mama", "scared"))
+    s.say("kid", "Mama! What happened?", ("pose", "kid", "surprised"))
+    s.say("mama", "I forgot the magic words, and the pot will not stop!", ("pose", "mama", "sad"))
+    s.say("kid", "Do not worry, Mama. I remember the magic words!", ("pose", "kid", "cheer", {"at": "40%"}), ("hop", "kid", {"at": "45%"}))
+    s.nar("Can you say them with her? Let us say them together!", ("pose", "kid", "happy"), ("pose", "mama", "think"))
+    s.say("kid", MG_STOP, ("pose", "kid", "cheer", {"at": "30%"}), ("set", "pot", "shake", 0.0, {"at": "92%", "dur": 0.3}), ("set", "pot", "glow", 0.0, {"at": "92%", "dur": 1.0}),
+          ("set", "pot", "over", 0.0, {"at": "92%", "dur": 1.8}), ("fx", "sparkle", MP_X, MP_Y - 100, {"at": "92%", "dur": 2.4, "r": 190}), ("sfx", "ding", {"at": "95%"}), tail=0.7)
+    s.nar("And the little pot stopped. No more porridge! Hooray!", ("pose", "kid", "cheer", {"at": 0.2}), ("pose", "mama", "cheer", {"at": 0.4}), ("hop", "kid", {"at": 0.8}),
+          ("hop", "mama", {"at": 1.1}), ("fx", "hearts", "kid", 0, {"at": 0.6, "dur": 3.5}), ("fx", "hearts", "mama", 0, {"at": 0.9, "dur": 3.5}))
+    s.say("mama", "Thank you, my clever girl! I will never forget the magic words again.", ("pose", "mama", "happy"), ("pose", "kid", "happy"))
+    s.nar("But what about all that porridge?", ("pose", "mama", "think"), ("pose", "kid", "think"), ("fx", "mark", "kid", -95, {"at": 0.5, "dur": 3.0, "text": "?"}))
+    s.say("kid", "Let us share it with our friends!", ("pose", "kid", "cheer"), ("hop", "kid", {"at": "50%"}), ("pose", "mama", "happy"))
+
+    # ---------------------------------------------------------------- 7 a porridge party for the whole village
+    s = t.scene("Porridge party", "meadow", mood="triumph", title="Porridge party")
+    for i, (cx, wall, roof) in enumerate(MP_HOUSES):
+        s.prop("h%d" % i, "cottage", cx, 606, 0.8, wall=wall, roof=roof, door=1.0 if i == 0 else 0.0, smoke=False)
+    s.prop("fl", "porridge", 640, 700, 1.0, h=0.5, l=-80, r=1360)
+    for gid, gx, _who in MP_PARTY:
+        s.prop("b_" + gid, "veg", gx, 252, 1.0, kind="bowl", rest=1.0, pop=0.0, size=1.0)
+    s.actor("kid", "girl", 300, 652, 0.95, face=1, hold="pot", **KID)
+    s.actor("mama", "girl", 470, 652, 0.95, face=1, **MAMA_P)
+    s.actor("gpa", "girl", 1500, 652, 0.95, face=-1, **OLD_M)
+    s.actor("gma", "girl", 1500, 652, 0.95, face=-1, **OLD_W)
+    s.actor("nei", "girl", 1500, 652, 0.9, face=-1, **GOLD)
+    s.nar("The little girl and her mama called all their neighbors.", ("pose", "kid", "wave", {"at": 0.3}), ("pose", "mama", "wave", {"at": 0.3}),
+          ("walk", "gpa", 830, 652, {"at": 0.6, "speed": 230, "pose": "walk"}), ("walk", "gma", 985, 652, {"at": 0.9, "speed": 230, "pose": "walk"}),
+          ("walk", "nei", 1135, 652, {"at": 1.2, "speed": 230, "pose": "walk"}), tail=0.6)
+    s.say("gpa", "A porridge party? What a wonderful idea!", ("pose", "gpa", "cheer"), ("pose", "gma", "happy"), ("pose", "nei", "happy"))
+    s.say("gma", "I will bring bowls and spoons for everybody!", ("pose", "gma", "cheer", {"at": "30%"}), ("hop", "gma", {"at": "40%"}))
+    s.nar("Everyone ate, and ate, and ate. Yum, yum, yum!", *[("hold", g[0], "bowl", {"at": 0.3}) for g in MP_PARTY], *[("pose", g[0], "eat", {"at": 0.5}) for g in MP_PARTY],
+          *_mp_flood(0.22, at=0.4, dur=3.4), ("sfx", "munch", {"at": "30%", "gain": 0.6}), ("sfx", "munch", {"at": "55%", "gain": 0.6}), ("sfx", "gulp", {"at": "88%", "gain": 0.6}),
+          ("fx", "hearts", "gma", 0, {"at": 0.8, "dur": 3.5}))
+    s.say("nei", "Mmm, mmm, mmm! The porridge is so sweet!", *[("pose", g[0], "eat") for g in MP_PARTY], ("hop", "nei", {"at": "60%"}))
+    s.nar("Soon, all the porridge was gone.", *[("pose", g[0], "happy") for g in MP_PARTY], *_mp_flood(0.0, at=0.2, dur=2.6), ("fx", "sparkle", 640, 560, {"at": 0.6, "dur": 2.6, "r": 300}))
+    s.nar("Let us count the bowls of porridge!", ("fx", "sparkle", 640, 250, {"at": 0.3, "dur": 3.0, "r": 360}))
+    for i, (gid, gx, who) in enumerate(MP_PARTY):
+        s.nar("%s! A bowl for %s." % (["One", "Two", "Three", "Four", "Five"][i], who), ("set", "b_" + gid, "pop", 1.0, {"at": 0.05, "dur": 0.4}),
+              ("fx", "mark", gx, 150, {"at": 0.05, "dur": 60.0, "text": str(i + 1)}), ("pose", gid, "cheer", {"at": 0.1}), ("pose", gid, "happy", {"at": "92%"}), tail=0.3)
+    s.nar("Five bowls of porridge, and five happy friends!", *[("hop", g[0], {"at": "%d%%" % (15 + 12 * j)}) for j, g in enumerate(MP_PARTY)], *[("pose", g[0], "cheer") for g in MP_PARTY],
+          ("fx", "sparkle", 640, 330, {"at": 0.2, "dur": 3.0, "r": 380}), ("fx", "confetti", 0, 0, {"at": 0.4, "dur": 60.0}), tail=0.8)
+
+    _outro(t, "Remember, little ones: always listen carefully, and share with your neighbors.", caption="Listen well, and share!")
+    return t
+
+
 TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_and_hare, "goldilocks": goldilocks,
          "red-riding-hood": red_riding_hood, "gingerbread-man": gingerbread_man, "three-billy-goats": three_billy_goats,
-         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup}
+         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup, "magic-porridge-pot": magic_porridge_pot}
 
 
 def build(key, lang="en"):

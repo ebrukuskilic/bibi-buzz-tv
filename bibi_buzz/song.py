@@ -16,6 +16,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 from . import draw as D
+from . import psola as P
 from . import singer as SG
 from . import songmusic as SM
 from . import story as SY
@@ -26,7 +27,23 @@ from .story import Tale
 
 SR = VO.SR
 ARTICLES = ("a", "an", "the")
+WEAK_EN = {"the", "a", "an", "of", "to", "and", "in", "on", "at", "is", "my", "i", "it", "as", "or", "so", "but"}          # little words that are sung softly
+PREFIX_EN = {"a", "be", "de", "re", "in", "un", "to", "for", "with", "e", "ex", "dis"}                                    # a first syllable that is not stressed (a-bove, be-low)
 SING_VOICE = {"en": ("en-US-AnaNeural", "-10%", "+0Hz"), "tr": ("tr-TR-EmelNeural", "-10%", "+0Hz")}
+# A song is not sung by one voice: a small choir sings it in unison, every singer a real text-to-speech voice of her own that is moved onto the notes (singer.py)
+# and that sings like a person (psola.note_curve_h: a note a few cents off, a scoop into a phrase, vibrato on long notes, a slow drift), a little before or after the
+# beat (dt, jit: seconds), a few cents flat or sharp (cents), and with her own random numbers (seed).  The first singer leads (the words light up on her time); gain is
+# the loudness of a singer, the sum is brought back to the loudness of the leading voice alone.  The pitch settings are the voice's own (native) melody:
+# '+58Hz' = 1.39 times higher.  A singer whose voice is not available is dropped (the others sing on).
+SING_LAYERS = {
+    "en": [dict(v=("en-US-AnaNeural", "-10%", "+0Hz"), gain=1.0, dt=0.0, jit=0.005, cents=0.0, vib=1.0, seed=11),
+           dict(v=("en-GB-MaisieNeural", "-10%", "+0Hz"), gain=0.62, dt=0.012, jit=0.014, cents=8.0, vib=0.9, seed=23),
+           dict(v=("en-US-AvaMultilingualNeural", "-12%", "+58Hz"), gain=0.48, dt=-0.010, jit=0.016, cents=-7.0, vib=1.1, seed=37)],
+    "tr": [dict(v=("tr-TR-EmelNeural", "-10%", "+0Hz"), gain=1.0, dt=0.0, jit=0.005, cents=0.0, vib=1.0, seed=11),
+           dict(v=("tr-TR-EmelNeural", "-10%", "+30Hz"), gain=0.62, dt=0.012, jit=0.014, cents=8.0, vib=0.9, seed=23),
+           dict(v=("tr-TR-EmelNeural", "-10%", "-16Hz"), gain=0.48, dt=-0.010, jit=0.016, cents=-7.0, vib=1.1, seed=37)],
+}
+SING_HUMAN = True                                                            # False: the old flat singer (one voice, nothing random)
 SFX_ALLOWED = ("pop", "ding", "tada", "cheer", "fanfare", "sparkle")       # the picture's sound effects that a song keeps (not the boing of every hop)
 MASTER_RMS = 0.15                                                            # every song is brought to this rms (about -16.5 LUFS, like the lessons and the tales)
 LIMIT_KNEE, LIMIT_CEIL = 0.80, 0.95                                          # above the knee the few loudest peaks are rounded off, never above the ceiling
@@ -324,37 +341,74 @@ class Song(Tale):
         return out
 
     # ---- the voice
-    def _voice(self):
-        return self.spec.get("voice", {}).get(self.lang) or SING_VOICE[self.lang]
+    def _layers(self):
+        """The singers of the choir (SING_LAYERS); a spec can name its own voice (spec['voice'][lang]) or its own choir (spec['layers'][lang])."""
+        ov = self.spec.get("voice", {}).get(self.lang)
+        if ov:
+            return [dict(SING_LAYERS[self.lang][0], v=tuple(ov))]
+        L = self.spec.get("layers", {}).get(self.lang) or SING_LAYERS[self.lang]
+        return list(L) if SING_HUMAN else [dict(L[0], dt=0.0, jit=0.0, cents=0.0)]
 
-    def _item_of(self, chunk):
-        v, r, p = self._voice()
+    def _voice(self):
+        return self._layers()[0]["v"]
+
+    def _item_of(self, chunk, layer=0):
+        v, r, p = self._layers()[layer]["v"]
         return (" ".join(w["speak"] for w in chunk), v, r, p, "")
 
     def voice_items(self):
         out = set()
-        for sec in self.sections:
-            for it in sec["items"]:
-                for ch in it["chunks"]:
-                    out.add(self._item_of(ch))
+        for k in range(len(self._layers())):
+            for sec in self.sections:
+                for it in sec["items"]:
+                    for ch in it["chunks"]:
+                        out.add(self._item_of(ch, k))
         return sorted(out)
 
+    def _stress(self, w, j):
+        """How loud syllable j of the word w is sung, compared with a stressed syllable (1.0): the stressed syllable of a word is the loud one (English: the first,
+        except after a prefix like a-bove; Turkish: the last), the other syllables and the little words (the, a, of ...) are a little softer.  Spelled words
+        (E-I-E-I-O) have no stress."""
+        n = len(w["syl"])
+        if any(s.endswith("-") for s in w["syl"]) or w["speak"].replace(" ", "") != "".join(w["syl"]).replace("-", ""):
+            return 1.0
+        if self.lang == "en":
+            if n == 1:
+                return 0.82 if w["plain"] in WEAK_EN else 1.0
+            first = re.sub(r"\W", "", w["syl"][0]).lower()
+            return 1.0 if j == (1 if (n == 2 and first in PREFIX_EN) else 0) else 0.84
+        return 1.0 if (n == 1 or j == n - 1) else 0.88
+
+    def _sing_layer(self, clips, sec, li, it, k, L, accents, notes):
+        """One singer of the choir sings the line `it` (item li of the section `sec`): -> (signal, t0) like singer.sing_line."""
+        chunks = []
+        for ch in it["chunks"]:
+            item = self._item_of(ch, k)
+            key = (item, n_syllables(ch))
+            if key not in self._chunk_cache:
+                self._chunk_cache[key] = SG.Chunk(clips[item], SR, n_syllables(ch))
+            chunks.append(self._chunk_cache[key])
+        if not SING_HUMAN:
+            return SG.sing_line(chunks, notes, accents, SR)
+        rng = np.random.default_rng(L["seed"] * 1000003 + sec["index"] * 1009 + li)
+        hp = P.human_params(seed=L["seed"] * 7919 + sec["index"] * 131 + li, vib=L.get("vib", 1.0), spread=L.get("spread", 1.0))
+        shifted = []
+        for (s, e, m) in notes:
+            d = L.get("dt", 0.0) + float(rng.normal(0.0, L.get("jit", 0.0)))
+            shifted.append((s + d, e + d, m + L.get("cents", 0.0) / 100.0))
+        return SG.sing_line(chunks, shifted, accents, SR, human=hp)
+
     def _sing_all(self, clips):
-        """The whole voice track (float array, the length of the song) and the span (start, end seconds) of every sung line."""
+        """The whole voice track (float array, the length of the song) and the span (start, end seconds) of every sung line (the leading singer's)."""
         n = int(round(self.total * SR)) + 2 * SR
-        voc = np.zeros(n)
+        layers = self._layers()
+        tracks = [np.zeros(n) for _ in layers]
         spans = {}
         for sec in self.sections:
             if sec.get("mode", "sing") != "sing":
                 continue
             for li, it in enumerate(sec["items"]):
-                chunks, notes, accents = [], [], []
-                for ch in it["chunks"]:
-                    item = self._item_of(ch)
-                    key = (item, n_syllables(ch))
-                    if key not in self._chunk_cache:
-                        self._chunk_cache[key] = SG.Chunk(clips[item], SR, n_syllables(ch))
-                    chunks.append(self._chunk_cache[key])
+                accents, notes = [], []
                 t = it["t0"]
                 for m, d in it["notes"]:
                     if m is not None:
@@ -362,12 +416,37 @@ class Song(Tale):
                         accents.append(1.0 if abs(pos) < 1e-6 else 0.9)
                         notes.append((t, t + d * self.beat, m + self.shift))
                     t += d * self.beat
-                out, t0 = SG.sing_line(chunks, notes, accents, SR)
-                i0 = int(round(t0 * SR))
-                if i0 < 0:
-                    out, i0 = out[-i0:], 0
-                voc[i0:i0 + len(out)] += out[:max(0, n - i0)]
-                spans[(sec["index"], li)] = (i0 / SR, (i0 + len(out)) / SR)
+                if SING_HUMAN:                                               # (the stress of the words: the loud syllables are the ones a person sings louder)
+                    for idx, (w, j, _a, _b) in enumerate(self.syllable_spans(sec, it)):
+                        accents[idx] *= self._stress(w, j)
+                for k, L in enumerate(layers):
+                    try:
+                        out, t0 = self._sing_layer(clips, sec, li, it, k, L, accents, notes)
+                    except Exception as e:                                   # (a second or third singer that does not work is left out; the leader must)
+                        if k == 0:
+                            raise
+                        print("[song] singer %d (%s) left out of %s line %d: %r" % (k, L["v"][0], sec["name"], li, e), flush=True)
+                        continue
+                    i0 = int(round(t0 * SR))
+                    if i0 < 0:
+                        out, i0 = out[-i0:], 0
+                    tracks[k][i0:i0 + len(out)] += out[:max(0, n - i0)]
+                    if k == 0:
+                        spans[(sec["index"], li)] = (i0 / SR, (i0 + len(out)) / SR)
+        voc = tracks[0]
+        if len(layers) > 1:
+            mix = sum(L["gain"] * tr for L, tr in zip(layers, tracks))
+            r0, r1 = float(np.sqrt(np.mean(voc ** 2))), float(np.sqrt(np.mean(mix ** 2)))
+            voc = mix * (r0 / r1) if r1 > 1e-9 else voc
+        if SING_HUMAN:                                                       # a breath before a line that comes after a pause
+            rng = np.random.default_rng(5)
+            for (si, li), (a, b) in sorted(spans.items()):
+                a0 = int(a * SR)
+                if a0 > int(0.45 * SR) and float(np.max(np.abs(voc[max(0, a0 - int(0.9 * SR)):a0]))) < 1e-3:
+                    br = SG.breath(SR, rng)
+                    st = a0 - int(0.04 * SR) - len(br)
+                    if st >= 0:
+                        voc[st:st + len(br)] += br
         return voc, spans
 
     def _ensure(self, clips):

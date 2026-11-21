@@ -28,6 +28,19 @@ SR = VO.SR
 ARTICLES = ("a", "an", "the")
 SING_VOICE = {"en": ("en-US-AnaNeural", "-10%", "+0Hz"), "tr": ("tr-TR-EmelNeural", "-10%", "+0Hz")}
 SFX_ALLOWED = ("pop", "ding", "tada", "cheer", "fanfare", "sparkle")       # the picture's sound effects that a song keeps (not the boing of every hop)
+MASTER_RMS = 0.15                                                            # every song is brought to this rms (about -16.5 LUFS, like the lessons and the tales)
+LIMIT_KNEE, LIMIT_CEIL = 0.80, 0.95                                          # above the knee the few loudest peaks are rounded off, never above the ceiling
+
+
+def soft_limit(x, knee=LIMIT_KNEE, ceil=LIMIT_CEIL):
+    """Rounds off the peaks above `knee` smoothly (tanh), so that nothing exceeds `ceil` and the part below the knee stays as it is."""
+    a = np.abs(x)
+    over = a > knee
+    if not over.any():
+        return x
+    y = np.array(x, dtype=np.float64)
+    y[over] = np.sign(y[over]) * (knee + (ceil - knee) * np.tanh((a[over] - knee) / (ceil - knee)))
+    return y
 
 
 # ================================================================================================ the words of a line
@@ -424,8 +437,8 @@ class Song(Tale):
         out = music * duck * 0.62 + sfx[:n] * 0.6 + voc
         fade = int(1.2 * SR)
         out[-fade:] *= np.linspace(1, 0, fade)
-        pk = float(np.max(np.abs(out))) or 1.0
-        out *= 0.92 / pk
+        rms = float(np.sqrt(np.mean(out ** 2))) or 1.0                  # the same loudness for every song: a single high peak does not set it
+        out = soft_limit(out * (MASTER_RMS / rms))
         self.mix_stats = dict(voice_rms=float(np.sqrt(np.mean(voc ** 2))), music_rms=float(np.sqrt(np.mean((music * duck * 0.62) ** 2))))
         return out.astype(np.float32)
 

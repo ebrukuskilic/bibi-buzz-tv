@@ -306,13 +306,17 @@ def _voices_table(a, ffmpeg, rows, base):
 
 def test_voices(a, ffmpeg):
     """Every character type of tales.TYPES says a line with its voice and effect; a table of the pitch and loudness and one mp3 to listen to."""
+    from bibi_buzz import ktts as KT
     i = 0 if a.lang == "en" else 1
-    nar = tuple(TL.TYPES["nar"][i])
+    kokoro = KT.enabled(a.lang)                                                # BIBI_KOKORO asks for the Kokoro voices (bibi_buzz/ktts.py) and they are installed: the casting of the daily videos
+    pick = lambda typ, spec: (KT.cast(typ, a.lang, tuple(spec), 0) if kokoro else None) or tuple(spec)
+    nar = pick("nar", TL.TYPES["nar"][i])
     rows = []
     for typ, spec in TL.TYPES.items():
         if typ in VOICE_LINES:
-            v, r, p, fx = spec[i]
+            v, r, p, fx = pick(typ, spec[i])
             rows.append((typ, VOICE_NAMES[typ][i], (VOICE_LINES[typ][i], v, r, p, fx), (VOICE_NAMES[typ][i],) + nar))
+    print("voices of the %s casting" % ("Kokoro" if kokoro else "Edge"), flush=True)
     _voices_table(a, ffmpeg, rows, os.path.join(a.out, "voices-" + a.lang))
 
 

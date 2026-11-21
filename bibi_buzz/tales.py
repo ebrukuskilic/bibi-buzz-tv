@@ -1224,7 +1224,7 @@ def _ss_visit(s, g, steam=True):
     s.say(gid, g["give"], ("pose", gid, "cheer", {"at": "55%"}), tail=0.2)
     s.nar(g["plop"], ("set", "v_" + gid, "u", 1.0, {"at": 0.0, "dur": 0.6}), ("set", "pot", g["veg"], 1.0, {"at": 0.52, "dur": 0.3}),
           ("sfx", "splash", {"at": 0.55, "gain": 0.5}), ("pose", gid, "happy", {"at": 1.0}), ("pose", "fox", "happy", {"at": 0.5}),
-          ("fx", "sparkle", SS_MOUTH[0], SS_MOUTH[1] - 20, {"at": 0.55, "dur": 2.0, "r": 120}), tail=0.3)
+          ("fx", "sparkle", SS_MOUTH[0], SS_MOUTH[1] - 20, {"at": 0.55, "dur": 2.0, "r": 120}), lead=0.5, tail=0.3)       # (the vegetable lands as "Plop!" begins)
     s.say("fox", g["taste"], ("pose", "fox", "eat"), ("set", "pot", "cook", g["cook"], {"at": 0.0, "dur": 1.4}), ("sfx", "gulp", {"at": "70%", "gain": 0.6}),
           ("pose", "fox", "happy", {"at": "80%"}), ("walk", gid, 1500, 650, {"at": 0.4, "speed": 200, "pose": "walk"}), tail=0.3)
 

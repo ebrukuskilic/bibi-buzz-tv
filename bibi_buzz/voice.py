@@ -58,6 +58,22 @@ def trim(y):
     return y
 
 
+def room(y, wet=0.10, rt=0.55, seed=11):
+    """A little room around a voice (FFT convolution with a decaying noise tail): the voice of something big, or something magic, sounds as if
+    it stood in a hall.  Much softer and more natural than an echo; `wet` is the loudness of the tail compared with the voice."""
+    pad = int(rt * 1.2 * SR)
+    t = np.arange(pad) / SR
+    ir = np.random.default_rng(seed).standard_normal(pad) * np.exp(-t * 6.9 / rt)
+    on = int(0.015 * SR)
+    ir[:on] *= np.linspace(0, 1, on)
+    ir /= np.sqrt(np.sum(ir ** 2))
+    L = len(y) + pad
+    nfft = 1 << (L - 1).bit_length()
+    w = np.fft.irfft(np.fft.rfft(y, nfft) * np.fft.rfft(ir, nfft), nfft)[:L]
+    yy = np.concatenate([y, np.zeros(pad)])
+    return yy + wet * w * (float(np.max(np.abs(y))) / (float(np.max(np.abs(w))) + 1e-9))
+
+
 def _gen_edge(todo, cache_dir, voice):
     import edge_tts
 
@@ -147,6 +163,10 @@ def synth_all(texts, ffmpeg, cache_dir, voice=VOICE):
 #   vib@5,0.45     wobble: speed in Hz, depth 0..1                          trem@50,0.12   growl: speed in Hz, depth 0..1
 #   bass@3 treb@2  boost (dB) of the low / high end                         nasal@6   boost (dB) around 1.2 kHz (a snout)
 #   lp@5500 hp@120 low-pass / high-pass filter (Hz)                         hall / echo@0.4 / chorus   room, big echo, shimmer
+#   room@0.1,0.55  a soft natural room around the voice: loudness of the tail, length of the tail in seconds
+# The natural voices of the tales (tales.TYPES) hardly use any effect: the text-to-speech voice itself is chosen, and its own pitch and speed
+# (the "+30Hz" / "-12%" of a TYPE) are moved a little.  A "+X Hz" of the pitch setting is a factor of 1 + X / 150 on the whole melody of the voice
+# (+45Hz = 30 % higher, -30Hz = 20 % lower), so the voice stays alive, which a resampled voice (p@) does not.
 FX_PRESETS = {
     "boy": "p@0.82",                       # (on the child voice Ana: a bit lower than the girl)
     "tiny": "p@1.32",
@@ -191,6 +211,8 @@ def fx_parse(spec, _depth=0):
             _merge(out, fx_parse(FX_PRESETS[tok], _depth + 1))
         elif tok in ("hall", "chorus"):
             out[tok] = [1.0]
+        elif tok == "room":
+            out[tok] = [0.10, 0.55]
         else:
             raise ValueError("unknown voice effect %r" % (tok,))
     return out
@@ -303,6 +325,9 @@ def _convert2(ffmpeg, cache_dir, item):
     else:
         subprocess.run(plain, check=True)
     y = trim(_read_wav(raw))
+    rm = fx_parse(fx).get("room")
+    if rm and len(y):
+        y = trim(room(y, rm[0], rm[1]))                                  # (the tail may be long: trim() cuts the silence again)
     peak = float(np.max(np.abs(y))) if len(y) else 1.0
     if peak > 1e-4:
         gain = 0.9 / peak

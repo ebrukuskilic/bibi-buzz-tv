@@ -2026,11 +2026,6 @@ GIFT_LINES = ["One! A tiny red coat.", "Two! Tiny blue trousers.", "Three! A tin
 ELF_MOUNT = [(760, BT - 14), (950, BT - 14)]                 # the two elves stand here while they work
 
 
-def _wardrobe_hide(s):
-    """The wardrobe the shoemaker and his wife hide behind: he peeks out on the left, she on the right."""
-    s.prop("ward", "wardrobe", 300, 650, 0.95)
-
-
 def elves_shoemaker(lang="en"):
     t = Tale("tale-elves-shoemaker", "The Elves and the Shoemaker | Fairy Tale Story for Kids | Bibi Buzz TV",
              "A kind old shoemaker and his wife are so poor that they have only one piece of leather left. But every morning, a beautiful pair of shoes is waiting on the bench... "
@@ -2056,7 +2051,7 @@ def elves_shoemaker(lang="en"):
           ("fx", "sparkle", "shoe", 0, {"at": 0.5, "dur": 3.0, "r": 150}))
     s.nar("They were very poor. They had only one little piece of leather left.", ("pose", "shoe", "sad", {"at": 0.4}), ("pose", "wife", "sad", {"at": 0.4}),
           ("fx", "sparkle", BL_X, 490, {"at": 2.6, "dur": 2.0, "r": 90}))
-    s.nar("It was just enough to make ONE pair of shoes.", ("fx", "mark", BL_X, 430, {"at": 1.6, "dur": 60.0, "text": "1", "color": MARK4[0]}), ("sfx", "pop", {"at": 1.6}),
+    s.nar("It was just enough to make ONE pair of shoes.", ("fx", "mark", BL_X, 430, {"at": 1.6, "dur": 2.6, "text": "1", "color": MARK4[0]}), ("sfx", "pop", {"at": 1.6}),
           ("pose", "shoe", "think", {"at": 0.4}))
     s.say("shoe", "I will cut out the shoes tonight. Tomorrow, I will sew them.", ("pose", "shoe", "talk"), ("walk", "shoe", 560, 676, {"at": 0.2, "dur": 1.0}), ("pose", "wife", "idle"))
     s.nar("So he cut the leather, and he left it on the bench. Then the shoemaker and his wife went to bed.", ("pose", "shoe", "plant", {"at": 0.2}), ("sfx", "knock", {"at": 0.5, "gain": 0.5}),

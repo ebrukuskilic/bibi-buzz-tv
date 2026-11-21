@@ -12,9 +12,11 @@ and, after a bar, the Edge voice (with its own rate and pitch) that takes over w
 The rate "-6%" of an item is a speed of 0.94; the pitch "+20Hz" is a pitch factor of 1 + 20 / 150 (the way the tales have always said it), made afterwards by
 ffmpeg's rubberband with the formants moving along (a smaller or a bigger person), not by Kokoro itself.
 """
+import json
 import os
 import re
 import subprocess
+import sys
 import tempfile
 import time
 import wave
@@ -22,6 +24,7 @@ import wave
 import numpy as np
 
 KSR = 24000                                   # the sample rate of both models
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))     # the folder that holds the package bibi_buzz: the worker is started from there
 EN_REPO = "hexgrad/Kokoro-82M"
 TR_REPO = "empiriolabsai/kokoro-turkish"
 _S = {}                                       # what is loaded (the models), and what is known to be broken
@@ -115,22 +118,26 @@ def read_wav(path):
         return data, w.getframerate()
 
 
-def pitch_shift(y, factor, ffmpeg="ffmpeg", sr=KSR):
-    """The pitch x factor, the formants move along (a smaller / a bigger person).  rubberband when this ffmpeg has it, else resampling."""
-    if abs(factor - 1.0) < 0.01:
+def shift_voice(y, factor):
+    """The voice of a smaller (factor > 1) or a bigger (factor < 1) person: the clip is played `factor` times faster (band-limited resampling), so the pitch AND the
+    formants move together, as they do between a child and a grown-up; there is none of the phase-vocoder noise of a pitch shifter, which made the voices
+    sound processed (in the first test the pitch shifter cost a character voice most of its naturalness).  speak() makes the clip `factor` times slower first,
+    so that its length stays the length that was asked for."""
+    if abs(factor - 1.0) < 0.01 or len(y) < 16:
         return y
-    with tempfile.TemporaryDirectory() as d:
-        src, dst = os.path.join(d, "in.wav"), os.path.join(d, "out.wav")
-        write_wav(src, y, sr)
-        tries = ["rubberband=pitch=%.4f:formant=shifted:pitchq=quality" % factor,
-                 "asetrate=%d,aresample=%d,atempo=%.5f" % (round(sr * factor), sr, 1.0 / factor)]
-        for chain in tries:
-            r = subprocess.run([ffmpeg, "-y", "-loglevel", "error", "-i", src, "-af", chain, "-ar", str(sr), "-ac", "1", dst], capture_output=True, text=True)
-            if r.returncode == 0 and os.path.exists(dst):
-                z, _ = read_wav(dst)
-                if len(z) > 0:
-                    return z
-        raise RuntimeError("the pitch of a clip could not be changed: " + r.stderr.strip()[:200])
+    pad = int(0.05 * KSR)
+    z = np.concatenate([np.zeros(pad), np.asarray(y, dtype=np.float64), np.zeros(pad)])
+    n, m = len(z), int(round(len(z) / factor))
+    X = np.fft.rfft(z)
+    k = min(len(X), m // 2 + 1)
+    Y = np.zeros(m // 2 + 1, dtype=np.complex128)
+    Y[:k] = X[:k]
+    if factor > 1.0:                                                     # (the part of the sound that no longer fits is cut off gently: no ringing)
+        w = max(8, int(0.04 * k))
+        Y[k - w:k] *= 0.5 * (1.0 + np.cos(np.linspace(0.0, np.pi, w)))
+    out = np.fft.irfft(Y, m) * (m / float(n))
+    cut = int(round(pad / factor))
+    return out[cut:len(out) - cut]
 
 
 # ------------------------------------------------------------------------------------------------------------------------ the models
@@ -208,40 +215,127 @@ def _speak_tr(text, blend, speed):
 
 
 def speak(text, voice, rate, pitch, ffmpeg="ffmpeg"):
-    """The clip (float array, 24 kHz) of a text in a voice spec; raises when it cannot be made or does not look like speech."""
+    """The clip (float array, 24 kHz) of a text in a voice spec; raises when it cannot be made or does not look like speech.
+    A pitch other than +0Hz makes a smaller or a bigger person (shift_voice): Kokoro speaks `factor` times slower, the clip is then played `factor` times faster."""
     eng, body, _fb = split_spec(voice)
     if eng not in ("k", "kt"):
         raise ValueError("not a Kokoro voice: %r" % (voice,))
     _loaded(eng)
-    speed = speed_of(rate)
+    f = pitch_factor(pitch)
+    if abs(f - 1.0) < 0.01:
+        f = 1.0
+    speed = min(2.0, max(0.5, speed_of(rate) / f))
     y = _speak_en(text, body, speed) if eng == "k" else _speak_tr(text, blend_of(body), speed)
     if not np.all(np.isfinite(y)) or len(y) < 0.2 * KSR or float(np.max(np.abs(y))) < 1e-3:
         raise RuntimeError("the clip is empty or broken")
+    y = shift_voice(y, f)
     secs, n = len(y) / float(KSR), len(text.strip())
     if not (0.03 * n <= secs <= max(0.30 * n, 2.5)):                             # people say 6 to 25 characters a second; a clip far outside is a failure of the model
         raise RuntimeError("the clip has the wrong length: %.1f s for %d characters" % (secs, n))
-    f = pitch_factor(pitch)
-    return pitch_shift(y, f, ffmpeg) if abs(f - 1.0) >= 0.01 else y
+    return y
+
+
+def _work(rows, ffmpeg, log, progress=None):
+    """rows: [(text, voice spec, rate, pitch, path)].  Writes the 24 kHz clip of every row to its path (a half-written file is never left behind) and
+    returns the rows that could not be made.  `progress` is a file that always holds the number of the row in work, so that whoever started a worker that
+    died or hung knows which row did it."""
+    failed = []
+    t0 = time.time()
+    seconds = 0.0
+    for i, row in enumerate(rows):
+        text, voice, rate, pitch, path = row
+        if progress:
+            with open(progress, "w") as f:
+                f.write(str(i))
+        try:
+            y = speak(text, voice, rate, pitch, ffmpeg)
+            write_wav(path + ".part", y, KSR)
+            os.replace(path + ".part", path)
+            seconds += len(y) / float(KSR)
+        except Exception as e:
+            log("[ktts] %s failed for %r: %s" % (voice, text[:50], repr(e)[:200]))
+            failed.append(row)
+    log("[ktts] %d of %d clips made (%.0f s of speech in %.0f s of work)" % (len(rows) - len(failed), len(rows), seconds, time.time() - t0))
+    return failed
+
+
+def _made(path):
+    return os.path.exists(path) and os.path.getsize(path) > 1000
 
 
 def make(items, path_of, ffmpeg="ffmpeg", log=print):
     """Writes the 24 kHz clip of every item (text, voice spec, rate, pitch, ...) to path_of(item).  Returns the items that could NOT be made:
-    the caller takes the Edge voice of the spec for those."""
-    failed = []
-    t0 = time.time()
-    seconds = 0.0
+    the caller takes the Edge voice of the spec for those.
+    The neural models run in a SEPARATE python process (a worker: `python -m bibi_buzz.ktts job.json`), so that whatever can go wrong in them (a crash, an
+    out-of-memory kill, a hang, torch's threads next to the frame-drawing processes of the video) can never stop the video: a worker that does not finish in
+    time is stopped, and one that dies is started once more for what is still missing.  BIBI_KOKORO_INPROC=1 does the work in this process (tests)."""
+    items = list(items)
+    rows = {}                                                           # one clip per file: the effect of an item does not change the clip
     for it in items:
-        text, voice, rate, pitch = it[0], it[1], it[2], it[3]
-        try:
-            y = speak(text, voice, rate, pitch, ffmpeg)
-            write_wav(path_of(it), y, KSR)
-            seconds += len(y) / float(KSR)
-        except Exception as e:
-            log("[ktts] %s failed for %r: %s" % (voice, text[:50], repr(e)[:200]))
-            failed.append(it)
-    done = len(items) - len(failed)
-    log("[ktts] %d of %d clips made (%.0f s of speech in %.0f s of work); %d will use the Edge voice" % (done, len(items), seconds, time.time() - t0, len(failed)))
+        rows.setdefault(path_of(it), (it[0], it[1], it[2], it[3], path_of(it)))
+    t0 = time.time()
+    if os.environ.get("BIBI_KOKORO_INPROC"):
+        _work(list(rows.values()), ffmpeg, log)
+    else:
+        skip = set()                                                     # the rows that killed or hung a worker: not tried again
+        stuck = 0
+        for attempt in range(4):
+            todo = [r for r in rows.values() if not _made(r[4]) and r[4] not in skip]
+            if not todo:
+                break
+            if stuck >= 2:                                               # two workers in a row that made nothing: the models do not run here
+                log("[ktts] two Kokoro workers in a row made no clip; the Edge voice is used for the rest")
+                break
+            chars = sum(len(r[0]) for r in todo)
+            budget = int(os.environ.get("BIBI_KOKORO_BUDGET") or min(5400, 600 + 0.25 * chars))        # seconds: a clip of speech is made in far less than the 12 characters a second it holds
+            clean = False
+            with tempfile.TemporaryDirectory() as d:
+                job = os.path.join(d, "job.json")
+                with open(job, "w", encoding="utf-8") as f:
+                    json.dump({"ffmpeg": ffmpeg, "rows": todo}, f)
+                try:
+                    r = subprocess.run([sys.executable, "-m", "bibi_buzz.ktts", job], cwd=ROOT, timeout=budget, stdin=subprocess.DEVNULL,
+                                       stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors="replace")
+                    out = r.stdout or ""
+                    clean = r.returncode == 0
+                except subprocess.TimeoutExpired as e:
+                    out = e.stdout if isinstance(e.stdout, str) else (e.stdout or b"").decode("utf-8", "replace")
+                    log("[ktts] the Kokoro worker did not finish in %d s and was stopped" % budget)
+                except Exception as e:
+                    out = ""
+                    log("[ktts] the Kokoro worker could not be started: %r" % (e,))
+                lines = [ln for ln in out.splitlines() if ln.strip()]
+                for ln in lines:
+                    if ln.startswith("[ktts]"):
+                        log(ln)
+                if not clean:
+                    if lines:
+                        log("[ktts] the Kokoro worker ended badly; the last of its output: " + " | ".join(ln.strip()[-160:] for ln in lines[-6:]))
+                    try:
+                        with open(job + ".at") as f:
+                            bad = todo[int(f.read().strip())]
+                        skip.add(bad[4])
+                        log("[ktts] the row that was in work: %r" % (bad[0][:60],))
+                    except Exception:
+                        skip.update(r[4] for r in todo[:1])              # (nothing known: the first row it had)
+            if clean:
+                break                                                    # (a clean worker that left clips out had a reason for each: no second try)
+            stuck = stuck + 1 if not any(_made(r[4]) for r in todo) else 0
+    failed = [it for it in items if not _made(path_of(it))]
+    made = len(rows) - len({path_of(it) for it in failed})
+    log("[ktts] %d of %d clips made in %.0f s; %d item(s) will use the Edge voice" % (made, len(rows), time.time() - t0, len(failed)))
     return failed
+
+
+def _main(argv):
+    """The worker: python -m bibi_buzz.ktts job.json  (job: {"ffmpeg": ..., "rows": [[text, voice, rate, pitch, path], ...]})"""
+    if len(argv) != 1:
+        print("usage: python -m bibi_buzz.ktts job.json")
+        return 2
+    with open(argv[0], encoding="utf-8") as f:
+        job = json.load(f)
+    _work([tuple(r) for r in job["rows"]], job.get("ffmpeg", "ffmpeg"), lambda m: print(m, flush=True), progress=argv[0] + ".at")
+    return 0
 
 
 # ------------------------------------------------------------------------------------------------------------------------ the characters
@@ -303,3 +397,7 @@ def cast(typ, lang, edge, off=0):
     if off:
         p = "%+dHz" % (int(p[:-2]) + off)
     return ("%s|%s|%s|%s" % (v, edge[0], edge[1], edge[2]), r, p, fx)
+
+
+if __name__ == "__main__":
+    sys.exit(_main(sys.argv[1:]))

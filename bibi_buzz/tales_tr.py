@@ -594,7 +594,7 @@ TR = {
     "Soon, the fox came to a little village.": "Çok geçmeden tilki küçük bir köye gelmiş.",
     "In the middle of the village, there was a big, empty pot.": "Köyün ortasında kocaman, boş bir tencere varmış.",
     "Hello, everybody! I am going to make stone soup!": "Merhaba herkese! Ben taş çorbası pişireceğim!",
-    "First, he filled the pot with water. Splash!": "Önce tencereyi suyla doldurmuş. Şapır!",
+    "First, he filled the pot with water. Splash!": "Önce tencereyi suyla doldurmuş. Şlap!",
     "Then he popped in the stone. Plop!": "Sonra taşı içine atmış. Pıt!",
     "Now the fox stirred, and stirred, and stirred.": "Şimdi tilki karıştırmış, karıştırmış, karıştırmış.",
     "Mmm, stone soup! It will be good. But a little help would make it even better.": "Mmm, taş çorbası! Güzel olacak. Ama biraz yardım olursa daha da güzel olur.",

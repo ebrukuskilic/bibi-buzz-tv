@@ -181,38 +181,51 @@ def near_meadow(c, w, seed=2, path=True, flowers=40, trees=True, fence_on=True):
         tuft(c, rng.uniform(0, w), rng.uniform(530, 710), 0.8 + rng.random() * 0.6, rng.choice(["#4FAE35", "#5BBE3E"]))
 
 
-def far_forest(c, w, seed=3):
+def far_forest(c, w, seed=3, dusk=False):
+    """dusk = a dark, bluish forest at twilight (with a few fireflies), for the scary parts of a tale."""
     rng = random.Random(seed)
-    vgrad(c, [(0, "#8CD3C7"), (0.6, "#C6EBD4"), (1, "#F0FAE4")], 0, 560)
-    for i in range(7):                                                                 # light rays
-        x = 100 + i * (w / 7)
-        c.poly([(x, 0), (x + 50, 0), (x + 190, 560), (x + 60, 560)], fill=mix("#C6EBD4", "#FFFFFF", 0.45))
+    if dusk:
+        vgrad(c, [(0, "#1F3550"), (0.6, "#3A6070"), (1, "#5C8C84")], 0, 560)
+        for i in range(7):
+            x = 100 + i * (w / 7)
+            c.poly([(x, 0), (x + 50, 0), (x + 190, 560), (x + 60, 560)], fill=mix("#3A6070", "#9EC4C8", 0.18))
+    else:
+        vgrad(c, [(0, "#8CD3C7"), (0.6, "#C6EBD4"), (1, "#F0FAE4")], 0, 560)
+        for i in range(7):                                                             # light rays
+            x = 100 + i * (w / 7)
+            c.poly([(x, 0), (x + 50, 0), (x + 190, 560), (x + 60, 560)], fill=mix("#C6EBD4", "#FFFFFF", 0.45))
     for i in range(int(w // 120) + 2):
-        pine_tree(c, 40 + i * 120 + rng.randint(-20, 20), 500 + rng.randint(-8, 8), 190 + rng.randint(-20, 30), "#5BB88B")
-    hills(c, w, 520, 30, 120, 1.3, "#6CC27E")
+        pine_tree(c, 40 + i * 120 + rng.randint(-20, 20), 500 + rng.randint(-8, 8), 190 + rng.randint(-20, 30), "#2E6B58" if dusk else "#5BB88B")
+    hills(c, w, 520, 30, 120, 1.3, "#2F7A52" if dusk else "#6CC27E")
     for i in range(int(w // 150) + 2):
-        round_tree(c, 60 + i * 150 + rng.randint(-30, 30), 530, 230 + rng.randint(-20, 40), "#3C9F57", "#7C5230")
-    c.rect(0, 545, w, WH, "#5FB864")
+        round_tree(c, 60 + i * 150 + rng.randint(-30, 30), 530, 230 + rng.randint(-20, 40), "#256A43" if dusk else "#3C9F57", "#5A3A20" if dusk else "#7C5230")
+    c.rect(0, 545, w, WH, "#2F7646" if dusk else "#5FB864")
+    if dusk:                                                                           # fireflies: a glowing dot in a soft ring
+        for _ in range(int(w // 55)):
+            x, y = rng.uniform(30, w - 30), rng.uniform(250, 520)
+            c.ellipse(x, y, 9, 9, fill="#4F8A72")
+            c.ellipse(x, y, 5.5, 5.5, fill="#B9E08A")
+            c.ellipse(x, y, 2.8, 2.8, fill="#FFF6B0")
 
 
-def near_forest(c, w, seed=4):
+def near_forest(c, w, seed=4, dusk=False):
     rng = random.Random(seed)
-    vgrad(c, [(0, "#72C45B"), (0.5, "#5BAE49"), (1, "#478F3A")], 530, WH)
+    vgrad(c, [(0, "#3E8A4A"), (0.5, "#2F7040"), (1, "#245A34")] if dusk else [(0, "#72C45B"), (0.5, "#5BAE49"), (1, "#478F3A")], 530, WH)
     for x in (40, w - 50):
         tw = 62
-        c.rrect(x - tw, -20, x + tw, 580, 20, fill="#8A5A30")
+        c.rrect(x - tw, -20, x + tw, 580, 20, fill="#5E3C22" if dusk else "#8A5A30")
         for yy in (80, 200, 330, 450):
-            c.arc(x, yy, tw * 0.5, 30, 200, 340, "#6E4524", 5)
-        c.ellipse(x, 584, tw + 18, 18, fill="#6E4524")
+            c.arc(x, yy, tw * 0.5, 30, 200, 340, "#46301C" if dusk else "#6E4524", 5)
+        c.ellipse(x, 584, tw + 18, 18, fill="#46301C" if dusk else "#6E4524")
     for x in (120, w - 140):
-        bush(c, x, 560, 1.2, "#3E9E4B")
+        bush(c, x, 560, 1.2, "#2A7A3C" if dusk else "#3E9E4B")
     for _ in range(14):
         mushroom(c, rng.uniform(80, w - 80), rng.uniform(600, 700), 0.8 + rng.random() * 0.5, rng.choice(["#E2574C", "#FF9A3D"]))
     for _ in range(40):
-        tuft(c, rng.uniform(0, w), rng.uniform(540, 710), 0.9 + rng.random() * 0.6, rng.choice(["#3E9B3A", "#52B045"]))
+        tuft(c, rng.uniform(0, w), rng.uniform(540, 710), 0.9 + rng.random() * 0.6, rng.choice(["#2E7A36", "#3C8E3A"] if dusk else ["#3E9B3A", "#52B045"]))
     for _ in range(26):
         x, y = rng.uniform(0, w), rng.uniform(560, 710)
-        c.ellipse(x, y, 9, 4, fill=rng.choice(["#E8A33A", "#D9783A", "#C95A3A"]))
+        c.ellipse(x, y, 9, 4, fill=rng.choice(["#B07F2E", "#A8602E", "#96492E"] if dusk else ["#E8A33A", "#D9783A", "#C95A3A"]))
 
 
 def far_room(c, w, wall="#FFE9B8", stripe="#FFDC96", floor="#C98A52", night=False, window=True):
@@ -488,20 +501,29 @@ def near_castle(c, w):
         c.rect(0, y, w, y + 2, "#7A80A4")
 
 
-def far_ballroom(c, w):
-    """A golden ballroom: tall arched windows with the night outside, gold pillars, chandeliers and a shiny chequered floor."""
+def far_ballroom(c, w, day=False):
+    """A golden ballroom: tall arched windows with the night (or, with day=True, a sunny day) outside, gold pillars, chandeliers and a shiny chequered floor."""
     vgrad(c, [(0, "#FFF6DC"), (1, "#F6DDA2")], 0, 560)
     cx = w * 0.5
     for dx in (-390, 0, 390):                                                                     # arched windows
         x = cx + dx
         c.rect(x - 84, 150, x + 84, 440, "#F1C85A")
         c.ellipse(x, 150, 84, 84, fill="#F1C85A")
-        c.rect(x - 70, 152, x + 70, 430, "#1F2C78")
-        c.ellipse(x, 152, 70, 70, fill="#1F2C78")
-        for k in range(7):
-            D.star(c, x - 52 + (k * 37) % 104, 110 + (k * 53) % 250, 4 + k % 3, "#FFF3A8")
-        if dx == 0:
-            c.ellipse(x + 20, 190, 26, 26, fill="#FFF8D0")
+        c.rect(x - 70, 152, x + 70, 430, "#8FD3FF" if day else "#1F2C78")
+        c.ellipse(x, 152, 70, 70, fill="#8FD3FF" if day else "#1F2C78")
+        if day:
+            c.ellipse(x - 30, 392, 64, 30, fill="#7FD16A")                                        # green hills, white clouds and a sun
+            c.ellipse(x + 36, 402, 66, 28, fill="#69C45A")
+            for ccx, ccy in ((-28, 250), (26, 336)):
+                for ox, oy, orx, ory in ((0, 0, 24, 11), (-16, 4, 15, 9), (17, 3, 17, 10)):
+                    c.ellipse(x + ccx + ox, ccy + oy, orx, ory, fill="#FFFFFF")
+            if dx == 0:
+                c.ellipse(x + 24, 196, 26, 26, fill="#FFE27A")
+        else:
+            for k in range(7):
+                D.star(c, x - 52 + (k * 37) % 104, 110 + (k * 53) % 250, 4 + k % 3, "#FFF3A8")
+            if dx == 0:
+                c.ellipse(x + 20, 190, 26, 26, fill="#FFF8D0")
         c.rect(x - 3, 90, x + 3, 430, "#F1C85A")
         c.rect(x - 70, 290, x + 70, 296, "#F1C85A")
     for dx in (-195, 195, -585, 585):                                                             # gold pillars
@@ -544,10 +566,12 @@ BACKDROPS = {
     "garden_night": (far_night, near_night),
     "castle_night": (lambda c, w: far_night(c, w, castle=True), near_castle),
     "ballroom": (far_ballroom, near_ballroom),
+    "ballroom_day": (lambda c, w: far_ballroom(c, w, day=True), near_ballroom),
     "meadow_dawn": (lambda c, w: far_meadow(c, w, "dawn"), near_meadow),
     "meadow_dusk": (lambda c, w: far_meadow(c, w, "dusk"), lambda c, w: near_meadow(c, w, path=False)),
     "meadow_open": (far_meadow, lambda c, w: near_meadow(c, w, path=False, flowers=60, trees=False, fence_on=False)),
     "forest": (far_forest, near_forest),
+    "forest_dusk": (lambda c, w: far_forest(c, w, dusk=True), lambda c, w: near_forest(c, w, dusk=True)),
     "room": (far_room, near_room),
     "room_night": (lambda c, w: far_room(c, w, night=True), near_room),
     "race": (far_race, near_race),

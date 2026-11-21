@@ -67,6 +67,7 @@ def test_tale(a, ffmpeg, key):
 
 # what each character TYPE says in the "voices" check: (English, Turkish), and its name (English, Turkish)
 VOICE_LINES = {
+    "nar": ("Once upon a time, in a sunny green meadow, there lived a very fast hare.", "Bir varmış, bir yokmuş, güneşli yemyeşil bir çayırda çok hızlı bir tavşan yaşarmış."),
     "girl": ("Hello! I am a little girl. Do you want to play?", "Merhaba! Ben küçük bir kızım. Oynamak ister misin?"),
     "teen": ("Oh, I would love to go to the ball!", "Of, baloya gitmeyi çok isterdim!"),
     "boy": ("Look at me! I can run so fast!", "Bana bak! Çok hızlı koşabiliyorum!"),
@@ -105,7 +106,7 @@ VOICE_LINES = {
     "lion": ("Roar! Who dares to wake the king of the jungle?", "Hırrr! Ormanın kralını kim uyandırmaya cesaret eder?"),
 }
 VOICE_NAMES = {
-    "girl": ("Girl", "Kız çocuğu"), "teen": ("Young woman", "Genç kız"), "boy": ("Boy", "Erkek çocuğu"), "baby": ("Baby", "Bebek"),
+    "nar": ("Narrator", "Anlatıcı"), "girl": ("Girl", "Kız çocuğu"), "teen": ("Young woman", "Genç kız"), "boy": ("Boy", "Erkek çocuğu"), "baby": ("Baby", "Bebek"),
     "woman": ("Mother", "Anne"), "granny": ("Granny", "Nine"), "fakegranny": ("The wolf as granny", "Nine kılığındaki kurt"),
     "man": ("Man", "Adam"), "grandpa": ("Grandpa", "Dede"), "prince": ("Prince", "Prens"), "king": ("King", "Kral"), "lord": ("Lord", "Lord"),
     "queen": ("Queen", "Kraliçe"), "stepmother": ("Stepmother", "Üvey anne"), "stepsister": ("Stepsister", "Üvey kız kardeş"), "witch": ("Witch", "Cadı"),

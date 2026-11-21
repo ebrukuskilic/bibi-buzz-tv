@@ -2207,9 +2207,193 @@ def elves_shoemaker(lang="en"):
     return t
 
 
+# ================================================================================================ the princess and the pea
+PP_PRINCE = dict(prince="#2FA7A0", hair="#5A3A22", hat_kind="crown")                                    # the prince, in a teal coat
+PP_KING = dict(prince="#B8332D", hair="#E4E4EC", beard="#EDEDF5", hat_kind="crown")                     # the king: a red coat, a white beard and a crown
+PP_QUEEN = dict(gown="#E86A9A", hair="#8A5A2B", shoe="#7A2E4E", hat_kind="crown")                       # the queen, in a pink gown
+PP_GIRL = dict(gown="#9CC7F0", hair="#C9812E", shoe="#5A7FB0")                                          # the girl in the storm: a blue gown, and no crown
+PP_PRINCESSES = [dict(gown="#FF8FB0", hair="#3B2A22", shoe="#C9456B", hat_kind="crown"),                # three other princesses: pink, yellow and purple
+                 dict(gown="#FFD21F", hair="#C8452B", shoe="#B8860B", hat_kind="crown"),
+                 dict(gown="#8C6BC8", hair="#2B2330", shoe="#4A1C57", hat_kind="crown")]
+PP_BRIDE = dict(gown="#FFFFFF", hair="#C9812E", shoe="#BFE6FF", hat_kind="crown")                       # ... and the wedding dress
+PP_COLORS3 = ["pink", "yellow", "purple"]
+PP_MARK3 = ["#E0457B", "#D9A400", "#7B4FBF"]                                                            # (darker colours of pink, yellow and purple: text on a white circle)
+PP_RAINBOW = ["red", "orange", "yellow", "green", "blue", "purple", "pink"]
+PP_MARK7 = ["#E2362F", "#E8700F", "#D9A400", "#2E9E3A", "#2F7FD8", "#7B4FBF", "#E0457B"]
+PP_BED_X, PP_BED_Y, PP_BED_K = 860, 690, 0.95                                                           # the princess's bed
+PP_MAT_Y = [PP_BED_Y + PP_BED_K * (-58 - 26 * (i + 0.5)) for i in range(7)]                             # the middle of each mattress, from the bottom up
+PP_PEA_P = (PP_BED_X, PP_BED_Y + PP_BED_K * -67)                                                        # where the pea lies
+PP_BED_TOP = PP_BED_Y + PP_BED_K * (-58 - 26 * 7)                                                       # the top of the pile of seven mattresses
+PP_LADDER_B = (PP_BED_X - PP_BED_K * 264, PP_BED_Y)                                                     # the foot and the top of the ladder
+PP_LADDER_T = (PP_BED_X - PP_BED_K * 202, PP_BED_TOP + 8)
+
+
+def princess_pea(lang="en"):
+    t = Tale("tale-princess-and-pea", "The Princess and the Pea | Fairy Tale Story for Kids | Bibi Buzz TV",
+             "A prince wants to marry a real princess, but how can anyone tell? One stormy night, a girl knocks at the castle door... and the queen has a clever plan: "
+             "ONE tiny green pea, and SEVEN soft mattresses! Count the mattresses from one to seven, learn the colors of the rainbow, count three princesses, and find out "
+             "who can feel a little pea. Watch the classic fairy tale by Hans Christian Andersen, in a gentle, colorful animated story in simple English for toddlers "
+             "and preschoolers.",
+             TAGS + ["the princess and the pea", "princess and the pea story", "princess story", "hans christian andersen", "counting story", "counting to seven",
+                     "rainbow colors for kids", "learn colors", "tell the truth"],
+             {"nar": NAR, "prince": (GUY, "+2%", "+8Hz"), "king": (GUY, "-14%", "-24Hz"), "queen": (ARIA, "-6%", "-4Hz"), "prn": (ANA, "+0%", "+10Hz")}, lang=lang)
+    t.bubble_tint = {"prince": "#DDF5F2", "king": "#FFE3E0", "queen": "#FFE3EE", "prn": "#E3F0FF"}
+    t.cover = dict(bg="room", title=("THE PRINCESS", "AND THE PEA"), size=104, gap=102,
+                   props=[("bed", "tall_bed", 640, 722, 1.18, dict(n=7.0, pea=1.0, glow=1.0, girl=1.0))],
+                   actors=[("queen", "girl", 150, 708, 1.3, 1, "happy", dict(PP_QUEEN)), ("prince", "girl", 1130, 708, 1.3, -1, "happy", dict(PP_PRINCE))])
+    _intro(t, ("THE PRINCESS", "AND THE PEA"), "Today's story is... The Princess and the Pea!")
+
+    # ---------------------------------------------------------------- 1 a prince who wants a real princess
+    s = t.scene("A prince's wish", "ballroom_day", mood="calm", title="A prince's wish")
+    s.actor("prince", "girl", 500, 676, 1.0, face=1, **PP_PRINCE)
+    s.actor("king", "girl", 1010, 676, 1.0, face=-1, **PP_KING)
+    s.actor("queen", "girl", 1150, 676, 0.97, face=-1, **PP_QUEEN)
+    s.nar("Once upon a time, there was a prince. He lived in a big castle with the king and the queen.", ("pose", "prince", "happy", {"at": 0.3}),
+          ("fx", "sparkle", 640, 400, {"at": 0.6, "dur": 3.0, "r": 330}))
+    s.say("prince", "I want to marry a real princess!", ("pose", "prince", "cheer"), ("hop", "prince", {"at": "50%"}), ("pose", "king", "idle"), ("pose", "queen", "idle"))
+    s.nar("So the prince traveled all over the world to find one.", ("pose", "prince", "wave", {"at": 0.2}), ("pose", "king", "wave", {"at": 0.6}), ("pose", "queen", "wave", {"at": 0.6}),
+          ("face", "prince", -1, {"at": 1.6}), ("walk", "prince", -250, 676, {"at": 1.8, "speed": 230, "pose": "walk"}), tail=0.3)
+
+    # ---------------------------------------------------------------- 2 three princesses: pink, yellow, purple
+    s = t.scene("A royal search", "meadow_open", mood="happy", title="Looking for a princess")
+    s.actor("prince", "girl", -200, 676, 1.0, face=1, **PP_PRINCE)
+    for i, x in enumerate((1560, 1560, 1560)):
+        s.actor("pr%d" % (i + 1), "girl", x, 676, 0.95, face=-1, **PP_PRINCESSES[i])
+    s.nar("He walked over green hills, and he sailed across the sea. He looked everywhere!", ("walk", "prince", 300, 676, {"fit": True, "pose": "walk"}), ("pose", "prince", "think", {"at": 5.0}), tail=0.2)
+    for i, (x, word) in enumerate(((600, "pink"), (860, "yellow"), (1120, "purple"))):
+        s.nar("%s a princess in a %s gown. %s!" % (("He met", "Then he met", "And then he met")[i], word, NUMBERS[i]), ("walk", "pr%d" % (i + 1), x, 676, {"at": 0.2, "speed": 300, "pose": "walk"}),
+              ("fx", "mark", "pr%d" % (i + 1), -110, {"at": 3.0 + 0.1 * i, "dur": 3.0, "text": str(i + 1), "color": PP_MARK3[i]}), ("sfx", "pop", {"at": 3.0 + 0.1 * i}),
+              ("pose", "pr%d" % (i + 1), "curtsy", {"at": 2.9 + 0.1 * i}), ("pose", "prince", "happy", {"at": 2.9}), tail=0.3)
+    s.nar("Three princesses! But the prince was not sure about any of them. So he said goodbye, and he went back home.", ("pose", "prince", "think", {"at": 0.4}),
+          ("pose", "pr1", "wave", {"at": 3.4}), ("pose", "pr2", "wave", {"at": 3.4}), ("pose", "pr3", "wave", {"at": 3.4}), tail=0.3)
+
+    # ---------------------------------------------------------------- 3 a sad prince at home
+    s = t.scene("A sad prince", "ballroom_day", mood="sad", title="A sad prince")
+    s.actor("prince", "girl", 560, 676, 1.0, face=1, **PP_PRINCE)
+    s.actor("king", "girl", 1010, 676, 1.0, face=-1, **PP_KING)
+    s.actor("queen", "girl", 1150, 676, 0.97, face=-1, **PP_QUEEN)
+    s.nar("The prince came home. He was very sad.", ("pose", "prince", "sad", {"at": 0.3}))
+    s.say("queen", "Do not be sad, my dear. One day, you will find a real princess.", ("pose", "queen", "happy"), ("pose", "king", "idle"), ("fx", "hearts", "queen", 0, {"at": "50%", "dur": 3.0}))
+    s.say("king", "Yes, my son. We must be patient.", ("pose", "king", "happy"), ("pose", "queen", "idle"), ("pose", "prince", "sad"))
+
+    # ---------------------------------------------------------------- 4 the storm
+    s = t.scene("A stormy night", "storm_castle", mood="tense", title="A stormy night")
+    s.actor("prn", "girl", -160, 690, 0.58, face=1, **PP_GIRL)
+    s.nar("One night, there was a terrible storm.", ("fx", "rain", 0, 0, {"at": 0.0, "dur": 90.0}), ("sfx", "rain", {"at": 0.0}), ("sfx", "wind", {"at": 0.3, "gain": 0.5}), tail=0.2)
+    s.nar("Whoosh, said the wind! Splash, splash, said the rain! And BOOM, said the thunder!", ("sfx", "wind", {"at": 0.2, "gain": 0.6}), ("sfx", "splash", {"at": 1.7, "gain": 0.4}),
+          ("sfx", "splash", {"at": 2.2, "gain": 0.4}), ("fx", "lightning", 0, 0, {"at": 3.9, "dur": 1.0, "bx": 300}), ("sfx", "thunder", {"at": 4.0}),
+          ("fx", "lightning", 0, 0, {"at": 5.6, "dur": 1.0, "bx": 980}), ("sfx", "thunder", {"at": 5.7, "gain": 0.8}), tail=0.3)
+    s.nar("Then, through the rain, a girl came walking up to the castle.", ("walk", "prn", 560, 690, {"at": 0.4, "speed": 150, "pose": "walk"}),
+          ("walk", "prn", 640, 650, {"at": 3.3, "speed": 150, "pose": "walk"}), ("sfx", "rain", {"at": 2.0, "gain": 0.8}), tail=0.2)
+    s.nar("She went up the steps, and she knocked on the big door. Knock, knock, knock!", ("move", "prn", 640, 484, {"at": 0.2, "dur": 2.2, "pose": "walk"}), ("pose", "prn", "knock", {"at": 2.6}),
+          ("sfx", "knock", {"at": 3.0}), ("sfx", "knock", {"at": 3.5}), ("sfx", "knock", {"at": 4.0}), tail=0.3)
+    s.nar("Who could be out in such a storm?", ("fx", "mark", 640, 340, {"at": 0.4, "dur": 2.4, "text": "?"}), ("fx", "lightning", 0, 0, {"at": 1.2, "dur": 1.0, "bx": 160}), ("sfx", "thunder", {"at": 1.4, "gain": 0.6}), tail=0.3)
+
+    # ---------------------------------------------------------------- 5 a guest at the door
+    s = t.scene("A guest in the storm", "ballroom", mood="calm", title="A guest in the storm")
+    s.actor("prince", "girl", 330, 676, 1.0, face=1, **PP_PRINCE)
+    s.actor("queen", "girl", 520, 676, 0.97, face=1, **PP_QUEEN)
+    s.actor("king", "girl", 760, 676, 1.0, face=1, **PP_KING)
+    s.actor("prn", "girl", 1560, 676, 1.0, face=-1, **PP_GIRL)
+    s.nar("Inside the castle, everybody heard the knock. The old king went to open the big door.", ("pose", "king", "surprised", {"at": 0.4}), ("pose", "queen", "surprised", {"at": 0.6}),
+          ("walk", "king", 960, 676, {"at": 2.2, "speed": 150, "pose": "walk"}), ("sfx", "creak", {"at": 4.2, "gain": 0.6}), tail=0.2)
+    s.nar("And there stood a girl. Her hair was dripping wet, and her shoes were full of water!", ("walk", "prn", 1140, 676, {"at": 0.3, "speed": 150, "pose": "walk"}), ("pose", "prn", "sad", {"at": 2.6}),
+          ("fx", "sweat", "prn", -140, {"at": 0.5, "dur": 60.0}), ("sfx", "splash", {"at": 3.4, "gain": 0.5}), tail=0.2)
+    s.say("prn", "Hello! I am a princess. I got lost in the storm. May I come in?", ("pose", "prn", "talk"), ("pose", "king", "idle"), ("pose", "queen", "idle"))
+    s.say("king", "Of course! Come in, come in, and get warm.", ("pose", "king", "happy"), ("walk", "prn", 1100, 676, {"at": "40%", "speed": 140, "pose": "walk"}), ("hop", "king", {"at": "60%"}))
+    s.nar("The queen gave her a warm towel, and the king gave her a bowl of hot soup. Everybody was kind to the girl.", ("pose", "queen", "happy", {"at": 0.3}), ("pose", "prn", "happy", {"at": 1.0}),
+          ("fx", "hearts", "prn", -150, {"at": 1.4, "dur": 3.5}), tail=0.3)
+    s.nar("But was she a real princess? The queen had a secret plan. She would find out!", ("pose", "queen", "sly", {"at": 0.4}), ("fx", "mark", "queen", -105, {"at": 0.6, "dur": 2.6, "text": "?"}),
+          ("pose", "prince", "think", {"at": 0.8}), tail=0.3)
+
+    # ---------------------------------------------------------------- 6 the queen's plan: a pea
+    s = t.scene("The queen's plan", "room", mood="sneaky", title="The queen's plan")
+    s.prop("bed", "tall_bed", PP_BED_X, PP_BED_Y, PP_BED_K, n=0.0, pea=0.0)
+    s.actor("queen", "girl", -200, 676, 0.97, face=1, **PP_QUEEN)
+    s.nar("The queen went to the guest bedroom. She carried one tiny green pea.", ("walk", "queen", 300, 676, {"fit": True, "pose": "walk"}), ("pose", "queen", "sly", {"at": 2.6}), tail=0.2)
+    s.say("queen", "I will put this little pea on the bed. It is so, so small.", ("pose", "queen", "sly"), ("walk", "queen", 400, 676, {"at": 0.4, "dur": 1.6, "pose": "walk"}),
+          ("set", "bed", "pea", 1.0, {"at": "60%", "dur": 0.05}), ("fx", "sparkle", PP_PEA_P[0], PP_PEA_P[1], {"at": "60%", "dur": 2.4, "r": 90}), ("sfx", "pop", {"at": "60%"}),
+          ("fx", "mark", PP_PEA_P[0], PP_PEA_P[1] - 70, {"at": "62%", "dur": 2.6, "text": "1", "color": "#2E9E3A"}))
+
+    # ---------------------------------------------------------------- 7 seven mattresses: count the colours of the rainbow
+    s = t.scene("Seven mattresses", "room", mood="happy", title="Seven rainbow mattresses")
+    s.prop("bed", "tall_bed", PP_BED_X, PP_BED_Y, PP_BED_K, n=0.0, pea=1.0)
+    s.actor("queen", "girl", 400, 676, 0.97, face=1, **PP_QUEEN)
+    s.nar("Then the queen piled soft mattresses on top of the pea. Let us count them!", ("pose", "queen", "happy", {"at": 0.3}), ("hop", "queen", {"at": 1.0}), tail=0.2)
+    for i in range(7):
+        s.nar("%s! %s %s mattress." % (NUMBERS[i], "An" if PP_RAINBOW[i][0] in "aeiou" else "A", PP_RAINBOW[i]), ("pose", "queen", "cheer", {"at": 0.0}), ("set", "bed", "n", float(i + 1), {"at": 0.05, "dur": 0.5}),
+              ("fx", "mark", 1090, PP_MAT_Y[i], {"at": 0.55, "dur": 2.0, "text": str(i + 1), "color": PP_MARK7[i]}), ("sfx", "thud", {"at": 0.5, "gain": 0.5}), ("sfx", "pop", {"at": 0.6}),
+              ("fx", "sparkle", PP_BED_X, PP_MAT_Y[i], {"at": 0.55, "dur": 1.4, "r": 130}), tail=0.2 if i < 6 else 0.4)
+    s.nar("Let us count them again! One, two, three, four, five, six, seven!", ("pose", "queen", "cheer", {"at": 0.2}),
+          *[("fx", "mark", 1090 + 70 * (i % 2), PP_MAT_Y[i], {"at": 0.35 + 0.62 * i, "dur": 0.85, "text": str(i + 1), "color": PP_MARK7[i]}) for i in range(7)],
+          *[("sfx", "pop", {"at": 0.35 + 0.62 * i, "gain": 0.4}) for i in range(7)], tail=0.2)
+    s.nar("Red, orange, yellow, green, blue, purple, and pink. What a beautiful rainbow of mattresses!", ("pose", "queen", "happy", {"at": 0.3}),
+          *[("fx", "sparkle", PP_BED_X, PP_MAT_Y[i], {"at": 0.2 + 0.55 * i, "dur": 1.2, "r": 120}) for i in range(7)], ("sfx", "sparkle", {"at": 0.4}), ("sfx", "tada", {"at": 4.2, "gain": 0.5}), tail=0.3)
+    s.nar("Seven soft mattresses, one on top of the other! The pile was so tall, it almost touched the ceiling.", ("pose", "queen", "proud", {"at": 0.4}), ("fx", "sparkle", PP_BED_X, PP_BED_TOP, {"at": 0.6, "dur": 3.0, "r": 260}), tail=0.3)
+    s.say("queen", "Now the princess will need a ladder to get into bed.", ("pose", "queen", "happy"), ("set", "bed", "ladder", 1.0, {"at": "40%", "dur": 0.05}), ("sfx", "pop", {"at": "40%"}),
+          ("fx", "sparkle", PP_LADDER_B[0], 560, {"at": "40%", "dur": 2.0, "r": 120}))
+
+    # ---------------------------------------------------------------- 8 climbing up to sleep
+    s = t.scene("Sleep tight", "room_night", mood="night", title="Sleep tight")
+    s.prop("bed", "tall_bed", PP_BED_X, PP_BED_Y, PP_BED_K, n=7.0, pea=1.0, ladder=1.0)
+    s.actor("queen", "girl", 330, 676, 0.97, face=1, **PP_QUEEN)
+    s.actor("prn", "girl", 520, 676, 1.0, face=-1, zy=720, **PP_GIRL)
+    s.say("queen", "Good night, dear princess. Sleep well!", ("pose", "queen", "wave"), ("pose", "prn", "idle"))
+    s.say("prn", "Thank you! Good night!", ("pose", "prn", "wave"), ("pose", "queen", "idle"), ("face", "prn", 1, {"at": "70%"}))
+    s.nar("The princess climbed up the ladder, step by step, all the way to the top.", ("walk", "prn", PP_LADDER_B[0], 690, {"at": 0.2, "speed": 150, "pose": "walk"}),
+          ("move", "prn", PP_LADDER_T[0], PP_LADDER_T[1] + 16, {"at": 1.6, "dur": 3.0, "pose": "walk"}), ("pose", "queen", "wave", {"at": 4.6}), tail=0.2)
+    s.nar("She lay down on the very top mattress, and she closed her eyes.", ("hide", "prn", {"at": 0.4}), ("set", "bed", "girl", 1.0, {"at": 0.4, "dur": 0.05}),
+          ("fx", "zzz", PP_BED_X - 86, PP_BED_TOP - 40, {"at": 1.4, "dur": 60.0}), ("sfx", "snore", {"at": 1.8, "gain": 0.3}), ("walk", "queen", -150, 676, {"at": 1.0, "speed": 150, "pose": "walk"}), tail=0.4)
+
+    # ---------------------------------------------------------------- 9 a restless night
+    s = t.scene("A restless night", "room_night", mood="sneaky", title="A restless night")
+    s.prop("bed", "tall_bed", PP_BED_X, PP_BED_Y, PP_BED_K, n=7.0, pea=1.0, ladder=1.0, girl=1.0)
+    s.actor("prn", "girl", PP_BED_X - 96, PP_BED_TOP + 6, 0.9, face=1, zy=720, show=False, **PP_GIRL)
+    s.nar("But the princess could not sleep. She turned this way, and she turned that way.", ("set", "bed", "toss", 1.0, {"at": 0.8, "dur": 0.05}), ("sfx", "creak", {"at": 1.4, "gain": 0.4}),
+          ("sfx", "creak", {"at": 3.0, "gain": 0.4}), tail=0.2)
+    s.nar("Something small and hard was under all those mattresses.", ("set", "bed", "glow", 1.0, {"at": 1.4, "dur": 0.6}), ("sfx", "sparkle", {"at": 1.4, "gain": 0.5}), tail=0.2)
+    s.say("prn", "Ouch! Something hard is in my bed!", ("show", "prn", {"at": 0.0}), ("set", "bed", "girl", 0.0, {"at": 0.0, "dur": 0.05}), ("pose", "prn", "sit"))
+    s.nar("All night long, she tossed and turned. And she hardly slept at all.", ("hide", "prn", {"at": 0.0}), ("set", "bed", "girl", 1.0, {"at": 0.0, "dur": 0.05}), ("set", "bed", "toss", 1.0, {"at": 0.0, "dur": 0.05}), tail=0.4)
+
+    # ---------------------------------------------------------------- 10 good morning
+    s = t.scene("Good morning", "room", mood="happy", title="Good morning")
+    s.prop("bed", "tall_bed", PP_BED_X, PP_BED_Y, PP_BED_K, n=7.0, pea=1.0, ladder=1.0)
+    s.actor("prince", "girl", 150, 676, 1.0, face=1, **PP_PRINCE)
+    s.actor("king", "girl", 290, 676, 1.0, face=1, **PP_KING)
+    s.actor("queen", "girl", 430, 676, 0.97, face=1, **PP_QUEEN)
+    s.actor("prn", "girl", PP_LADDER_T[0], PP_LADDER_T[1] + 16, 1.0, face=-1, zy=720, **PP_GIRL)
+    s.nar("In the morning, the princess climbed down the ladder, yawning a great big yawn.", ("pose", "prn", "tired"), ("sfx", "yawn", {"at": 0.4}), ("move", "prn", PP_LADDER_B[0], 690, {"at": 1.4, "dur": 2.4, "pose": "walk"}),
+          ("walk", "prn", 640, 676, {"at": 4.0, "speed": 160, "pose": "walk"}), ("pose", "queen", "wave", {"at": 3.0}), tail=0.2)
+    s.say("queen", "Good morning, dear! How did you sleep?", ("pose", "queen", "happy"), ("pose", "prn", "idle"), ("hop", "queen", {"at": "40%"}))
+    s.say("prn", "Oh, not well at all! Something hard was in my bed, and I could hardly close my eyes.", ("pose", "prn", "sad"), ("pose", "queen", "idle"))
+    s.nar("The queen smiled a big smile. Her plan had worked!", ("pose", "queen", "cheer", {"at": 0.3}), ("hop", "queen", {"at": 0.6}), ("fx", "sparkle", "queen", 0, {"at": 0.4, "dur": 3.0, "r": 160}), tail=0.2)
+    s.say("queen", "Only a real princess could feel one tiny pea under seven mattresses!", ("pose", "queen", "proud"), ("set", "bed", "glow", 1.0, {"at": "30%", "dur": 0.6}),
+          ("fx", "sparkle", PP_PEA_P[0], PP_PEA_P[1], {"at": "30%", "dur": 3.0, "r": 120}), ("sfx", "sparkle", {"at": "30%"}))
+    s.say("king", "Hooray! She is a real princess!", ("pose", "king", "cheer"), ("pose", "queen", "happy"), ("hop", "king", {"at": "40%"}), ("fx", "confetti", 0, 0, {"at": "30%", "dur": 8.0}))
+    s.say("prince", "Hooray! I have found my real princess!", ("pose", "prince", "cheer"), ("hop", "prince", {"at": "40%"}), ("pose", "king", "happy"), ("fx", "hearts", "prince", 0, {"at": "50%", "dur": 3.0}))
+
+    # ---------------------------------------------------------------- 11 happily ever after
+    s = t.scene("Happily ever after", "ballroom_day", mood="triumph", title="Happily ever after")
+    s.prop("dome", "pea_dome", 1130, 690, 1.0)
+    s.actor("prince", "girl", 560, 676, 1.0, face=1, **PP_PRINCE)
+    s.actor("bride", "girl", 700, 676, 1.0, face=-1, **PP_BRIDE)
+    s.actor("king", "girl", 330, 676, 1.0, face=1, **PP_KING)
+    s.actor("queen", "girl", 190, 676, 0.97, face=1, **PP_QUEEN)
+    s.nar("The prince and the princess got married, and the whole kingdom cheered.", ("pose", "prince", "happy", {"at": 0.3}), ("pose", "bride", "happy", {"at": 0.3}),
+          ("pose", "king", "cheer", {"at": 0.6}), ("pose", "queen", "cheer", {"at": 0.6}), ("fx", "confetti", 0, 0, {"at": 0.5, "dur": 90.0}), ("fx", "hearts", "bride", 0, {"at": 1.4, "dur": 3.0}), tail=0.2)
+    s.nar("They danced and danced all night long.", ("pose", "prince", "dance", {"at": 0.2}), ("pose", "bride", "dance", {"at": 0.2}), ("fx", "notes", "bride", -60, {"at": 0.4, "dur": 4.0}),
+          ("pose", "king", "happy", {"at": 0.4}), ("pose", "queen", "happy", {"at": 0.4}), tail=0.3)
+    s.nar("And the little green pea? The king and the queen put it in a museum, under a glass dome. You can still see it today!", ("fx", "sparkle", 1130, 520, {"at": 0.4, "dur": 4.0, "r": 200}),
+          ("pose", "prince", "idle", {"at": 0.2}), ("pose", "bride", "idle", {"at": 0.2}), ("face", "prince", 1, {"at": 0.2}), ("face", "bride", 1, {"at": 0.2}), ("sfx", "ding", {"at": 0.6}), tail=0.3)
+    s.nar("And they all lived happily ever after.", ("pose", "prince", "cheer", {"at": 0.3}), ("pose", "bride", "cheer", {"at": 0.3}), ("hop", "prince", {"at": 0.6}), ("hop", "bride", {"at": 0.8}), tail=0.8)
+
+    _outro(t, "Remember, little ones: always tell the truth, and notice the little things!", caption="Always tell the truth!")
+    return t
+
+
 TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_and_hare, "goldilocks": goldilocks,
          "red-riding-hood": red_riding_hood, "gingerbread-man": gingerbread_man, "three-billy-goats": three_billy_goats,
-         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup, "magic-porridge-pot": magic_porridge_pot, "cinderella": cinderella, "snow-white": snow_white, "elves-and-shoemaker": elves_shoemaker}
+         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup, "magic-porridge-pot": magic_porridge_pot, "cinderella": cinderella, "snow-white": snow_white, "elves-and-shoemaker": elves_shoemaker, "princess-and-pea": princess_pea}
 
 
 def build(key, lang="en"):

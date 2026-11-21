@@ -13,10 +13,13 @@ on:
   workflow_dispatch:
     inputs:
       only:
-        description: "Engines to run: keys separated by commas (e.g. cast,prod-kokoro,kokoro-tr) or all (cast = the casting sweep of the character voices)"
+        description: "Engines to run: keys separated by commas (e.g. palette,studio,gallery,cast,prod-kokoro,kokoro-tr) or all (palette = every voice at several sizes, gallery = the casting of some tales, studio = EQ chains, cast = the casting sweep)"
         default: "all"
       cbx:
         description: "Also try Chatterbox (a big neural voice in its own python 3.11 environment, slow on the CPU): yes or no"
+        default: "no"
+      myvoice:
+        description: "Chatterbox speaks in the voice of the reference clips of the secrets MYVOICE_TR and MYVOICE_EN (the voice of the channel's owner, who agreed to it; the scenes are published only encrypted): yes or no"
         default: "no"
   push:
     branches: [main]
@@ -29,7 +32,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: bibi-speech-lab
+  group: bibi-speech-lab-${{ github.event.inputs.myvoice == 'yes' && 'myvoice' || 'main' }}          # (a run with the owner's voice and a run of the other tests do not stop each other)
   cancel-in-progress: true
 
 jobs:
@@ -37,8 +40,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
-      ONLY: ${{ github.event.inputs.only || 'cast,prod-kokoro' }}      # (a run started by a push does only the newest jobs: the casting sweep, and the whole tale the way the daily videos make it)
+      ONLY: ${{ github.event.inputs.only || 'palette,studio' }}      # (a run started by a push does only the newest jobs: every voice at several sizes, and the studio chains)
       CBX: ${{ github.event.inputs.cbx || 'no' }}
+      MYVOICE: ${{ github.event.inputs.myvoice || 'no' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -81,7 +85,7 @@ jobs:
           ls -la out/speech
 
       - name: Install Chatterbox in its own environment (python 3.11)
-        if: env.CBX == 'yes'
+        if: env.CBX == 'yes' || env.MYVOICE == 'yes'
         continue-on-error: true
         run: |
           mkdir -p out/speech
@@ -105,11 +109,42 @@ jobs:
           done
           python tools/speech_lab.py cbx-collect --out out/speech
 
+      - name: Your voice - the reference clips (from the secrets; they are never part of the result)
+        if: env.MYVOICE == 'yes'
+        continue-on-error: true
+        env:
+          MYVOICE_TR: ${{ secrets.MYVOICE_TR }}
+          MYVOICE_EN: ${{ secrets.MYVOICE_EN }}
+        run: python tools/speech_lab.py myvoice-prepare --out out/speech
+
+      - name: Chatterbox speaks in your voice
+        if: env.MYVOICE == 'yes'
+        continue-on-error: true
+        run: |
+          test -x /opt/cbx/bin/python || { echo "there is no Chatterbox environment"; exit 1; }
+          for L in tr en; do
+            if [ -f out/speech/_myvoice_$L.json ]; then
+              timeout 1700 /opt/cbx/bin/python tools/cbx_synth.py out/speech/_myvoice_$L.json out/speech/_myvoice_$L 2>&1 | tee out/speech/myvoice_run_$L.txt || true
+            fi
+          done
+          python tools/speech_lab.py myvoice-collect --out out/speech
+
       - name: Collect the result (mp3 scenes and text files only)
         if: ${{ !cancelled() }}
+        env:
+          MYVOICE_TR: ${{ secrets.MYVOICE_TR }}
         run: |
           mkdir -p result out/speech
           find out/speech -maxdepth 1 -type f \( -name '*.mp3' -o -name '*.txt' \) -exec cp {} result/ \;
+          # The scenes in the voice of the channel's owner are a copy of her voice and this repository is public: they are published only encrypted (AES-256, the key is
+          # the SHA-256 of the secret MYVOICE_TR, so only somebody who has her clip can open them); without that secret they are not published at all.
+          KEY=""
+          if [ -n "$MYVOICE_TR" ]; then KEY=$(printf %s "$MYVOICE_TR" | sha256sum | cut -d' ' -f1); fi
+          for f in result/*myvoice*.mp3; do
+            [ -f "$f" ] || continue
+            if [ -n "$KEY" ]; then openssl enc -aes-256-cbc -pbkdf2 -salt -in "$f" -out "$f.enc" -pass "pass:$KEY"; fi
+            rm -f "$f"
+          done
           ls -la result
 
       - uses: actions/upload-artifact@v4
@@ -127,6 +162,9 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
+    concurrency:
+      group: bibi-speech-publish                     # (two runs publish one after the other: the branch is rewritten from what is there)
+      cancel-in-progress: false
     steps:
       - uses: actions/download-artifact@v4
         with:

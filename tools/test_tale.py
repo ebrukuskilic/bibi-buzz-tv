@@ -99,6 +99,10 @@ def test_song(a, ffmpeg, key):
     D.set_language(a.lang)
     sr = VO.SR
     clips = SY.prepare(t, ffmpeg, a.cache)                                  # the real voice: one clip for every word that is sung
+    keys = sorted(clips, key=str)                                           # (the spoken words are kept too: the singing can then be worked on offline)
+    np.savez_compressed(base + "-clips.npz", **{"c%03d" % i: np.asarray(clips[k], dtype=np.float32) for i, k in enumerate(keys)})
+    with open(base + "-clips.json", "w", encoding="utf-8") as f:
+        json.dump([list(k) for k in keys], f, ensure_ascii=False)
     problems, st = SY.sync_report(t)
     print("song %s (%s): %.1f s, %d scenes, sync problems: %s" % (key, a.lang, t.duration, len(t.scenes), problems or "none"), flush=True)
     mix = t.mix_audio(clips)

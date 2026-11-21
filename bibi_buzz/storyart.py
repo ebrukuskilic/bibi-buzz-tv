@@ -1156,6 +1156,152 @@ def chick(c, x, y, k=1.0, t=0.0, P=None, fur="#FFD84A", **_):
     return r
 
 
+# ------------------------------------------------------------------------------------------------ critters: cat, dog, mouse, lion, fox, sheep, cow
+CRITTERS = {"cat": ("#F5A04A", "#FFF1DC"), "dog": ("#C98A52", "#FFF1DC"), "mouse": ("#B8B8C8", "#F6F0F6"), "lion": ("#EBA83F", "#FFEBBE"),
+            "fox": ("#E2762E", "#FFF4E8"), "sheep": ("#3F3636", "#FFFFFF"), "cow": ("#FFFFFF", "#FFC4CF")}
+
+
+def critter(c, x, y, k=1.0, t=0.0, P=None, species="cat", fur=None, belly=None, accent=None, stripes=False, patch=None, apron=None, bow=None, hold=None, **_):
+    """One kit for seven furry friends on two legs (species = cat, dog, mouse, lion, fox, sheep or cow): the same round body, arms and face, with
+    their own ears, muzzle, tail and extras. fur / belly = colours; accent = the colour of a lion's mane or of a cow's spots; stripes = tabby stripes;
+    patch = a dog's eye patch; apron = a little apron; bow = a bow on the head."""
+    P = P or Pose()
+    r = Rig(c, x + P.dx * k, y - P.bob * k + min(P.lower, 0.0) * k, k, P.face, P.lean, P.sq)
+    f0, b0 = CRITTERS[species]
+    fur, belly = fur or f0, belly or b0
+    dark = darker(fur, 0.28)
+    sh = 3
+    sway = math.sin(t * 2.4)
+    legc = fur if species != "cow" else "#FFFFFF"
+    if species == "cat":                                                                 # --- the tail, behind everything
+        r.line([(-34, -66), (-70, -70), (-88, -100), (-82 + 5 * sway, -140)], INK, 18)
+        r.line([(-34, -66), (-70, -70), (-88, -100), (-82 + 5 * sway, -140)], fur, 12)
+    elif species == "dog":
+        r.limb((-36, -72), (-62 + 9 * math.sin(t * 8.0), -100), 13, fur)
+    elif species == "mouse":
+        r.line([(-34, -60), (-72, -46), (-100, -66), (-114 + 4 * sway, -104)], INK, 9)
+        r.line([(-34, -60), (-72, -46), (-100, -66), (-114 + 4 * sway, -104)], "#F2A5B5", 4.6)
+    elif species == "lion":
+        r.line([(-34, -66), (-72, -60), (-94, -88)], INK, 13)
+        r.line([(-34, -66), (-72, -60), (-94, -88)], fur, 7.4)
+        r.ell(-98, -94, 15, 19, accent or "#B5651D", INK, 2.8, ang=30)
+    elif species == "fox":
+        r.ell(-64, -90, 42, 25, fur, INK, 3.2, ang=-38)
+        r.ell(-90, -108, 18, 15, "#FFFFFF", INK, 2.6, ang=-38)
+    elif species == "sheep":
+        r.ell(-42, -80, 15, 15, "#FFFFFF", INK, 2.8)
+    elif species == "cow":
+        r.line([(-36, -72), (-62, -62), (-66, -30)], INK, 8)
+        r.line([(-36, -72), (-62, -62), (-66, -30)], "#FFFFFF", 4)
+        r.ell(-66, -24, 8, 13, "#3A3030", INK, 2.2)
+    for s in (-1, 1):                                                                    # legs and feet
+        sw, lift = P.leg(s)
+        hip, foot = (s * 19, -54), (s * 23 + sw, -12 - lift)
+        r.limb(hip, foot, 16, legc)
+        r.ell(foot[0] + s * 4, foot[1] + 5, 20, 9, "#3A3030" if species == "cow" else legc, INK, 2.8)
+    if species == "sheep":                                                               # a body of fluffy wool
+        for i in range(10):
+            a = 2 * math.pi * i / 10
+            r.ell(46 * math.cos(a), -92 + 50 * math.sin(a), 24, 24, "#FFFFFF", INK, 3)
+        r.ell(0, -92, 46, 50, "#FFFFFF", None)
+    else:
+        r.ell(0, -92, 44, 48, fur, INK, 3.2)
+        r.ell(0, -84, 27, 32, belly, None)
+        if species == "cow":
+            for (px, py, rx, ry) in ((-24, -112, 17, 21), (26, -70, 15, 17), (24, -118, 10, 12)):
+                r.ell(px, py, rx, ry, accent or "#3A3030", None)
+        if stripes:
+            for i in range(3):
+                r.line([(-44 + 6 * i, -108 + 16 * i), (-30, -104 + 16 * i)], dark, 4.2)
+                r.line([(44 - 6 * i, -108 + 16 * i), (30, -104 + 16 * i)], dark, 4.2)
+    if apron:
+        r.poly([(-26, -118), (26, -118), (38, -52), (-38, -52)], apron, INK, 3)
+        r.rrect(-13, -86, 13, -66, 4, darker(apron, 0.1), INK, 2)
+    hands = f_arms(r, P, 40, -118, 38, 16, fur if species != "cow" else "#FFFFFF", hand=belly if species in ("cat", "dog", "mouse", "lion", "fox") else None)
+    held(r, hold, hands[1])
+    for s in (-1, 1):                                                                    # --- ears and mane, behind the head
+        if species == "dog":
+            r.ell(s * 51, -150, 17, 36, dark, INK, 3, ang=s * 14)
+        elif species == "sheep":
+            r.ell(s * 56, -164, 21, 10, fur, INK, 3, ang=-s * 16)
+        elif species == "cow":
+            r.ell(s * 58, -168, 21, 10, fur if fur != "#FFFFFF" else "#3A3030", INK, 3, ang=-s * 16)
+            r.poly([(s * 24, -194), (s * 30, -218), (s * 40, -216), (s * 36, -192)], "#F4EAD0", INK, 2.6)
+    if species == "lion":
+        for i in range(14):
+            a = 2 * math.pi * i / 14
+            r.ell(60 * math.cos(a), -158 + 56 * math.sin(a), 26, 26, accent or "#B5651D", INK, 3)
+        r.ell(0, -158, 60, 54, accent or "#B5651D", None)
+    for s in (-1, 1):
+        tw = 3 * math.sin(t * 3.1 + s)
+        if species == "cat":
+            r.poly([(s * 12, -190), (s * 52, -172), (s * (38 + tw * 0.3), -230)], fur, INK, 3.2)
+            r.poly([(s * 22, -192), (s * 45, -180), (s * (37 + tw * 0.3), -216)], "#FFB3C7", None)
+        elif species == "mouse":
+            r.ell(s * 40, -196, 27, 29, fur, INK, 3.2)
+            r.ell(s * 40, -196, 17, 19, "#F7B6C6", None)
+        elif species == "lion":
+            r.ell(s * 36, -198, 15, 15, fur, INK, 3)
+            r.ell(s * 36, -198, 8, 8, "#E8A9A0", None)
+        elif species == "fox":
+            r.poly([(s * 10, -188), (s * 54, -170), (s * (42 + tw * 0.3), -240)], fur, INK, 3.2)
+            r.poly([(s * 22, -190), (s * 47, -178), (s * (41 + tw * 0.3), -222)], "#FFF4E8", None)
+            r.poly([(s * 36, -224), (s * (42 + tw * 0.3), -240), (s * 46, -216)], "#3A2A22", None)
+    if species == "sheep":                                                               # the head: a dark face inside a fluffy wool cap
+        r.ell(0, -158, 46, 42, fur, INK, 3.2)
+        for i in range(7):
+            r.ell(-36 + 12 * i, -196 + 4 * abs(i - 3), 15, 14, "#FFFFFF", INK, 2.8)
+        r.ell(0, -190, 36, 12, "#FFFFFF", None)
+    else:
+        r.ell(0, -158, 48, 43, fur if species != "cow" else "#FFFFFF", INK, 3.2)
+    if species in ("cat", "mouse", "lion", "fox", "dog"):                                # muzzle and nose
+        wid = {"cat": 22, "mouse": 20, "lion": 25, "fox": 24, "dog": 28}[species]
+        r.ell(sh, -146, wid, 16 if species != "dog" else 21, belly, None)
+        if species == "fox":
+            for s in (-1, 1):
+                r.poly([(s * 30, -156), (s * 54, -148), (s * 36, -126)], "#FFFFFF", None)
+        if species == "patch" or patch:
+            r.ell(-19, -166, 17, 16, patch, None)
+    if species == "cat":
+        r.poly([(sh - 6, -152), (sh + 6, -152), (sh, -145)], "#FF7A9A", INK, 2)
+    elif species == "dog":
+        r.ell(sh, -152, 11, 8, "#2B2B2B", INK, 2)
+        r.dot(sh + 3, -155, 2.4, "#FFFFFF")
+    elif species == "mouse":
+        r.dot(sh, -150, 5.5, "#F58BA7")
+    elif species == "lion":
+        r.poly([(sh - 9, -154), (sh + 9, -154), (sh, -143)], "#8A4B2A", INK, 2)
+    elif species == "fox":
+        r.ell(sh, -152, 8, 6, "#2B2B2B", INK, 2)
+    elif species == "sheep":
+        r.ell(sh, -150, 20, 15, "#5A4A4A", None)
+        r.dot(sh, -152, 5, "#F58BA7")
+    elif species == "cow":
+        r.ell(sh, -142, 33, 21, "#FFB3C1", INK, 2.6)
+        r.dot(sh - 11, -142, 3.8, "#C77A8A")
+        r.dot(sh + 11, -142, 3.8, "#C77A8A")
+    f_eyes(r, sh * 1.5, -168, 20, 10.5, 13, P)
+    f_cheeks(r, sh, -146, 37, "#FF9DAB", 8, P.puff)
+    if species in ("cat", "dog", "mouse", "lion", "fox", "sheep"):
+        f_mouth(r, sh, -135 if species != "cow" else -126, P, 11)
+        if P.mouth in ("open", "grin") and species == "dog":                              # a long pink tongue
+            r.ell(sh, -122, 7, 11, "#FF7A9A", INK, 2)
+    else:
+        f_mouth(r, sh, -128, P, 9)
+    if species in ("cat", "mouse"):                                                      # whiskers
+        for s in (-1, 1):
+            for dy in (-7, 0, 7):
+                r.line([(s * 30, -148 + dy * 0.5), (s * 68, -152 + dy * 1.5)], "#5A4A4A", 2.2)
+    if stripes and species == "cat":                                                     # tabby stripes on the forehead
+        for i in (-1, 0, 1):
+            r.line([(i * 11, -199 + abs(i) * 4), (i * 11, -184 + abs(i) * 3)], dark, 4.4)
+    if bow:
+        r.poly([(sh * 0 + 16, -196), (sh * 0 + 46, -208), (sh * 0 + 46, -184)], bow, INK, 2.4)
+        r.poly([(sh * 0 + 16, -196), (sh * 0 - 14, -208), (sh * 0 - 14, -184)], bow, INK, 2.4)
+        r.dot(16, -196, 7, darker(bow, 0.15))
+    return r
+
+
 # ------------------------------------------------------------------------------------------------ small helpers for Bibi's friends
 def friend(c, which, x, y, k, t, mood="smile"):
     f = {"bibi": D.bibi, "pip": D.pip, "mo": D.mo, "lila": D.lila}[which]
@@ -1164,3 +1310,5 @@ def friend(c, which, x, y, k, t, mood="smile"):
 
 CHARACTERS = {"pig": pig, "wolf": wolf, "bear": bear, "hare": hare, "tortoise": tortoise, "girl": girl, "ginger": ginger, "goat": goat, "troll": troll,
               "mirror": mirror, "hen": hen, "chick": chick}
+for _sp in CRITTERS:                                                                     # every critter species is an actor kind of its own
+    CHARACTERS[_sp] = (lambda sp: (lambda c, x, y, k=1.0, t=0.0, P=None, **kw: critter(c, x, y, k, t, P, species=sp, **kw)))(_sp)

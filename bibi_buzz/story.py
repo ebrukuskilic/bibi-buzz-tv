@@ -20,6 +20,7 @@ from . import storyart as A
 from . import storyart2 as B
 from . import storyaudio as SA
 from . import storyprops as PR
+from . import vibe as VB
 from . import voice as VO
 from .draw import clamp, lerp, ease_out_back
 from .storyview import View
@@ -601,7 +602,8 @@ def _draw_actor(view, scene, tl, ts, near, far, tale, amp_of):
             kw["mouth_amt"] = amp
         f(view.c, view.X(x), view.Y(y - hop) - HEAD[d.kind] * 0.4 * kk * view.z, kk * view.z * 0.9, **kw)
         return
-    P = A.pose_for(name, ts, phase=phase, moving=moving, amp=amp, face=face, seed=d.seed, speed=speed / 150.0)
+    P = A.pose_for(name, ts, phase=phase, moving=moving, amp=amp, face=face, seed=d.seed, speed=speed / 150.0,
+                   gesture=not tl.hold_at(ts))
     P.lean += tl.tilt_at(ts)
     style = d.style
     if d.kind in ("girl", "bear", "troll", "wolf"):
@@ -648,6 +650,7 @@ def draw_scene(tale, si, ts, scale_out=1.0):
         for i in range(3):
             px = (i * 520 + ts * (9 + 4 * i) + 100) % (scene.world + 600) - 300
             B.cloud_shape(view, px, 70 + 46 * i, 0.9 + 0.2 * i)
+    VB.story_ambient(canvas, scene.bg, ts)                      # birds, butterflies, leaves, fireflies, glitter: behind the actors
     amp_of = {}
     for (v0, v1, who, key, text) in scene.speech:
         if who and v0 - 0.02 <= ts <= v1:
@@ -672,6 +675,7 @@ def draw_scene(tale, si, ts, scale_out=1.0):
             PR.PROPS[d.kind](view, d.x, d.y, d.k * pop, ts, st)
         else:
             _draw_actor(view, scene, tl, ts, near, far, tale, amp_of)
+    VB.story_foreground(canvas, scene.bg, ts, cx, z, scene.world)     # swaying grass along the bottom edge, in front of everybody
     for f_ in scene.fxs:
         if f_["t0"] <= ts <= f_["t1"]:
             x, y = _fx_pos(scene, f_, ts)

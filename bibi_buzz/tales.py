@@ -1,5 +1,5 @@
 """The fairy tales (public-domain classics) as story scripts, told in short, simple sentences for ages 2-6."""
-from .story import Tale
+from .story import Tale, ease
 
 NAR = ("en-US-JennyNeural", "-6%", "+0Hz")
 ANA = "en-US-AnaNeural"
@@ -770,8 +770,197 @@ def gingerbread_man(lang="en"):
     return t
 
 
+# ================================================================================================ the three billy goats gruff
+GOAT_S = dict(fur="#F7F1E3", scarf="#FF6B8B", horns=0.7)
+GOAT_M = dict(fur="#E5C99C", scarf="#FFD23F", horns=1.0)
+GOAT_B = dict(fur="#8F8179", scarf="#3E8EDE", horns=1.25, horn="#D9C98E")
+TROLL = dict(hold="club")
+K_S, K_M, K_B, K_T = 0.52, 0.72, 0.92, 0.80                  # (no depth scaling in the gorge scenes: everybody is "flat")
+DECK, POOL, TROLL_X = 440, 688, 780                          # the goats' feet on the bridge, the troll's feet in the stream, where the troll lives
+BIG_X, MID_X, LIT_X = 135, 245, 340                          # the three brothers on the dry hill (left bank)
+RBIG_X, RMID_X, RLIT_X = 985, 1110, 1205                     # ... and on the green hill (right bank)
+FIGHT_X, HIT_X, WIN_X = 460, 660, RBIG_X                     # where the big goat stops to talk to the troll, where his horns hit him, where he walks to afterwards
+TROLL_UP = 800                                               # where the troll jumps up onto the bridge
+TROLL_Q = "Who is that, tripping over my bridge?"
+TROLL_EAT = "Grr! Now I am going to gobble you up!"
+
+
+def _gorge(s):
+    """The bridge over the gorge and the front of the stream (see-through: it hides the troll's feet)."""
+    return s.prop("bridge", "bridge", 640, DECK, 1.0).prop("water", "gorge_water", 640, 700, 1.0)
+
+
+def _steps(k, dist, dur, at=0.0, c0=0.0, gain=0.5, heavy=False):
+    """The trip-trap of hooves: one sound for every step of a goat that walks `dist` px in `dur` s, starting at `at`, after it already
+    walked `c0` px in this scene. It follows the gait of story._draw_actor (one step per 46 * k + 0.05 * speed px; the walk eases
+    in and out a little), so every sound lands on a foot. heavy = a big goat: thuds."""
+    stride = 46.0 * max(0.6, k) + 0.05 * dist / dur
+    acts, n = [], int(c0 // stride) + 1
+    while n * stride - c0 <= dist + 1e-6:
+        want = (n * stride - c0) / dist
+        lo, hi = 0.0, 1.0
+        for _ in range(24):                                   # solve u * 0.86 + 0.14 * ease(u) = want
+            u = (lo + hi) / 2
+            if u * 0.86 + 0.14 * ease(u) < want:
+                lo = u
+            else:
+                hi = u
+        tt = at + dur * lo
+        if heavy:
+            acts.append(("sfx", "thud", {"at": tt, "gain": gain * 1.2}))
+            acts.append(("sfx", ("hoof", "hoof2")[n % 2], {"at": tt, "gain": gain * 0.8}))
+        else:
+            acts.append(("sfx", ("hoof", "hoof2")[n % 2], {"at": tt, "gain": gain}))
+        n += 1
+    return acts
+
+
+def _taps(n, at=0.0, gap=0.42, gain=0.45):
+    """n hoof taps that are heard from far away (trip, trap ...)."""
+    return [("sfx", ("hoof", "hoof2")[i % 2], {"at": at + i * gap, "gain": gain}) for i in range(n)]
+
+
+def three_billy_goats(lang="en"):
+    t = Tale("tale-three-billy-goats-gruff", "The Three Billy Goats Gruff | Fairy Tale Story for Kids | Bibi Buzz TV",
+             "Trip, trap! Trip, trap! Watch the classic fairy tale of The Three Billy Goats Gruff: three hungry brothers want to cross the old wooden bridge, to eat the sweet green "
+             "grass on the other side, but a big, grumpy troll lives under it. A gentle, colorful animated story in simple English for toddlers and preschoolers.",
+             TAGS + ["three billy goats gruff", "billy goats gruff", "the three billy goats gruff", "troll under the bridge", "trip trap trip trap"],
+             {"nar": NAR, "lit": (ANA, "+4%", "+24Hz"), "mid": ("en-US-EricNeural", "+0%", "+8Hz"), "big": (GUY, "-12%", "-14Hz"),
+              "troll": ("en-US-ChristopherNeural", "-16%", "-26Hz")}, lang=lang)
+    t.bubble_tint = {"lit": "#FFE3EE", "mid": "#FFF3C4", "big": "#DCEBFF", "troll": "#DDEFC8"}
+    t.cover = dict(bg="meadow", title=("THE THREE BILLY", "GOATS GRUFF"), size=104, gap=108,
+                   actors=[("lit", "goat", 140, 706, 1.12, 1, "happy", GOAT_S), ("mid", "goat", 375, 708, 1.3, 1, "cheer", GOAT_M),
+                           ("big", "goat", 650, 712, 1.42, 1, "proud", GOAT_B), ("troll", "troll", 1070, 712, 1.4, -1, "sly", TROLL)])
+    _intro(t, ("THE THREE BILLY", "GOATS GRUFF"), "Today's story is... The Three Billy Goats Gruff!")
+
+    # ---------------------------------------------------------------- 1 three hungry goats
+    s = t.scene("Three hungry goats", "meadow_gorge", mood="happy", title="Three hungry billy goats")
+    _gorge(s)
+    s.actor("big", "goat", -330, DECK, K_B, face=1, flat=True, **GOAT_B).actor("mid", "goat", -215, DECK, K_M, face=1, flat=True, **GOAT_M)
+    s.actor("lit", "goat", -105, DECK, K_S, face=1, flat=True, **GOAT_S).actor("troll", "troll", TROLL_X, POOL, K_T, face=-1, show=False, flat=True, **TROLL)
+    s.nar("Once upon a time, three billy goats lived on a dry, brown hill.",
+          ("walk", "lit", LIT_X, DECK, {"fit": True}), ("walk", "mid", MID_X, DECK, {"fit": True}), ("walk", "big", BIG_X, DECK, {"fit": True}))
+    s.nar("There was a little goat, a middle goat, and a big goat.", ("pose", "lit", "happy"), ("pose", "mid", "happy"), ("pose", "big", "happy"),
+          ("hop", "lit", {"at": "30%"}), ("hop", "mid", {"at": "58%"}), ("hop", "big", {"at": "88%"}))
+    s.nar("They were brothers, and they loved to eat green grass.", ("pose", "lit", "eat"), ("pose", "mid", "eat"), ("pose", "big", "eat"),
+          ("sfx", "munch", {"at": "55%"}), ("sfx", "munch", {"at": "85%"}))
+    s.say("lit", "Oh no! All the grass on our hill is gone!", ("pose", "lit", "sad"), ("pose", "mid", "sad"), ("pose", "big", "idle"))
+    s.say("mid", "My tummy is rumbling. I am so hungry!", ("pose", "mid", "sad"), ("pose", "lit", "idle"))
+    s.say("big", "Do not worry, brothers. Look across the bridge!", ("pose", "big", "wave"), ("pose", "mid", "idle"))
+    s.nar("On the other side of the bridge, there was a hill full of sweet, green grass.",
+          ("pose", "big", "idle"), ("pose", "lit", "surprised"), ("pose", "mid", "surprised"), ("fx", "sparkle", 1110, 330, {"at": 0.3, "dur": 4.5, "r": 190}))
+    s.say("lit", "Yum! Let us go and eat it!", ("pose", "lit", "cheer"), ("hop", "lit", {"at": "35%"}), ("pose", "mid", "cheer"), ("pose", "big", "happy"))
+    s.nar("But under the bridge, there lived a big, grumpy troll. He did not like anyone to cross his bridge!",
+          ("show", "troll", {"at": "42%"}), ("pose", "troll", "sly", {"at": "42%"}), ("pose", "lit", "scared", {"at": "46%"}), ("pose", "mid", "scared", {"at": "46%"}),
+          ("pose", "big", "surprised", {"at": "46%"}), ("fx", "mark", "lit", 0, {"at": "46%", "dur": 1.8, "text": "!"}),
+          ("pose", "troll", "knock", {"at": "78%"}), ("sfx", "thud", {"at": "78%", "gain": 0.9}))
+    s.say("big", "Do not be afraid. I have a plan!", ("pose", "big", "proud"), ("pose", "lit", "idle"), ("pose", "mid", "idle"), ("pose", "troll", "sly"))
+    s.say("big", "Little brother, you go first.", ("pose", "big", "wave"), ("pose", "lit", "surprised"))
+    s.say("big", "Then middle brother. Then me!", ("pose", "big", "idle"), ("pose", "lit", "idle"), ("pose", "mid", "happy"))
+    s.say("lit", "Okay! Here I go!", ("pose", "lit", "cheer"), ("hop", "lit", {"at": "40%"}), ("pose", "mid", "happy"), ("pose", "big", "happy"), tail=0.5)
+
+    # ---------------------------------------------------------------- 2 the grumpy troll
+    s = t.scene("The grumpy troll", "meadow_gorge", mood="sneaky", title="The grumpy troll")
+    _gorge(s)
+    s.actor("troll", "troll", TROLL_X, POOL, K_T, face=-1, flat=True, **TROLL)
+    s.nar("Under the bridge, the grumpy troll was waiting. His tummy was rumbling, too!", ("cam", 780, 520, 1.4, {"at": 0.0, "dur": 2.6}), ("pose", "troll", "sly"))
+    s.say("troll", "Grr... I am so hungry! I hope something yummy comes along!", ("pose", "troll", "think"))
+    s.nar("Just then, he heard a sound. Trip, trap! Trip, trap!", ("pose", "troll", "surprised", {"at": "20%"}), ("fx", "mark", "troll", 0, {"at": "20%", "dur": 1.8, "text": "!"}),
+          *_taps(5, at=1.6), ("pose", "troll", "sly", {"at": -1.0}), ("hide", "troll", {"at": -0.45}), tail=0.3)
+
+    # ---------------------------------------------------------------- 3 little billy goat gruff
+    s = t.scene("Little Billy Goat Gruff", "meadow_gorge", mood="sneaky", title="Little Billy Goat Gruff")
+    _gorge(s)
+    s.actor("big", "goat", BIG_X, DECK, K_B, face=1, flat=True, **GOAT_B).actor("mid", "goat", MID_X, DECK, K_M, face=1, flat=True, **GOAT_M)
+    s.actor("lit", "goat", LIT_X, DECK, K_S, face=1, flat=True, **GOAT_S).actor("troll", "troll", TROLL_X, POOL, K_T, face=-1, show=False, flat=True, **TROLL)
+    s.nar("Little Billy Goat Gruff walked onto the bridge. Trip, trap! Trip, trap!", ("walk", "lit", 560, DECK, {"at": 0.3, "dur": 3.9}),
+          *_steps(K_S, 560 - LIT_X, 3.9, at=0.3), ("pose", "mid", "scared"), ("pose", "big", "idle"))
+    s.say("troll", TROLL_Q, ("show", "troll"), ("pose", "troll", "sly"), ("pose", "lit", "scared"), ("fx", "mark", "lit", 0, {"at": 0.3, "dur": 1.8, "text": "!"}))
+    s.say("lit", "It is only me, Little Billy Goat Gruff.", ("pose", "lit", "shrug"), ("pose", "troll", "idle"))
+    s.say("lit", "I am going to the green hill, to eat some grass.", ("pose", "lit", "happy"))
+    s.say("troll", TROLL_EAT, ("pose", "troll", "knock"), ("sfx", "thud", {"at": 0.25, "gain": 0.9}), ("pose", "lit", "scared"), ("fx", "sweat", "lit", 0, {"at": "30%", "dur": 3.0}))
+    s.say("lit", "Please do not eat me! I am only a little goat.", ("pose", "lit", "scared"), ("pose", "troll", "idle"))
+    s.say("lit", "My brother is coming soon. He is much bigger!", ("pose", "lit", "wave"))
+    s.say("troll", "Hmm... Bigger, you say? Off you go, then!", ("pose", "troll", "think"), ("pose", "lit", "idle"))
+    s.nar("So Little Billy Goat Gruff skipped across the bridge, and up the green hill. Munch, munch, munch!", ("walk", "lit", RLIT_X, DECK, {"at": 0.3, "dur": 4.6}),
+          *_steps(K_S, RLIT_X - 560, 4.6, at=0.3, c0=560 - LIT_X, gain=0.45), ("hide", "troll", {"at": 0.6}), ("pose", "mid", "happy"), ("pose", "big", "happy"),
+          ("pose", "lit", "eat", {"at": -1.4}), ("sfx", "munch", {"at": -1.2}), ("sfx", "munch", {"at": -0.7}), ("sfx", "munch", {"at": -0.2}), tail=0.5)
+
+    # ---------------------------------------------------------------- 4 middle billy goat gruff
+    s = t.scene("Middle Billy Goat Gruff", "meadow_gorge", mood="sneaky", title="Middle Billy Goat Gruff")
+    _gorge(s)
+    s.actor("big", "goat", BIG_X, DECK, K_B, face=1, flat=True, **GOAT_B).actor("mid", "goat", MID_X, DECK, K_M, face=1, flat=True, **GOAT_M)
+    s.actor("lit", "goat", RLIT_X, DECK, K_S, face=-1, flat=True, **GOAT_S).actor("troll", "troll", TROLL_X, POOL, K_T, face=-1, show=False, flat=True, **TROLL)
+    s.nar("Next came Middle Billy Goat Gruff. Trip, trap! Trip, trap! Trip, trap!", ("walk", "mid", 560, DECK, {"at": 0.3, "dur": 4.4}),
+          *_steps(K_M, 560 - MID_X, 4.4, at=0.3), ("pose", "lit", "eat"), ("pose", "big", "idle"), ("sfx", "munch", {"at": 0.8, "gain": 0.5}), ("sfx", "munch", {"at": 1.6, "gain": 0.5}))
+    s.say("troll", TROLL_Q, ("show", "troll"), ("pose", "troll", "sly"), ("pose", "mid", "scared"), ("pose", "lit", "scared"), ("fx", "mark", "mid", 0, {"at": 0.3, "dur": 1.8, "text": "!"}))
+    s.say("mid", "It is only me, Middle Billy Goat Gruff.", ("pose", "mid", "shrug"), ("pose", "troll", "idle"))
+    s.say("mid", "I am going to the green hill, to eat some grass.", ("pose", "mid", "happy"))
+    s.say("troll", TROLL_EAT, ("pose", "troll", "knock"), ("sfx", "thud", {"at": 0.25, "gain": 0.9}), ("pose", "mid", "scared"), ("fx", "sweat", "mid", 0, {"at": "30%", "dur": 3.0}))
+    s.say("mid", "Please do not eat me! I am only a middle goat.", ("pose", "mid", "scared"), ("pose", "troll", "idle"))
+    s.say("mid", "My big brother is coming soon. He is much bigger!", ("pose", "mid", "wave"))
+    s.say("troll", "Even bigger? Hmm... I will wait! Off you go!", ("pose", "troll", "think"), ("pose", "mid", "idle"))
+    s.nar("So Middle Billy Goat Gruff crossed the bridge, and joined his little brother. Munch, munch, munch!", ("walk", "mid", RMID_X, DECK, {"at": 0.3, "dur": 4.6}),
+          *_steps(K_M, RMID_X - 560, 4.6, at=0.3, c0=560 - MID_X, gain=0.5), ("hide", "troll", {"at": 0.6}), ("pose", "big", "happy"), ("pose", "lit", "happy", {"at": -2.2}), ("hop", "lit", {"at": -2.2}),
+          ("pose", "mid", "eat", {"at": -1.4}), ("pose", "lit", "eat", {"at": -1.4}), ("sfx", "munch", {"at": -1.2}), ("sfx", "munch", {"at": -0.7}), ("sfx", "munch", {"at": -0.2}), tail=0.5)
+
+    # ---------------------------------------------------------------- 5 big billy goat gruff
+    s = t.scene("Big Billy Goat Gruff", "meadow_gorge", mood="chase", title="Big Billy Goat Gruff")
+    _gorge(s)
+    s.actor("big", "goat", BIG_X, DECK, K_B, face=1, flat=True, **GOAT_B)
+    s.actor("mid", "goat", RMID_X, DECK, K_M, face=-1, flat=True, **GOAT_M).actor("lit", "goat", RLIT_X, DECK, K_S, face=-1, flat=True, **GOAT_S)
+    s.actor("troll", "troll", TROLL_X, POOL, K_T, face=-1, show=False, flat=True, **TROLL)
+    s.nar("Last of all came Big Billy Goat Gruff. TRIP, TRAP! TRIP, TRAP! The old bridge shook and shook!", ("walk", "big", FIGHT_X, DECK, {"at": 0.3, "dur": 4.8}),
+          *_steps(K_B, FIGHT_X - BIG_X, 4.8, at=0.3, heavy=True), ("set", "bridge", "shake", 1.0, {"at": 2.2, "dur": 0.4}), ("cam", 640, 380, 1.1, {"at": 1.0, "dur": 3.5}),
+          ("pose", "lit", "scared", {"at": "55%"}), ("pose", "mid", "scared", {"at": "55%"}))
+    s.say("troll", "WHO is that, stomping over MY bridge?", ("set", "bridge", "shake", 0.0, {"at": 0.0, "dur": 0.4}), ("show", "troll", {"at": 0.0}), ("cam", 640, 360, 1.0, {"at": 0.0, "dur": 0.9}),
+          ("walk", "troll", TROLL_UP, DECK, {"at": 0.5, "dur": 0.7, "pose": "jump"}), ("hop", "troll", {"at": 0.5}), ("scale", "troll", 1.12, {"at": 0.5, "dur": 0.7}),
+          ("fx", "dust", TROLL_UP, 452, {"at": 1.2, "dur": 1.0, "size": 1.3}), ("pose", "troll", "sly", {"at": 1.25}), lead=1.5)
+    s.say("big", "It is I, Big Billy Goat Gruff!", ("pose", "big", "proud"))
+    s.say("big", "I am going to cross your bridge!", ("pose", "big", "idle"))
+    s.say("troll", TROLL_EAT, ("pose", "troll", "knock"), ("sfx", "thud", {"at": 0.25, "gain": 0.9}))
+    s.say("big", "Oh no, you are not! I have big horns, and I am brave!", ("pose", "big", "sly"))
+    s.say("lit", "Go, big brother, go!", ("pose", "lit", "cheer"), ("hop", "lit", {"at": "30%"}), ("pose", "mid", "cheer"))
+    s.nar("Big Billy Goat Gruff lowered his horns, and ran at the troll!", ("pose", "troll", "scared", {"at": -1.2}), ("walk", "big", HIT_X, DECK, {"at": -1.0, "dur": 0.9, "pose": "run"}),
+          *_steps(K_B, HIT_X - FIGHT_X, 0.9, at=-1.0, c0=FIGHT_X - BIG_X, heavy=True), ("cam", 700, 370, 1.12, {"at": -1.6, "dur": 1.4}))
+    s.nar("BONK! Up, up, up went the troll, high into the air!", ("fx", "burst", HIT_X + 95, 300, {"at": 0.0, "dur": 1.4, "text": "BONK!", "size": 0.85}),
+          ("set", "bridge", "shake", 1.0, {"at": 0.0, "dur": 0.1}), ("set", "bridge", "shake", 0.0, {"at": 0.8, "dur": 0.4}),
+          ("walk", "troll", TROLL_UP + 110, -40, {"at": 0.05, "dur": 1.3, "pose": "scared"}), ("pose", "big", "proud", {"at": 0.3}), ("pose", "lit", "surprised", {"at": 0.3}),
+          ("pose", "mid", "surprised", {"at": 0.3}), ("walk", "big", WIN_X, DECK, {"at": 0.9, "dur": 3.2, "pose": "walk"}),
+          *_steps(K_B, WIN_X - HIT_X, 3.2, at=0.9, c0=HIT_X - BIG_X, heavy=True, gain=0.42))
+    s.nar("And down, down, down he fell, SPLASH, into the water!", ("face", "big", -1, {"at": 0.0}), ("cam", 640, 360, 1.0, {"at": 0.0, "dur": 1.0}),
+          ("walk", "troll", 790, POOL, {"at": -2.7, "dur": 0.9, "pose": "scared"}), ("scale", "troll", 1.0, {"at": -2.7, "dur": 0.9}),
+          ("fx", "splash", 765, 672, {"at": -1.8, "dur": 1.2}), ("fx", "splash", 820, 672, {"at": -1.8, "dur": 1.2, "sfx": False}),
+          ("fx", "burst", 790, 520, {"at": -1.8, "dur": 1.6, "text": "SPLASH!", "color": "#3E9BE8", "sfx": "splash"}), ("pose", "troll", "dizzy", {"at": -1.7}),
+          ("fx", "dizzy", "troll", 0, {"at": -1.6, "dur": 3.0}), ("pose", "big", "idle", {"at": -1.7}), ("pose", "lit", "cheer", {"at": -1.0}), ("pose", "mid", "cheer", {"at": -1.0}))
+    s.say("troll", "Ouch! I am sorry that I was so mean!", ("pose", "troll", "sad"), ("pose", "big", "idle"), ("pose", "lit", "idle"), ("pose", "mid", "idle"))
+    s.say("big", "Be kind, and others will be kind to you!", ("pose", "big", "proud"))
+    s.say("troll", "I will! I promise! Thank you!", ("pose", "troll", "happy"), ("fx", "hearts", "troll", 0, {"at": "30%", "dur": 3.0}), ("pose", "big", "happy"), ("pose", "lit", "happy"), ("pose", "mid", "happy"))
+    s.nar("And the three brothers were together again!", ("pose", "troll", "wave", {"at": 0.3}), ("pose", "big", "cheer", {"at": "40%"}), ("hop", "big", {"at": "40%"}), ("pose", "mid", "cheer", {"at": "55%"}),
+          ("hop", "mid", {"at": "55%"}), ("pose", "lit", "cheer", {"at": "70%"}), ("hop", "lit", {"at": "70%"}), ("fx", "hearts", "mid", 0, {"at": "60%", "dur": 3.0}), tail=0.5)
+
+    # ---------------------------------------------------------------- 6 the green hill
+    s = t.scene("The green hill", "meadow_gorge_dusk", mood="calm", title="The green hill")
+    _gorge(s)
+    s.actor("big", "goat", WIN_X, DECK, K_B, face=-1, flat=True, **GOAT_B).actor("mid", "goat", RMID_X, DECK, K_M, face=-1, flat=True, **GOAT_M)
+    s.actor("lit", "goat", RLIT_X, DECK, K_S, face=-1, flat=True, **GOAT_S).actor("troll", "troll", TROLL_X, POOL, K_T, face=1, show=False, flat=True, **TROLL)
+    s.nar("And on the sweet, green hill, the three billy goats ate, and ate, and ate, until their tummies were full.",
+          ("pose", "lit", "eat"), ("pose", "mid", "eat"), ("pose", "big", "eat"), ("sfx", "munch", {"at": 0.8}), ("sfx", "munch", {"at": 1.8}), ("sfx", "munch", {"at": 2.8}),
+          ("sfx", "munch", {"at": 3.8}), ("fx", "sparkle", 1090, 330, {"at": 0.4, "dur": 5.0, "r": 200}))
+    s.say("lit", "Yum, yum! This grass is the best!", ("pose", "lit", "happy"), ("hop", "lit", {"at": "40%"}), ("pose", "mid", "eat"), ("pose", "big", "eat"))
+    s.say("mid", "Thank you, big brother, for being so brave!", ("pose", "mid", "happy"), ("pose", "lit", "eat"))
+    s.say("big", "We did it together, brothers!", ("pose", "big", "cheer"), ("hop", "big", {"at": "40%"}), ("pose", "mid", "eat"), ("fx", "hearts", "big", 0, {"at": "30%", "dur": 3.0}))
+    s.nar("And the troll? He was never mean again. Now he says hello to everyone who crosses his bridge.", ("pose", "big", "happy"), ("pose", "mid", "happy"), ("pose", "lit", "happy"),
+          ("show", "troll", {"at": "40%"}), ("pose", "troll", "wave", {"at": "40%"}), ("fx", "hearts", "troll", 0, {"at": "62%", "dur": 3.0}))
+    s.say("troll", "Hello, friends! Have a nice day!", ("pose", "troll", "wave"), ("pose", "big", "wave"), ("pose", "mid", "wave"), ("pose", "lit", "wave"))
+    s.nar("Snip, snap, snout, this tale is told out!", ("fx", "sparkle", 640, 300, {"at": 0.2, "dur": 4.0, "r": 400}), ("pose", "troll", "happy"), tail=0.8)
+
+    _outro(t, "Remember, little ones: be kind to others, and be brave when you need to be.", caption="Be kind, and be brave!")
+    return t
+
+
 TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_and_hare, "goldilocks": goldilocks,
-         "red-riding-hood": red_riding_hood, "gingerbread-man": gingerbread_man}
+         "red-riding-hood": red_riding_hood, "gingerbread-man": gingerbread_man, "three-billy-goats": three_billy_goats}
 
 
 def build(key, lang="en"):

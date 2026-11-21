@@ -7,7 +7,8 @@ plus a recipe that dresses its sections with pictures: backdrops, the four frien
 """
 import re
 
-from . import songart  # noqa: F401  (registers the farm backdrops in storyart2.BACKDROPS and the props of the rainbow sheep)
+from . import draw as D
+from . import songart  # noqa: F401  (registers the farm and lake backdrops in storyart2.BACKDROPS and the props of the rainbow sheep, the boat and the animals of the lake)
 from .song import Song
 
 FAMILY = ("bibi", "pip", "mo", "lila")
@@ -715,9 +716,327 @@ def _rainbowsheep(s):
         ("sfx", "ding", {"at": sub_t + 0.05}), ("sfx", "pop", {"at": sub_t}), ("sfx", "sparkle", {"at": sub_t + 0.1})])
 
 
+# ================================================================================================ Row, row, row your boat / Kürek çek, kürek çek
+# C major, 6/8, written with the dotted quarter as the beat (60 to the minute, two beats to a bar).  A verse is eight bars:
+#   a  'Row, row, row your boat, gently down the stream.'      b  'Merrily, merrily, merrily, merrily, life is but a dream.'
+# The first verse (sunrise) and the last one (starry night, a lullaby) are the song as it is.  In the four verses between, an animal of the lake comes by:
+# the third line becomes its sound (eight half beats: quack quack ...) and the fourth greets it ('Hello little duck!').
+_T1, _T2 = "%.10g" % (1 / 3), "%.10g" % (2 / 3)          # a third of a beat and two thirds of a beat (an eighth and a quarter in 6/8)
+_RW_N1 = "C4 C4 C4:%s D4:%s E4" % (_T2, _T1)
+_RW_N1_TR = "C4:0.5 C4:0.5 C4 C4:%s D4:%s E4" % (_T2, _T1)                                  # 'Kü-rek çek, kü-rek çek': six syllables
+_RW_N2 = "E4:%s D4:%s E4:%s F4:%s G4:2" % (_T2, _T1, _T2, _T1)
+_RW_N3 = " ".join("%s:%s" % (p, _T1) for p in "C5 C5 C5 G4 G4 G4 E4 E4 E4 C4 C4 C4".split())
+_RW_N4 = "G4:%s F4:%s E4:%s D4:%s C4:2" % (_T2, _T1, _T2, _T1)
+_RW_N4_6 = "G4:%s G4:%s F4:%s E4:%s D4:%s C4:2" % (_T1, _T1, _T1, _T2, _T1)                 # 'Mer-ha-ba kur-ba-ğa': six syllables
+_RW_NS = "C5:0.5 C5:0.5 G4:0.5 G4:0.5 E4:0.5 E4:0.5 C4:0.5 C4:0.5"                         # the sound of an animal: eight half beats down the chord
+
+RW_ANIMALS = [      # who comes by, the sound it makes (the plain lower-case word of the sound line), the big sound word, the colour of its burst, its line 3 and its greeting
+    dict(key="duck", color="#F2A71B", snd=dict(en="quack", tr="vak"), big=dict(en="QUACK!", tr="VAK!"),
+         sound=dict(en=" ".join(["Quack"] * 8) + "!", tr=" ".join(["Vak"] * 8) + "!"),
+         hello=dict(en="Hel-lo lit-tle duck!", tr="Mer-ha-ba ör-dek!")),
+    dict(key="frog", color="#3FAE49", snd=dict(en="ribbit", tr="vrak"), big=dict(en="RIBBIT!", tr="VRAK!"),
+         sound=dict(en=" ".join(["Rib-bit"] * 4) + "!", tr=" ".join(["Vrak"] * 8) + "!"),
+         hello=dict(en="Hel-lo lit-tle frog!", tr="Mer-ha-ba kur-ba-ğa!")),
+    dict(key="fish", color="#FF7A1F", snd=dict(en="blub", tr="blup"), big=dict(en="BLUB!", tr="BLUP!"),
+         sound=dict(en=" ".join(["Blub"] * 8) + "!", tr=" ".join(["Blup"] * 8) + "!"),
+         hello=dict(en="Hel-lo lit-tle fish!", tr="Mer-ha-ba ba-lık!")),
+    dict(key="bird", color="#4A8FE7", snd=dict(en="tweet", tr="cik"), big=dict(en="TWEET!", tr="CİK!"),
+         sound=dict(en=" ".join(["Tweet"] * 8) + "!", tr=" ".join(["Cik"] * 8) + "!"),
+         hello=dict(en="Hel-lo lit-tle bird!", tr="Mer-ha-ba ku-şum!")),
+]
+
+
+def _rw_lines():
+    L = {
+        "L1": dict(en="Row, row, row your boat,", tr="Kü-rek çek, kü-rek çek,", notes=_RW_N1, tr_notes=_RW_N1_TR, chords="C:4"),
+        "L2": dict(en="Gent-ly down the stream.", tr="Su-da u-sul-ca.", notes=_RW_N2, chords="C:2 G:2"),
+        "L3": dict(en="Mer-ri-ly, mer-ri-ly, mer-ri-ly, mer-ri-ly,", tr="Ne-şey-le ne-şey-le ne-şey-le ne-şey-le,", notes=_RW_N3, chords="C:4"),
+        "L4": dict(en="Life is but a dream.", tr="Ha-yat bir rü-ya.", notes=_RW_N4, chords="G7:2 C:2"),
+    }
+    for i, a in enumerate(RW_ANIMALS):
+        L["S%d" % i] = dict(en=a["sound"]["en"], tr=a["sound"]["tr"], notes=_RW_NS, chords="C:4")
+        L["H%d" % i] = dict(en=a["hello"]["en"], tr=a["hello"]["tr"], notes=_RW_N4, chords="G7:2 C:2")
+        if a["key"] == "frog":
+            L["H%d" % i]["tr_notes"] = _RW_N4_6
+    return L
+
+
+_RW_SOFT = dict(lead="box", lead_gain=0.22, chords="rollbox", chord_gain=1.0, bass_gain=0.8, drums="none")
+_RW_SING = dict(lead="xylo", lead_gain=0.20, chords="roll", chord_gain=1.0, bass_gain=0.75, drums="sway")
+_RW_CLAP = dict(lead="xylo", lead_gain=0.20, chords="roll", chord_gain=1.05, bass_gain=0.8, drums="sway_clap", drum_gain=0.85)
+_RW_SOUND = dict(lead="flute", lead_gain=0.20, chords="roll", chord_gain=1.1, bass_gain=0.9, drums="sway_clap", drum_gain=0.9)
+_RW_PARTY = dict(lead="xylo", lead_gain=0.45, chords="roll", chord_gain=1.1, bass_gain=0.9, drums="sway_party", drum_gain=1.0)
+_RW_OUTRO = dict(lead="xylo", lead_gain=0.5, chords="roll", chord_gain=1.1, bass_gain=0.9, drums="sway_clap", drum_gain=0.9)
+
+
+def _rw_form():
+    form = [dict(name="Intro", mode="inst", lines=["L1"], style=_RW_PARTY)]
+
+    def verse(n, sa, sb, l3="L3", l4="L4"):
+        return [dict(name="Verse %d a" % n, lines=["L1", "L2"], style=sa), dict(name="Verse %d b" % n, lines=[l3, l4], style=sb)]
+
+    form += verse(1, _RW_SOFT, _RW_SING)
+    form += verse(2, _RW_SING, _RW_SOUND, "S0", "H0")
+    form += verse(3, _RW_CLAP, _RW_SOUND, "S1", "H1")
+    form += verse(4, _RW_SING, _RW_SOUND, "S2", "H2")
+    form += verse(5, _RW_CLAP, _RW_SOUND, "S3", "H3")
+    form.append(dict(name="Dance", mode="inst", lines=["L1", "L2", "L3", "L4"], style=_RW_PARTY))
+    form += verse(6, _RW_SOFT, _RW_SOFT)
+    form.append(dict(name="Outro", mode="inst", lines=["L4"], post=4, style=_RW_OUTRO))
+    return form
+
+
+def _rw_cover(lang):
+    en = lang == "en"
+    tint = songart.LAKE_MOODS["day"]["tint"]
+    return dict(bg="lake", title=("ROW ROW ROW", "YOUR BOAT") if en else ("KÜREK ÇEK,", "KÜREK ÇEK!"), size=110, gap=112,
+                sub="Sing along with Bibi Buzz TV" if en else "Bibi Buzz TV ile şarkı söyle",
+                props=[("water", "lake_water", 640, 420, 1.0, dict(mood="day")),
+                       ("boat_b", "boat_back", 620, 480, 1.0, dict(wl=534, bar=2.0)),
+                       ("boat_f", "boat_front", 620, 540, 1.0, dict(wl=534, bar=2.0, water=tint)),
+                       ("duck", "duck", 905, 566, 0.95, dict(face=1, water=tint, talk=[(0.6, 1.5)], seed=0.3)),
+                       ("kid0", "duck", 770, 569, 0.42, dict(face=1, water=tint, talk=[(0.75, 1.5)], seed=1.1)),
+                       ("kid1", "duck", 712, 570, 0.4, dict(face=1, water=tint, talk=[(0.85, 1.5)], seed=2.1)),
+                       ("frog", "frog_pad", 290, 578, 0.62, dict(face=1, water=tint, croak=[(0.6, 1.5)])),
+                       ("fish", "fish", 500, 566, 0.9, dict(water=tint, jumps=[(0.3, 1.4, 170, 190)], seed=0.7)),
+                       ("bird", "songbird", 1100, 345, 1.0, dict(face=-1, talk=[(0.6, 1.5)]))],
+                actors=[("bibi", "bibi", 320, 498, 1.075, 1, "idle", {}), ("pip", "pip", 500, 500, 1.079, 1, "idle", {}),
+                        ("mo", "mo", 680, 500, 1.079, -1, "idle", {}), ("lila", "lila", 860, 496, 1.071, -1, "idle", {})],
+                fx=[])
+
+
+ROWBOAT = dict(
+    id="rowboat",
+    title={"en": "Row Row Row Your Boat | Kids Song & Nursery Rhyme | Bibi Buzz TV",
+           "tr": "Kürek Çek, Kürek Çek | Çocuk Şarkısı | Bibi Buzz TV"},
+    blurb={
+        "en": "Sing along with Bibi, Pip, Mo and Lila! Row, row, row your boat gently down the stream, and say hello to a duck, a frog, a fish and a little bird along the way. "
+              "Watch the day go by from sunrise to a starry night, with the words lighting up as we sing. A cheerful, gentle nursery rhyme for babies, toddlers and preschoolers.",
+        "tr": "Bibi, Pip, Mo ve Lila ile birlikte söyleyelim! Kürek çek, kürek çek, suda usulca; yolda bir ördeğe, bir kurbağaya, bir balığa ve küçük bir kuşa merhaba diyoruz. "
+              "Gün doğumundan yıldızlı geceye uzanan yolculukta sözler şarkı söylenirken ekranda yanıyor. Bebekler, küçük çocuklar ve okul öncesi minikler için neşeli, sakin bir çocuk şarkısı.",
+    },
+    tags={
+        "en": ["row row row your boat", "row your boat", "nursery rhymes", "kids songs", "animal sounds", "sing along", "songs for kids", "toddler songs",
+               "baby songs", "children songs", "lullaby", "Bibi Buzz TV"],
+        "tr": ["kürek çek", "row row row your boat türkçe", "çocuk şarkıları", "hayvan sesleri", "bebek şarkıları", "çocuk şarkısı", "ninni",
+               "birlikte söyleyelim", "okul öncesi şarkılar", "türkçe çocuk şarkıları", "Bibi Buzz TV"],
+    },
+    bpm=60, beats=2, shift={"en": -3, "tr": -6},
+    lines=_rw_lines(),
+    form=_rw_form(),
+    cover={"en": _rw_cover("en"), "tr": _rw_cover("tr")},
+)
+
+RW_FRIENDS = (("bibi", 320, 498), ("pip", 500, 500), ("mo", 680, 500), ("lila", 860, 496))      # where the friends sit in the boat
+RW_DUCK, RW_FROG, RW_FISH, RW_BIRD = (905, 566, 0.95), (290, 578, 0.76), (500, 566, 0.9), (1100, 345, 1.0)
+RW_KIDS = ((770, 569, 0.42), (712, 570, 0.4))                                                  # the ducklings behind their mother
+RW_MOOD = {"lake": "day", "lake_dawn": "dawn", "lake_dusk": "dusk", "lake_night": "night"}
+RW_LANTERN = {"lake": 0.0, "lake_dawn": 0.0, "lake_dusk": 0.45, "lake_night": 1.0}
+RW_IDS = {"duck": ("duck", "kid0", "kid1"), "frog": ("frog",), "fish": ("fish",), "bird": ("bird",)}
+RW_HEAD = {"duck": (950, 485), "frog": (300, 500), "fish": (500, 470), "bird": (1105, 275)}       # (above) where its hearts go
+RW_ZZZ = {"duck": (962, 440), "frog": (228, 520), "bird": (1118, 232)}                                # where an animal sleeps (the fish is out of sight)
+RW_BURST = {"duck": ((760, 262), (990, 238)), "frog": ((300, 262), (500, 238)), "fish": ((420, 262), (640, 238)), "bird": ((760, 200), (980, 176))}
+
+
+def _rw_size(s, sec):
+    """The biggest size (up to 62) at which the longest line of a section fits in one row of the lyrics pill (about 1090 px)."""
+    D.set_language(s.lang)
+    for size in range(62, 35, -2):
+        widest = 0.0
+        for it in sec["items"]:
+            ws = ["".join(w["syl"]) for w in it["words"]]
+            if ws:
+                widest = max(widest, sum(D.font(size).getlength(w) / D.SS for w in ws) + 0.28 * size * (len(ws) - 1))
+        if widest <= 1090:
+            return size
+    return 36
+
+
+def _rowboat(s):
+    """The pictures of 'Row, row, row your boat': the four friends row a boat over a lake while the day goes by (dawn, day, dusk, night).  Four animals come by
+    one after the other (a duck, a frog, a fish, a little bird), make their sound with the song and are greeted; at the end they all fall asleep."""
+    S, lg, en, beat = s.sections, s.lang, s.lang == "en", s.beat
+    at = {sec["name"]: sec["index"] for sec in S}
+    bar = 2.0 * beat                                                  # one stroke of the oar for every bar
+    A = {a["key"]: a for a in RW_ANIMALS}
+
+    def stage(sc, bg, rowing=True, speed=1.0):
+        """The lake, the boat and the four friends in it (between the far wall and the near wall of the boat)."""
+        tint = songart.LAKE_MOODS[RW_MOOD[bg]]["tint"]
+        sc.prop("water", "lake_water", 640, 420, 1.0, mood=RW_MOOD[bg], speed=speed)
+        sc.prop("boat_b", "boat_back", 620, 480, 1.0, wl=534, bar=bar if rowing else 0.0)
+        for w, x, y in RW_FRIENDS:
+            sc.actor(w, w, x, y, 1.3)
+        sc.prop("boat_f", "boat_front", 620, 540, 1.0, wl=534, bar=bar if rowing else 0.0, water=tint, lantern=RW_LANTERN[bg])
+        return tint
+
+    def critter(sc, key, tint, show=True, sleep=0, talk=(), croak=(), hops=(), jumps=()):
+        """An animal of the lake: talk / croak / hops / jumps are the times (seconds in the scene) at which it sings, croaks, hops, leaps."""
+        if key == "duck":
+            x, y, k = RW_DUCK
+            sc.prop("duck", "duck", x, y, k, show=show, face=1, water=tint, talk=list(talk), sleep=sleep, seed=0.3)
+            for i, (kx, ky, kk) in enumerate(RW_KIDS):
+                d = 0.14 + 0.08 * i
+                sc.prop("kid%d" % i, "duck", kx, ky, kk, show=show, face=1, water=tint, talk=[(a + d, b + d) for a, b in talk], sleep=sleep, seed=1.1 + i)
+        elif key == "frog":
+            x, y, k = RW_FROG
+            sc.prop("frog", "frog_pad", x, y, k, show=show, face=1, water=tint, croak=list(croak), hops=list(hops), sleep=sleep)
+        elif key == "fish":
+            x, y, k = RW_FISH
+            sc.prop("fish", "fish", x, y, k, show=show, water=tint, jumps=list(jumps), sleep=sleep, seed=0.7)
+        else:
+            x, y, k = RW_BIRD
+            sc.prop("bird", "songbird", x, y, k, show=show, face=-1, talk=list(talk), sleep=sleep)
+
+    def appear(key, t):
+        """The animal pops in at the time t (a splash for the water animals, a few sparkles for the bird)."""
+        out = [("show", pid, {"at": max(0.0, t + 0.12 * i)}) for i, pid in enumerate(RW_IDS[key])]
+        if key == "bird":
+            out.append(_fx("sparkle", RW_BIRD[0], 300, t, 1.2, r=100, n=8))
+        else:
+            x, y, _k = {"duck": RW_DUCK, "frog": RW_FROG, "fish": RW_FISH}[key]
+            out += [_fx("ripples", x, y, t, 1.8, r=110), _fx("droplets", x, y, t, 1.1, n=12)]
+        return out
+
+    def notes_fx(sec):
+        return [_fx("notes", 90, 520, 0.0, sec["dur"]), _fx("notes", 1190, 520, 0.7, sec["dur"])]
+
+    def wins(sec, word, item=0):
+        """[(start, end)] of every sung `word` (plain lower case) in the item of the section."""
+        return [(a, b) for pl, a, b in s.word_spans(sec, sec["items"][item]) if pl == word]
+
+    def splash_at(x, y, t):
+        return [_fx("droplets", x, y, t, 1.1, n=10, power=0.9), _fx("ripples", x, y, t, 1.8, r=90, n=2)]
+
+    # ---- intro: the title card; the four animals pop in one after the other
+    sec = S[0]
+    sc = s.scene_for(0, "lake", mood="title", drift=0.0, clouds=False)
+    tint = stage(sc, "lake")
+    for key in ("duck", "frog", "fish", "bird"):
+        critter(sc, key, tint, show=False)
+    acts = []
+    for i, key in enumerate(("duck", "frog", "fish", "bird")):
+        acts += appear(key, 0.5 + 0.8 * i)
+    title = ("ROW ROW ROW", "YOUR BOAT") if en else ("KÜREK ÇEK,", "KÜREK ÇEK!")
+    sub = "Sing along with Bibi Buzz TV" if en else "Bibi Buzz TV ile şarkı söyle"
+    s.finish_scene(sc, dancers=ALL4, hop=1.0, hop_mode="wave", extra=acts + [
+        ("fx", "title", 0, 0, {"at": 0.0, "dur": sec["dur"], "lines": title, "sub": sub, "top": 52, "size": 100, "gap": 100, "pill": 38, "sfx": False}),
+        _fx("notes", 90, 520, 0.0, sec["dur"]), _fx("notes", 1190, 520, 0.7, sec["dur"]), ("sfx", "tada", {"at": 0.0})])
+
+    present = []                                                       # the animals that have come by
+    for n in range(1, 7):
+        if n == 6:                                                     # (the dance comes after the bird's verse)
+            secD = S[at["Dance"]]
+            sc = s.scene_for(at["Dance"], "lake_dusk", drift=0.0, clouds=False)
+            tint = stage(sc, "lake_dusk")
+            bt = [i * bar for i in range(int(secD["beats"] // 2))]       # the first beat of every bar
+            talk = {k: [] for k in A}
+            extra, jumps = [], []
+            for i, t in enumerate(bt):
+                key = RW_ANIMALS[i % 4]["key"]
+                a = A[key]
+                bx, by = RW_BURST[key][(i // 4) % 2]
+                extra.append(("fx", "burst", bx, by, {"at": t, "dur": 0.9, "text": a["big"][lg], "color": a["color"], "size": 0.85, "sfx": False}))
+                talk[key].append((t, t + 0.8))
+                if key == "fish":
+                    sgn = 1 if (i // 4) % 2 == 0 else -1
+                    jumps.append((t - 0.1, 1.2, sgn * 170, 200))
+                    extra += splash_at(RW_FISH[0] - sgn * 85, RW_FISH[1], t - 0.1) + splash_at(RW_FISH[0] + sgn * 85, RW_FISH[1], t + 1.1)
+            critter(sc, "duck", tint, talk=talk["duck"])
+            critter(sc, "frog", tint, croak=talk["frog"], hops=[a for a, b in talk["frog"]])
+            critter(sc, "fish", tint, jumps=jumps)
+            critter(sc, "bird", tint, talk=talk["bird"])
+            s.finish_scene(sc, dancers=ALL4, hop=1.0, hop_mode="all", extra=_bar_pumps(s, secD, amount=0.03) + extra + [
+                _fx("confetti", 0, 0, 0.0, secD["dur"]), ("sfx", "cheer", {"at": 0.0}), _fx("notes", 90, 520, 0.0, secD["dur"]), _fx("notes", 1190, 520, 0.7, secD["dur"])])
+        secA, secB = S[at["Verse %d a" % n]], S[at["Verse %d b" % n]]
+        bg = {1: "lake_dawn", 2: "lake", 3: "lake", 4: "lake", 5: "lake_dusk", 6: "lake_night"}[n]
+        key = {2: "duck", 3: "frog", 4: "fish", 5: "bird"}.get(n)
+        asleep = 1 if n == 6 else 0
+
+        # -- a: 'Row, row, row your boat, gently down the stream.' (the animal of the verse pops in during the long last note)
+        sc = s.scene_for(at["Verse %d a" % n], bg, drift=0.03)
+        tint = stage(sc, bg, rowing=(n != 6), speed=1.0 if n != 6 else 0.5)
+        for k_ in present:
+            critter(sc, k_, tint, sleep=asleep)
+        extra = notes_fx(secA)
+        if key:
+            critter(sc, key, tint, show=False)
+            extra += appear(key, secA["dur"] - 1.7)
+        if n == 6:
+            for k_ in RW_ZZZ:
+                extra.append(_fx("zzz", RW_ZZZ[k_][0], RW_ZZZ[k_][1], 0.8 + 0.5 * list(RW_ZZZ).index(k_), secA["dur"]))
+        s.finish_scene(sc, singers=(ALL4,), dancers=ALL4, hop=2.0, hop_mode="wave", cam=(640, 360, 1.04), size=_rw_size(s, secA), extra=extra)
+
+        # -- b: the sound of the animal and the greeting (or: 'Merrily, merrily ...  Life is but a dream.')
+        sc = s.scene_for(at["Verse %d b" % n], bg, drift=0.0)
+        tint = stage(sc, bg, rowing=(n != 6), speed=1.0 if n != 6 else 0.5)
+        extra = notes_fx(secB)
+        if key is None:
+            for k_ in present:
+                critter(sc, k_, tint, sleep=asleep)
+            for (pl, a, b) in s.word_spans(secB, secB["items"][0]):                  # a sparkle at every 'merrily'
+                extra.append(_fx("sparkle", 640, 300, a, 1.0, r=220, n=7))
+            t_dream = s.word_spans(secB, secB["items"][1])[-1][1]
+            if n == 6:
+                extra += [_fx("hearts", 640, 330, t_dream, 2.0), _fx("sparkle", 640, 250, t_dream, 2.0, r=320, n=12), ("sfx", "sparkle", {"at": t_dream})]
+                for k_ in RW_ZZZ:
+                    extra.append(_fx("zzz", RW_ZZZ[k_][0], RW_ZZZ[k_][1], 0.2 + 0.5 * list(RW_ZZZ).index(k_), secB["dur"]))
+            else:
+                extra += [_fx("hearts", 640, 330, t_dream, 2.0), ("sfx", "ding", {"at": t_dream})]
+            s.finish_scene(sc, singers=(ALL4,), dancers=ALL4, hop=1.0, hop_mode="wave", size=_rw_size(s, secB), extra=extra)
+        else:
+            a = A[key]
+            snd = wins(secB, a["snd"][lg], 0)
+            words = s.word_spans(secB, secB["items"][1])
+            t_name = words[-1][1]                                                    # when the animal's name is sung
+            greet = [(t_name, t_name + 0.9)]
+            for k_ in present:
+                critter(sc, k_, tint)
+            kw = {}
+            if key in ("duck", "bird"):
+                kw = dict(talk=snd + greet)
+            elif key == "frog":
+                kw = dict(croak=snd + greet, hops=[w[0] + 0.05 for i, w in enumerate(snd) if i % (1 if len(snd) <= 4 else 2) == 0] + [t_name])
+            else:
+                jumps, sgn = [], 1                                                     # a leap at every second sound, left to right and back again
+                for t0, _t1 in snd[::2]:
+                    ta = max(0.0, t0 - 0.1)
+                    jumps.append((ta, 0.9, sgn * 170, 165))
+                    extra += splash_at(RW_FISH[0] - sgn * 85, RW_FISH[1], ta) + splash_at(RW_FISH[0] + sgn * 85, RW_FISH[1], ta + 0.9)
+                    sgn = -sgn
+                ta = t_name - 0.5                                                      # and a high one over the name of the fish (it starts where the last one ended)
+                jumps.append((ta, 1.6, sgn * 170, 230))
+                extra += splash_at(RW_FISH[0] - sgn * 85, RW_FISH[1], ta) + splash_at(RW_FISH[0] + sgn * 85, RW_FISH[1], ta + 1.6)
+                kw = dict(jumps=jumps)
+            critter(sc, key, tint, **kw)
+            for i, (t0, _t1) in enumerate(snd):                                       # the sound word bursts out at every sound
+                bx, by = RW_BURST[key][i % 2]
+                extra.append(("fx", "burst", bx, by + 14 * (i % 3), {"at": max(0.0, t0 - 0.05), "dur": 0.9, "text": a["big"][lg], "color": a["color"],
+                                                                  "size": 0.8 if len(a["big"][lg]) <= 6 else 0.72, "sfx": False}))
+            hx, hy = RW_HEAD[key]
+            extra += [_fx("hearts", hx, hy, t_name, 2.0), ("sfx", "ding", {"at": t_name})]
+            s.finish_scene(sc, singers=(ALL4,), dancers=ALL4, hop=1.0, hop_mode="all", size=_rw_size(s, secB), extra=extra)
+            present.append(key)
+
+    # ---- outro: thank you, like and subscribe (everybody is awake again)
+    sc = s.scene_for(len(S) - 1, "lake", drift=0.0)
+    tint = stage(sc, "lake")
+    for k_ in ("duck", "frog", "fish", "bird"):
+        critter(sc, k_, tint, talk=[(0.5, 1.2), (2.2, 2.9)], croak=[(0.5, 1.2), (2.2, 2.9)], hops=[0.5, 2.2],
+                jumps=[(1.0, 1.3, 170, 190)] if k_ == "fish" else ())
+    sec = S[-1]
+    like, sub_t = 1.7, 3.0
+    caption = "Like and subscribe for more songs!" if en else "Daha fazla şarkı için beğen ve abone ol!"
+    s.finish_scene(sc, dancers=ALL4, hop=2.0, hop_mode="all", extra=[
+        _fx("confetti", 0, 0, sub_t, sec["dur"]), ("fx", "cta", 640, 215, {"at": 0.0, "dur": sec["dur"], "like": like, "sub": sub_t, "sfx": False}),
+        _fx("caption", 0, 0, 0.3, sec["dur"], text=caption), _fx("hearts", 330, 380, 1.0, sec["dur"]), _fx("hearts", 950, 380, 1.4, sec["dur"]),
+        ("sfx", "pop", {"at": 0.05}), ("sfx", "pop", {"at": 0.3}), ("sfx", "ding", {"at": like + 0.05}), ("sfx", "pop", {"at": like}),
+        ("sfx", "ding", {"at": sub_t + 0.05}), ("sfx", "pop", {"at": sub_t}), ("sfx", "sparkle", {"at": sub_t + 0.1})])
+
+
 # ================================================================================================ the shelf
-SPECS = {"twinkle": TWINKLE, "oldmac": OLDMAC, "rainbowsheep": RAINBOWSHEEP}
-RECIPES = {"twinkle": _twinkle, "oldmac": _oldmac, "rainbowsheep": _rainbowsheep}
+SPECS = {"twinkle": TWINKLE, "oldmac": OLDMAC, "rainbowsheep": RAINBOWSHEEP, "rowboat": ROWBOAT}
+RECIPES = {"twinkle": _twinkle, "oldmac": _oldmac, "rainbowsheep": _rainbowsheep, "rowboat": _rowboat}
 QUEUE = ["twinkle", "oldmac", "rainbowsheep"]            # the order in which the songs come out (one a day: curriculum.py)
 
 

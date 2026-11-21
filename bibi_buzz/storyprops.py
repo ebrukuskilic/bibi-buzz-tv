@@ -1637,6 +1637,83 @@ def picnic(c, x, y, k, t, st):
             r.line([(bx - 24 + j * 24, -178 * g + 4), (bx - 10 + j * 24, -156 * g + 4)], "#A85E1E", 3)
     return r
 
+
+@prop
+def net(c, x, y, k, t, st):
+    """A big rope net trap (a see-through dome of rope: it is drawn IN FRONT of whoever stands inside, so put it a few px lower on the screen than the actor).
+    (x, y) = the middle of its base on the ground. st: drop 0..1 = it hangs high up in the trees on four ropes (a wide, flat mesh that swings a little), falls, and settles over
+    whoever stands below as a dome about 600 px wide and 400 px high; cut 0..3 = how many of the front-left strands have been gnawed through (frayed gaps near the ground,
+    growing while the number goes up); open 0..1 = the net slumps into a low heap and slides away to the right, so everybody who was inside it is free."""
+    drop, cut, opn = clamp(st.get("drop", 1.0)), max(0.0, min(3.0, st.get("cut", 0.0))), clamp(st.get("open", 0.0))
+    g = drop ** 1.8
+    W, D, H, TILT = 300.0, 190.0, 400.0, 0.2
+    base_y = lerp(-540.0, 0.0, g)
+    land = ease(clamp((g - 0.55) / 0.45))
+    h = H * land * (1.0 - 0.9 * opn) + 4.0 * (1.0 - land)
+    wide = lerp(1.3, 1.0, ease(clamp((g - 0.4) / 0.6))) * (1.0 + 0.15 * opn)
+    cx = 280.0 * ease(opn) + (1.0 - g) * 7.0 * math.sin(t * 2.2)
+    r = Rig(c, x, y, k)
+    rope, knot = "#DDB66E", "#8B5A2B"
+    NM, NP = 12, 10
+
+    def pt(th, ph):                                                                          # a point of the shell: th = angle round it, ph = 0 at the rim .. pi/2 at the top
+        return (cx + W * wide * math.cos(ph) * math.cos(th), base_y - h * math.sin(ph) + D * wide * math.cos(ph) * math.sin(th) * TILT)
+    cuts = [(5, clamp(cut - 0.0)), (6, clamp(cut - 1.0)), (4, clamp(cut - 2.0))]            # (meridian, how far it is gnawed through 0..1): front left, left, front
+    strands, frays = [], []
+    for j in range(NM):                                                                      # meridians: from the rim up to the knot on top
+        th = j * 2.0 * math.pi / NM
+        amt = next((a for (m, a) in cuts if m == j), 0.0)
+        gap = 0.62 * amt                                                                     # radians of the arc (from the rim) that are gone
+        pts = [pt(th, i * (math.pi / 2.0) / NP) for i in range(NP + 1)]
+        strands.append([p for i, p in enumerate(pts) if i * (math.pi / 2.0) / NP >= gap - 1e-6])
+        if amt > 0.02:
+            ex, ey = pt(th, gap)
+            frays.append((ex, ey, th))
+            ex2, ey2 = pt(th, 0.0)
+            frays.append((ex2, ey2, th + 0.4))
+    for i in range(5):                                                                       # rings: the rim and four smaller rings above it
+        ph = i * (math.pi / 2.0) / 5.0
+        broken = [th for (m, a) in cuts for th in (m * 2.0 * math.pi / NM,) if a > 0.5] if i == 0 else []
+        run = []
+        for a in range(49):
+            th = a * 2.0 * math.pi / 48.0
+            if any(abs(math.atan2(math.sin(th - b), math.cos(th - b))) < 0.11 for b in broken):
+                if len(run) > 1:
+                    strands.append(run)
+                run = []
+                continue
+            run.append(pt(th, ph))
+        if len(run) > 1:
+            strands.append(run)
+    hoist = lerp(-1150.0, base_y - h - 14.0, ease(clamp((g - 0.25) / 0.6)))                 # four ropes lead from the rim up to the branches ...
+    up = 1.0 - ease(clamp((g - 0.5) / 0.4))                                                 # ... and slacken onto the net once it has fallen
+    ropes = []
+    if up > 0.02:
+        for j in (1, 5, 7, 11):
+            ax, ay = pt(j * 2.0 * math.pi / NM, 0.0)
+            ropes.append([(ax, ay), (cx + (ax - cx) * 0.18, ay + (hoist - ay) * up)])
+    for pts in ropes:
+        r.line(pts, INK, 9.0)
+    for pts in strands:
+        r.line(pts, INK, 7.2)
+    for pts in ropes:
+        r.line(pts, "#E9C98A", 6.0)
+    for pts in strands:
+        r.line(pts, rope, 4.2)
+    for (ex, ey, th) in frays:                                                              # frayed rope ends where a strand was gnawed through
+        for s in (-1, 0, 1):
+            r.line([(ex, ey), (ex + 7 * math.cos(th + s * 0.9) + s * 3, ey + 7 * math.sin(th + s * 0.9) - 4)], rope, 2.2)
+    for j in range(NM):                                                                      # little knots where the rim meets each strand
+        if not any(m == j and a > 0.5 for (m, a) in cuts):
+            kx, ky = pt(j * 2.0 * math.pi / NM, 0.0)
+            r.dot(kx, ky, 8.5, INK)
+            r.dot(kx, ky, 6.2, knot)
+    ax, ay = pt(0.0, math.pi / 2.0)                                                         # the big knot on top
+    r.dot(ax, ay, 16, INK)
+    r.dot(ax, ay, 12.4, knot)
+    r.dot(ax - 3, ay - 3, 3.6, "#C28A4C")
+    return r
+
 # ================================================================================================ effects
 @fx
 def wind(c, s, x, y, dt, dir=1, power=1.0, dx=0, **_):

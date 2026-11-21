@@ -18,6 +18,9 @@ on:
       tail:
         description: "Also render the LAST n seconds (the end and the like / subscribe card) with real voices (0 = no)"
         default: "22"
+      kokoro:
+        description: "The Kokoro neural voices of bibi_buzz/ktts.py for the narrator and the characters: yes or no (an Edge voice stands in for every line Kokoro cannot make)"
+        default: "no"
 
 permissions:
   contents: write
@@ -29,9 +32,11 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@v5
         with:
@@ -47,12 +52,28 @@ jobs:
           curl -fL --retry 4 -o assets/Baloo2-Variable.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/baloo2/Baloo2%5Bwght%5D.ttf"
           ls -la assets
 
+      - uses: actions/cache@v4
+        if: github.event.inputs.kokoro == 'yes'
+        with:
+          path: ~/.cache/huggingface
+          key: hf-kokoro-v1
+
+      - name: Install the Kokoro voices (CPU)
+        if: github.event.inputs.kokoro == 'yes'
+        continue-on-error: true
+        run: |
+          sudo apt-get install -y -qq espeak-ng libsndfile1
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install "kokoro>=0.9.4" soundfile
+          ffmpeg -hide_banner -filters 2>/dev/null | grep -i rubberband || echo "NO rubberband in this ffmpeg"
+
       - name: Test render
         env:
           TALE: ${{ github.event.inputs.tale }}
           LANG_: ${{ github.event.inputs.lang }}
           SECONDS_: ${{ github.event.inputs.seconds }}
           TAIL_: ${{ github.event.inputs.tail }}
+          BIBI_KOKORO: ${{ github.event.inputs.kokoro == 'yes' && 'en,tr' || '' }}
         run: |
           python tools/test_tale.py "$TALE" "$LANG_" --out out/test --seconds "$SECONDS_" --tail "$TAIL_"
           ls -la out/test

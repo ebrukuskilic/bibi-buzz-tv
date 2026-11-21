@@ -630,9 +630,12 @@ def r_quiz(X, c, seg):
 
 def r_outro(X, c, seg):
     L, t = X.L, X.t
+    cx = L.w / 2
+    for k in range(6):                                          # the floating hearts drift BEHIND the title and the friends
+        u = ((t - seg.t0) * 0.35 + k / 6.0) % 1.0
+        D.heart(c, cx + math.sin(k * 2.3 + t * 1.3) * L.w * 0.38, L.sy1 - u * 520, 16 + 6 * math.sin(k), "#FF5C8A")
     label(c, "See you next time!", L.scx if L.v else L.w / 2, L.sy0 + (90 if L.v else 70), 92 if not L.v else 80, "#FF6FAE",
           X.cue_p(seg, 0, 0.6), L.w - 60)
-    cx = L.w / 2
     sc = L.w / 1280.0
     y = L.sy0 + (330 if L.v else 330)
     if L.v:
@@ -645,9 +648,6 @@ def r_outro(X, c, seg):
         D.mo(c, 960, y + 110, 0.95, t, "smile", (-4, -2))
         D.lila(c, 1130, y + 80, 0.95, t, "smile", (-4, -2))
         bibi_at(X, c, 640, y + 20, 1.6)
-    for k in range(6):
-        u = ((t - seg.t0) * 0.35 + k / 6.0) % 1.0
-        D.heart(c, cx + math.sin(k * 2.3 + t * 1.3) * L.w * 0.38, L.sy1 - u * 520, 16 + 6 * math.sin(k), "#FF5C8A")
     VB.confetti(c, L.w, L.h, t, seg.t0 + 0.2, dur=4.2, n=80, seed=3)
 
 
@@ -655,6 +655,9 @@ def r_cta(X, c, seg):
     """The Like / Subscribe card right before the goodbye (YouTube has no comments, end screens or subscribe watermark on kids videos)."""
     L, t = X.L, X.t - seg.t0
     t_like, t_sub = SCH.cta_times(X.lesson)
+    for k in range(6):                                          # the floating hearts drift BEHIND the buttons and the friends
+        u = ((X.t - seg.t0) * 0.35 + k / 6.0) % 1.0
+        D.heart(c, L.w / 2 + math.sin(k * 2.3 + X.t * 1.3) * L.w * 0.38, L.sy1 - u * 520, 16 + 6 * math.sin(k), "#FF5C8A")
     D.cta(c, L.w / 2, L.sy0 + (150 if L.v else 130), t, min(1.0, (L.w - 70) / 820.0), t_like, t_sub)
     mood = "open" if X.amp is not None else "smile"
     y = L.sy0 + 330
@@ -668,9 +671,6 @@ def r_cta(X, c, seg):
         D.mo(c, 960, y + 120, 0.95, X.t, "smile", (-4, -2))
         D.lila(c, 1130, y + 90, 0.95, X.t, "smile", (-4, -2))
         bibi_at(X, c, 640, y + 70, 1.5)
-    for k in range(6):
-        u = ((X.t - seg.t0) * 0.35 + k / 6.0) % 1.0
-        D.heart(c, L.w / 2 + math.sin(k * 2.3 + X.t * 1.3) * L.w * 0.38, L.sy1 - u * 520, 16 + 6 * math.sin(k), "#FF5C8A")
     VB.confetti(c, L.w, L.h, X.t, seg.t0 + t_sub, dur=2.6, n=48, seed=4)        # a shower when the pointer presses Subscribe
 
 

@@ -21,6 +21,9 @@ engines
   kokoro-tr / kokoro-tr-shift   Kokoro-Turkish (a Turkish fine-tune of Kokoro-82M: two voices, elif and emre), plain / with the pitch of the characters moved by rubberband
   prod-kokoro  the way the daily videos would do it: bibi_buzz.tales with BIBI_KOKORO=<language> (the Kokoro voices of bibi_buzz/ktts.py, the Edge voice when Kokoro
               cannot make a line), the WHOLE tale; every line is measured and the whole tale is written as one mp3 to listen to (<language>-full-prod.mp3)
+  cast        the CASTING sweep (--only cast): every character type of the tales says its own line in several Kokoro voices / sizes (bibi_buzz/ktts.py speak(): a
+              smaller or bigger person by shift_voice, not by a pitch shifter), measured (UTMOS, words wrong, pitch F0), plus a ladder of sizes and a comparison with
+              the pitch shifter; one gallery mp3 per language (cast-<language>.mp3: the narrator says the type, then every candidate says the line)
 """
 import argparse
 import asyncio
@@ -467,6 +470,200 @@ def cbx_collect(a):
             log("   line %s: %.1f s of audio in %.1f s of work" % (k, times[k][1], times[k][0]))
 
 
+# ------------------------------------------------------------------------------------------------------------------------ the casting sweep (--only cast)
+# type -> candidates (Kokoro voice or mix, rate, pitch); the pitch is "+X Hz" = a factor of 1 + X / 150 (a smaller / bigger person: bibi_buzz/ktts.py shift_voice)
+CAST_EN = {
+    "nar": [("af_heart", "-8%", "+0Hz"), ("af_heart", "-4%", "+0Hz"), ("af_bella", "-6%", "+0Hz")],
+    "girl": [("af_bella", "-2%", "+10Hz"), ("af_aoede", "-2%", "+14Hz"), ("af_kore", "-2%", "+16Hz")],
+    "teen": [("af_kore", "-2%", "+0Hz"), ("af_sarah", "-2%", "+6Hz"), ("af_aoede", "-2%", "+0Hz")],
+    "boy": [("am_puck", "+4%", "+16Hz"), ("am_puck", "+4%", "+24Hz"), ("am_michael", "+4%", "+30Hz")],
+    "baby": [("af_bella", "+0%", "+40Hz"), ("af_aoede", "+0%", "+38Hz"), ("af_kore", "+0%", "+40Hz")],
+    "woman": [("af_bella", "-4%", "+0Hz"), ("af_nicole", "-4%", "+0Hz"), ("bf_emma", "-4%", "+0Hz")],
+    "granny": [("bf_emma", "-14%", "-10Hz"), ("af_nicole", "-14%", "-14Hz"), ("bf_isabella", "-14%", "-10Hz")],
+    "fakegranny": [("am_michael", "-8%", "+30Hz"), ("am_puck", "-8%", "+16Hz")],
+    "man": [("am_michael", "-6%", "+0Hz"), ("am_fenrir", "-6%", "+8Hz"), ("am_puck", "-6%", "-8Hz")],
+    "grandpa": [("bm_fable", "-14%", "-8Hz"), ("am_michael", "-14%", "-14Hz"), ("bm_george", "-14%", "-8Hz")],
+    "prince": [("am_puck", "+0%", "+0Hz"), ("am_michael", "+0%", "+8Hz"), ("bm_fable", "+0%", "+6Hz")],
+    "king": [("bm_george", "-14%", "-12Hz"), ("am_fenrir", "-14%", "-14Hz"), ("bm_fable", "-14%", "-14Hz")],
+    "lord": [("bm_fable", "-8%", "-4Hz"), ("bm_george", "-8%", "-6Hz")],
+    "queen": [("bf_emma", "-10%", "-8Hz"), ("bf_isabella", "-10%", "-8Hz"), ("af_nicole", "-10%", "-10Hz")],
+    "stepmother": [("af_nicole", "-12%", "-10Hz"), ("bf_isabella", "-12%", "-12Hz")],
+    "stepsister": [("af_kore", "+6%", "+12Hz"), ("af_sarah", "+6%", "+14Hz"), ("af_aoede", "+6%", "+12Hz")],
+    "witch": [("af_nicole", "-14%", "-20Hz"), ("bf_emma", "-14%", "-20Hz"), ("af_nicole", "-14%", "-14Hz")],
+    "fairy": [("af_aoede", "-8%", "+14Hz"), ("af_sarah", "-8%", "+14Hz")],
+    "mirror": [("bm_fable", "-18%", "-6Hz"), ("bm_george", "-18%", "-10Hz")],
+    "dwarf": [("am_michael", "+6%", "+20Hz"), ("am_puck", "+6%", "+4Hz")],
+    "elf": [("am_puck", "+10%", "+24Hz"), ("am_puck", "+10%", "+30Hz")],
+    "elfgirl": [("af_bella", "+10%", "+28Hz"), ("af_aoede", "+10%", "+28Hz")],
+    "troll": [("am_fenrir", "-16%", "-26Hz"), ("am_fenrir", "-16%", "-34Hz"), ("am_onyx", "-16%", "-28Hz")],
+    "giant": [("am_fenrir", "-16%", "-34Hz"), ("am_onyx", "-16%", "-34Hz")],
+    "pig": [("am_puck", "+2%", "+12Hz"), ("am_puck", "+2%", "+20Hz"), ("am_michael", "+2%", "+20Hz")],
+    "wolf": [("am_fenrir", "-10%", "-20Hz"), ("am_fenrir", "-10%", "-28Hz"), ("bm_george", "-10%", "-22Hz")],
+    "hare": [("am_puck", "+8%", "+16Hz"), ("am_puck", "+8%", "+24Hz")],
+    "tortoise": [("am_michael", "-20%", "-8Hz"), ("bm_fable", "-20%", "-10Hz")],
+    "bear": [("am_fenrir", "-12%", "-12Hz"), ("am_michael", "-12%", "-18Hz")],
+    "mamabear": [("af_nicole", "-8%", "-14Hz"), ("bf_emma", "-8%", "-14Hz")],
+    "goat_little": [("am_puck", "+4%", "+22Hz"), ("af_sky", "+4%", "+20Hz")],
+    "goat_mid": [("am_michael", "+0%", "+8Hz"), ("am_puck", "+0%", "+0Hz")],
+    "goat_big": [("am_fenrir", "-14%", "-14Hz"), ("am_fenrir", "-14%", "-22Hz")],
+    "hen": [("af_kore", "+4%", "+10Hz"), ("af_sarah", "+4%", "+12Hz")],
+    "fox": [("bm_fable", "-4%", "+0Hz"), ("am_puck", "-4%", "-6Hz")],
+    "tiny": [("af_bella", "+8%", "+45Hz"), ("af_aoede", "+8%", "+45Hz"), ("af_sky", "+8%", "+40Hz")],
+    "lion": [("am_fenrir", "-12%", "-28Hz"), ("am_fenrir", "-12%", "-34Hz")],
+}
+E9, E8, E7 = "elif=0.9,emre=0.1", "elif=0.8,emre=0.2", "elif=0.7,emre=0.3"
+M8, M7 = "elif=0.2,emre=0.8", "elif=0.3,emre=0.7"
+CAST_TR = {
+    "nar": [("elif", "-5%", "+0Hz"), ("elif", "-8%", "+0Hz"), (E9, "-5%", "+0Hz")],
+    "girl": [("elif", "-2%", "+15Hz"), ("elif", "-2%", "+24Hz"), (E9, "-2%", "+20Hz")],
+    "teen": [("elif", "-2%", "+6Hz"), ("elif", "-2%", "+0Hz")],
+    "boy": [("emre", "+4%", "+18Hz"), ("emre", "+4%", "+26Hz"), (M7, "+4%", "+20Hz")],
+    "baby": [("elif", "+0%", "+40Hz"), ("elif", "+0%", "+32Hz")],
+    "woman": [(E8, "-8%", "+0Hz"), ("elif", "-8%", "-4Hz")],
+    "granny": [("elif", "-14%", "-10Hz"), (E8, "-14%", "-12Hz")],
+    "fakegranny": [("emre", "-8%", "+30Hz"), ("emre", "-8%", "+20Hz")],
+    "man": [("emre", "-6%", "+0Hz"), (M8, "-6%", "+0Hz")],
+    "grandpa": [("emre", "-12%", "-10Hz"), ("emre", "-12%", "-14Hz")],
+    "prince": [("emre", "-2%", "+6Hz"), (M8, "-2%", "+8Hz")],
+    "king": [("emre", "-14%", "-14Hz"), ("emre", "-14%", "-20Hz")],
+    "lord": [("emre", "-10%", "-8Hz"), ("emre", "-10%", "-12Hz")],
+    "queen": [("elif", "-12%", "-10Hz"), (E9, "-12%", "-12Hz")],
+    "stepmother": [(E8, "-10%", "-10Hz"), ("elif", "-10%", "-12Hz")],
+    "stepsister": [("elif", "+6%", "+16Hz"), ("elif", "+6%", "+24Hz")],
+    "witch": [("elif", "-14%", "-20Hz"), (E7, "-14%", "-22Hz")],
+    "fairy": [("elif", "-14%", "+8Hz"), ("elif", "-14%", "+14Hz")],
+    "mirror": [("emre", "-16%", "-8Hz"), ("emre", "-16%", "-12Hz")],
+    "dwarf": [("emre", "+8%", "+16Hz"), ("emre", "+8%", "+24Hz")],
+    "elf": [("emre", "+10%", "+26Hz"), ("emre", "+10%", "+34Hz")],
+    "elfgirl": [("elif", "+10%", "+28Hz"), ("elif", "+10%", "+34Hz")],
+    "troll": [("emre", "-16%", "-28Hz"), ("emre", "-16%", "-34Hz")],
+    "giant": [("emre", "-18%", "-38Hz"), ("emre", "-18%", "-44Hz")],
+    "pig": [("emre", "+4%", "+12Hz"), ("emre", "+4%", "+20Hz")],
+    "wolf": [("emre", "-10%", "-20Hz"), ("emre", "-10%", "-28Hz")],
+    "hare": [("emre", "+8%", "+24Hz"), ("emre", "+8%", "+32Hz")],
+    "tortoise": [("emre", "-20%", "-8Hz"), ("emre", "-20%", "-12Hz")],
+    "bear": [("emre", "-12%", "-20Hz"), ("emre", "-12%", "-26Hz")],
+    "mamabear": [("elif", "-10%", "-14Hz"), (E8, "-10%", "-16Hz")],
+    "goat_little": [("elif", "+4%", "+28Hz"), ("elif", "+4%", "+36Hz")],
+    "goat_mid": [("emre", "+2%", "+14Hz"), ("emre", "+2%", "+20Hz")],
+    "goat_big": [("emre", "-10%", "-20Hz"), ("emre", "-10%", "-28Hz")],
+    "hen": [("elif", "+2%", "+20Hz"), ("elif", "+2%", "+28Hz")],
+    "fox": [("emre", "-4%", "+6Hz"), ("emre", "-4%", "+12Hz")],
+    "tiny": [("elif", "+8%", "+45Hz"), ("elif", "+8%", "+38Hz")],
+    "lion": [("emre", "-12%", "-28Hz"), ("emre", "-12%", "-34Hz")],
+}
+LADDER = {"en": ["af_bella", "am_michael"], "tr": ["elif", "emre"]}
+LADDER_LINE = {"en": "The little bird sat on the branch and sang a happy song.", "tr": "Küçük kuş dalın üstüne konup neşeli bir şarkı söyledi."}
+LADDER_F = [0.75, 0.85, 0.92, 1.0, 1.08, 1.16, 1.25, 1.35, 1.45]
+VS_PS = {"en": [("boy", "am_puck", "+24Hz"), ("wolf", "am_fenrir", "-28Hz"), ("baby", "af_bella", "+40Hz")],
+         "tr": [("boy", "emre", "+26Hz"), ("wolf", "emre", "-28Hz"), ("baby", "elif", "+40Hz")]}
+
+
+def f0_of(y, sr=KSR):
+    """Median pitch (Hz) of the voiced frames of a clip: normalized autocorrelation by FFT on a copy at a third of the sample rate; None when there is no pitch."""
+    n3 = len(y) // 3 * 3
+    y = np.asarray(y[:n3], dtype=np.float64).reshape(-1, 3).mean(axis=1)
+    sr //= 3
+    fl, hop = int(0.04 * sr), int(0.01 * sr)
+    lo, hi = int(sr / 520), int(sr / 70)
+    if len(y) < fl + hop * 4:
+        return None
+    idx = np.arange(0, len(y) - fl, hop)
+    fr = np.stack([y[i:i + fl] for i in idx])
+    fr = (fr - fr.mean(axis=1, keepdims=True)) * np.hanning(fl)
+    e = np.sqrt((fr ** 2).mean(axis=1))
+    nfft = 1 << (2 * fl - 1).bit_length()
+    sp = np.fft.rfft(fr, n=nfft, axis=1)
+    ac = np.fft.irfft(sp * np.conj(sp), axis=1)[:, :hi + 1]
+    ac = ac / (ac[:, :1] + 1e-12)
+    out = []
+    thr = 0.35 * np.percentile(e, 90)
+    for k in range(len(idx)):
+        if e[k] < thr:
+            continue
+        seg = ac[k, lo:hi + 1]
+        j = int(np.argmax(seg))
+        if seg[j] > 0.55 and 0 < j < len(seg) - 1:
+            a, b, c = seg[j - 1], seg[j], seg[j + 1]
+            d = a - 2 * b + c
+            out.append(sr / (lo + j + (0.5 * (a - c) / d if abs(d) > 1e-12 else 0.0)))
+    return float(np.median(out)) if len(out) >= 8 else None
+
+
+def cast_sweep(a):
+    """Every character type of the tales says its line in the candidate voices; every clip is measured; one gallery mp3 per language."""
+    os.environ["BIBI_KOKORO_INPROC"] = "1"                              # (the model is loaded once, in this process)
+    try:
+        _cast_sweep()
+    finally:
+        os.environ.pop("BIBI_KOKORO_INPROC", None)                      # (the engines after it work the way the daily videos do: Kokoro in a worker process)
+
+
+def _cast_sweep():
+    from bibi_buzz import ktts as KT
+    try:
+        from test_tale import VOICE_LINES, VOICE_NAMES
+    except Exception:
+        log("test_tale could not be imported", traceback.format_exc()[-400:])
+        return
+    for lang, table in (("en", CAST_EN), ("tr", CAST_TR)):
+        i = 0 if lang == "en" else 1
+        pre = "k:" if lang == "en" else "kt:"
+        gap1, gap2 = np.zeros(int(0.35 * KSR)), np.zeros(int(1.0 * KSR))
+        parts, rows = [], []
+        log("---- cast sweep %s: type  voice  rate  pitch   seconds  F0 Hz  UTMOS  words wrong   (the best of a type by UTMOS is marked *)" % lang)
+        for typ, cands in table.items():
+            line = VOICE_LINES[typ][i]
+            try:
+                parts += [KT.speak(VOICE_NAMES[typ][i], pre + ("af_heart" if lang == "en" else "elif"), "-8%", "+0Hz"), gap1]
+            except Exception:
+                log("   narrator failed", typ, traceback.format_exc()[-200:])
+            made = []
+            for body, rate, pitch in cands:
+                try:
+                    y = KT.speak(line, pre + body, rate, pitch)
+                except Exception:
+                    log("   %-11s %-22s %-4s %-6s FAILED %s" % (typ, body, rate, pitch, traceback.format_exc()[-160:].replace("\n", " | ")))
+                    continue
+                sc = score(y, line, lang)
+                made.append((sc.get("mos", 0.0), sc.get("wer", 1.0), body, rate, pitch, y, f0_of(y)))
+                parts += [y, gap1]
+            parts.append(gap2)
+            best = max(made, key=lambda m: m[0] - 2.0 * max(0.0, m[1] - 0.2), default=None)
+            for m in made:
+                log("   %-11s %-22s %-4s %-6s %5.1f s  F0 %5s  UTMOS %.2f  wrong %3.0f%% %s" % (typ, m[2], m[3], m[4], len(m[5]) / float(KSR), ("%.0f" % m[6]) if m[6] else "-", m[0], 100 * m[1],
+                                                                                              "*" if m is best else ""))
+                rows.append(m)
+        if rows:
+            log("   %s: %d clips, mean UTMOS %.2f, mean words wrong %.0f%%" % (lang, len(rows), np.mean([m[0] for m in rows]), 100 * np.mean([m[1] for m in rows])))
+        VL.save("cast-" + lang, np.concatenate(parts) if parts else np.zeros(KSR), KSR)
+
+        log("---- ladder %s: the same voice as a smaller or a bigger person (factor 1.00 = the voice as it is)" % lang)
+        for body in LADDER[lang]:
+            for f in LADDER_F:
+                try:
+                    y = KT.speak(LADDER_LINE[lang], pre + body, "+0%", "%+.1fHz" % ((f - 1.0) * 150))
+                except Exception:
+                    log("   %-10s %.2f FAILED" % (body, f))
+                    continue
+                sc = score(y, LADDER_LINE[lang], lang)
+                log("   %-10s x%.2f  F0 %5s  UTMOS %.2f  wrong %3.0f%%" % (body, f, ("%.0f" % f0_of(y)) if f0_of(y) else "-", sc.get("mos", 0.0), 100 * sc.get("wer", 1.0)))
+
+        log("---- the way of the first test (a pitch shifter: ffmpeg rubberband) against the new way (shift_voice) %s" % lang)
+        for typ, body, pitch in VS_PS[lang]:
+            line = VOICE_LINES[typ][i]
+            f = KT.pitch_factor(pitch)
+            try:
+                new = KT.speak(line, pre + body, "-0%", pitch)
+                old = pitch_shift(KT.speak(line, pre + body, "-0%", "+0Hz"), f, "shifted")
+            except Exception:
+                log("   %s comparison failed %s" % (typ, traceback.format_exc()[-200:].replace("\n", " | ")))
+                continue
+            for name, y in (("rubberband", old), ("shift_voice", new)):
+                sc = score(y, line, lang)
+                log("   %-5s %-10s x%.2f  %-11s F0 %5s  UTMOS %.2f  wrong %3.0f%%" % (typ, body, f, name, ("%.0f" % f0_of(y)) if f0_of(y) else "-", sc.get("mos", 0.0), 100 * sc.get("wer", 1.0)))
+
+
 # ------------------------------------------------------------------------------------------------------------------------ main
 ENGINES = [                                                   # (language, key, function)
     ("en", "1-cur", e_cur), ("en", "2-edge-multi", e_edge(EDGE_MULTI)), ("en", "3-kokoro", e_kokoro), ("en", "4-prod-kokoro", e_prod),
@@ -487,6 +684,14 @@ def job_main(a):
             log("  ", m, "MISSING", repr(e)[:120])
     list_edge_voices()
     only = [x for x in (a.only or "").split(",") if x]
+    if "cast" in only:
+        try:
+            cast_sweep(a)
+        except Exception:
+            log("CAST SWEEP FAILED", traceback.format_exc()[-1500:])
+        only = [x for x in only if x != "cast"]
+        if not only:
+            return
     for lang, key, fn in ENGINES:
         if only and key.split("-", 1)[1] not in only and key not in only:
             continue

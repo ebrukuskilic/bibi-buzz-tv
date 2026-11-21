@@ -14,6 +14,9 @@ pointer clicks on the words).
   python tools/test_tale.py voices en --out out/test        # the key "voices": every character TYPE of tales.TYPES says a line of its own
 writes <out>/voices-<lang>.mp3 (the narrator says the type, then the character says its line, with its voice and effect) and
 <out>/voices-<lang>.txt (a table: voice, effect, pitch F0, loudness) - to listen to and to tune the character voices.
+
+  python tools/test_tale.py voices-list en --out out/test   # which voices the machine offers (voices-list.txt)
+  python tools/test_tale.py "lab=girl:en-US-AnaNeural|-2%|+10Hz|;boy:en-US-AnaNeural|+2%|-30Hz|" en --out out/test   # a voice laboratory (voices-lab-en.mp3 / .txt)
 """
 import argparse
 import json
@@ -150,24 +153,27 @@ def _f0(y, sr=44100):
     return np.array(out)
 
 
-def test_voices(a, ffmpeg):
-    """Every character type of tales.TYPES says a line with its voice and effect; a table of the pitch and loudness and one mp3 to listen to."""
+def _voices_table(a, ffmpeg, rows, base):
+    """rows: [(type, name, item, label_item)]: writes <base>.txt (a table of the pitch and loudness of every clip) and <base>.mp3 to listen to
+    (the narrator says the name, then the character says its line)."""
     import wave
     import numpy as np
     from bibi_buzz import voice as VO
-    i = 0 if a.lang == "en" else 1
-    nar = tuple(TL.TYPES["nar"][i])
-    rows = []
-    for typ, spec in TL.TYPES.items():
-        if typ in VOICE_LINES:
-            v, r, p, fx = spec[i]
-            rows.append((typ, VOICE_NAMES[typ][i], (VOICE_LINES[typ][i], v, r, p, fx), (VOICE_NAMES[typ][i],) + nar))
-    clips = VO.synth_items([it for row in rows for it in row[2:]], ffmpeg, a.cache)
+    clips = {}
+    for it in sorted({it for row in rows for it in row[2:]}):
+        try:
+            clips.update(VO.synth_items([it], ffmpeg, a.cache))
+        except BaseException as e:                                             # (a voice that does not exist must not stop the others)
+            print("FAILED:", it, repr(e)[:160], flush=True)
     sr = VO.SR
     gap1, gap2 = np.zeros(int(0.35 * sr)), np.zeros(int(1.0 * sr))
     lines, parts = [], []
-    lines.append("%-12s %-24s %-5s %-6s %-34s %5s  %6s %6s %6s %7s %5s" % ("type", "voice", "rate", "pitch", "effect", "sec", "F0 med", "p10", "p90", "rms dB", "peak"))
+    lines.append("%-12s %-34s %-5s %-6s %-30s %5s  %6s %6s %6s %7s %5s" % ("type", "voice", "rate", "pitch", "effect", "sec", "F0 med", "p10", "p90", "rms dB", "peak"))
+    n = 0
     for typ, name, item, lab in rows:
+        if item not in clips:
+            lines.append("%-12s %-34s %-5s %-6s %-30s  FAILED" % (typ, item[1], item[2], item[3], item[4] or "-"))
+            continue
         y = clips[item]
         f = _f0(y, sr)
         rms = 20 * math.log10(float(np.sqrt(np.mean(y ** 2))) + 1e-9)
@@ -175,10 +181,12 @@ def test_voices(a, ffmpeg):
             fs = "%6.1f %6.1f %6.1f" % (np.median(f), np.percentile(f, 10), np.percentile(f, 90))
         else:
             fs = "%6s %6s %6s" % ("-", "-", "-")
-        lines.append("%-12s %-24s %-5s %-6s %-34s %5.1f  %s %7.1f %5.2f" % (typ, item[1], item[2], item[3], item[4] or "-", len(y) / sr, fs, rms, float(np.max(np.abs(y)))))
-        parts += [clips[lab], gap1, y, gap2]
-    y = np.concatenate(parts)
-    base = os.path.join(a.out, "voices-" + a.lang)
+        lines.append("%-12s %-34s %-5s %-6s %-30s %5.1f  %s %7.1f %5.2f" % (typ, item[1], item[2], item[3], item[4] or "-", len(y) / sr, fs, rms, float(np.max(np.abs(y)))))
+        if lab in clips:
+            parts += [clips[lab], gap1]
+        parts += [y, gap2]
+        n += 1
+    y = np.concatenate(parts) if parts else np.zeros(sr)
     with wave.open(base + ".wav", "wb") as w:
         w.setnchannels(1)
         w.setsampwidth(2)
@@ -190,8 +198,52 @@ def test_voices(a, ffmpeg):
     else:
         os.remove(base + ".wav")
     lines.append("")
-    lines.append("%d voices, %.0f seconds" % (len(rows), len(y) / sr))
+    lines.append("%d voices, %.0f seconds" % (n, len(y) / sr))
     with open(base + ".txt", "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+    print("\n".join(lines), flush=True)
+
+
+def test_voices(a, ffmpeg):
+    """Every character type of tales.TYPES says a line with its voice and effect; a table of the pitch and loudness and one mp3 to listen to."""
+    i = 0 if a.lang == "en" else 1
+    nar = tuple(TL.TYPES["nar"][i])
+    rows = []
+    for typ, spec in TL.TYPES.items():
+        if typ in VOICE_LINES:
+            v, r, p, fx = spec[i]
+            rows.append((typ, VOICE_NAMES[typ][i], (VOICE_LINES[typ][i], v, r, p, fx), (VOICE_NAMES[typ][i],) + nar))
+    _voices_table(a, ffmpeg, rows, os.path.join(a.out, "voices-" + a.lang))
+
+
+def test_lab(a, ffmpeg, spec):
+    """A voice laboratory: spec = 'type:voice|rate|pitch|effect;type:voice|rate|pitch|effect;...' (the type picks the sentence that is said,
+    in the language a.lang; the effect may be left out) -> voices-lab-<lang>.txt / .mp3, to compare voices and settings by ear and by pitch."""
+    i = 0 if a.lang == "en" else 1
+    nar = tuple(TL.TYPES["nar"][i])
+    rows = []
+    for ent in [e.strip() for e in spec.split(";") if e.strip()]:
+        typ, _, rest = ent.partition(":")
+        v, r, p, fx = (rest.split("|") + ["", "", "", ""])[:4]
+        name = "%s %s %s %s" % (v.split("-")[-1].replace("Neural", ""), r, p, fx)
+        rows.append((typ, name, (VOICE_LINES[typ][i], v, r, p, fx), (name,) + nar))
+    _voices_table(a, ffmpeg, rows, os.path.join(a.out, "voices-lab-" + a.lang))
+
+
+def test_voice_list(a):
+    """Which text-to-speech voices the machine offers for English and Turkish (and the multilingual ones): voices-list.txt."""
+    import asyncio
+    import edge_tts
+    vs = asyncio.run(edge_tts.list_voices())
+    keep = [v for v in vs if v["Locale"].startswith(("en-", "tr-")) or "Multilingual" in v["ShortName"]]
+    lines = []
+    for v in sorted(keep, key=lambda v: v["ShortName"]):
+        tag = v.get("VoiceTag", {}) or {}
+        lines.append("%-42s %-7s %-7s %s | %s" % (v["ShortName"], v["Gender"], v["Locale"], ",".join(tag.get("ContentCategories", [])),
+                                                  ",".join(tag.get("VoicePersonalities", []))))
+    lines.append("")
+    lines.append("%d voices of %d" % (len(keep), len(vs)))
+    with open(os.path.join(a.out, "voices-list.txt"), "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
     print("\n".join(lines), flush=True)
 
@@ -264,9 +316,14 @@ def main():
     except Exception:
         ffmpeg = "ffmpeg"
     os.makedirs(a.out, exist_ok=True)
+    if a.key.startswith("lab="):                                               # the spec has commas and semicolons of its own
+        test_lab(a, ffmpeg, a.key[4:])
+        return
     for key in [k.strip() for k in a.key.split(",") if k.strip()]:
         if key == "voices":
             test_voices(a, ffmpeg)
+        elif key == "voices-list":
+            test_voice_list(a)
         elif key in TL.TALES:
             test_tale(a, ffmpeg, key)
         elif re.fullmatch(r"d\d{3}-[LS]\d+", key):

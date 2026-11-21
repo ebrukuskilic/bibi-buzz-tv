@@ -2392,9 +2392,229 @@ def princess_pea(lang="en"):
     return t
 
 
+# ================================================================================================ the little red hen
+RH_HEN = dict(feathers="#E4573D", apron="#FFFFFF")
+RH_PIG = dict(outfit="#8C5BC8", hat_kind="cap", hat_color="#FFD21F")
+RH_GOAT = dict(scarf="#3DB54A")
+RH_CHICK = ("#FFD84A", "#FFE88A", "#FFC93C")
+RH_FR = (("pig", "pig", RH_PIG), ("goat", "goat", RH_GOAT), ("hare", "hare", {}))             # the three friends who never help
+RH_IDS = ("pig", "goat", "hare")
+RH_MARK = ("#FF8A1F", "#3DB54A", "#3E8EDE", "#8C5BC8", "#E2362F")
+
+
+def _rh_poses(ids, pose, **o):
+    return [("pose", i, pose, dict(o)) if o else ("pose", i, pose) for i in ids]
+
+
+def _rh_cast(s, hen_x, ck_xs, fr_xs, y=676, face=1, fr_face=None, hold=None, fr_y=None, fr_k=0.98):
+    """The little red hen, her three chicks and her three friends (the friends look the other way unless fr_face says so)."""
+    s.actor("hen", "hen", hen_x, y, 1.15, face=face, **dict(RH_HEN, **({"hold": hold} if hold else {})))
+    for i, x in enumerate(ck_xs):
+        s.actor("ck%d" % (i + 1), "chick", x, y + 18, 1.25, face=face, fur=RH_CHICK[i])
+    for (aid, kind, st), x in zip(RH_FR, fr_xs):
+        s.actor(aid, kind, x, fr_y or y, fr_k, face=fr_face or -face, **st)
+
+
+def _rh_ask(s, question, answer, face=1, cam=860):
+    """The hen asks for help, the pig, the goat and the hare each say "Not I!", so the little red hen does the job herself."""
+    s.say("hen", question, ("face", "hen", face), ("pose", "hen", "talk"), ("fx", "mark", "hen", 0, {"at": "30%", "dur": 2.4, "text": "?"}), ("cam", cam, 390, 1.1, {"at": "75%", "dur": 1.4}), tail=0.3)
+    for aid, pose in zip(RH_IDS, ("shrug", "sly", "laugh")):
+        s.say(aid, "Not I!", ("pose", aid, pose), *_rh_poses([o for o in RH_IDS if o != aid], "sit"), ("pose", "hen", "sad"), tail=0.25)
+    s.say("hen", answer, ("pose", "hen", "proud"), ("cam", 640, 360, 1.0, {"at": 0.0, "dur": 1.0}), ("hop", "hen", {"at": "55%"}), tail=0.3)
+
+
+def little_red_hen(lang="en"):
+    t = Tale("tale-little-red-hen", "The Little Red Hen | Fairy Tale Story for Kids | Bibi Buzz TV",
+             "Who will help the little red hen plant the wheat? Not the pig! Not the goat! Not the hare! Watch this classic farm story and see how wheat becomes bread: plant it, "
+             "cut it, take it to the mill, make the dough, and bake it. Count three little chicks, count the five steps from one to five, and find out why helping each other makes "
+             "everything easier. A gentle, colorful animated story in simple English for toddlers and preschoolers.",
+             TAGS + ["the little red hen", "little red hen story", "farm story", "teamwork story", "how bread is made", "counting story", "counting to five", "learn to help others",
+                     "who will help me"],
+             {"nar": NAR, "hen": (ARIA, "+2%", "+14Hz"), "pig": (GUY, "+6%", "+14Hz"), "goat": (GUY, "-2%", "+26Hz"), "hare": ("en-US-EricNeural", "+8%", "+14Hz")}, lang=lang)
+    t.bubble_tint = {"hen": "#FFE3E0", "pig": "#FFE3EE", "goat": "#E3F5E3", "hare": "#FFF0DC"}
+    t.cover = dict(bg="meadow_open", title=("THE LITTLE", "RED HEN"), size=104, gap=102,
+                   props=[("wh", "wheat", 255, 706, 0.9, dict(grow=1.0)), ("mill", "mill", 1085, 690, 0.74, dict(turn=0.1))],
+                   actors=[("hen", "hen", 640, 722, 1.5, 1, "happy", dict(RH_HEN, hold="loaf")), ("ck1", "chick", 450, 722, 1.5, 1, "cheer", dict(fur=RH_CHICK[0])),
+                           ("ck2", "chick", 850, 728, 1.5, -1, "happy", dict(fur=RH_CHICK[1])), ("ck3", "chick", 935, 722, 1.35, -1, "cheer", dict(fur=RH_CHICK[2]))])
+    _intro(t, ("THE LITTLE", "RED HEN"), "Today's story is... The Little Red Hen!")
+
+    # ---------------------------------------------------------------- 1 a hen, three chicks and three friends
+    s = t.scene("A little red hen", "meadow_open", mood="happy", title="A little red hen")
+    _rh_cast(s, -200, (-420, -540, -660), (1560, 1690, 1820))
+    s.nar("Once upon a time, there was a little red hen. She lived on a farm.", ("walk", "hen", 430, 676, {"fit": True}),
+          *[("walk", "ck%d" % (i + 1), 310 - 95 * i, 694, {"at": 0.1 * i, "fit": True}) for i in range(3)], ("sfx", "cluck", {"at": 2.8}), ("pose", "hen", "happy", {"at": -0.6}))
+    s.nar("She had three little chicks. One, two, three!", *[("hop", "ck%d" % (i + 1), {"at": -1.95 + 0.55 * i}) for i in range(3)],
+          *[("fx", "mark", "ck%d" % (i + 1), -30, {"at": -2.0 + 0.55 * i, "dur": 2.0, "text": str(i + 1), "color": RH_MARK[i]}) for i in range(3)],
+          *[("sfx", "peep", {"at": -2.0 + 0.55 * i, "gain": 0.35}) for i in range(3)], tail=0.35)
+    s.nar("Her friends lived on the farm, too. There was a pig, a goat, and a hare.", *[("walk", aid, x, 676, {"at": 0.3 + 0.25 * i, "fit": True}) for i, (aid, x) in enumerate(zip(RH_IDS, (960, 1075, 1190)))],
+          ("pose", "hen", "wave", {"at": 2.6}))
+    s.nar("The little red hen worked hard all day long. But her friends liked to sit and rest.", ("hold", "hen", "broom", {"at": 0.0}), ("pose", "hen", "sweep", {"at": 0.4}),
+          *_rh_poses(RH_IDS, "sit", at="58%"), ("fx", "zzz", "goat", 0, {"at": "80%", "dur": 6.0}), ("hop", "ck2", {"at": 2.4}), tail=0.5)
+
+    # ---------------------------------------------------------------- 2 grains of wheat: who will help me plant them?
+    s = t.scene("Grains of wheat", "meadow_open", mood="happy", title="Some grains of wheat")
+    s.prop("wh", "wheat", 700, 664, 0.95, grow=0.0)
+    _rh_cast(s, 430, (310, 220, 130), (950, 1060, 1170))
+    s.nar("One sunny morning, the little red hen found some grains of wheat.", *_rh_poses(RH_IDS, "sit"), ("pose", "hen", "surprised", {"at": 1.4}),
+          ("fx", "sparkle", 700, 640, {"at": 1.4, "dur": 3.0, "r": 160}), ("fx", "mark", "hen", 0, {"at": 1.6, "dur": 2.0, "text": "!"}), ("sfx", "cluck", {"at": 1.4}))
+    _rh_ask(s, "Who will help me plant the wheat?", "Then I will plant it myself!")
+    s.nar("So the little red hen planted the wheat, one grain at a time. And her three little chicks helped her.", ("walk", "hen", 570, 676, {"at": 0.2, "speed": 160}),
+          ("pose", "hen", "plant", {"at": 1.4}), ("fx", "dust", 640, 690, {"at": 2.0, "dur": 1.0, "size": 0.7}), ("fx", "dust", 760, 690, {"at": 3.2, "dur": 1.0, "size": 0.7}),
+          *[("walk", "ck%d" % (i + 1), 640 + 95 * i, 702, {"at": 0.3 + 0.2 * i, "speed": 190}) for i in range(3)], *[("pose", "ck%d" % (i + 1), "plant", {"at": 2.2 + 0.2 * i}) for i in range(3)],
+          ("set", "wh", "grow", 0.14, {"at": 3.4, "dur": 2.4}), tail=0.4)
+
+    # ---------------------------------------------------------------- 3 the sun shines, the rain falls, the wheat grows
+    s = t.scene("The wheat grows", "meadow_open", mood="calm", title="The wheat grows")
+    s.prop("wh", "wheat", 700, 664, 0.95, grow=0.14)
+    _rh_cast(s, 470, (360, 270, 180), (950, 1060, 1170))
+    s.nar("The sun shone, and the rain fell.", ("pose", "hen", "happy", {"at": 0.3}), *_rh_poses(RH_IDS, "nap"), ("fx", "glow", 1010, 110, {"at": 0.1, "dur": 1.2, "r": 150}),
+          ("fx", "rain", 0, 0, {"at": 1.2, "dur": 2.6, "power": 0.5}), ("sfx", "rain", {"at": 1.2, "gain": 0.5}))
+    s.nar("And the little wheat grew, and grew, and grew.", ("set", "wh", "grow", 0.62, {"at": 0.3, "dur": 3.8}), ("fx", "sparkle", 700, 520, {"at": 0.4, "dur": 4.0, "r": 220}),
+          ("sfx", "whoosh", {"at": 0.4, "gain": 0.4}), ("pose", "hen", "cheer", {"at": 2.0}))
+    s.nar("Soon, the wheat was tall and golden. It was ready to cut!", ("set", "wh", "grow", 1.0, {"at": 0.2, "dur": 3.0}), ("fx", "sparkle", 700, 460, {"at": 0.3, "dur": 3.5, "r": 260}),
+          ("hop", "hen", {"at": 3.0}), *[("hop", "ck%d" % (i + 1), {"at": 3.2 + 0.25 * i}) for i in range(3)], ("sfx", "tada", {"at": 3.0, "gain": 0.35}), tail=0.5)
+
+    # ---------------------------------------------------------------- 4 who will help me cut the wheat?
+    s = t.scene("Time to cut", "meadow_open", mood="happy", title="Time to cut the wheat")
+    s.prop("wh", "wheat", 700, 664, 0.95, grow=1.0)
+    _rh_cast(s, 440, (330, 240, 150), (960, 1070, 1180), hold="sickle")
+    s.nar("Now the wheat was ready to cut.", *_rh_poses(RH_IDS, "sit"), ("pose", "hen", "happy", {"at": 0.3}))
+    _rh_ask(s, "Who will help me cut the wheat?", "Then I will cut it myself!")
+    s.nar("Snip, snip, snip! The little red hen cut all the wheat. And her chicks helped her tie it up.", ("walk", "hen", 540, 676, {"at": 0.2, "speed": 150}),
+          ("pose", "hen", "stitch", {"at": 1.6}), *[("sfx", "whoosh", {"at": 2.0 + 0.6 * i, "gain": 0.45}) for i in range(3)], ("set", "wh", "cut", 1.0, {"at": 2.0, "dur": 3.0}),
+          *[("hop", "ck%d" % (i + 1), {"at": 3.6 + 0.3 * i}) for i in range(3)], tail=0.4)
+    s.nar("Then she picked up the wheat, and she carried it away.", ("hold", "hen", None, {"at": 0.0}), ("walk", "hen", 900, 676, {"at": 0.2, "speed": 150}), ("pose", "hen", "happy", {"at": 2.6}),
+          ("hold", "hen", "sheaf", {"at": 2.4}), ("set", "wh", "sheaf", 0.0, {"at": 2.4, "dur": 0.1}), ("fx", "sparkle", 920, 560, {"at": 2.4, "dur": 2.0, "r": 110}), ("sfx", "pop", {"at": 2.4}), tail=0.4)
+
+    # ---------------------------------------------------------------- 5 who will help me take it to the mill?
+    s = t.scene("To the mill", "meadow", mood="happy", title="To the mill")
+    s.prop("mill", "mill", 1040, 648, 0.95, spin=0.0)
+    _rh_cast(s, 560, (460, 370, 280), (150, 260, 370), face=1, fr_face=1, hold="sheaf", fr_y=616, fr_k=0.92)
+    s.nar("Next, the wheat had to be made into flour. But the mill was far away.", *_rh_poses(RH_IDS, "sit"), ("pose", "hen", "think", {"at": 0.6}))
+    _rh_ask(s, "Who will help me take the wheat to the mill?", "Then I will take it myself!", face=-1, cam=500)
+    s.nar("So the little red hen carried the wheat all the way to the mill. Her chicks followed her, peep, peep, peep!", ("face", "hen", 1, {"at": 0.0}), ("walk", "hen", 800, 676, {"at": 0.3, "speed": 62}),
+          *[("walk", "ck%d" % (i + 1), 690 - 90 * i, 694, {"at": 0.5 + 0.2 * i, "speed": 68}) for i in range(3)], *[("sfx", "peep", {"at": 2.6 + 0.9 * i, "gain": 0.35}) for i in range(3)], tail=0.4)
+    s.nar("The big mill turned and turned. The wheat became soft, white flour.", ("hold", "hen", None, {"at": 0.2}), ("pose", "hen", "happy", {"at": 0.4}), ("set", "mill", "turn", 7.0, {"at": 0.3, "dur": 7.0}),
+          ("set", "mill", "flour", 1.0, {"at": 1.8, "dur": 1.5}), ("sfx", "creak", {"at": 0.4, "gain": 0.4}), ("sfx", "whoosh", {"at": 1.8, "gain": 0.4}), ("fx", "sparkle", 1030, 520, {"at": 2.2, "dur": 3.0, "r": 150}), tail=0.4)
+    s.nar("Now she had three sacks of flour. One, two, three!", *[("set", "mill", "sacks", float(i + 1), {"at": -2.0 + 0.55 * i, "dur": 0.2}) for i in range(3)],
+          *[("fx", "mark", 1126 + 50 * i, 520, {"at": -2.0 + 0.55 * i, "dur": 2.0, "text": str(i + 1), "color": RH_MARK[i]}) for i in range(3)], ("hop", "hen", {"at": -0.9}), tail=0.4)
+
+    # ---------------------------------------------------------------- 6 who will help me make the dough?
+    s = t.scene("Make the dough", "room", mood="happy", title="Make the dough")
+    s.prop("counter", "counter", 820, 690, 1.0)
+    _rh_cast(s, -200, (-420, -540, -660), (1500, 1620, 1740), fr_k=0.88, y=676)
+    s.nar("Now the little red hen had flour. She went into her kitchen.", ("walk", "hen", 560, 676, {"fit": True}), *[("walk", "ck%d" % (i + 1), 440 - 95 * i, 694, {"at": 0.1 * i, "fit": True}) for i in range(3)],
+          *[("walk", aid, x, 690, {"at": 0.4 + 0.25 * i, "fit": True}) for i, (aid, x) in enumerate(zip(RH_IDS, (1050, 1122, 1192)))], ("pose", "hen", "happy", {"at": -0.5}))
+    _rh_ask(s, "Who will help me make the dough?", "Then I will make it myself!")
+    s.nar("She mixed the flour with water. She pressed and pushed the dough. Squish, squish, squish!", ("hold", "hen", "dough", {"at": 0.0}), ("pose", "hen", "stitch", {"at": 0.4}),
+          *[("fx", "dust", 600 + 20 * i, 600, {"at": 2.6 + 0.7 * i, "dur": 1.0, "size": 0.9}) for i in range(3)], *[("sfx", "pop", {"at": 2.6 + 0.7 * i, "gain": 0.5}) for i in range(3)], tail=0.4)
+    s.nar("Her three little chicks helped, too. They sprinkled the flour, and they got flour on their feathers!", *[("hop", "ck%d" % (i + 1), {"at": 0.8 + 0.5 * i}) for i in range(3)],
+          *[("fx", "dust", "ck%d" % (i + 1), 40, {"at": 0.9 + 0.5 * i, "dur": 1.0, "size": 0.7}) for i in range(3)], ("pose", "hen", "laugh", {"at": 3.0}), tail=0.4)
+
+    # ---------------------------------------------------------------- 7 who will help me bake the bread?
+    s = t.scene("Bake the bread", "room", mood="happy", title="Bake the bread")
+    s.prop("oven", "oven", 400, 690, 1.0, door=0.0)
+    _rh_cast(s, 690, (800, 890, 980), (1062, 1130, 1198), face=-1, fr_face=-1, hold="dough", fr_k=0.88, y=676)
+    s.nar("Now the dough was ready for the oven.", *_rh_poses(RH_IDS, "sit"), ("pose", "hen", "happy", {"at": 0.4}))
+    _rh_ask(s, "Who will help me bake the bread?", "Then I will bake it myself!", face=1, cam=900)
+    s.nar("So the little red hen put the dough into the hot oven.", ("face", "hen", -1, {"at": 0.0}), ("walk", "hen", 580, 676, {"at": 0.3, "speed": 150}), ("set", "oven", "door", 1.0, {"at": 1.6, "dur": 0.8}),
+          ("hold", "hen", None, {"at": 3.0}), ("pose", "hen", "happy", {"at": 3.0}), ("set", "oven", "door", 0.0, {"at": 3.6, "dur": 0.7}), ("sfx", "pop", {"at": 3.0}), tail=0.3)
+    s.nar("She waited, and waited, and waited. The chicks waited, too. Tick, tock, tick, tock.", ("pose", "hen", "sit", {"at": 0.3}), *_rh_poses(("ck1", "ck2", "ck3"), "sit", at=0.5),
+          *_rh_poses(RH_IDS, "nap"), ("fx", "steam", 400, 440, {"at": 0.6, "dur": 5.0}), ("cam", 520, 420, 1.12, {"at": 0.4, "dur": 3.0}),
+          *[("sfx", "knock", {"at": 1.0 + 1.0 * i, "gain": 0.25}) for i in range(3)], tail=0.3)
+    s.nar("Ding! The bread was ready!", ("cam", 640, 360, 1.0, {"at": 0.0, "dur": 0.8}), ("sfx", "ding", {"at": 0.4}), ("pose", "hen", "cheer", {"at": 0.6}), *_rh_poses(("ck1", "ck2", "ck3"), "cheer", at=0.6),
+          ("set", "oven", "door", 1.0, {"at": 1.0, "dur": 0.7}), ("hold", "hen", "loaf", {"at": 1.6}), ("fx", "steam", 400, 440, {"at": 1.2, "dur": 3.0}), ("fx", "sparkle", 420, 520, {"at": 1.5, "dur": 2.4, "r": 140}), tail=0.3)
+    s.nar("Mmm! What a yummy smell!", ("set", "oven", "door", 0.0, {"at": 0.4, "dur": 0.7}), ("face", "hen", 1, {"at": 0.4}), *_rh_poses(RH_IDS, "happy", at=0.3),
+          *[("fx", "hearts", aid, 0, {"at": 0.6 + 0.2 * i, "dur": 2.4}) for i, aid in enumerate(RH_IDS)],
+          *[("walk", aid, x, 690, {"at": 0.9 + 0.2 * i, "speed": 120}) for i, (aid, x) in enumerate(zip(RH_IDS, (905, 985, 1065)))], tail=0.3)
+
+    # ---------------------------------------------------------------- 8 who will help me eat it?
+    s = t.scene("Who will help me eat it?", "room", mood="sneaky", title="Who will help me eat it?")
+    s.prop("tb", "picnic", 770, 700, 1.0, bread=0.0, plates=1.0)
+    s.actor("hen", "hen", 770, 650, 1.15, face=1, **dict(RH_HEN, hold="loaf"))
+    s.actor("ck1", "chick", 590, 654, 1.25, face=1, fur=RH_CHICK[0])
+    s.actor("ck2", "chick", 940, 654, 1.25, face=-1, fur=RH_CHICK[1])
+    s.actor("ck3", "chick", 1020, 654, 1.25, face=-1, fur=RH_CHICK[2])
+    for (aid, kind, st), x in zip(RH_FR, (110, 215, 320)):
+        s.actor(aid, kind, x, 700, 0.98, face=1, **st)
+    s.nar("The bread was warm and golden. The little red hen put it on the table.", *_rh_poses(("ck1", "ck2", "ck3"), "happy@70"), ("pose", "hen", "happy", {"at": 0.3}), ("hold", "hen", None, {"at": 2.2}), ("set", "tb", "bread", 1.0, {"at": 2.2, "dur": 0.5}),
+          ("fx", "sparkle", 770, 520, {"at": 2.3, "dur": 2.4, "r": 160}), ("sfx", "pop", {"at": 2.2}), tail=0.3)
+    s.say("hen", "Now, who will help me eat the bread?", ("pose", "hen", "talk"), ("fx", "mark", "hen", 0, {"at": "30%", "dur": 2.2, "text": "?"}))
+    for aid in RH_IDS:
+        s.say(aid, "I will!", ("pose", aid, "cheer"), ("hop", aid, {"at": "40%"}), tail=0.25)
+    ex = ("You did not help me plant the wheat.", "You did not help me cut the wheat.", "You did not help me take it to the mill.", "You did not help me make the dough.", "And you did not help me bake the bread.")
+    s.say("hen", "No, no, no!", ("pose", "hen", "angry"), ("fx", "burst", 770, 340, {"at": 0.0, "dur": 1.4, "text": "NO!", "color": "#E2362F"}), ("pose", "pig", "sad"), ("pose", "goat", "sad"), ("pose", "hare", "sad"), tail=0.3)
+    for i, line in enumerate(ex):
+        s.say("hen", line, ("pose", "hen", "talk"), ("fx", "mark", "hen", 0, {"at": "30%", "dur": 2.0, "text": str(i + 1), "color": RH_MARK[i]}), tail=0.2)
+    s.say("hen", "So my chicks and I will eat it ourselves!", ("pose", "hen", "proud"), ("hop", "hen", {"at": "60%"}), tail=0.3)
+    s.nar("Munch, munch, munch! It was so, so yummy. And the pig, the goat, and the hare watched with hungry tummies. Grumble, grumble!", ("pose", "hen", "eat", {"at": 0.3}),
+          *_rh_poses(("ck1", "ck2", "ck3"), "eat@70", at=0.3), *[("sfx", "munch", {"at": 0.5 + 0.7 * i, "gain": 0.6}) for i in range(3)], ("sfx", "rumble", {"at": 4.0, "gain": 0.7}),
+          ("sfx", "rumble", {"at": 5.4, "gain": 0.7}), tail=0.5)
+
+    # ---------------------------------------------------------------- 9 sorry, little red hen
+    s = t.scene("We are sorry", "room", mood="calm", title="We are sorry")
+    s.prop("tb", "picnic", 770, 700, 1.0, bread=1.0, plates=1.0)
+    s.actor("hen", "hen", 770, 650, 1.15, face=1, **RH_HEN)
+    s.actor("ck1", "chick", 590, 654, 1.25, face=1, fur=RH_CHICK[0])
+    s.actor("ck2", "chick", 940, 654, 1.25, face=-1, fur=RH_CHICK[1])
+    s.actor("ck3", "chick", 1020, 654, 1.25, face=-1, fur=RH_CHICK[2])
+    for (aid, kind, st), x in zip(RH_FR, (110, 215, 320)):
+        s.actor(aid, kind, x, 700, 0.98, face=1, **st)
+    s.say("pig", "Oh dear. We should have helped you.", *_rh_poses(("ck1", "ck2", "ck3"), "idle@70"), ("pose", "pig", "sad"), *_rh_poses(("goat", "hare"), "sad"), ("pose", "hen", "idle"))
+    s.say("goat", "We are sorry, little red hen.", ("pose", "goat", "sad"), ("pose", "pig", "sad"))
+    s.say("hare", "Next time, we will help you. We promise!", ("pose", "hare", "happy"), ("hop", "hare", {"at": "50%"}), ("pose", "pig", "happy"), ("pose", "goat", "happy"))
+    s.nar("The little red hen smiled a big smile.", ("pose", "hen", "happy", {"at": 0.3}), ("fx", "hearts", "hen", 0, {"at": 0.5, "dur": 3.0}), tail=0.3)
+    s.say("hen", "Thank you, my friends. Next time, we will do it together!", ("pose", "hen", "cheer"), ("hop", "hen", {"at": "50%"}), ("fx", "sparkle", 770, 420, {"at": "20%", "dur": 3.0, "r": 300}))
+
+    # ---------------------------------------------------------------- 10 everybody helps: five steps from one to five
+    s = t.scene("Everybody helps", "meadow_open", mood="triumph", title="Everybody helps")
+    s.prop("p1", "wheat", 130, 500, 0.5, grow=0.2, show=False)
+    s.prop("p2", "wheat", 385, 500, 0.5, grow=1.0, cut=1.0, show=False)
+    s.prop("p3", "mill", 650, 500, 0.5, spin=0.0, show=False)
+    s.prop("p4", "counter", 905, 500, 0.5, show=False)
+    s.prop("p5", "oven", 1160, 500, 0.55, door=0.0, show=False)
+    s.actor("hen", "hen", 610, 700, 0.9, face=1, **RH_HEN)
+    for i, x in enumerate((510, 430, 350)):
+        s.actor("ck%d" % (i + 1), "chick", x, 712, 0.95, face=1, fur=RH_CHICK[i])
+    for (aid, kind, st), x in zip(RH_FR, (720, 820, 920)):
+        s.actor(aid, kind, x, 700, 0.82, face=-1, **st)
+    xs5 = (130, 385, 650, 905, 1160)
+    everyone = ("hen", "ck1", "ck2", "ck3") + RH_IDS
+    s.nar("The next day, they all worked together. Everybody helped!", *_rh_poses(everyone, "cheer", at=0.4), ("fx", "confetti", 0, 0, {"at": 0.5, "dur": 3.0}), tail=0.3)
+    steps = (("They planted the wheat. One!", "p1", "plant"), ("They cut the wheat. Two!", "p2", "stitch"), ("They took it to the mill. Three!", "p3", "happy"),
+             ("They made the dough. Four!", "p4", "stitch"), ("And they baked the bread. Five!", "p5", "cheer"))
+    for i, (line, pid, pose) in enumerate(steps):
+        extra = [("set", "p3", "turn", 4.0, {"at": 0.3, "dur": 5.0})] if i == 2 else ([("set", "p5", "door", 1.0, {"at": 0.6, "dur": 0.8})] if i == 4 else [])
+        s.nar(line, ("show", pid, {"at": 0.0}), ("fx", "sparkle", xs5[i], 380, {"at": 0.1, "dur": 2.2, "r": 150}), ("fx", "mark", xs5[i], 250, {"at": -1.0, "dur": 2.4, "text": str(i + 1), "color": RH_MARK[i]}),
+              *_rh_poses(everyone, pose, at=0.2), ("hop", ("hen", "pig", "goat", "hare")[i % 4], {"at": 0.6}), *extra, tail=0.3)
+
+    # ---------------------------------------------------------------- 11 a big feast for everybody
+    s = t.scene("A big feast", "room", mood="triumph", title="A big feast")
+    s.prop("tb", "picnic", 640, 704, 1.0, bread=0.0, plates=1.0)
+    s.actor("hen", "hen", 640, 654, 1.15, face=1, **RH_HEN)
+    for i, x in enumerate((480, 800, 880)):
+        s.actor("ck%d" % (i + 1), "chick", x, 656, 1.25, face=1 if i == 0 else -1, fur=RH_CHICK[i])
+    for (aid, kind, st), x in zip(RH_FR, (135, 240, 1140)):
+        s.actor(aid, kind, x, 700, 0.98, face=1 if x < 640 else -1, **st)
+    s.nar("At last, the bread was ready. This time, there were three big, golden loaves. One, two, three!", ("pose", "hen", "happy", {"at": 0.3}), *_rh_poses(("ck1", "ck2", "ck3"), "happy@70"),
+          *[("set", "tb", "bread", float(i + 1), {"at": -2.0 + 0.55 * i, "dur": 0.4}) for i in range(3)], *[("fx", "mark", 640 + 110 * (i - 1), 380, {"at": -2.0 + 0.55 * i, "dur": 2.0, "text": str(i + 1), "color": RH_MARK[i]}) for i in range(3)],
+          ("fx", "confetti", 0, 0, {"at": -1.0, "dur": 90.0}), tail=0.3)
+    s.say("hen", "Who will help me eat the bread?", ("pose", "hen", "talk"), ("fx", "mark", "hen", 0, {"at": "30%", "dur": 2.2, "text": "?"}))
+    for aid in RH_IDS:
+        s.say(aid, "I will!", ("pose", aid, "cheer"), ("hop", aid, {"at": "40%"}), tail=0.25)
+    s.say("hen", "Yes! Come and eat, my dear friends.", ("pose", "hen", "cheer"), ("hop", "hen", {"at": "55%"}), ("fx", "hearts", "hen", 0, {"at": "40%", "dur": 3.0}))
+    s.nar("They all sat down together. Munch, munch, munch! It was the yummiest bread in the whole wide world.", ("pose", "hen", "eat", {"at": 0.4}), *_rh_poses(("ck1", "ck2", "ck3"), "eat@70", at=0.4), *_rh_poses(RH_IDS, "eat", at=0.4),
+          *[("sfx", "munch", {"at": 0.6 + 0.7 * i, "gain": 0.6}) for i in range(3)], ("fx", "notes", "hen", -40, {"at": 1.0, "dur": 5.0}), tail=0.4)
+    s.nar("And they all lived happily together on the farm.", ("pose", "hen", "happy", {"at": 0.3}), *_rh_poses(RH_IDS, "happy", at=0.3), *_rh_poses(("ck1", "ck2", "ck3"), "happy@70", at=0.3),
+          ("fx", "hearts", "hen", 0, {"at": 0.6, "dur": 3.0}), tail=0.8)
+
+    _outro(t, "Remember, little ones: when we all help each other, the work is easier, and the bread tastes even better!", caption="Let's help each other!")
+    return t
+
+
 TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_and_hare, "goldilocks": goldilocks,
          "red-riding-hood": red_riding_hood, "gingerbread-man": gingerbread_man, "three-billy-goats": three_billy_goats,
-         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup, "magic-porridge-pot": magic_porridge_pot, "cinderella": cinderella, "snow-white": snow_white, "elves-and-shoemaker": elves_shoemaker, "princess-and-pea": princess_pea}
+         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup, "magic-porridge-pot": magic_porridge_pot, "cinderella": cinderella, "snow-white": snow_white, "elves-and-shoemaker": elves_shoemaker, "princess-and-pea": princess_pea, "little-red-hen": little_red_hen}
 
 
 def build(key, lang="en"):

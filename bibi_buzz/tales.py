@@ -2612,9 +2612,180 @@ def little_red_hen(lang="en"):
     return t
 
 
+# ================================================================================================ the lion and the mouse
+LM_Y, LM_MY = 648, 690                                                              # the lion's feet and the (nearer) mouse's feet on the forest floor
+LM_FR = (("fox", "fox", 1500), ("hare", "hare", 1620), ("bear", "bear", 1760))       # three forest friends who greet the king
+LM_FRY = {"fox": 662, "hare": 668, "bear": 672}
+LM_FRK = {"fox": 0.95, "hare": 0.95, "bear": 0.9}
+LM_Z = (5.2, 6.0)                                                                   # seconds the lion snores while the mouse arrives / runs over him (scene 4)
+
+
+def _lm_friends(s, xs, face=-1):
+    for (aid, kind, _), x in zip(LM_FR, xs):
+        s.actor(aid, kind, x, LM_FRY[aid], LM_FRK[aid], face=face)
+
+
+def lion_and_mouse(lang="en"):
+    t = Tale("tale-lion-and-mouse", "The Lion and the Mouse | Fairy Tale Story for Kids | Bibi Buzz TV",
+             "Can a tiny mouse help a big, strong lion? Watch this classic fable from old Greece: a lion catches a little mouse, but he lets her go. Later, the lion is stuck in a hunter's net, "
+             "and the mouse runs to help him. Learn the opposites big and small and loud and quiet, count three ropes from one to three, and find out why kindness always comes back. "
+             "A gentle, colorful animated story in simple English for toddlers and preschoolers.",
+             TAGS + ["the lion and the mouse", "lion and mouse story", "aesop fables", "fables for kids", "kindness story", "big and small", "opposites for kids",
+                     "counting to three", "moral stories for kids", "be kind to everyone"],
+             {"nar": NAR, "lion": ("en-US-ChristopherNeural", "-12%", "-26Hz"), "mouse": (ANA, "+4%", "+26Hz"), "fox": ("en-US-EricNeural", "-2%", "+8Hz"),
+              "hare": ("en-US-EricNeural", "+8%", "+14Hz"), "bear": (GUY, "-8%", "-16Hz")}, lang=lang)
+    t.bubble_tint = {"lion": "#FFE9C2", "mouse": "#ECEAF6", "fox": "#FFE6D6", "hare": "#FFF0DC", "bear": "#EADBC8"}
+    t.cover = dict(bg="forest", title=("THE LION AND", "THE MOUSE"), size=100, gap=100, props=[],
+                   actors=[("lion", "lion", 470, 722, 1.5, 1, "proud", {}), ("mouse", "mouse", 900, 730, 1.15, -1, "cheer", {})])
+    _intro(t, ("THE LION AND", "THE MOUSE"), "Today's story is... The Lion and the Mouse!")
+
+    # ---------------------------------------------------------------- 1 a big lion, the king of the forest
+    s = t.scene("A big lion", "forest", mood="happy", title="A big lion")
+    s.actor("lion", "lion", -240, LM_Y, 1.2, face=1)
+    _lm_friends(s, [x for (_, _, x) in LM_FR])
+    s.nar("Once upon a time, a big lion lived in a forest.", ("walk", "lion", 520, LM_Y, {"fit": True}), ("pose", "lion", "proud", {"at": -0.7}))
+    s.nar("He had big paws, a big golden mane, and a big, loud roar!", ("pose", "lion", "proud"), ("hop", "lion", {"at": "55%"}), ("fx", "sparkle", 520, 400, {"at": "20%", "dur": 3.0, "r": 250}))
+    s.say("lion", "Roar!", ("cam", 520, 420, 1.2, {"at": 0.0, "dur": 0.6}), ("fx", "burst", 520, 240, {"at": 0.0, "dur": 1.7, "text": "ROAR!", "color": "#E2362F"}),
+          ("sfx", "roar", {"at": 0.0}), ("pose", "lion", "proud"), tail=0.6)
+    s.nar("All the animals knew him. They called him the king of the forest.", ("cam", 640, 360, 1.0, {"at": 0.0, "dur": 0.9}), ("pose", "lion", "happy", {"at": 0.6}),
+          *[("walk", aid, x, y, {"at": 0.2 + 0.3 * i, "speed": 190}) for i, (aid, x, y) in enumerate((("fox", 880, 662), ("hare", 1000, 668), ("bear", 1130, 672)))])
+    s.say("fox", "Good morning, King Lion!", ("pose", "fox", "wave"), ("face", "lion", 1))
+    s.say("bear", "What a lovely day, King Lion!", ("pose", "bear", "wave"), ("pose", "fox", "happy"))
+    s.say("lion", "Good morning, my friends!", ("pose", "lion", "cheer"), ("hop", "lion", {"at": "50%"}), ("fx", "hearts", "lion", 0, {"at": "40%", "dur": 2.6}), tail=0.5)
+
+    # ---------------------------------------------------------------- 2 big and small, loud and quiet
+    s = t.scene("Big and small", "forest", mood="happy", title="Big and small")
+    s.actor("lion", "lion", 420, LM_Y, 1.2, face=1)
+    s.actor("mouse", "mouse", 1500, LM_MY, 0.6, face=-1)
+    s.nar("A tiny mouse lived in the forest, too.", ("walk", "mouse", 880, LM_MY, {"fit": True, "pose": "run"}), ("pose", "mouse", "happy", {"at": -0.6}), ("sfx", "squeak", {"at": "75%"}))
+    s.nar("The lion was big.", ("pose", "lion", "proud"), ("fx", "burst", 420, 170, {"at": "35%", "dur": 1.7, "text": "BIG!", "color": "#E8832A"}))
+    s.nar("And the mouse was small.", ("hop", "mouse", {"at": "40%"}), ("fx", "burst", 880, 470, {"at": "50%", "dur": 1.7, "text": "small", "color": "#5B8EE6", "size": 0.55}))
+    s.nar("The lion had a big, loud roar. The mouse had a tiny, quiet squeak.", ("pose", "lion", "proud"), ("sfx", "roar", {"at": 2.0, "gain": 0.5}),
+          ("sfx", "squeak", {"at": 4.9}), ("hop", "mouse", {"at": 4.6}))
+    s.nar("The little mouse loved to run and play all day long.", ("walk", "mouse", 700, LM_MY, {"at": 0.2, "speed": 320, "pose": "run"}), ("walk", "mouse", 1120, LM_MY, {"speed": 320, "pose": "run"}),
+          ("walk", "mouse", 860, LM_MY, {"speed": 320, "pose": "run"}), ("hop", "mouse", {"at": -0.8}), tail=0.5)
+
+    # ---------------------------------------------------------------- 3 nap time under a big tree
+    s = t.scene("Nap time", "forest", mood="calm", title="Nap time")
+    s.prop("tree", "bigtree", 930, 610, 1.0)
+    s.actor("lion", "lion", -240, LM_Y, 1.2, face=1)
+    s.nar("One hot, sunny day, the big lion felt very sleepy.", ("walk", "lion", 700, LM_Y, {"fit": True, "pose": "walk"}), ("pose", "lion", "tired", {"at": -1.3}), ("sfx", "yawn", {"at": -1.6}))
+    s.nar("He lay down under a big tree, and he fell fast asleep. Zzz, zzz, zzz.", ("pose", "lion", "nap"), ("fx", "zzz", "lion", 0, {"at": 0.8, "dur": 12.0}),
+          ("cam", 720, 440, 1.12, {"at": 0.4, "dur": 3.0}), tail=0.4)
+    s.wait(2.6, ("sfx", "snore", {"at": 0.1}))
+
+    # ---------------------------------------------------------------- 4 tickle, tickle: the mouse runs over the sleeping lion
+    s = t.scene("Tickle, tickle!", "forest", mood="sneaky", title="Tickle, tickle!")
+    s.prop("tree", "bigtree", 930, 610, 1.0)
+    s.actor("lion", "lion", 700, LM_Y, 1.2, face=1)
+    s.actor("mouse", "mouse", -140, LM_MY, 0.6, face=1, flat=True, zy=900)
+    s.wait(0.1, ("pose", "lion", "nap"), ("cam", 720, 440, 1.12, {"at": 0.0, "dur": 0.05}))
+    s.nar("Just then, the little mouse came running by. She was playing, and she did not see the lion.", ("walk", "mouse", 520, LM_MY, {"fit": True, "pose": "run"}), ("sfx", "snore", {"at": 0.5, "gain": 0.5}), ("fx", "zzz", "lion", 0, {"at": 0.0, "dur": LM_Z[0]}))
+    s.nar("She ran up his paw, over his tummy, and across his nose. Tickle, tickle, tickle!", ("walk", "mouse", 590, 686, {"at": 0.3, "speed": 110, "pose": "run"}),
+          ("walk", "mouse", 650, 604, {"speed": 110, "pose": "run"}), ("walk", "mouse", 690, 528, {"speed": 110, "pose": "run"}), ("walk", "mouse", 722, 476, {"speed": 90, "pose": "run"}),
+          ("walk", "mouse", 790, 566, {"speed": 130, "pose": "run"}), ("walk", "mouse", 860, 686, {"speed": 130, "pose": "run"}),
+          ("fx", "sparkle", 722, 470, {"at": 3.3, "dur": 2.0, "r": 120}), ("sfx", "pop", {"at": 3.6, "gain": 0.4}), ("sfx", "pop", {"at": 4.4, "gain": 0.4}), ("sfx", "pop", {"at": 5.2, "gain": 0.4}),
+          ("pose", "lion", "surprised", {"at": -0.5}), ("fx", "zzz", "lion", 0, {"at": 0.0, "dur": LM_Z[1]}))
+    s.say("lion", "Roar! Who woke me up?", ("cam", 700, 430, 1.2, {"at": 0.0, "dur": 0.5}), ("pose", "lion", "angry"), ("fx", "burst", 700, 240, {"at": 0.0, "dur": 1.7, "text": "ROAR!", "color": "#E2362F"}),
+          ("sfx", "roar", {"at": 0.0}), ("pose", "mouse", "scared"), ("sfx", "squeak", {"at": 0.4}), tail=0.5)
+
+    # ---------------------------------------------------------------- 5 caught
+    s = t.scene("Caught!", "forest", mood="tense", title="Caught!")
+    s.actor("lion", "lion", 500, LM_Y, 1.2, face=1)
+    s.actor("mouse", "mouse", 770, LM_MY, 0.6, face=-1)
+    s.nar("The lion caught the little mouse with his big paw.", ("pose", "lion", "angry"), ("pose", "mouse", "scared"), ("fx", "sweat", "mouse", 0, {"at": 0.6, "dur": 5.0}), ("cam", 640, 420, 1.15, {"at": 0.0, "dur": 1.0}))
+    s.say("lion", "Nobody wakes up the king of the forest!", ("pose", "lion", "angry"), ("fx", "burst", 500, 170, {"at": "20%", "dur": 1.7, "text": "GRR!", "color": "#E2362F", "size": 0.8}), ("sfx", "rumble", {"at": 0.0, "gain": 0.6}))
+    s.say("mouse", "Please, Mr. Lion! Please let me go!", ("pose", "mouse", "scared"), ("hop", "mouse", {"at": "60%"}), ("sfx", "squeak", {"at": 0.1}))
+    s.say("mouse", "I am sorry I woke you up. If you let me go, I will help you one day. I promise!", ("pose", "mouse", "sad"), ("pose", "lion", "think", {"at": "70%"}), tail=0.5)
+
+    # ---------------------------------------------------------------- 6 a kind heart
+    s = t.scene("A kind heart", "forest", mood="calm", title="A kind heart")
+    s.actor("lion", "lion", 500, LM_Y, 1.2, face=1)
+    s.actor("mouse", "mouse", 770, LM_MY, 0.6, face=-1)
+    s.wait(0.1, ("pose", "lion", "think"), ("pose", "mouse", "sad"), ("cam", 640, 420, 1.15, {"at": 0.0, "dur": 0.05}))
+    s.say("lion", "Ha, ha, ha! You are so tiny! How can a little mouse help a big lion?", ("pose", "lion", "laugh"), ("hop", "lion", {"at": "45%"}), ("pose", "mouse", "shrug", {"at": "70%"}))
+    s.nar("But the lion had a kind heart. So he smiled, and he lifted his paw.", ("pose", "lion", "happy", {"at": 0.5}), ("fx", "hearts", "lion", 0, {"at": 1.4, "dur": 3.0}),
+          ("pose", "mouse", "surprised", {"at": 3.4}), ("fx", "mark", "mouse", -10, {"at": 3.5, "dur": 2.0, "text": "!"}))
+    s.say("lion", "All right, little mouse. You may go.", ("pose", "lion", "happy"), ("face", "lion", 1))
+    s.say("mouse", "Thank you, thank you, Mr. Lion!", ("pose", "mouse", "cheer"), ("hop", "mouse", {"at": "40%"}), ("walk", "mouse", 1500, LM_MY, {"at": "75%", "speed": 380, "pose": "run"}),
+          ("cam", 640, 360, 1.0, {"at": "50%", "dur": 1.0}), ("sfx", "squeak", {"at": "75%"}), tail=0.6)
+
+    # ---------------------------------------------------------------- 7 a trap in the trees
+    s = t.scene("A trap!", "forest", mood="tense", title="A trap!")
+    s.prop("net", "net", 640, LM_Y + 14, 1.0, drop=0.0)
+    s.actor("lion", "lion", -250, LM_Y, 1.2, face=1)
+    s.nar("A few days later, some hunters hung a big net in the trees. It was a trap!", ("cam", 640, 270, 1.3, {"at": 0.6, "dur": 1.6}), ("sfx", "creak", {"at": 0.8, "gain": 0.4}))
+    s.nar("The lion did not see the net. He walked, and walked, and walked.", ("cam", 640, 360, 1.0, {"at": 0.0, "dur": 1.0}), ("walk", "lion", 640, LM_Y, {"fit": True, "pose": "walk"}))
+    s.nar("Whoosh! The net fell down on the lion!", ("pose", "lion", "surprised", {"at": 0.9}), ("set", "net", "drop", 1.0, {"at": 0.9, "dur": 0.9}), ("sfx", "whoosh", {"at": 0.9, "gain": 0.7}),
+          ("sfx", "thud", {"at": 1.8, "gain": 0.9}), ("fx", "dust", 540, LM_Y + 36, {"at": 1.8, "dur": 1.2, "size": 0.9}), ("fx", "dust", 740, LM_Y + 36, {"at": 1.85, "dur": 1.2, "size": 0.9}),
+          ("pose", "lion", "scared", {"at": 2.0}), tail=0.5)
+
+    # ---------------------------------------------------------------- 8 stuck
+    s = t.scene("Stuck!", "forest", mood="tense", title="Stuck!")
+    s.prop("net", "net", 640, LM_Y + 14, 1.0, drop=1.0)
+    s.actor("lion", "lion", 640, LM_Y, 1.2, face=1)
+    s.wait(0.1, ("pose", "lion", "scared"), ("cam", 640, 400, 1.1, {"at": 0.0, "dur": 0.05}))
+    s.say("lion", "Roar! Help! Somebody, help me!", ("pose", "lion", "scared"), ("sfx", "roar", {"at": 0.0}), ("fx", "burst", 640, 130, {"at": 0.0, "dur": 1.7, "text": "HELP!", "color": "#E2362F"}))
+    s.nar("The big lion pulled and pulled. But the net was too strong.", ("pose", "lion", "strain"), ("fx", "sweat", "lion", 0, {"at": 0.6, "dur": 5.0}), ("sfx", "creak", {"at": 0.8, "gain": 0.5}),
+          ("sfx", "creak", {"at": 2.2, "gain": 0.5}))
+    s.nar("He could not get out. The lion felt very sad.", ("pose", "lion", "sad", {"at": 1.4}), tail=0.6)
+
+    # ---------------------------------------------------------------- 9 the mouse hears the roar and runs
+    s = t.scene("A friend needs help", "forest", world=2600, mood="chase", title="A friend needs help", drift=0.0)
+    s.actor("mouse", "mouse", 250, LM_MY, 0.6, face=1)
+    s.wait(0.1, ("follow", "mouse", 300, 1.0, {"dur": 3600}))
+    s.nar("Far, far away, the little mouse heard a loud roar.", ("pose", "mouse", "surprised", {"at": 0.9}), ("sfx", "roar", {"at": 1.2, "gain": 0.3}), ("fx", "mark", "mouse", -10, {"at": 1.3, "dur": 2.2, "text": "!"}))
+    s.say("mouse", "That is the lion! My friend is in trouble!", ("pose", "mouse", "scared"), ("hop", "mouse", {"at": "60%"}))
+    s.nar("She ran, and ran, and ran, as fast as her little legs could go.", ("walk", "mouse", 2350, LM_MY, {"fit": True, "pose": "run"}), ("fx", "speed", "mouse", 0, {"dur": 9.0, "dir": 1}),
+          ("fx", "dust", 700, LM_MY + 8, {"at": 1.2, "dur": 1.0, "size": 0.8}), tail=0.3)
+
+    # ---------------------------------------------------------------- 10 nibble, nibble, nibble: one, two, three ropes
+    s = t.scene("Nibble, nibble, nibble!", "forest", mood="triumph", title="Nibble, nibble, nibble!")
+    s.prop("net", "net", 700, LM_Y + 14, 1.0, drop=1.0)
+    s.actor("lion", "lion", 700, LM_Y, 1.2, face=-1)
+    s.actor("mouse", "mouse", -140, LM_MY, 0.6, face=1)
+    s.wait(0.1, ("pose", "lion", "sad"))
+    s.say("mouse", "Do not worry, Mr. Lion! I am here!", ("walk", "mouse", 372, LM_MY, {"fit": True, "pose": "run"}), ("pose", "mouse", "cheer", {"at": -0.5}))
+    s.say("lion", "Little mouse! You came to help me!", ("pose", "lion", "surprised"), ("pose", "lion", "happy", {"at": "60%"}), ("fx", "hearts", "lion", 0, {"at": "50%", "dur": 2.4}))
+    s.nar("The little mouse had tiny, sharp teeth. She began to chew the rope. Nibble, nibble, nibble!", ("cam", 520, 470, 1.4, {"at": 0.4, "dur": 1.4}), ("pose", "mouse", "eat", {"at": 2.6}),
+          ("sfx", "gnaw", {"at": 3.9}), ("set", "net", "cut", 0.7, {"at": 3.9, "dur": 3.0}), ("pose", "lion", "sad", {"at": 3.0}))
+    for i, line in enumerate(("Snap! The first rope was broken. One!", "Nibble, nibble, nibble! Snap! The second rope was broken. Two!", "Nibble, nibble, nibble! Snap! The third rope was broken. Three!")):
+        gn = [("sfx", "gnaw", {"at": 0.2, "gain": 0.5})] if i else []
+        s.nar(line, ("pose", "mouse", "eat"), *gn, ("sfx", "snap", {"at": 0.4 if i == 0 else 2.1}), ("set", "net", "cut", float(i + 1), {"at": 0.4 if i == 0 else 2.1, "dur": 0.25}),
+              ("fx", "mark", "mouse", -12, {"at": -1.2, "dur": 2.2, "text": str(i + 1), "color": RH_MARK[i]}), ("hop", "mouse", {"at": -1.0}), ("fx", "sparkle", 420, 600, {"at": -1.2, "dur": 1.8, "r": 110}))
+    s.nar("And the net fell open!", ("cam", 640, 360, 1.0, {"at": 0.0, "dur": 1.3}), ("set", "net", "open", 1.0, {"at": 0.3, "dur": 1.4}), ("sfx", "whoosh", {"at": 0.3, "gain": 0.6}),
+          ("pose", "lion", "cheer", {"at": 0.6}), ("pose", "mouse", "cheer", {"at": 0.6}), ("fx", "sparkle", 700, 400, {"at": 0.5, "dur": 3.0, "r": 280}), ("sfx", "tada", {"at": 0.8, "gain": 0.3}), tail=0.5)
+
+    # ---------------------------------------------------------------- 11 free at last, and best friends
+    s = t.scene("Free at last!", "forest", mood="triumph", title="Free at last!")
+    s.prop("net", "net", 640, LM_Y + 14, 1.0, drop=1.0, cut=3.0, open=1.0)
+    s.actor("lion", "lion", 400, LM_Y, 1.2, face=1)
+    s.actor("mouse", "mouse", 580, LM_MY, 0.6, face=-1, flat=True, zy=900)
+    s.wait(0.1, ("pose", "lion", "cheer"), ("pose", "mouse", "cheer"))
+    s.say("lion", "I am free! Thank you, little mouse!", ("pose", "lion", "cheer"), ("hop", "lion", {"at": "40%"}), ("fx", "confetti", 0, 0, {"at": 0.2, "dur": 4.0}))
+    s.say("lion", "You are so small, but you have a very big heart.", ("pose", "lion", "happy"), ("fx", "hearts", "lion", 0, {"at": "50%", "dur": 3.0}), ("pose", "mouse", "happy"))
+    s.say("mouse", "You were kind to me, Mr. Lion. So I wanted to help you.", ("pose", "mouse", "happy"), ("hop", "mouse", {"at": "60%"}), ("fx", "hearts", "mouse", 0, {"at": "60%", "dur": 2.6}))
+    s.nar("From that day on, the lion and the mouse were the very best of friends.", ("walk", "mouse", 400, 362, {"at": 0.4, "dur": 0.8, "pose": "jump"}), ("pose", "mouse", "cheer", {"at": 1.4}),
+          ("pose", "lion", "happy", {"at": 1.4}), ("fx", "sparkle", 400, 380, {"at": 1.4, "dur": 3.0, "r": 220}), ("sfx", "tada", {"at": 1.4, "gain": 0.3}), tail=0.6)
+
+    # ---------------------------------------------------------------- 12 hooray for the little mouse
+    s = t.scene("Hooray!", "meadow_open", mood="triumph", title="Hooray!")
+    s.actor("lion", "lion", 470, LM_Y, 1.2, face=1)
+    s.actor("mouse", "mouse", 470, 362, 0.6, face=1, flat=True, zy=900)
+    _lm_friends(s, (860, 980, 1110))
+    s.wait(0.1, ("pose", "mouse", "cheer"), ("pose", "lion", "proud"))
+    s.nar("All the animals in the forest cheered for the brave little mouse.", *[("pose", a, "cheer", {"at": 0.4}) for a in ("fox", "hare", "bear")], ("pose", "lion", "cheer", {"at": 0.4}),
+          ("fx", "confetti", 0, 0, {"at": 0.5, "dur": 90.0}), *[("hop", a, {"at": 0.8 + 0.3 * i}) for i, a in enumerate(("fox", "hare", "bear"))])
+    s.say("fox", "Hip, hip, hooray!", ("pose", "fox", "cheer"), ("hop", "fox", {"at": "40%"}), tail=0.2)
+    s.say("bear", "Hooray for the little mouse!", ("pose", "bear", "cheer"), ("hop", "bear", {"at": "40%"}), ("fx", "hearts", "mouse", 0, {"at": "50%", "dur": 3.0}), tail=0.6)
+
+    _outro(t, "Remember, little ones: be kind to everyone, big or small. Even the smallest friend can help in a very big way!", caption="Be kind to everyone!")
+    return t
+
+
 TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_and_hare, "goldilocks": goldilocks,
          "red-riding-hood": red_riding_hood, "gingerbread-man": gingerbread_man, "three-billy-goats": three_billy_goats,
-         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup, "magic-porridge-pot": magic_porridge_pot, "cinderella": cinderella, "snow-white": snow_white, "elves-and-shoemaker": elves_shoemaker, "princess-and-pea": princess_pea, "little-red-hen": little_red_hen}
+         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup, "magic-porridge-pot": magic_porridge_pot, "cinderella": cinderella, "snow-white": snow_white, "elves-and-shoemaker": elves_shoemaker, "princess-and-pea": princess_pea, "little-red-hen": little_red_hen, "lion-and-mouse": lion_and_mouse}
 
 
 def build(key, lang="en"):

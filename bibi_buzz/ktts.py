@@ -9,8 +9,9 @@ A voice spec is the `voice` of an item of voice.py:
     "k:af_heart"                 English (Kokoro-82M): one voice, or voices that are averaged:  "k:af_heart,af_sarah"
     "kt:elif=0.7,emre=0.3"       Turkish (Kokoro-Turkish): a mix of its two voices, elif (woman) and emre (man), with weights
 and, after a bar, the Edge voice (with its own rate and pitch) that takes over when Kokoro cannot run:   "k:af_heart|en-US-JennyNeural|-6%|+0Hz"
-The rate "-6%" of an item is a speed of 0.94; the pitch "+20Hz" is a pitch factor of 1 + 20 / 150 (the way the tales have always said it), made afterwards by
-ffmpeg's rubberband with the formants moving along (a smaller or a bigger person), not by Kokoro itself.
+The rate "-6%" of an item is a speed of 0.94; the pitch "+20Hz" is a pitch factor of 1 + 20 / 150 (the way the tales have always said it): a smaller or a bigger
+person, made by shift_voice (the clip is played that many times faster, so the formants move along with the pitch; Kokoro speaks that many times slower first, so
+that the length stays) - not by a pitch shifter, which made the voices sound processed.
 """
 import json
 import os
@@ -184,16 +185,33 @@ def _loaded(eng):
         raise
 
 
-def _tr_style(blend):
-    import torch
-    from huggingface_hub import hf_hub_download
+_PACK_NAME = re.compile(r"^(elif|emre|[a-z]{2}_[a-z]+)$")
+
+
+def _tr_pack(name):
+    """The voice pack (one style for every length of the phonemes) of a voice for the Turkish model: elif and emre are the model's own; a name like af_kore is a
+    voice of Kokoro-82M, whose style the Turkish fine-tune may still understand (the speaker comes along; whether it sounds right is measured, tools/speech_lab.py)."""
+    if not _PACK_NAME.match(name):
+        raise ValueError("not a voice name: %r" % (name,))
     cache = _tr_model()[2]
+    if name not in cache:
+        import torch
+        from huggingface_hub import hf_hub_download
+        repo = TR_REPO if name in ("elif", "emre") else EN_REPO
+        cache[name] = torch.load(hf_hub_download(repo, "voices/%s.pt" % name), weights_only=True)
+    return cache[name]
+
+
+def _tr_style(blend):
     out, total = None, 0.0
     for name, w in blend.items():
-        if name not in cache:
-            cache[name] = torch.load(hf_hub_download(TR_REPO, "voices/%s.pt" % name), weights_only=True)
-        out = cache[name] * w if out is None else out + cache[name] * w
+        pack = _tr_pack(name)
+        if out is not None and pack.shape != out.shape:
+            raise ValueError("the voices %s do not fit together" % ", ".join(blend))
+        out = pack * w if out is None else out + pack * w
         total += w
+    if abs(total) < 0.2:
+        raise ValueError("the weights of %r add up to nothing" % (blend,))
     return out / total
 
 

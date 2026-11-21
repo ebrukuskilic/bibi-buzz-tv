@@ -336,8 +336,9 @@ def chair(c, x, y, k, t, st):
 @prop
 def bed(c, x, y, k, t, st):
     size = {"big": 1.35, "mid": 1.0, "small": 0.72}[st.get("size", "mid")]
-    quilt = {"big": "#3E8EDE", "mid": "#3DB54A", "small": "#FF6B8B"}[st.get("size", "mid")]
-    wood = {"big": "#8B4F26", "mid": "#B8733A", "small": "#D9954F"}[st.get("size", "mid")]
+    quilt = st.get("quilt") or {"big": "#3E8EDE", "mid": "#3DB54A", "small": "#FF6B8B"}[st.get("size", "mid")]        # (quilt / wood / hair can be given as colours)
+    wood = st.get("wood") or {"big": "#8B4F26", "mid": "#B8733A", "small": "#D9954F"}[st.get("size", "mid")]
+    hair = st.get("hair") or "#FFC83D"
     r = Rig(c, x, y, k * size)
     r.ell(0, 3, 150, 12, mix("#C98A52", "#5A3A1A", 0.5), None)
     r.rrect(-136, -128, -112, 0, 6, wood, INK, 2.8)                                           # headboard
@@ -350,8 +351,8 @@ def bed(c, x, y, k, t, st):
     if st.get("girl", 0.0) > 0.5:
         r.ell(-82, -92, 28, 26, "#FFDDBF", INK, 2.8)
         for i in range(7):
-            r.ell(-102 + i * 6.5, -108 + abs(i - 3) * 2.4, 9, 9, "#FFC83D", INK, 2)
-        r.ell(-106, -86, 10, 22, "#FFC83D", INK, 2)
+            r.ell(-102 + i * 6.5, -108 + abs(i - 3) * 2.4, 9, 9, hair, INK, 2)
+        r.ell(-106, -86, 10, 22, hair, INK, 2)
         r.arc(-90, -92, 6, 4, 22, 158, INK, 2.6)
         r.arc(-72, -92, 6, 4, 22, 158, INK, 2.6)
         r.dot(-98, -82, 4.4, "#FF9DB0")
@@ -360,6 +361,14 @@ def bed(c, x, y, k, t, st):
         r.rrect(-72, -64, 134, -8, 10, quilt, INK, 2.8)
         for i in range(5):
             r.line([(-50 + i * 44, -62), (-50 + i * 44, -10)], mix(quilt, "#FFFFFF", 0.4), 3)
+    if st.get("flowers", 0.0) > 0.5:                                                          # a bed of flowers: blossoms all along the quilt and the foot of the bed
+        for i, (fx, fy) in enumerate(((-48, -8), (-12, -30), (22, -12), (58, -32), (92, -10), (124, -40), (-130, -14), (138, -14), (-6, 3), (66, 4), (-90, 2))):
+            col = ("#FF6B8B", "#FFFFFF", "#FFD23F", "#B58CFF")[i % 4]
+            r.line([(fx, fy), (fx - 3, fy + 9)], "#3E9B3A", 2.6)
+            for j in range(5):
+                a = math.radians(j * 72 + 18)
+                r.dot(fx + 6.5 * math.cos(a), fy - 1 + 6.5 * math.sin(a), 4.6, col)
+            r.dot(fx, fy - 1, 3.4, "#FFE98A")
     return r
 
 

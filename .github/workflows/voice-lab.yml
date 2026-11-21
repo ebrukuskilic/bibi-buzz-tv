@@ -7,14 +7,14 @@ on:
   workflow_dispatch:
     inputs:
       jobs:
-        description: "Jobs of tools/voice_lab.py, comma separated (all, or env,speech,psola,vocos,kokoro)"
+        description: "Jobs of tools/voice_lab.py, comma separated (all, or env,speech,psola,vocos,kokoro,asr,mos)"
         default: "all"
       song:
         description: "Song key (songs.py)"
         default: "twinkle"
       lang:
-        description: "Language of the song: en or tr"
-        default: "en"
+        description: "Language of the song: en, tr or both"
+        default: "both"
       lines:
         description: "How many lines of the song"
         default: "2"
@@ -53,7 +53,8 @@ jobs:
           pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
           pip install "kokoro>=0.9.4" || echo "kokoro install failed"
           pip install vocos || echo "vocos install failed"
-          pip list 2>/dev/null | grep -i -E "^(torch|torchaudio|kokoro|misaki|vocos|transformers|numpy|scipy|spacy) " || true
+          pip install faster-whisper || echo "faster-whisper install failed"
+          pip list 2>/dev/null | grep -i -E "^(torch|torchaudio|kokoro|misaki|vocos|faster-whisper|ctranslate2|transformers|numpy|scipy|spacy) " || true
 
       - name: Laboratory
         env:

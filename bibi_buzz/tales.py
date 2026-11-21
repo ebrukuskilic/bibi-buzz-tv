@@ -3032,67 +3032,77 @@ TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_a
 
 
 # ================================================================================================ voice casting
-# Every character is a TYPE (a girl, a boy, a granny, a wolf, a giant...). The type decides the text-to-speech voice, the speaking speed and the
-# effects of voice.FX_PRESETS (higher, deeper, wobbly, growly, nasal, echoing), so a mouse squeaks, a wolf growls, a granny quavers and a giant booms.
-# Turkish has only two voices (Emel, Ahmet), so there the effects do most of the work. A tale only says which type each of its characters is
-# (CASTING); ("pig", 1.06) is the same type, but 6 % higher, to tell two characters of one type apart.
+# Every character is a TYPE (a girl, a boy, a granny, a wolf, a giant...).  The type decides which REAL text-to-speech voice speaks, how fast, and how
+# high or low its own melody is moved.  Nothing is bent by signal processing any more (no wobble, no growl, no chipmunk resampling): a wolf is a
+# deep man's voice, a granny an old Irish lady, a mouse a high child voice; that is what makes the characters sound like people.
+# The pitch setting is native: "+X Hz" multiplies the whole melody of the voice by 1 + X / 150 (+45Hz = 30 % higher, -30Hz = 20 % lower).
+# Measured natural pitch (median, Hz) of the voices at +0Hz:  Ana 290, Maisie 283 (children) - Jenny 179, Aria 210, Sonia 200, Libby 195, Emily 216,
+# Natasha 213, Molly 192, Clara 195, Ava 180 (women) - Christopher 125, Eric 117, Luke 118, William 127, Steffan 140, Thomas 137, Andrew 141, Brian 149,
+# Liam 142, Roger 158, Ryan 183, Mitchell 177 (men) - Emel 225, Ahmet 143 (Turkish, the only two).
+# The pitch of a voice cannot go beyond about +75 Hz (the service stops there), so the highest Turkish voices (baby, mouse) are Emel at +75.
+# Only a few characters get a light effect: a little room around the big or magic ones (room), a darker or softer sound (bass, lp).
+# A tale only says which type each of its characters is (CASTING); ("pig", 12) is the same type, but 12 Hz higher, to tell two of one type apart.
 _EMEL, _AHMET = "tr-TR-EmelNeural", "tr-TR-AhmetNeural"
-_JENNY, _ANA, _ERIC, _GUY, _ARIA, _CHRIS = ("en-US-JennyNeural", "en-US-AnaNeural", "en-US-EricNeural", "en-US-GuyNeural", "en-US-AriaNeural",
-                                            "en-US-ChristopherNeural")
+_JENNY, _ANA, _MAISIE, _ARIA, _SONIA, _LIBBY, _EMILY, _NATASHA, _MOLLY, _CLARA = ("en-US-JennyNeural", "en-US-AnaNeural", "en-GB-MaisieNeural",
+    "en-US-AriaNeural", "en-GB-SoniaNeural", "en-GB-LibbyNeural", "en-IE-EmilyNeural", "en-AU-NatashaNeural", "en-NZ-MollyNeural", "en-CA-ClaraNeural")
+_CHRIS, _ERIC, _LUKE, _WILLIAM, _STEFFAN, _THOMAS, _BRIAN, _LIAM, _ROGER, _RYAN, _MITCHELL, _ANDREW, _ANDREW_M, _AVA_M = ("en-US-ChristopherNeural",
+    "en-US-EricNeural", "en-ZA-LukeNeural", "en-AU-WilliamMultilingualNeural", "en-US-SteffanNeural", "en-GB-ThomasNeural", "en-US-BrianMultilingualNeural",
+    "en-CA-LiamNeural", "en-US-RogerNeural", "en-GB-RyanNeural", "en-NZ-MitchellNeural", "en-US-AndrewNeural", "en-US-AndrewMultilingualNeural",
+    "en-US-AvaMultilingualNeural")
 TYPES = {      # type: ((English voice, rate, pitch, effect), (Turkish voice, rate, pitch, effect))
     "nar": ((_JENNY, "-6%", "+0Hz", ""), (_EMEL, "-6%", "+0Hz", "")),
     # people
-    "girl": ((_ANA, "-2%", "+10Hz", ""), (_EMEL, "-2%", "+8Hz", "p@1.2")),
-    "teen": ((_ARIA, "-2%", "+6Hz", "p@1.10"), (_EMEL, "-2%", "+2Hz", "p@1.1")),
-    "boy": ((_ANA, "+2%", "+0Hz", "boy"), (_AHMET, "+4%", "+0Hz", "p@1.65")),
-    "baby": ((_ANA, "+0%", "+16Hz", "p@1.12"), (_EMEL, "+0%", "+0Hz", "p@1.55")),
-    "woman": ((_ARIA, "-4%", "+0Hz", ""), (_EMEL, "-8%", "-6Hz", "")),
-    "granny": ((_ARIA, "-12%", "-10Hz", "oldwoman"), (_EMEL, "-14%", "-12Hz", "oldwoman")),
-    "fakegranny": ((_ARIA, "-10%", "-8Hz", "p@0.92+trem@45,0.10"), (_EMEL, "-12%", "-12Hz", "p@0.92+trem@45,0.10")),
-    "man": ((_CHRIS, "-8%", "-6Hz", ""), (_AHMET, "-6%", "+0Hz", "")),
-    "grandpa": ((_CHRIS, "-12%", "-8Hz", "oldman"), (_AHMET, "-12%", "-6Hz", "oldman")),
-    "prince": ((_ERIC, "+0%", "+0Hz", ""), (_AHMET, "-2%", "+4Hz", "")),
-    "king": ((_CHRIS, "-14%", "-14Hz", "king"), (_AHMET, "-14%", "-14Hz", "king+pm@0.86")),
-    "lord": ((_CHRIS, "-12%", "-14Hz", "p@0.88+bass@2"), (_AHMET, "-12%", "-10Hz", "p@0.78+bass@2")),
-    "queen": ((_ARIA, "-12%", "-14Hz", "queen"), (_EMEL, "-12%", "-14Hz", "queen")),
-    "stepmother": ((_ARIA, "-8%", "-14Hz", "p@0.9+trem@38,0.08"), (_EMEL, "-10%", "-14Hz", "p@0.9+trem@38,0.08")),
-    "stepsister": ((_ARIA, "+6%", "+12Hz", "p@1.14+nasal@3"), (_EMEL, "+6%", "+10Hz", "p@1.12+nasal@3")),
-    "witch": ((_ARIA, "-12%", "-20Hz", "witch"), (_EMEL, "-14%", "-20Hz", "witch")),
+    "girl": ((_ANA, "-2%", "+10Hz", ""), (_EMEL, "-2%", "+55Hz", "")),
+    "teen": ((_LIBBY, "-2%", "+22Hz", ""), (_EMEL, "-2%", "+15Hz", "")),
+    "boy": ((_MAISIE, "+4%", "-35Hz", ""), (_EMEL, "+4%", "+36Hz", "")),
+    "baby": ((_MAISIE, "+0%", "+30Hz", ""), (_EMEL, "+0%", "+75Hz", "")),
+    "woman": ((_AVA_M, "-4%", "+12Hz", ""), (_EMEL, "-8%", "-18Hz", "")),
+    "granny": ((_EMILY, "-14%", "-18Hz", ""), (_EMEL, "-14%", "-28Hz", "lp@7000")),
+    "fakegranny": ((_ANDREW, "-8%", "+45Hz", ""), (_AHMET, "-8%", "+60Hz", "")),
+    "man": ((_BRIAN, "-6%", "+0Hz", ""), (_AHMET, "-6%", "-8Hz", "")),
+    "grandpa": ((_ANDREW_M, "-14%", "-12Hz", ""), (_AHMET, "-12%", "-14Hz", "lp@7000")),
+    "prince": ((_THOMAS, "+0%", "+10Hz", ""), (_AHMET, "-2%", "+8Hz", "")),
+    "king": ((_CHRIS, "-14%", "-25Hz", "room@0.07,0.5"), (_AHMET, "-14%", "-28Hz", "room@0.07,0.5")),
+    "lord": ((_ERIC, "-8%", "-6Hz", ""), (_AHMET, "-10%", "-20Hz", "")),
+    "queen": ((_SONIA, "-10%", "-15Hz", "room@0.06,0.5"), (_EMEL, "-12%", "-22Hz", "room@0.06,0.5")),
+    "stepmother": ((_AVA_M, "-12%", "-20Hz", ""), (_EMEL, "-10%", "-20Hz", "")),
+    "stepsister": ((_CLARA, "+6%", "+20Hz", ""), (_EMEL, "+6%", "+30Hz", "")),
+    "witch": ((_EMILY, "-14%", "-30Hz", ""), (_EMEL, "-14%", "-40Hz", "lp@7000")),
     # magic folk
-    "fairy": ((_ARIA, "-10%", "+4Hz", "fairy"), (_EMEL, "-10%", "+4Hz", "fairy")),
-    "mirror": ((_GUY, "-20%", "-8Hz", "mirror"), (_AHMET, "-16%", "-8Hz", "mirror")),
-    "dwarf": ((_CHRIS, "+8%", "+12Hz", "dwarf+pm@1.23"), (_AHMET, "+8%", "+14Hz", "dwarf")),
-    "elf": ((_ERIC, "+12%", "+14Hz", "elf+pm@1.25"), (_AHMET, "+10%", "+12Hz", "elf")),
-    "elfgirl": ((_ANA, "+12%", "+16Hz", "elf+pm@0.8"), (_EMEL, "+10%", "+10Hz", "elf")),
-    "troll": ((_CHRIS, "-16%", "-20Hz", "troll"), (_AHMET, "-16%", "-20Hz", "troll")),
-    "giant": ((_CHRIS, "-16%", "-26Hz", "giant"), (_AHMET, "-16%", "-26Hz", "giant+pm@0.85")),
+    "fairy": ((_MOLLY, "-8%", "+30Hz", "room@0.12,0.8"), (_EMEL, "-14%", "+0Hz", "room@0.14,0.9")),
+    "mirror": ((_WILLIAM, "-18%", "-8Hz", "room@0.16,0.9"), (_AHMET, "-16%", "-10Hz", "room@0.16,0.9")),
+    "dwarf": ((_ROGER, "+6%", "+10Hz", ""), (_AHMET, "+8%", "+22Hz", "")),
+    "elf": ((_MITCHELL, "+10%", "+25Hz", ""), (_AHMET, "+10%", "+50Hz", "")),
+    "elfgirl": ((_MAISIE, "+10%", "+30Hz", ""), (_EMEL, "+10%", "+55Hz", "")),
+    "troll": ((_LUKE, "-16%", "-35Hz", "bass@2"), (_AHMET, "-16%", "-42Hz", "bass@2")),
+    "giant": ((_CHRIS, "-16%", "-45Hz", "room@0.10,0.7"), (_AHMET, "-18%", "-58Hz", "room@0.10,0.7")),
     # animals
-    "pig": ((_ERIC, "+2%", "+10Hz", "pig+pm@1.22"), (_AHMET, "+4%", "+6Hz", "p@1.42+nasal@6")),
-    "wolf": ((_GUY, "-10%", "-14Hz", "wolf+pm@0.80"), (_AHMET, "-10%", "-10Hz", "wolf")),
-    "hare": ((_ERIC, "+8%", "+6Hz", "hare+pm@1.25"), (_AHMET, "+8%", "+8Hz", "hare")),
-    "tortoise": ((_CHRIS, "-18%", "-6Hz", "tortoise"), (_AHMET, "-18%", "-6Hz", "tortoise")),
-    "bear": ((_GUY, "-12%", "-12Hz", "bear+pm@0.80"), (_AHMET, "-10%", "-10Hz", "bear+pm@0.84")),
-    "mamabear": ((_ARIA, "-6%", "-8Hz", "p@0.9+bass@2"), (_EMEL, "-10%", "-10Hz", "p@0.9+bass@2")),
-    "goat_little": ((_ANA, "+4%", "+20Hz", "p@1.0+vib@8,0.45"), (_EMEL, "+4%", "+10Hz", "p@1.25+vib@8,0.45")),
-    "goat_mid": ((_GUY, "+0%", "+4Hz", "p@1.15+vib@8,0.45"), (_AHMET, "+2%", "+10Hz", "p@1.2+vib@8,0.45")),
-    "goat_big": ((_CHRIS, "-14%", "-12Hz", "p@0.80+vib@7,0.45+bass@2"), (_AHMET, "-10%", "-12Hz", "p@0.7+vib@7,0.45+bass@2")),
-    "hen": ((_ARIA, "+2%", "+8Hz", "hen"), (_EMEL, "+2%", "+6Hz", "hen")),
-    "fox": ((_GUY, "-4%", "+4Hz", "fox"), (_AHMET, "-4%", "+4Hz", "fox")),
-    "tiny": ((_ANA, "+4%", "+20Hz", "tiny+pm@0.9"), (_EMEL, "+8%", "+10Hz", "tiny+pm@1.15")),          # a mouse, a ladybird, a chick
-    "lion": ((_CHRIS, "-12%", "-20Hz", "lion"), (_AHMET, "-12%", "-20Hz", "lion")),
+    "pig": ((_ROGER, "+2%", "+15Hz", ""), (_AHMET, "+4%", "+25Hz", "")),
+    "wolf": ((_CHRIS, "-10%", "-28Hz", "bass@2"), (_AHMET, "-10%", "-36Hz", "bass@2")),
+    "hare": ((_MITCHELL, "+8%", "+10Hz", ""), (_AHMET, "+8%", "+55Hz", "")),
+    "tortoise": ((_STEFFAN, "-20%", "-10Hz", "lp@7000"), (_AHMET, "-20%", "-14Hz", "lp@7000")),
+    "bear": ((_ERIC, "-12%", "-22Hz", ""), (_AHMET, "-12%", "-38Hz", "")),
+    "mamabear": ((_SONIA, "-8%", "-22Hz", ""), (_EMEL, "-10%", "-26Hz", "")),
+    "goat_little": ((_MAISIE, "+4%", "+15Hz", ""), (_EMEL, "+4%", "+60Hz", "")),
+    "goat_mid": ((_LIAM, "+0%", "+10Hz", ""), (_AHMET, "+2%", "+30Hz", "")),
+    "goat_big": ((_CHRIS, "-14%", "-20Hz", "bass@2"), (_AHMET, "-10%", "-36Hz", "bass@2")),
+    "hen": ((_NATASHA, "+4%", "+15Hz", ""), (_EMEL, "+2%", "+40Hz", "")),
+    "fox": ((_RYAN, "-4%", "-12Hz", ""), (_AHMET, "-4%", "+12Hz", "")),
+    "tiny": ((_ANA, "+8%", "+40Hz", ""), (_EMEL, "+8%", "+75Hz", "")),                          # a mouse, a ladybird, a chick
+    "lion": ((_CHRIS, "-12%", "-38Hz", "room@0.10,0.8"), (_AHMET, "-12%", "-44Hz", "room@0.10,0.8")),
 }
 
-CASTING = {    # tale: {character id of the tale: type, or (type, pitch factor)}
-    "three-little-pigs": {"mama": "woman", "pig1": ("pig", 1.06), "pig2": ("pig", 0.99), "pig3": ("pig", 0.92), "wolf": "wolf"},
-    "tortoise-and-hare": {"hare": "hare", "tort": "tortoise", "bear": "bear", "pig1": ("pig", 1.06), "pig2": ("pig", 0.99), "pig3": ("pig", 0.92)},
+CASTING = {    # tale: {character id of the tale: type, or (type, pitch offset in Hz)}
+    "three-little-pigs": {"mama": "woman", "pig1": ("pig", 12), "pig2": ("pig", 0), "pig3": ("pig", -12), "wolf": "wolf"},
+    "tortoise-and-hare": {"hare": "hare", "tort": "tortoise", "bear": "bear", "pig1": ("pig", 12), "pig2": ("pig", 0), "pig3": ("pig", -12)},
     "goldilocks": {"gold": "girl", "papa": "bear", "mama": "mamabear", "baby": "baby"},
     "red-riding-hood": {"red": "girl", "mama": "woman", "granny": "granny", "wolf": "wolf", "wolfg": "fakegranny", "wood": "man"},
-    "gingerbread-man": {"gm": ("boy", 1.06), "woman": "granny", "man": "grandpa", "pig": "pig", "bear": "bear", "fox": "fox"},
+    "gingerbread-man": {"gm": ("boy", 9), "woman": "granny", "man": "grandpa", "pig": "pig", "bear": "bear", "fox": "fox"},
     "three-billy-goats": {"lit": "goat_little", "mid": "goat_mid", "big": "goat_big", "troll": "troll"},
     "enormous-turnip": {"gpa": "grandpa", "gma": "granny", "kid": "girl", "pig": "pig", "hare": "hare", "bear": "bear", "pip": "tiny"},
     "stone-soup": {"fox": "fox", "hare": "hare", "pig": "pig", "goat": "goat_mid", "gma": "granny", "kid": "girl"},
-    "magic-porridge-pot": {"kid": "girl", "mama": "woman", "old": "granny", "gpa": "grandpa", "gma": "granny", "nei": ("girl", 1.06)},
-    "cinderella": {"cin": "teen", "cing": "teen", "sm": "stepmother", "s1": ("stepsister", 1.05), "s2": "stepsister", "fg": "fairy", "pr": "prince"},
+    "magic-porridge-pot": {"kid": "girl", "mama": "woman", "old": "granny", "gpa": "grandpa", "gma": ("granny", -8), "nei": ("girl", 9)},
+    "cinderella": {"cin": "teen", "cing": "teen", "sm": "stepmother", "s1": ("stepsister", 8), "s2": "stepsister", "fg": "fairy", "pr": "prince"},
     "snow-white": {"snow": "teen", "queen": "queen", "mir": "mirror", "dw": "dwarf", "old": "witch", "pr": "prince"},
     "elves-and-shoemaker": {"shoe": "man", "wife": "woman", "lady": "teen", "lord": "lord", "e1": "elf", "e2": "elfgirl"},
     "princess-and-pea": {"prince": "prince", "king": "king", "queen": "woman", "prn": "teen"},
@@ -3107,10 +3117,10 @@ def cast_voices(key, lang="en"):
     i = 0 if lang == "en" else 1
     out = {}
     for who, spec in dict(CASTING[key], nar="nar").items():
-        typ, mult = (spec, 1.0) if isinstance(spec, str) else spec
+        typ, off = (spec, 0) if isinstance(spec, str) else spec
         v, r, p, fx = TYPES[typ][i]
-        if abs(mult - 1.0) > 1e-6:
-            fx = (fx + "+" if fx else "") + "pm@%.3f" % mult
+        if off:
+            p = "%+dHz" % (int(p[:-2]) + off)                                          # the same type, a little higher or lower
         VO.fx_parse(fx)                                                                # a typo in an effect name fails here, when the tale is built
         out[who] = (v, r, p, fx)
     return out

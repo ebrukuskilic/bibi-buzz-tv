@@ -2006,9 +2006,215 @@ def snow_white(lang="en"):
     return t
 
 
+# ================================================================================================ the elves and the shoemaker
+SHOEM = dict(gramps="#B8733A", hair="#E4E4EC", hat_kind="cap", hat_color="#7A4A25")                 # the old shoemaker: a brown cardigan and a flat cap
+WIFE = dict(dress="#5BC27A", hair="#E4E4EC", granny="#FF9DB0")                                      # his wife, in a pink shawl
+LADY = dict(gown="#8C6BC8", hair="#7B4A2A", shoe="#4A1C57", hat_kind="bow", hat_color="#FFD21F")    # a customer in a fine dress
+LORD = dict(prince="#3E8EDE", hair="#4A3A2A", hat_kind="tophat", hat_color="#2A2A3A")               # ... and a gentleman in a top hat
+ELF_RAGS1 = dict(dress="#A99A84", hair="#C98A52", shoe="#FFDDBF", hat_kind="pointy", hat_color="#8C7B66")      # elves in old, ragged clothes, with bare feet
+ELF_RAGS2 = dict(dress="#98A08A", hair="#8A5A2B", shoe="#FFDDBF", hat_kind="pointy", hat_color="#7C8A6A")
+ELF_NEW1 = dict(dress="#E2362F", hair="#C98A52", shoe="#FFD21F", hat_kind="pointy", hat_color="#3DB54A")        # ... and in their new clothes
+ELF_NEW2 = dict(dress="#3E8EDE", hair="#8A5A2B", shoe="#FFD21F", hat_kind="pointy", hat_color="#FF9A3D")
+EK = 0.5                                                     # the elves are tiny
+B_X, B_Y, B_K = 860, 650, 1.25                               # the workbench
+BP = [B_X + B_K * (-90 + 80 * i) for i in range(4)]          # where the four things (pairs of shoes, tiny clothes) stand on the bench
+BL_X = B_X + B_K * -200                                      # the pile of leather
+BT = B_Y + B_K * -130                                        # the top of the bench, where the elves stand
+MARK4 = ["#E2362F", "#2F7FD8", "#2E9E3A", "#D9A400"]         # (darker colours of red, blue, green and yellow: text on a white circle)
+PAIR_NAMES = ["red", "blue", "green", "yellow"]
+GIFT_LINES = ["One! A tiny red coat.", "Two! Tiny blue trousers.", "Three! A tiny green cap.", "Four! Tiny yellow boots."]
+ELF_MOUNT = [(760, BT - 14), (950, BT - 14)]                 # the two elves stand here while they work
+
+
+def _wardrobe_hide(s):
+    """The wardrobe the shoemaker and his wife hide behind: he peeks out on the left, she on the right."""
+    s.prop("ward", "wardrobe", 300, 650, 0.95)
+
+
+def elves_shoemaker(lang="en"):
+    t = Tale("tale-elves-shoemaker", "The Elves and the Shoemaker | Fairy Tale Story for Kids | Bibi Buzz TV",
+             "A kind old shoemaker and his wife are so poor that they have only one piece of leather left. But every morning, a beautiful pair of shoes is waiting on the bench... "
+             "then two pairs... and then four! Who is helping them in the night? Count the pairs of shoes from one to four, learn the colors red, blue, green and yellow, "
+             "and meet two tiny elves. Watch the classic fairy tale about kindness and about saying thank you, in a gentle, colorful animated story in simple English for toddlers "
+             "and preschoolers.",
+             TAGS + ["the elves and the shoemaker", "elves and the shoemaker story", "elves story", "shoemaker story", "counting story", "colors for kids", "learn colors", "say thank you"],
+             {"nar": NAR, "shoe": (GUY, "-8%", "-10Hz"), "wife": (ARIA, "-4%", "-6Hz"), "lady": (ANA, "-4%", "+0Hz"), "lord": (GUY, "-14%", "-24Hz"),
+              "e1": (GUY, "+16%", "+34Hz"), "e2": (ANA, "+12%", "+22Hz")}, lang=lang)
+    t.bubble_tint = {"shoe": "#FFF0CF", "wife": "#FFE3EE", "lady": "#EBDDFF", "lord": "#DDEBFF", "e1": "#E3FFD9", "e2": "#FFE9C7", "e1n": "#E3FFD9", "e2n": "#FFE9C7"}
+    t.cover = dict(bg="room", title=("THE ELVES AND", "THE SHOEMAKER"), size=100, gap=100,
+                   props=[("bench", "bench", 650, 716, 1.55, dict(pairs=4.0))],
+                   actors=[("shoe", "girl", 170, 708, 1.3, 1, "happy", dict(SHOEM)), ("wife", "girl", 1130, 708, 1.25, -1, "happy", dict(WIFE)),
+                           ("e1", "girl", 520, 522, 0.62, 1, "knock", dict(ELF_RAGS1, hold="hammer", zy=900)), ("e2", "girl", 790, 522, 0.62, -1, "stitch", dict(ELF_RAGS2, hold="needle", zy=900))])
+    _intro(t, ("THE ELVES AND", "THE SHOEMAKER"), "Today's story is... The Elves and the Shoemaker!")
+
+    # ---------------------------------------------------------------- 1 a kind shoemaker with one piece of leather
+    s = t.scene("The shop", "room", mood="calm", title="A kind shoemaker")
+    s.prop("bench", "bench", B_X, B_Y, B_K, leather=1.0, pairs=0.0)
+    s.actor("shoe", "girl", 470, 676, 1.0, face=1, **SHOEM)
+    s.actor("wife", "girl", 300, 676, 0.95, face=1, **WIFE)
+    s.nar("Once upon a time, there was a kind old shoemaker and his wife.", ("pose", "shoe", "happy", {"at": 0.3}), ("pose", "wife", "happy", {"at": 0.6}),
+          ("fx", "sparkle", "shoe", 0, {"at": 0.5, "dur": 3.0, "r": 150}))
+    s.nar("They were very poor. They had only one little piece of leather left.", ("pose", "shoe", "sad", {"at": 0.4}), ("pose", "wife", "sad", {"at": 0.4}),
+          ("fx", "sparkle", BL_X, 490, {"at": 2.6, "dur": 2.0, "r": 90}))
+    s.nar("It was just enough to make ONE pair of shoes.", ("fx", "mark", BL_X, 430, {"at": 1.6, "dur": 60.0, "text": "1", "color": MARK4[0]}), ("sfx", "pop", {"at": 1.6}),
+          ("pose", "shoe", "think", {"at": 0.4}))
+    s.say("shoe", "I will cut out the shoes tonight. Tomorrow, I will sew them.", ("pose", "shoe", "talk"), ("walk", "shoe", 560, 676, {"at": 0.2, "dur": 1.0}), ("pose", "wife", "idle"))
+    s.nar("So he cut the leather, and he left it on the bench. Then the shoemaker and his wife went to bed.", ("pose", "shoe", "plant", {"at": 0.2}), ("sfx", "knock", {"at": 0.5, "gain": 0.5}),
+          ("pose", "shoe", "tired", {"at": 2.6}), ("walk", "wife", -150, 676, {"at": 3.2, "speed": 150, "pose": "walk"}), ("walk", "shoe", -250, 676, {"at": 3.6, "speed": 150, "pose": "walk"}), tail=0.4)
+
+    # ---------------------------------------------------------------- 2 a surprise in the morning
+    s = t.scene("Morning", "room", mood="happy", title="A surprise in the morning")
+    s.prop("bench", "bench", B_X, B_Y, B_K, leather=0.0, pairs=0.0)
+    s.actor("shoe", "girl", -150, 676, 1.0, face=1, **SHOEM)
+    s.actor("wife", "girl", -320, 676, 0.95, face=1, **WIFE)
+    s.actor("lady", "girl", 1600, 676, 0.95, face=-1, **LADY)
+    s.nar("In the morning, the shoemaker came to his bench. And what do you think he saw?", ("walk", "shoe", 530, 676, {"fit": True, "pose": "walk"}), ("walk", "wife", 360, 676, {"fit": True, "pose": "walk"}),
+          ("set", "bench", "pairs", 1.0, {"at": "92%", "dur": 0.05}), ("fx", "sparkle", BP[0], 480, {"at": "92%", "dur": 3.0, "r": 140}), ("sfx", "tada", {"at": "92%"}))
+    s.say("shoe", "Oh my! A beautiful pair of shoes! Every stitch is perfect!", ("pose", "shoe", "surprised"), ("pose", "wife", "surprised", {"at": 0.2}),
+          ("fx", "mark", "shoe", -105, {"at": 0.3, "dur": 2.6, "text": "!"}), ("hop", "shoe", {"at": 0.4}))
+    s.say("wife", "But who made them? How strange!", ("pose", "wife", "think"), ("pose", "shoe", "idle"))
+    s.nar("Just then, a customer came into the shop.", ("walk", "lady", 760, 676, {"at": 0.3, "speed": 220, "pose": "walk"}), ("pose", "shoe", "happy", {"at": 1.0}), tail=0.2)
+    s.say("lady", "What lovely shoes! I will buy them, and I will pay you a lot of gold!", ("pose", "lady", "happy"), ("fx", "sparkle", BP[0], 480, {"at": "70%", "dur": 2.0, "r": 120}),
+          ("sfx", "ding", {"at": "80%"}), ("set", "bench", "pairs", 0.0, {"at": "82%", "dur": 0.05}), ("hold", "lady", "box", {"at": "82%"}))
+    s.nar("Now the shoemaker had enough gold to buy leather for TWO pairs of shoes.", ("walk", "lady", 1600, 676, {"at": 0.4, "speed": 260, "pose": "walk"}), ("pose", "shoe", "cheer", {"at": 0.4}),
+          ("pose", "wife", "cheer", {"at": 0.6}), ("set", "bench", "leather", 2.0, {"at": 2.2, "dur": 0.05}), ("fx", "mark", BL_X, 430, {"at": 2.2, "dur": 60.0, "text": "2", "color": MARK4[1]}),
+          ("fx", "sparkle", BL_X, 490, {"at": 2.2, "dur": 2.5, "r": 100}), ("sfx", "pop", {"at": 2.2}), tail=0.4)
+
+    # ---------------------------------------------------------------- 3 more and more shoes: one pair, two pairs, four pairs
+    s = t.scene("More shoes", "room", mood="happy", title="More and more shoes")
+    s.prop("bench", "bench", B_X, B_Y, B_K, leather=2.0, pairs=0.0)
+    s.actor("shoe", "girl", 530, 676, 1.0, face=1, **SHOEM)
+    s.actor("wife", "girl", 360, 676, 0.95, face=1, **WIFE)
+    s.actor("lord", "girl", 1600, 676, 0.95, face=-1, **LORD)
+    s.nar("That night, the shoemaker cut the leather for two pairs of shoes. Then he went to bed.", ("pose", "shoe", "plant", {"at": 0.3}), ("sfx", "knock", {"at": 0.6, "gain": 0.5}),
+          ("set", "bench", "leather", 0.0, {"at": 2.6, "dur": 0.05}), ("pose", "shoe", "tired", {"at": 2.6}), ("walk", "wife", -150, 676, {"at": 3.0, "speed": 160, "pose": "walk"}),
+          ("walk", "shoe", -250, 676, {"at": 3.3, "speed": 160, "pose": "walk"}), tail=0.3)
+    s.nar("In the morning, there were TWO pairs of shoes on the bench! A red pair, and a blue pair.", ("walk", "shoe", 530, 676, {"at": 0.0, "speed": 250, "pose": "walk"}),
+          ("walk", "wife", 360, 676, {"at": 0.0, "speed": 250, "pose": "walk"}), ("set", "bench", "pairs", 2.0, {"at": 1.2, "dur": 0.05}), ("fx", "sparkle", BP[0], 480, {"at": 1.2, "dur": 3.0, "r": 150}),
+          ("fx", "sparkle", BP[1], 480, {"at": 1.4, "dur": 3.0, "r": 150}), ("sfx", "tada", {"at": 1.2}), ("pose", "shoe", "surprised", {"at": 1.4}), ("pose", "wife", "surprised", {"at": 1.4}))
+    s.nar("Again, a gentleman came, and he bought them both. Now the shoemaker could buy leather for FOUR pairs.", ("walk", "lord", 780, 676, {"at": 0.2, "speed": 260, "pose": "walk"}),
+          ("hold", "lord", "box", {"at": 2.4}), ("set", "bench", "pairs", 0.0, {"at": 2.4, "dur": 0.05}), ("sfx", "ding", {"at": 2.6}), ("walk", "lord", 1600, 676, {"at": 3.4, "speed": 280, "pose": "walk"}),
+          ("set", "bench", "leather", 4.0, {"at": 4.6, "dur": 0.05}), ("fx", "mark", BL_X, 430, {"at": 4.6, "dur": 4.0, "text": "4", "color": MARK4[2]}), ("fx", "sparkle", BL_X, 490, {"at": 4.6, "dur": 2.5, "r": 100}),
+          ("sfx", "pop", {"at": 4.6}), ("pose", "shoe", "cheer", {"at": 4.6}), ("pose", "wife", "cheer", {"at": 4.7}), tail=0.3)
+    s.nar("That night, he cut the leather for four pairs of shoes. In the morning, let us count them!", ("pose", "shoe", "plant", {"at": 0.4}), ("sfx", "knock", {"at": 0.7, "gain": 0.5}), ("set", "bench", "leather", 0.0, {"at": 2.8, "dur": 0.05}), ("pose", "shoe", "happy", {"at": 3.2}),
+          ("pose", "wife", "happy", {"at": 3.4}), tail=0.3)
+    for i in range(4):
+        s.nar("%s! A %s pair of shoes." % (NUMBERS[i], PAIR_NAMES[i]), ("set", "bench", "pairs", float(i + 1), {"at": 0.1, "dur": 0.05}), ("pose", "shoe", "cheer", {"at": 0.0}), ("pose", "wife", "cheer", {"at": 0.1}),
+              ("fx", "mark", BP[i], 425, {"at": 0.15, "dur": 60.0, "text": str(i + 1), "color": MARK4[i]}), ("sfx", "pop", {"at": 0.15}), ("fx", "sparkle", BP[i], 480, {"at": 0.15, "dur": 1.6, "r": 90}),
+              tail=0.25 if i < 3 else 0.5)
+    s.nar("Four pairs of shoes! The shoemaker and his wife were so happy, and so puzzled.", ("pose", "shoe", "think", {"at": 1.0}), ("pose", "wife", "think", {"at": 1.4}), tail=0.4)
+
+    # ---------------------------------------------------------------- 4 who is helping us?
+    s = t.scene("Who is helping?", "room", mood="sneaky", title="Who is our helper?")
+    s.prop("bench", "bench", B_X, B_Y, B_K, leather=4.0, pairs=0.0)
+    s.prop("ward", "wardrobe", 300, 662, 0.95)
+    s.actor("shoe", "girl", 560, 676, 1.0, face=1, zy=656, **SHOEM)
+    s.actor("wife", "girl", 700, 676, 0.95, face=-1, zy=656, **WIFE)
+    s.say("wife", "Who is helping us every night?", ("pose", "wife", "think"), ("pose", "shoe", "idle"), ("fx", "mark", "wife", -105, {"at": 0.3, "dur": 2.2, "text": "?"}))
+    s.say("shoe", "Maybe it is a kind fairy?", ("pose", "shoe", "think"), ("pose", "wife", "idle"), ("fx", "mark", "shoe", -105, {"at": 0.3, "dur": 2.2, "text": "?"}))
+    s.say("wife", "Or maybe it is a clever little mouse!", ("pose", "wife", "laugh"), ("pose", "shoe", "idle"), ("hop", "wife", {"at": "50%"}))
+    s.say("shoe", "Let us stay up tonight, and see!", ("pose", "shoe", "happy"), ("pose", "wife", "idle"), ("hop", "shoe", {"at": "50%"}))
+    s.say("wife", "Good idea! Let us hide behind the wardrobe, and watch.", ("pose", "wife", "happy"), ("pose", "shoe", "idle"), ("hop", "wife", {"at": "50%"}))
+    s.nar("That night, they put out the leather. Then the shoemaker and his wife hid, and they waited, and they waited.", ("pose", "shoe", "sly", {"at": 1.0}), ("pose", "wife", "sly", {"at": 1.0}),
+          ("walk", "shoe", 230, 676, {"at": 1.4, "speed": 190, "pose": "walk"}), ("walk", "wife", 370, 676, {"at": 2.2, "speed": 190, "pose": "walk"}),
+          ("face", "shoe", 1, {"at": 4.4}), ("face", "wife", 1, {"at": 4.4}), ("pose", "shoe", "sly", {"at": 4.4}), ("pose", "wife", "sly", {"at": 4.4}), tail=0.3)
+    s.nar("Who do you think is coming? Let us wait and see!", ("pose", "shoe", "think", {"at": 0.2}), ("pose", "wife", "think", {"at": 0.2}),
+          ("fx", "mark", "shoe", -105, {"at": 1.4, "dur": 2.4, "text": "?"}), ("fx", "mark", "wife", -105, {"at": 1.7, "dur": 2.1, "text": "?"}), tail=0.3)
+
+    # ---------------------------------------------------------------- 5 at midnight: two tiny elves
+    s = t.scene("At midnight", "room_night", mood="sneaky", title="Two tiny elves")
+    s.prop("bench", "bench", B_X, B_Y, B_K, leather=4.0, pairs=0.0)
+    s.prop("ward", "wardrobe", 300, 662, 0.95)
+    s.actor("shoe", "girl", 230, 676, 1.0, face=1, zy=656, **SHOEM)
+    s.actor("wife", "girl", 370, 676, 0.95, face=1, zy=656, **WIFE)
+    s.actor("e1", "girl", 1500, 700, EK, face=-1, zy=900, hold="hammer", **ELF_RAGS1)
+    s.actor("e2", "girl", 1640, 700, EK, face=-1, zy=900, hold="needle", **ELF_RAGS2)
+    s.nar("At midnight, the room was dark and quiet.", ("pose", "shoe", "sly"), ("pose", "wife", "sly"), ("sfx", "bong", {"at": 0.3, "gain": 0.8}), ("fx", "sparkle", 1000, 300, {"at": 1.4, "dur": 3.0, "r": 200}))
+    s.nar("Then, the door creaked open. And two tiny elves tiptoed in!", ("sfx", "creak", {"at": 0.4, "gain": 0.6}), ("walk", "e1", 1080, 700, {"at": 1.6, "speed": 120, "pose": "walk"}),
+          ("walk", "e2", 1210, 700, {"at": 1.8, "speed": 120, "pose": "walk"}), ("fx", "mark", "shoe", -105, {"at": 2.6, "dur": 2.2, "text": "!"}), ("fx", "mark", "wife", -105, {"at": 2.8, "dur": 2.0, "text": "!"}))
+    s.nar("One elf! Two elves! They had no shoes, and their clothes were old and torn.", ("fx", "mark", "e1", -90, {"at": 0.5, "dur": 5.4, "text": "1", "color": MARK4[0]}), ("sfx", "pop", {"at": 0.5}),
+          ("fx", "mark", "e2", -90, {"at": 1.2, "dur": 4.7, "text": "2", "color": MARK4[1]}), ("sfx", "pop", {"at": 1.2}), ("pose", "e1", "sad", {"at": 2.6}), ("pose", "e2", "sad", {"at": 2.6}))
+    s.nar("They hopped up onto the bench, and they got to work.", ("move", "e1", ELF_MOUNT[0][0], ELF_MOUNT[0][1], {"at": 0.7, "dur": 0.6, "pose": "jump"}), ("hop", "e1", {"at": 0.9}),
+          ("move", "e2", ELF_MOUNT[1][0], ELF_MOUNT[1][1], {"at": 1.3, "dur": 0.6, "pose": "jump"}), ("hop", "e2", {"at": 1.5}), ("pose", "e1", "happy", {"at": 2.2}), ("pose", "e2", "happy", {"at": 2.2}),
+          ("face", "e1", 1, {"at": 1.4}), ("face", "e2", -1, {"at": 1.9}), tail=0.2)
+    for rnd in range(4):
+        s.say("e1", "Tap, tap, tap!", ("pose", "e1", "knock"), ("pose", "e2", "idle"), ("sfx", "knock", {"at": "15%", "gain": 0.6}), ("sfx", "knock", {"at": "45%", "gain": 0.6}), ("sfx", "knock", {"at": "75%", "gain": 0.6}))
+        s.say("e2", "Stitch, stitch, stitch!", ("pose", "e2", "stitch"), ("pose", "e1", "idle"), ("sfx", "pop", {"at": "15%", "gain": 0.4}), ("sfx", "pop", {"at": "45%", "gain": 0.4}), ("sfx", "pop", {"at": "75%", "gain": 0.4}),
+              ("set", "bench", "leather", 3.0 - rnd, {"at": "95%", "dur": 0.05}), ("set", "bench", "pairs", float(rnd + 1), {"at": "95%", "dur": 0.05}),
+              ("fx", "sparkle", BP[rnd], 480, {"at": "95%", "dur": 2.5, "r": 120}), ("sfx", "tada", {"at": "95%", "gain": 0.7}))
+    s.nar("Soon, all four pairs of shoes were finished!", ("pose", "e1", "cheer"), ("pose", "e2", "cheer"), ("hop", "e1", {"at": 0.3}), ("hop", "e2", {"at": 0.5}), ("fx", "sparkle", 960, 440, {"at": 0.3, "dur": 3.0, "r": 280}))
+    s.nar("The elves danced all around the bench. Then they hopped away, quick as a wink.", ("pose", "e1", "dance", {"at": 0.2}), ("pose", "e2", "dance", {"at": 0.2}), ("fx", "notes", "e1", -60, {"at": 0.4, "dur": 3.0}),
+          ("move", "e1", 1100, 700, {"at": 3.0, "dur": 0.5, "pose": "jump"}), ("move", "e2", 1220, 700, {"at": 3.2, "dur": 0.5, "pose": "jump"}),
+          ("walk", "e1", 1500, 700, {"at": 3.6, "speed": 260, "pose": "run"}), ("walk", "e2", 1640, 700, {"at": 3.8, "speed": 260, "pose": "run"}), tail=0.2)
+    s.say("wife", "Oh, my! Two tiny elves! They worked so hard, just for us!", ("pose", "wife", "happy"), ("pose", "shoe", "surprised"), ("hop", "wife", {"at": "30%"}))
+
+    # ---------------------------------------------------------------- 6 a thank-you gift
+    s = t.scene("A gift", "room", mood="happy", title="A thank-you gift")
+    s.prop("bench", "bench", B_X, B_Y, B_K, leather=0.0, pairs=0.0, gifts=0.0, gifts2=0.0)
+    s.actor("shoe", "girl", 540, 676, 1.0, face=1, **SHOEM)
+    s.actor("wife", "girl", 330, 676, 0.95, face=1, hold="needle", **WIFE)
+    s.say("wife", "Those little elves have no shoes, and their clothes are old and torn. They must be so cold!", ("pose", "wife", "sad"), ("pose", "shoe", "sad"))
+    s.say("shoe", "Let us make them some new clothes, to say thank you!", ("pose", "shoe", "cheer"), ("pose", "wife", "happy"), ("hop", "shoe", {"at": "50%"}), ("fx", "hearts", "shoe", 0, {"at": "40%", "dur": 3.0}))
+    s.nar("So the wife sewed, and sewed, and sewed. And the shoemaker made some tiny boots.", ("pose", "wife", "stitch", {"at": 0.3}), ("hold", "shoe", "hammer", {"at": 0.3}), ("pose", "shoe", "knock", {"at": 0.3}),
+          ("sfx", "knock", {"at": 0.8, "gain": 0.45}), ("sfx", "knock", {"at": 1.4, "gain": 0.45}), ("sfx", "knock", {"at": 2.0, "gain": 0.45}), ("fx", "notes", "wife", -80, {"at": 0.6, "dur": 4.0}), tail=0.3)
+    s.nar("Let us count the new clothes!", ("pose", "wife", "happy", {"at": 0.2}), ("pose", "shoe", "happy", {"at": 0.2}), ("hold", "shoe", None, {"at": 0.2}), ("hold", "wife", None, {"at": 0.2}))
+    for i in range(4):
+        s.nar(GIFT_LINES[i], ("set", "bench", "gifts", float(i + 1), {"at": 0.1, "dur": 0.05}), ("pose", "shoe", "cheer", {"at": 0.0}), ("pose", "wife", "cheer", {"at": 0.1}),
+              ("fx", "mark", BP[i], 425, {"at": 0.15, "dur": 60.0, "text": str(i + 1), "color": MARK4[i]}), ("sfx", "pop", {"at": 0.15}), ("fx", "sparkle", BP[i], 480, {"at": 0.15, "dur": 1.6, "r": 90}),
+              tail=0.25 if i < 3 else 0.4)
+    s.nar("And they made a second set, so that both elves could have new clothes.", ("set", "bench", "gifts2", 1.0, {"at": 0.4, "dur": 0.05}), ("fx", "sparkle", 960, 470, {"at": 0.4, "dur": 3.0, "r": 280}),
+          ("sfx", "sparkle", {"at": 0.4}), ("pose", "shoe", "proud", {"at": 0.6}), ("pose", "wife", "proud", {"at": 0.6}), tail=0.4)
+
+    # ---------------------------------------------------------------- 7 the elves find their new clothes
+    s = t.scene("A happy surprise", "room_night", mood="happy", title="A happy surprise")
+    s.prop("bench", "bench", B_X, B_Y, B_K, leather=0.0, pairs=0.0, gifts=4.0, gifts2=1.0)
+    s.prop("ward", "wardrobe", 300, 662, 0.95)
+    s.actor("shoe", "girl", 230, 676, 1.0, face=1, zy=656, **SHOEM)
+    s.actor("wife", "girl", 370, 676, 0.95, face=1, zy=656, **WIFE)
+    s.actor("e1", "girl", 1500, 700, EK, face=-1, zy=900, hold="hammer", **ELF_RAGS1)
+    s.actor("e2", "girl", 1640, 700, EK, face=-1, zy=900, hold="needle", **ELF_RAGS2)
+    s.actor("e1n", "girl", ELF_MOUNT[0][0], ELF_MOUNT[0][1], EK, face=1, zy=900, show=False, **ELF_NEW1)
+    s.actor("e2n", "girl", ELF_MOUNT[1][0], ELF_MOUNT[1][1], EK, face=-1, zy=900, show=False, **ELF_NEW2)
+    s.nar("That night, they put the tiny clothes on the bench, instead of the leather. Then they hid, and they watched.", ("pose", "shoe", "sly"), ("pose", "wife", "sly"), ("sfx", "bong", {"at": 4.2, "gain": 0.8}), tail=0.2)
+    s.nar("At midnight, the two elves tiptoed in. And they saw the bench!", ("walk", "e1", 1080, 700, {"at": 0.6, "speed": 130, "pose": "walk"}), ("walk", "e2", 1210, 700, {"at": 0.8, "speed": 130, "pose": "walk"}),
+          ("pose", "e1", "surprised", {"at": 3.2}), ("pose", "e2", "surprised", {"at": 3.2}), ("fx", "mark", "e1", -90, {"at": 3.2, "dur": 2.0, "text": "!"}), ("fx", "mark", "e2", -90, {"at": 3.4, "dur": 2.0, "text": "!"}))
+    s.nar("The elves hopped up onto the bench.", ("move", "e1", ELF_MOUNT[0][0], ELF_MOUNT[0][1], {"at": 0.3, "dur": 0.6, "pose": "jump"}), ("hop", "e1", {"at": 0.5}),
+          ("move", "e2", ELF_MOUNT[1][0], ELF_MOUNT[1][1], {"at": 0.8, "dur": 0.6, "pose": "jump"}), ("hop", "e2", {"at": 1.0}), ("face", "e1", 1, {"at": 0.9}), ("face", "e2", -1, {"at": 1.4}), tail=0.2)
+    s.say("e1", "Look! New clothes! Are they for us?", ("pose", "e1", "surprised"), ("pose", "e2", "idle"), ("hold", "e1", None, {"at": 0.1}), ("hop", "e1", {"at": "50%"}))
+    s.say("e2", "They are so pretty! Let us put them on!", ("pose", "e2", "cheer"), ("pose", "e1", "cheer", {"at": "40%"}), ("hold", "e2", None, {"at": 0.1}), ("hop", "e2", {"at": "40%"}))
+    s.nar("The elves put on their new clothes. And poof! They looked so fine!",
+          ("fx", "poof", "e1", 40, {"at": 0.6, "dur": 1.1, "sfx": "tada", "r": 110}), ("hide", "e1", {"at": 0.9}), ("show", "e1n", {"at": 0.9}),
+          ("fx", "poof", "e2", 40, {"at": 0.9, "dur": 1.1, "r": 110}), ("hide", "e2", {"at": 1.2}), ("show", "e2n", {"at": 1.2}),
+          ("set", "bench", "gifts", 0.0, {"at": 0.9, "dur": 0.05}), ("set", "bench", "gifts2", 0.0, {"at": 0.9, "dur": 0.05}),
+          ("pose", "e1n", "proud", {"at": 1.6}), ("pose", "e2n", "proud", {"at": 1.8}), ("fx", "sparkle", 860, 440, {"at": 1.0, "dur": 3.0, "r": 240}), tail=0.3)
+    s.say("e1n", "Now we are dressed so fine! Why should we work any more?", ("pose", "e1n", "happy"), ("pose", "e2n", "laugh"), voice="e1")
+    s.nar("The elves laughed, and they danced, and they danced!", ("pose", "e1n", "dance", {"at": 0.2}), ("pose", "e2n", "dance", {"at": 0.2}), ("fx", "notes", "e1n", -60, {"at": 0.4, "dur": 3.5}),
+          ("fx", "hearts", "e2n", -20, {"at": 1.4, "dur": 3.0}), ("sfx", "cheer", {"at": 0.4, "gain": 0.5}), tail=0.3)
+    s.say("e2n", "Thank you, kind shoemaker and kind wife!", ("pose", "e2n", "wave"), ("pose", "e1n", "wave"), voice="e2")
+    s.nar("Then they hopped out of the door, and the elves were never seen again.", ("move", "e1n", 1100, 700, {"at": 0.4, "dur": 0.5, "pose": "jump"}), ("move", "e2n", 1220, 700, {"at": 0.6, "dur": 0.5, "pose": "jump"}),
+          ("walk", "e1n", 1500, 700, {"at": 1.0, "speed": 240, "pose": "run"}), ("walk", "e2n", 1640, 700, {"at": 1.2, "speed": 240, "pose": "run"}),
+          ("pose", "shoe", "wave", {"at": 1.2}), ("pose", "wife", "wave", {"at": 1.2}), tail=0.3)
+    s.say("wife", "Goodbye, little elves! Thank you for everything!", ("pose", "wife", "wave"), ("pose", "shoe", "wave"), ("fx", "hearts", "wife", 0, {"at": "40%", "dur": 3.0}))
+
+    # ---------------------------------------------------------------- 8 happily ever after
+    s = t.scene("Happily ever after", "room", mood="triumph", title="Happily ever after")
+    s.prop("bench", "bench", B_X, B_Y, B_K, pairs=4.0)
+    s.actor("shoe", "girl", 520, 676, 1.0, face=1, **SHOEM)
+    s.actor("wife", "girl", 380, 676, 0.95, face=1, **WIFE)
+    s.actor("lady", "girl", 1600, 690, 0.95, face=-1, **LADY)
+    s.actor("lord", "girl", 1760, 690, 0.95, face=-1, **LORD)
+    s.nar("The elves never came back. But the shoemaker and his wife were never poor again.", ("pose", "shoe", "happy", {"at": 0.3}), ("pose", "wife", "happy", {"at": 0.3}),
+          ("walk", "lady", 1000, 690, {"at": 1.0, "speed": 250, "pose": "walk"}), ("walk", "lord", 1130, 690, {"at": 1.4, "speed": 250, "pose": "walk"}), ("fx", "sparkle", 960, 470, {"at": 1.5, "dur": 4.0, "r": 300}))
+    s.nar("Every day, people came to buy their lovely shoes. And they all lived happily ever after.", ("pose", "shoe", "cheer", {"at": 0.6}), ("pose", "wife", "cheer", {"at": 0.6}), ("pose", "lady", "happy", {"at": 0.8}),
+          ("pose", "lord", "happy", {"at": 0.8}), ("hop", "shoe", {"at": 1.2}), ("hop", "wife", {"at": 1.5}), ("fx", "confetti", 0, 0, {"at": 0.6, "dur": 60.0}), ("fx", "hearts", "wife", 0, {"at": 2.0, "dur": 4.0}), tail=0.8)
+
+    _outro(t, "Remember, little ones: when someone is kind to you, say thank you, and be kind back!", caption="Say thank you, and be kind!")
+    return t
+
+
 TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_and_hare, "goldilocks": goldilocks,
          "red-riding-hood": red_riding_hood, "gingerbread-man": gingerbread_man, "three-billy-goats": three_billy_goats,
-         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup, "magic-porridge-pot": magic_porridge_pot, "cinderella": cinderella, "snow-white": snow_white}
+         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup, "magic-porridge-pot": magic_porridge_pot, "cinderella": cinderella, "snow-white": snow_white, "elves-and-shoemaker": elves_shoemaker}
 
 
 def build(key, lang="en"):

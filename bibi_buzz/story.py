@@ -447,8 +447,8 @@ class Tale:
         for sc in self.scenes:
             for b in sc.beats:
                 if b.text:
-                    v, r, p = self.voice_of(b.voice or b.who)
-                    b.key = (b.text, v, r, p)
+                    v, r, p, *rest = self.voice_of(b.voice or b.who)           # (voice, rate, pitch) or (voice, rate, pitch, effect)
+                    b.key = (b.text, v, r, p, rest[0] if rest else "")
                     out.append(b.key)
         return out
 

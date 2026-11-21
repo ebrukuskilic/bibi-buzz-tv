@@ -1118,6 +1118,120 @@ def porridge(c, x, y, k, t, st):
     return None
 
 
+# ================================================================================================ Cinderella's world
+@prop
+def carriage(c, x, y, k, t, st):
+    """A big orange pumpkin that turns into a golden coach. (x, y) = the middle of its base. st: morph 0..1 (0 = pumpkin, 1 = coach),
+    glow 0..1 = a golden glow around it, roll = how far the wheels have turned (degrees), shake 0..1 = it rattles while it changes."""
+    m, glow, shake = clamp(st.get("morph", 0.0)), clamp(st.get("glow", 0.0)), clamp(st.get("shake", 0.0))
+    dx = st.get("dx", 0.0)                                                                  # driving along: the wheels turn with the distance
+    sc = 1.0 + 0.10 * math.sin(math.pi * clamp(m * 1.0)) if 0.02 < m < 0.98 else 1.0
+    r = Rig(c, x + dx + math.sin(t * 40.0) * 4.0 * shake * k, y, k * sc)
+    _tint(c, _ellipse_world(r, 0, 4, 150, 16), "#000000", 0.20)
+    if glow > 0.02:
+        pulse = 1.0 + 0.05 * math.sin(t * 7.0)
+        for i in range(4):
+            rr = (130 + 36 * i) * pulse
+            _tint(c, _ellipse_world(r, 0, -100, rr, rr * 0.8, 40), "#FFE27A", 0.10 * glow)
+    if m < 0.5:                                                                           # the pumpkin
+        for dx, rx in ((-76, 50), (76, 50), (-44, 56), (44, 56)):
+            r.ell(dx, -70, rx, 68, "#E8761A", INK, 3.2)
+        r.ell(0, -70, 58, 72, "#F28C28", INK, 3.4)
+        for dx in (-104, -62, 62, 104):                                                   # the grooves between the lobes
+            r.arc(dx, -70, 10, 56, 100 if dx < 0 else -80, 260 if dx < 0 else 80, "#C9610F", 3)
+        r.ell(-36, -102, 15, 24, "#FFC27A", None, ang=18)
+        r.rrect(-10, -152, 12, -126, 4, "#4E8A2E", INK, 2.8)
+        r.line([(10, -140), (36, -156), (58, -142)], INK, 8)
+        r.line([(10, -140), (36, -156), (58, -142)], "#4E9B3A", 4.4)
+    else:                                                                                 # the golden coach
+        roll = st.get("roll", 0.0) + math.degrees(dx / (46.0 * k))
+        for wx in (-92, 92):
+            r.ell(wx, -44, 46, 46, "#FFD21F", INK, 4)
+            r.ell(wx, -44, 36, 36, "#FFF3B0", INK, 2.4)
+            for i in range(8):
+                a = math.radians(roll + i * 45)
+                r.line([(wx, -44), (wx + 35 * math.cos(a), -44 + 35 * math.sin(a))], "#D9A82E", 3.2)
+            r.dot(wx, -44, 8, "#FFD21F")
+            r.dot(wx, -44, 3.4, "#C99A25")
+        r.rrect(-122, -88, 122, -62, 10, "#E8A21E", INK, 3.4)                             # the underbody
+        r.ell(0, -126, 112, 72, "#FFC83D", INK, 3.6)                                      # the round cab
+        for dx in (-84, -50, 50, 84):
+            r.arc(dx, -126, 14 + abs(dx) * 0.06, 64, 100 if dx < 0 else -80, 260 if dx < 0 else 80, "#E8A21E", 3)
+        r.ell(-48, -158, 18, 26, "#FFE98A", None, ang=22)
+        r.rrect(-40, -168, 40, -96, 22, "#BFE6FF", INK, 3.2)                              # the window and its curtains
+        r.poly([(-40, -168), (-18, -168), (-26, -120), (-40, -100)], "#FF8FB8", INK, 2.4)
+        r.poly([(40, -168), (18, -168), (26, -120), (40, -100)], "#FF8FB8", INK, 2.4)
+        r.ell(-24, -148, 5, 12, "#FFFFFF", None, ang=12)
+        r.rrect(-8, -208, 10, -188, 4, "#4E8A2E", INK, 2.8)                               # the stalk is still there, with a star on top
+        r.poly(star_pts(0, -222, 20, 8), "#FFD21F", INK, 2.6)
+        r.dot(106, -118, 6, "#FFFFFF")
+        r.rrect(96, -110, 130, -98, 5, "#E8A21E", INK, 2.4)
+    return r
+
+
+@prop
+def clock(c, x, y, k, t, st):
+    """A tall grandfather clock with a pendulum. (x, y) = the middle of its base. st: n 0..12 = the numeral that glows (the clock is striking),
+    h / mn = the time (h = 12, mn = 0 is midnight; mn may run past 60), swing 0..1 = the pendulum swings, hit 0..1 = the clock shivers after a bong."""
+    n = int(round(clamp(st.get("n", 0.0), 0, 12)))
+    h, mn, swing, hit = st.get("h", 12.0), st.get("mn", 0.0), clamp(st.get("swing", 1.0)), clamp(st.get("hit", 0.0))
+    r = Rig(c, x + math.sin(t * 55.0) * 3.0 * hit * k, y, k)
+    _tint(c, _ellipse_world(r, 0, 4, 110, 14), "#000000", 0.20)
+    wood, dark = "#8B5A2B", "#5E3A1A"
+    r.rrect(-88, -64, 88, 0, 6, dark, INK, 3.4)                                           # the foot
+    r.rrect(-70, -350, 70, -60, 6, wood, INK, 3.6)                                        # the long body
+    r.rrect(-48, -300, 48, -112, 20, "#2B1B10", INK, 3)                                   # the pendulum window
+    pa = math.radians(math.sin(t * 3.0) * 13.0 * swing)
+    px, py = 0 + math.sin(pa) * 150, -290 + math.cos(pa) * 150
+    r.line([(0, -290), (px, py)], "#D9A82E", 4)
+    r.ell(px, py, 25, 25, "#FFD21F", INK, 3)
+    r.ell(px - 6, py - 7, 8, 8, "#FFF3B0", None)
+    r.rrect(-96, -470, 96, -340, 14, wood, INK, 3.6)                                      # the head
+    r.poly([(-100, -468), (100, -468), (70, -510), (-70, -510)], dark, INK, 3.4)
+    r.poly(star_pts(0, -532, 22, 9), "#FFD21F", INK, 2.6)
+    cx_, cy_ = 0, -404
+    r.ell(cx_, cy_, 78, 78, "#D9A82E", INK, 3.6)                                          # the face
+    r.ell(cx_, cy_, 68, 68, "#FFF8E6", INK, 2.4)
+    for i in range(1, 13):
+        a = math.radians(i * 30 - 90)
+        nx, ny = cx_ + 50 * math.cos(a), cy_ + 50 * math.sin(a)
+        if i == n:
+            pulse = 1.0 + 0.18 * math.sin(t * 16.0)
+            r.ell(nx, ny, 24 * pulse, 24 * pulse, "#FFE27A", INK, 3)
+            c.text(*r.P(nx, ny + 1), str(i), 30 * k, "#C9314D", stroke=2 * k, stroke_fill="#FFFFFF")
+        else:
+            c.text(*r.P(nx, ny + 1), str(i), 21 * k, "#3A2316")
+    ha, ma = math.radians(((h + mn / 60.0) % 12.0) * 30.0), math.radians((mn % 60.0) * 6.0)
+    r.line([(cx_, cy_), (cx_ + 34 * math.sin(ha), cy_ - 34 * math.cos(ha))], INK, 9)
+    r.line([(cx_, cy_), (cx_ + 34 * math.sin(ha), cy_ - 34 * math.cos(ha))], "#3A2316", 5.4)
+    r.line([(cx_, cy_), (cx_ + 52 * math.sin(ma), cy_ - 52 * math.cos(ma))], INK, 7)
+    r.line([(cx_, cy_), (cx_ + 52 * math.sin(ma), cy_ - 52 * math.cos(ma))], "#3A2316", 3.6)
+    r.dot(cx_, cy_, 6.5, "#D9A82E")
+    return r
+
+
+@prop
+def slipper(c, x, y, k, t, st):
+    """A lost glass slipper lying on the ground, twinkling. (x, y) = the middle of its base. st: shine 0..1 (default 1)."""
+    shine = clamp(st.get("shine", 1.0))
+    r = Rig(c, x, y, k)
+    _tint(c, _ellipse_world(r, 0, 3, 60, 8), "#000000", 0.2)
+    if shine > 0.02:
+        pulse = 1.0 + 0.1 * math.sin(t * 5.0)
+        for i in range(3):
+            rr = (46 + 22 * i) * pulse
+            _tint(c, _ellipse_world(r, 0, -26, rr, rr * 0.7, 30), "#FFF3B0", 0.12 * shine)
+    sh_pts = [(-30, 0), (-31, -26), (-24, -37), (-11, -35), (-5, -23), (9, -17), (25, -14), (36, -8), (38, 0)]
+    r.rrect(-38, -4, -24, 10, 3, "#BFE6FF", INK, 2.6)
+    r.poly([(1.4 * px + 4, 1.4 * py - 2) for px, py in sh_pts], "#BFE6FF", INK, 3)
+    r.poly([(1.4 * px + 4, 1.4 * py - 2) for px, py in ((-28, -4), (-29, -24), (-23, -33), (-14, -30), (-17, -12))], "#E6F6FF", None)
+    r.dot(40, -18, 4.6, "#FF8FB8")
+    for i in range(3):
+        ph = (t * 0.9 + i * 0.33) % 1.0
+        r.poly(star_pts(-28 + i * 36, -64 - 20 * ph, 11 * shine * (1.0 - abs(ph - 0.5)), 4, 4), "#FFFFFF", None)
+    return r
+
+
 # ================================================================================================ effects
 @fx
 def wind(c, s, x, y, dt, dir=1, power=1.0, dx=0, **_):
@@ -1300,6 +1414,23 @@ def glow(c, s, x, y, dt, r=60, color="#FFF3A8", **_):
     p = 1.0 + 0.08 * math.sin(dt * 5)
     for i, a in enumerate((1.8, 1.4, 1.0)):
         c.ellipse(x, y, r * a * p, r * a * p, fill=mix("#FFFFFF", color, 0.25 + 0.3 * i))
+
+
+@fx
+def poof(c, s, x, y, dt, r=240, color="#FFF2A8", **_):
+    """A magic flash: a soft golden burst and a ring of white stars that swells and fades away (somebody changes inside it)."""
+    if dt > 1.1:
+        return
+    u = dt / 1.1
+    a = (1.0 - u) ** 1.4
+    rad = r * (0.45 + 0.75 * ease(u))
+    for i, f in enumerate((1.0, 0.72, 0.46)):
+        pts = [(x + rad * f * math.cos(2 * math.pi * j / 32), y + rad * f * 0.95 * math.sin(2 * math.pi * j / 32)) for j in range(32)]
+        _tint(c, pts, color if i < 2 else "#FFFFFF", min(0.95, 0.5 * a * (1 + i * 0.6)))
+    for i in range(10):
+        ang = i * 0.628 + 0.4
+        d = rad * (0.5 + 0.65 * u)
+        D.star(c, x + d * math.cos(ang), y + d * 0.95 * math.sin(ang), 15 * a + 3, "#FFFFFF")
 
 
 # ---- full-screen cards (drawn on the screen canvas `s`, not in the world)

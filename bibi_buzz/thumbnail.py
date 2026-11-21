@@ -3,7 +3,7 @@
 make_thumbnail          episode 1: big Bibi, colourful flowers and 'COLORS!' text
 make_lesson_thumbnail   every long lesson: big sticker title, three big pictures and Bibi
 """
-from .draw import Canvas, bibi, flower, sun, cloud, big_label, star
+from .draw import Canvas, bibi, pip, mo, lila, flower, sun, cloud, big_label, star
 
 
 def make_thumbnail(bg, path):
@@ -39,21 +39,31 @@ def make_lesson_thumbnail(lesson, path):
     """Designed thumbnail of a long lesson, drawn from its title segment (title + first emoji pictures)."""
     import re
     from . import stage as ST
+    from . import vibe as VB
     L = ST.layout("long")
     d = lesson.segs[0].data
     c = Canvas(ST.background(L, lesson.theme).copy(), w=L.w, h=L.h)
     ST.decor(c, L, lesson.theme, 0.0)
+    ring_i = sum(ord(ch) for ch in lesson.id) % len(ST.RINGS)
+    VB.ambient(c, L, lesson.theme, 8.0 + ring_i)                  # birds / fish / fireflies... caught in mid-air
     ST.chip(c, L)
+
+    # Bibi's friends peek in from behind him
+    pip(c, 64, 596, 0.95, 0.3, "smile", (6, -2))
+    mo(c, 452, 604, 0.82, 0.3, "smile", (-6, -2))
+    lila(c, 118, 178, 0.85, 0.5, "smile", (5, -2))
 
     # Bibi on the left, mouth open
     bibi(c, 250, 452, 2.25, 0.6, "open", look=(10, -2))
 
-    # three big pictures, each on a sticker plate
+    # three big pictures, each on a sticker plate, with light rays behind them
     codes = list(d["codes"])[:3]
     n = len(codes)
     size, gap = 250, 252
     x0 = 862 - gap * (n - 1) / 2
-    ring_i = sum(ord(ch) for ch in lesson.id) % len(ST.RINGS)
+    for k, code in enumerate(codes):
+        VB.rays(c, x0 + k * gap, 530 + (-14 if k % 2 else 6), 110, 215, 1.0 + k * 2.0,
+                ST.mix(ST.RINGS[(ring_i + k) % len(ST.RINGS)], "#FFFFFF", 0.66), n=12)
     for k, code in enumerate(codes):
         y = 530 + (-14 if k % 2 else 6)
         ST.icon(c, code, x0 + k * gap, y, size, ST.RINGS[(ring_i + k) % len(ST.RINGS)])

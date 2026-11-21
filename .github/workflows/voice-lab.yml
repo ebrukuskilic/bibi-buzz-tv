@@ -1,0 +1,79 @@
+name: voice-lab
+
+# A laboratory for the sound of the songs (tools/voice_lab.py): other ways to make the sung voice sound like a person (a neural voice that is told the
+# notes, a neural vocoder). It touches neither the daily videos nor the "media" branch: the result goes to the "lab-output" branch
+# (raw files: https://raw.githubusercontent.com/<owner>/<repo>/lab-output/A-psola-choir.mp3 ...).
+on:
+  workflow_dispatch:
+    inputs:
+      jobs:
+        description: "Jobs of tools/voice_lab.py, comma separated (all, or env,speech,psola,vocos,kokoro)"
+        default: "all"
+      song:
+        description: "Song key (songs.py)"
+        default: "twinkle"
+      lang:
+        description: "Language of the song: en or tr"
+        default: "en"
+      lines:
+        description: "How many lines of the song"
+        default: "2"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bibi-voice-lab
+  cancel-in-progress: true
+
+jobs:
+  lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install tools, fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core espeak-ng libsndfile1
+          python -m pip install --upgrade pip
+          pip install pillow numpy scipy edge-tts gTTS soundfile
+          mkdir -p assets
+          curl -fL --retry 4 -o assets/Fredoka-Variable.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/fredoka/Fredoka%5Bwdth%2Cwght%5D.ttf"
+          curl -fL --retry 4 -o assets/Baloo2-Variable.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/baloo2/Baloo2%5Bwght%5D.ttf"
+
+      - name: Install the neural models (CPU)
+        continue-on-error: true
+        run: |
+          pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+          pip install "kokoro>=0.9.4" || echo "kokoro install failed"
+          pip install vocos || echo "vocos install failed"
+          pip list 2>/dev/null | grep -i -E "^(torch|torchaudio|kokoro|misaki|vocos|transformers|numpy|scipy|spacy) " || true
+
+      - name: Laboratory
+        env:
+          JOBS: ${{ github.event.inputs.jobs }}
+          SONG: ${{ github.event.inputs.song }}
+          LANG_: ${{ github.event.inputs.lang }}
+          LINES: ${{ github.event.inputs.lines }}
+        run: |
+          python tools/voice_lab.py "$JOBS" --song "$SONG" --lang "$LANG_" --lines "$LINES" --out out/lab
+          ls -la out/lab
+
+      - name: Publish the result on the lab-output branch
+        if: always()
+        run: |
+          mkdir -p out/lab
+          cd out/lab
+          rm -f *.wav *.npy
+          git init -q -b lab-output
+          git config user.name "bibi-bot"
+          git config user.email "bibi-bot@users.noreply.github.com"
+          git add -A
+          git commit -q --allow-empty -m "voice lab: ${{ github.event.inputs.jobs }} ${{ github.event.inputs.song }} ${{ github.event.inputs.lang }}"
+          git push -q --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" lab-output

@@ -15,6 +15,9 @@ pointer clicks on the words).
 writes <out>/voices-<lang>.mp3 (the narrator says the type, then the character says its line, with its voice and effect) and
 <out>/voices-<lang>.txt (a table: voice, effect, pitch F0, loudness) - to listen to and to tune the character voices.
 
+  python tools/test_tale.py song:twinkle en --out out/test --seconds 40     # a song (bibi_buzz/songs.py): the sound (mp3), the voice alone, a table
+      # that compares every sung syllable with its note (pitch in Hz and cents, how much of it is voiced), cover, sheet, clip, description
+
   python tools/test_tale.py voices-list en --out out/test   # which voices the machine offers (voices-list.txt)
   python tools/test_tale.py "lab=girl:en-US-AnaNeural|-2%|+10Hz|;boy:en-US-AnaNeural|+2%|-30Hz|" en --out out/test   # a voice laboratory (voices-lab-en.mp3 / .txt)
 """
@@ -66,6 +69,99 @@ def test_tale(a, ffmpeg, key):
     if a.tail > 0:
         info = SY.render(t, base + "-tail.mp4", ffmpeg, a.cache, t_range=(max(0.0, t.duration - a.tail), t.duration), quiet=True)
         print("tail clip:", info["file"], "(the last %.0f s, with the real voices) rendered in %ss" % (a.tail, info["seconds_to_render"]), flush=True)
+
+
+def _write_mp3(y, sr, path, ffmpeg, kbps=160):
+    import wave
+    import numpy as np
+    wav = path[:-4] + ".wav"
+    with wave.open(wav, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(sr)
+        w.writeframes((np.clip(y, -1, 1) * 32767).astype(np.int16).tobytes())
+    r = subprocess.run([ffmpeg, "-y", "-loglevel", "error", "-i", wav, "-c:a", "libmp3lame", "-b:a", "%dk" % kbps, path], capture_output=True, text=True)
+    if r.returncode:
+        print("mp3 failed:", r.stderr[:300], flush=True)
+    else:
+        os.remove(wav)
+
+
+def test_song(a, ffmpeg, key):
+    """A song of bibi_buzz/songs.py in one language, made with the real voice: <base>.mp3 (the whole sound), <base>-voice.mp3 (the sung voice alone),
+    <base>.txt (every sung syllable: its note, the pitch that was measured in the voice, the error in cents, how much of it is voiced; the span of
+    every line; the description), the cover, a contact sheet and a clip of the video (the first --seconds, and with --tail the last seconds)."""
+    import numpy as np
+    from bibi_buzz import songs as SS
+    from bibi_buzz import voice as VO
+    base = os.path.join(a.out, "song-%s-%s" % (key, a.lang))
+    t = SS.build(key, a.lang)
+    D.set_language(a.lang)
+    sr = VO.SR
+    clips = SY.prepare(t, ffmpeg, a.cache)                                  # the real voice: one clip for every word that is sung
+    problems, st = SY.sync_report(t)
+    print("song %s (%s): %.1f s, %d scenes, sync problems: %s" % (key, a.lang, t.duration, len(t.scenes), problems or "none"), flush=True)
+    mix = t.mix_audio(clips)
+    voc, spans, _c = t._ensure(clips)
+    voc = voc[:len(mix)]
+    _write_mp3(mix, sr, base + ".mp3", ffmpeg)
+    _write_mp3(voc / (float(np.max(np.abs(voc))) + 1e-9) * 0.9, sr, base + "-voice.mp3", ffmpeg, 128)
+    print("mix:", {k: round(v, 4) for k, v in t.mix_stats.items()}, flush=True)
+
+    rows, errs, unvoiced = [], [], 0
+    names = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+    for sec in t.sections:
+        if sec.get("mode", "sing") != "sing":
+            continue
+        for li, it in enumerate(sec["items"]):
+            tt = it["t0"]                                                  # (global seconds of the note that is being looked at)
+            syl = t.syllable_spans(sec, it)
+            k = 0
+            for mm, d in it["notes"]:
+                if mm is not None and k < len(syl):
+                    w, j, _a, _b = syl[k]
+                    k += 1
+                    exp = 440.0 * 2 ** ((mm + t.shift - 69) / 12.0)
+                    lo, hi = tt + 0.22 * d * t.beat, tt + d * t.beat - 0.12 * d * t.beat
+                    seg = voc[int(lo * sr):int(hi * sr)]
+                    f = _f0(seg, sr) if len(seg) > int(0.12 * sr) else np.array([])
+                    nb = (mm + t.shift) % 12
+                    nm = "%s%d" % (names[nb], (mm + t.shift) // 12 - 1)
+                    if len(f) >= 3:
+                        got = float(np.median(f))
+                        cents = 1200.0 * math.log2(got / exp)
+                        errs.append(cents)
+                        rows.append("%-9s %-3s %-10s %-4s %7.1f %7.1f %+7.0f   %3d%%" % (sec["name"], it["key"], w["syl"][j], nm, exp, got, cents,
+                                                                                           100 * len(f) / max(1, (hi - lo) / 0.01)))
+                    else:
+                        unvoiced += 1
+                        rows.append("%-9s %-3s %-10s %-4s %7.1f %7s %7s   (no pitch found)" % (sec["name"], it["key"], w["syl"][j], nm, exp, "-", "-"))
+                tt += d * t.beat
+    summary = "syllables with a pitch: %d, without: %d" % (len(errs), unvoiced)
+    if errs:
+        e = np.array(errs)
+        summary += " | median error %+.0f cents, mean |error| %.0f cents, within 50 cents: %d%%, within 100 cents: %d%%" % (
+            np.median(e), np.mean(np.abs(e)), 100 * np.mean(np.abs(e) < 50), 100 * np.mean(np.abs(e) < 100))
+    print(summary, flush=True)
+    meta = CU.metadata(t, "")
+    with open(base + ".txt", "w", encoding="utf-8") as f:
+        f.write("song %s (%s)  %.2f s  bpm %s  shift %+d semitones  voice %s\n" % (key, a.lang, t.duration, t.bpm, t.shift, t._voice()))
+        f.write("sync problems: %s\n%s\n\n" % (problems or "none", summary))
+        f.write("%-9s %-3s %-10s %-4s %7s %7s %7s   %s\n" % ("section", "ln", "syllable", "note", "exp Hz", "got Hz", "cents", "voiced"))
+        f.write("\n".join(rows) + "\n\n")
+        for (si, li), (s0, s1) in sorted(spans.items()):
+            sec = t.sections[si]
+            it = sec["items"][li]
+            f.write("line %-9s %-3s expected %7.2f .. %7.2f   sound %7.2f .. %7.2f\n" % (sec["name"], it["key"], it["t0"], it["t0"] + it["beats"] * t.beat, s0, s1))
+        f.write("\n" + json.dumps(meta, ensure_ascii=False, indent=1) + "\n")
+    SY.make_cover(t, base + "-cover.jpg")
+    SY.contact_sheet(t, base + "-sheet.png", cols=4, thumb=480, times=[sc.t_start + sc.dur * f for sc in t.scenes for f in (0.3, 0.75)])
+    if a.seconds > 0:
+        info = SY.render(t, base + "-clip.mp4", ffmpeg, a.cache, t_range=(0.0, a.seconds), quiet=True)
+        print("clip:", info["file"], "(first %.0f s, with the real voice) rendered in %ss" % (a.seconds, info["seconds_to_render"]), flush=True)
+    if a.tail > 0:
+        info = SY.render(t, base + "-tail.mp4", ffmpeg, a.cache, t_range=(max(0.0, t.duration - a.tail), t.duration), quiet=True)
+        print("tail clip:", info["file"], "(the last %.0f s)" % a.tail, flush=True)
 
 
 # what each character TYPE says in the "voices" check: (English, Turkish), and its name (English, Turkish)
@@ -324,6 +420,8 @@ def main():
             test_voices(a, ffmpeg)
         elif key == "voices-list":
             test_voice_list(a)
+        elif key.startswith("song:"):
+            test_song(a, ffmpeg, key[5:])
         elif key in TL.TALES:
             test_tale(a, ffmpeg, key)
         elif re.fullmatch(r"d\d{3}-[LS]\d+", key):

@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw
 
 from . import draw as D
 from .draw import INK, clamp, lerp, darker, mix, ease_out_back
-from .storyart import Rig
+from .storyart import Rig, star_pts
 
 PROPS, FX = {}, {}
 
@@ -889,7 +889,7 @@ def _stone_soup(r, t, st):
 
 def _vegetable(r, kind, cx, cy, s=1.0, rot=0.0):
     """One whole vegetable centred at (cx, cy) in r's units (s = 1.0 is about 80 units long), turned by rot degrees.
-    kind: carrot, potato, cabbage, onion, tomato or stone."""
+    kind: carrot, potato, cabbage, onion, tomato, bowl (of porridge) or stone."""
     co, si = math.cos(math.radians(rot)), math.sin(math.radians(rot))
 
     def P(px, py):
@@ -947,6 +947,15 @@ def _vegetable(r, kind, cx, cy, s=1.0, rot=0.0):
             rr = 15 if i % 2 == 0 else 6
             star.append((math.cos(ang) * rr, -24 + math.sin(ang) * rr * 0.7))
         Y(star, "#4FAE4B", 2.2)
+    elif kind == "bowl":                                                                    # a bowl of porridge with a spoon in it
+        L([(10, -14), (32, -46)], "#C98A52", 5.6)
+        E(35, -51, 7, 9.5, "#D9A066", 2.2, -30)
+        Y([(38 * math.cos(math.radians(a)), 6 + 30 * math.sin(math.radians(a))) for a in range(0, 181, 15)], "#6CB7FF", 3.0)
+        L([(-30, 16), (30, 16)], "#FFFFFF", 3.0)
+        E(0, 6, 38, 10, "#EAF4FF", 2.8)
+        Y([(-31, 4), (-24, -9), (-8, -17), (8, -17), (24, -9), (31, 4)], "#FFF0C2", 2.6)
+        E(-9, -10, 9, 3.6, "#FFFFFF", 0, -15)
+        L([(-12, -4), (0, -9), (12, -4)], "#E9A94A", 2.6)
     else:                                                                                   # stone
         E(0, 2, 36, 24, "#9EA7B3", 2.8, -6)
         E(-10, -6, 12, 6, "#CDD3DB", 0, -20)
@@ -966,7 +975,7 @@ def stone(c, x, y, k, t, st):
 
 @prop
 def veg(c, x, y, k, t, st):
-    """A vegetable (st["kind"]: carrot, potato, cabbage, onion, tomato or stone) with (x, y) as its middle.
+    """A vegetable (st["kind"]: carrot, potato, cabbage, onion, tomato, bowl or stone) with (x, y) as its middle.
     st["u"] 0..1 = how far it has flown along its arc to (x + st["dx"], y + st["dy"]) (units of the prop; st["h"] = how high the arc is,
     st["turns"] = how often it spins on the way). It is only seen while 0 < u < 1, unless st["rest"] = 1: then it just stays at (x, y),
     popping up with st["pop"] 0..1 (st["size"] = its size)."""
@@ -986,6 +995,127 @@ def veg(c, x, y, k, t, st):
     px, py = st.get("dx", 0.0) * u, st.get("dy", 0.0) * u - 4.0 * st.get("h", 160.0) * u * (1.0 - u)
     _vegetable(r, st.get("kind", "carrot"), px, py, size, 360.0 * st.get("turns", 1.0) * u)
     return r
+
+
+# ================================================================================================ the magic porridge pot's world
+CREAM, CREAM_D, CREAM_L = "#FFFDF5", "#FBE6CC", "#FFFFFF"
+
+
+def _ellipse_world(r, lx, ly, rx, ry, n=30):
+    return [r.P(lx + rx * math.cos(2 * math.pi * i / n), ly + ry * math.sin(2 * math.pi * i / n)) for i in range(n)]
+
+
+@prop
+def mpot(c, x, y, k, t, st):
+    """The magic porridge pot: a little black pot with a golden star on its belly, standing on three stubby legs. (x, y) = the middle of its base.
+    st: fill 0..1 = how full of porridge it is, over 0..1 = the porridge heaps up and runs down the sides, shake 0..1 = the pot rattles,
+    glow 0..1 = a golden glow around it (the star flashes)."""
+    fill, over = clamp(st.get("fill", 0.0)), clamp(st.get("over", 0.0))
+    shake, glow = clamp(st.get("shake", 0.0)), clamp(st.get("glow", 0.0))
+    r = Rig(c, x + math.sin(t * 34.0) * 3.2 * shake * k, y, k, lean=math.sin(t * 29.0 + 1.0) * 2.6 * shake)
+    _tint(c, _ellipse_world(r, 0, 4, 84, 11), "#000000", 0.20)                              # the shadow on the floor
+    if glow > 0.02:                                                                         # a soft golden glow
+        pulse = 1.0 + 0.05 * math.sin(t * 7.0)
+        for i in range(4):
+            rr = (96 + 30 * i) * pulse
+            _tint(c, _ellipse_world(r, 0, -70, rr, rr * 0.85, 40), "#FFE27A", 0.11 * glow)
+    for sx in (-1, 1):                                                                      # the legs
+        r.rrect(sx * 42 - 10, -28, sx * 42 + 10, 2, 5, "#24243A", INK, 2.6)
+    for sx in (-1, 1):                                                                      # the handles
+        r.arc(sx * 68, -78, 19, 19, -90 if sx > 0 else 90, 90 if sx > 0 else 270, INK, 10)
+        r.arc(sx * 68, -78, 19, 19, -90 if sx > 0 else 90, 90 if sx > 0 else 270, "#34344A", 5.4)
+    r.ell(0, -64, 68, 52, "#34344A", INK, 3.6)                                              # the body
+    r.ell(-32, -86, 15, 23, "#5C5C7C", None, ang=26)
+    r.rrect(-62, -120, 62, -100, 8, "#24243A", INK, 3.2)                                    # the rim
+    r.rrect(-56, -118, -40, -112, 3, "#4A4A66", None)
+    r.ell(0, -120, 56, 13, "#12121C", INK, 3)                                               # the inside
+    if fill > 0.02:
+        lvl = ease(fill)
+        r.ell(0, -116 - 4 * lvl, 56 * (0.5 + 0.5 * lvl), 12 * lvl, CREAM, None)
+        r.ell(-14, -118 - 4 * lvl, 18 * lvl, 3.2 * lvl, CREAM_L, None)
+    ov = ease(over)
+    if ov > 0.02:
+        for i, (dx, lag, wd) in enumerate(((-48, 0.0, 9), (34, 0.14, 8), (52, 0.3, 7), (-30, 0.42, 7))):      # drips run down the pot
+            ln = clamp((ov - lag) / (0.75 - lag)) * (30 + 22 * ((i * 7) % 3))
+            if ln > 3:
+                r.rrect(dx - wd, -116, dx + wd, -112 + ln, wd, CREAM, INK, 2.8)
+                r.ell(dx - wd * 0.3, -112 + ln * 0.5, wd * 0.25, ln * 0.28, CREAM_L, None)
+        hh = 16 + 74 * ov
+        bulge = 11.0 * ov
+        pts = [(math.cos(math.radians(a)) * (56 + bulge * math.sin(math.radians(a))), -120 - hh * math.sin(math.radians(a)) ** 0.85) for a in range(180, -1, -10)]
+        pts += [(56 * math.cos(math.radians(a)), -120 + 13 * math.sin(math.radians(a))) for a in range(0, 181, 15)]
+        r.poly(pts, CREAM, INK, 3.2)
+        r.ell(-18 - 6 * ov, -120 - hh * 0.62, 14 + 8 * ov, 6 + 5 * ov, CREAM_L, None, ang=-12)
+        if ov > 0.4:                                                                        # a golden drizzle of honey on top
+            r.line([(-28 + 11 * j, -120 - hh * (0.7 + 0.05 * math.sin(j * 1.9)) + 5 * math.sin(j * 1.3)) for j in range(6)], "#E9A94A", 4.0)
+        for i in range(4):                                                                  # bubbles on the heap
+            ph = (t * 1.3 + i * 0.27) % 1.0
+            if ph < 0.85:
+                bb = 3 + 8 * ph
+                r.ell(-30 + i * 20, -120 - hh * (0.35 + 0.12 * (i % 2)), bb, bb * 0.8, "#FFF8DB", "#D9B25E", 1.6)
+    spark = 0.5 + 0.5 * math.sin(t * 9.0)
+    r.poly(star_pts(0, -62, 27, 11.5), mix("#FFD21F", "#FFFFFF", 0.45 * glow * spark), INK, 2.8)
+    r.poly(star_pts(-2, -64, 14, 6), "#FFF1A0", None)
+    if fill > 0.3 and over < 0.05:                                                          # a little steam
+        for i in range(3):
+            ph = (t * 0.5 + i * 0.33) % 1.0
+            r.ell(-22 + i * 22 + 5 * math.sin(t * 2 + i), -128 - 52 * ph, 8 + 7 * ph, 6 + 6 * ph, "#FFFFFF", None)
+    return r
+
+
+@prop
+def porridge(c, x, y, k, t, st):
+    """A flood of porridge in front of everyone (put it at y = 700). st: h 0..1 = how high it stands (1 = about 200 units), l / r = where its
+    left and right fronts are (world x, default far outside the screen)."""
+    h = clamp(st.get("h", 0.0))
+    if h < 0.01:
+        return None
+    xl, xr = st.get("l", -80.0), st.get("r", 1360.0)
+    if xr - xl < 40:
+        return None
+    bottom, top0 = 760.0, 704.0 - 204.0 * h
+    amp = clamp(h / 0.25)
+
+    def ty(xx):
+        return top0 + amp * (4.0 * math.sin(xx / 41.0 + t * 1.7) + 2.0 * math.sin(xx / 17.0 - t * 2.3) - 7.0 * abs(math.sin(xx / 53.0 + t * 0.8)))
+
+    fw = min(100.0 + 130.0 * h, (xr - xl) / 2.0 - 1.0)
+    n = max(8, int((xr - xl - 2 * fw) / 18.0))
+    top = [(lerp(xl + fw, xr - fw, i / n), 0.0) for i in range(n + 1)]
+    top = [(px, ty(px)) for px, _ in top]
+    pts = list(top)
+    for j in range(1, 9):                                                                   # the right front
+        th = math.radians(90.0 * j / 8)
+        y0 = ty(xr - fw)
+        pts.append((xr - fw + fw * math.sin(th), y0 + (bottom - y0) * (1.0 - math.cos(th))))
+    pts.append((xl + fw, bottom))
+    yl = ty(xl + fw)
+    for j in range(8, 0, -1):                                                               # the left front
+        th = math.radians(90.0 * j / 8)
+        pts.append((xl + fw - fw * math.sin(th), yl + (bottom - yl) * (1.0 - math.cos(th))))
+    c.poly(pts, CREAM_D, INK, 3.4)
+    band = 16.0 + 8.0 * h
+    c.poly(top + [(px, py + band + 3.0 * math.sin(px / 23.0 + t)) for px, py in reversed(top)], CREAM, None, 0)
+    c.line(top, INK, 3.4)
+    rng = random.Random(11)
+    for i in range(34):                                                                     # oat flecks, they stay where they are while the porridge rises
+        fx_ = lerp(xl + fw, xr - fw, rng.random()) + 7.0 * math.sin(t * 0.8 + i)
+        fy_ = lerp(top0 + 40, 740.0, rng.random() ** 0.8)
+        if fy_ > ty(fx_) + band + 6.0 and xl + fw < fx_ < xr - fw:
+            c.ellipse(fx_, fy_, 5.5, 2.5, fill="#C99A5E")
+    for i in range(12):                                                                     # bubbles rise and pop at the top
+        ph = (t * 0.42 + i * 0.137) % 1.0
+        bx = lerp(xl + fw, xr - fw, (i * 0.6180339 + 0.13) % 1.0)
+        by = lerp(ty(bx) + 62.0, ty(bx) + 5.0, ph)
+        if ph < 0.92 and h > 0.12 and by < 716:
+            rr = 4.0 + 8.0 * ph
+            c.ellipse(bx, by, rr, rr * 0.82, fill="#FFF8DB", outline="#D9B25E", width=1.8)
+    for i in range(5):                                                                      # shiny spots and a drizzle of honey on the top
+        gx = lerp(xl + fw, xr - fw, (i * 0.37 + 0.11) % 1.0)
+        c.ellipse(gx, ty(gx) + 8.0, 14, 2.6, fill=CREAM_L)
+        hx_ = lerp(xl + fw, xr - fw, (i * 0.37 + 0.31) % 1.0)
+        c.line([(hx_ - 26 + 9 * j, ty(hx_ - 26 + 9 * j) + 11.0 + 3.0 * math.sin(j * 1.7 + i)) for j in range(7)], "#E9A94A", 3.0)
+    return None
 
 
 # ================================================================================================ effects

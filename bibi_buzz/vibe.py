@@ -7,6 +7,7 @@ A fixed pseudo random number per object (_rnd) replaces a random generator, so t
 """
 import math
 
+import numpy as np
 from PIL import Image, ImageDraw
 
 from . import draw as D
@@ -366,3 +367,174 @@ def wipe(new, old, u, kind="circle", cx=None, cy=None, edge=9.0):
         if rr > 1.0 or rc > 1.0:
             out = Image.composite(src, out, m.resize((w, h), Image.BOX))
     return out
+
+
+# ------------------------------------------------------------------------------------------------ fairy tales (the 1280x720 screen)
+_glows = {}
+
+
+def glow(c, x, y, r, color, alpha=0.8):
+    """A soft round glow of radius r (layout px): Canvas.sprite pastes the RGBA picture with its own transparency."""
+    key = (int(r), color, int(round(alpha * 8)))
+    if key not in _glows:
+        n = max(4, int(2 * r * D.SS))
+        yy, xx = np.mgrid[0:n, 0:n].astype(np.float32)
+        d = np.hypot(xx - n / 2.0, yy - n / 2.0) / (n / 2.0)
+        arr = np.zeros((n, n, 4), np.uint8)
+        arr[..., 0], arr[..., 1], arr[..., 2] = D.hex2rgb(color)
+        arr[..., 3] = (np.clip(1.0 - d, 0.0, 1.0) ** 2 * (key[2] / 8.0) * 255).astype(np.uint8)
+        _glows[key] = Image.fromarray(arr, "RGBA")
+    c.sprite(_glows[key], x, y)
+
+
+def leaf(c, x, y, s, ang, col):
+    pts = ellipse_pts(x, y, 11 * s, 5.5 * s, ang=ang, n=18)
+    c.poly(pts, fill=col, outline=darker(col, 0.4), width=1.2 * s)
+    a = math.radians(ang)
+    c.line([(x - math.cos(a) * 9 * s, y - math.sin(a) * 9 * s), (x + math.cos(a) * 9 * s, y + math.sin(a) * 9 * s)], darker(col, 0.3), 1.1 * s)
+
+
+def petal(c, x, y, s, ang, col):
+    c.poly(ellipse_pts(x, y, 6 * s, 3.2 * s, ang=ang, n=14), fill=col)
+
+
+LEAVES = ("#7CC24A", "#F2B134", "#E8743B", "#B7D84B", "#D9A441")
+
+
+def falling(c, ts, w, h, n, draw, period=11.0, seed=0, sway=46.0, top=-30.0, bottom=None):
+    """n things that drift from the top of the screen to the bottom (every one has its own start, speed and swing)."""
+    bottom = h + 30.0 if bottom is None else bottom
+    for i in range(n):
+        per = period * (0.8 + 0.5 * _rnd(i, seed + 1))
+        u = ((ts + _rnd(i, seed + 2) * per) % per) / per
+        x = _rnd(i, seed + 3) * w + math.sin(u * 9.0 + i) * sway
+        y = lerp(top, bottom, u)
+        draw(x, y, i, u)
+
+
+def tale_day(c, ts, w, h, dusk=False, birds=True):
+    if birds:
+        cyc = 28.0
+        for fl in range(2):
+            tt = ts + 6.0 + fl * 15.0
+            k = int(tt // cyc)
+            u = (tt - k * cyc) / 14.0
+            if 0.0 <= u <= 1.0:
+                face = 1 if (k + fl) % 2 == 0 else -1
+                x0 = -140 + u * (w + 280) if face > 0 else w + 140 - u * (w + 280)
+                yb = h * (0.10 + 0.07 * fl) + 10 * math.sin(u * 11 + fl)
+                for i in range(2):
+                    bird(c, x0 - face * i * 64, yb + i * 26, 1.2, ts, i * 0.9 + fl, BIRD_COLORS[(k + i + fl) % 4], face)
+    for i, (c1, c2) in enumerate(BUTTERFLIES[:2]):
+        cx = w * (0.20 + 0.50 * i) + math.sin(ts * 0.27 + i * 2.0) * w * 0.10
+        cy = h * (0.62 if i == 0 else 0.55) + math.sin(ts * 0.43 + i * 1.3) * h * 0.05
+        butterfly(c, cx + math.sin(ts * 0.9 + i) * 64, cy + math.sin(ts * 1.7 + i * 2.3) * 30, 1.5, ts, i * 1.7, c1, c2)
+    cols = ("#FFFFFF", "#FFC2E2", "#FFE680")
+    falling(c, ts, w, h, 6, lambda x, y, i, u: petal(c, x, y, 1.0, ts * 90 + i * 50, cols[i % 3]), period=15.0, seed=11, sway=60.0)
+    if dusk:
+        tale_fireflies(c, ts, w, h, 9, seed=5)
+
+
+def tale_forest(c, ts, w, h, dusk=False):
+    falling(c, ts, w, h, 9, lambda x, y, i, u: leaf(c, x, y, 1.0 + 0.2 * (i % 3), ts * 70 + i * 63 + math.sin(ts * 2 + i) * 40, LEAVES[i % len(LEAVES)]), period=12.0, seed=21)
+    c0, c1 = BUTTERFLIES[1]
+    butterfly(c, w * 0.30 + math.sin(ts * 0.5) * 90, h * 0.58 + math.sin(ts * 1.5) * 28, 1.4, ts, 1.0, c0, c1)
+    if dusk:
+        tale_fireflies(c, ts, w, h, 14, seed=7)
+    else:
+        for i in range(8):
+            x = w * (0.1 + 0.8 * _rnd(i, 31)) + math.sin(ts * 0.3 + i) * 30
+            y = h * (0.15 + 0.5 * _rnd(i, 32)) + math.cos(ts * 0.37 + i) * 24
+            glow(c, x, y, 7, "#FFF6C0", 0.35 + 0.25 * math.sin(ts * 1.5 + i))
+
+
+def tale_fireflies(c, ts, w, h, n=12, seed=3):
+    for i in range(n):
+        x = w * (0.05 + 0.9 * _rnd(i, seed)) + math.sin(ts * 0.42 + i * 1.7) * 38
+        y = h * (0.40 + 0.45 * _rnd(i, seed + 1)) + math.cos(ts * 0.53 + i * 1.3) * 26
+        g = 0.5 + 0.5 * math.sin(ts * 2.1 + i * 1.9)
+        glow(c, x, y, 16 + 6 * g, "#E8F26A", 0.30 + 0.35 * g)
+        c.ellipse(x, y, 2.4, 2.4, fill=mix("#FFF3A0", "#FFFFFF", g * 0.8))
+
+
+def tale_night(c, ts, w, h, shooting=True):
+    for i in range(7):
+        ph = ts * 1.5 + i * 2.3
+        r = 12.0 * max(0.0, math.sin(ph)) ** 2
+        if r > 1.0:
+            sparkle(c, w * (0.05 + 0.9 * _rnd(i, 41)), h * (0.04 + 0.34 * _rnd(i, 42)), r, "#FFF6C8", ang=20 * i)
+    if shooting:
+        shooting_star(c, w, h, ts, period=13.0, dur=1.0, seed=3, top=0.04, bottom=0.26)
+    tale_fireflies(c, ts, w, h, 10, seed=9)
+
+
+def tale_hall(c, ts, w, h):
+    for i in range(5):
+        x = w * (0.1 + 0.8 * _rnd(i, 51)) + math.sin(ts * 0.3 + i * 2) * 40
+        y = h * 0.8 - ((ts * 14 + i * 160) % (h * 0.75))
+        glow(c, x, y, 38 + 20 * _rnd(i, 52), ("#FFE9A8", "#FFD1EC", "#CFE8FF")[i % 3], 0.20)
+    for i in range(16):
+        x = w * (0.04 + 0.92 * _rnd(i, 53)) + math.sin(ts * 0.5 + i) * 24
+        y = h * 0.95 - ((ts * (18 + 14 * _rnd(i, 54)) + i * 97) % (h * 0.95))
+        r = 4.5 + 5.0 * max(0.0, math.sin(ts * 3.0 + i * 1.9)) ** 2
+        sparkle(c, x, y, r, ("#FFF2B0", "#FFFFFF", "#FFD7EE")[i % 3], ang=ts * 40 + i * 30)
+
+
+def tale_room(c, ts, w, h, night=False):
+    for i in range(14):
+        x = w * (0.04 + 0.92 * _rnd(i, 61)) + math.sin(ts * 0.25 + i * 1.7) * 26
+        y = h * (0.12 + 0.62 * _rnd(i, 62)) + math.cos(ts * 0.31 + i * 1.1) * 20
+        glow(c, x, y, 5.5, "#FFF3C4" if not night else "#C9D4FF", 0.30 + 0.22 * math.sin(ts * 1.3 + i))
+
+
+STORY_AMBIENT = {
+    "meadow": ("day", False), "meadow_open": ("day", False), "meadow_dawn": ("day", False), "river": ("day", False),
+    "meadow_gorge": ("day", False), "race": ("day", False), "meadow_dusk": ("day", True), "meadow_gorge_dusk": ("day", True),
+    "sunset": ("day", True), "forest": ("forest", False), "forest_dusk": ("forest", True),
+    "garden_night": ("night", True), "castle_night": ("night", True),
+    "ballroom": ("hall", False), "ballroom_day": ("hall", False), "room": ("room", False), "room_night": ("room", True),
+}
+
+
+def story_ambient(c, bg, ts, w=1280, h=720):
+    """The living layer of a tale scene (behind the actors): birds, butterflies, petals, falling leaves, fireflies, glitter, dust."""
+    kind = STORY_AMBIENT.get(bg)
+    if not kind:
+        return
+    k, flag = kind
+    if k == "day":
+        tale_day(c, ts, w, h, dusk=flag, birds=not flag)
+    elif k == "forest":
+        tale_forest(c, ts, w, h, dusk=flag)
+    elif k == "night":
+        tale_night(c, ts, w, h)
+    elif k == "hall":
+        tale_hall(c, ts, w, h)
+    elif k == "room":
+        tale_room(c, ts, w, h, night=flag)
+
+
+FG_GRASS = {"meadow": "#3FA33A", "meadow_open": "#3FA33A", "meadow_dawn": "#4CA84A", "river": "#3FA33A", "meadow_gorge": "#3FA33A",
+            "race": "#3FA33A", "meadow_dusk": "#C98A2E", "meadow_gorge_dusk": "#C98A2E", "sunset": "#B8782A", "forest": "#2F8A3A",
+            "forest_dusk": "#2A6E55", "garden_night": "#2F4A8A"}
+
+
+def story_foreground(c, bg, ts, cx, z, world, w=1280, h=720):
+    """Tufts of swaying grass along the bottom edge, in FRONT of everybody (they slide a little faster than the backdrop when the camera moves)."""
+    col = FG_GRASS.get(bg)
+    if not col:
+        return
+    f = 1.25
+    step = 78.0
+    first = int((cx - 640.0 / z - 120.0) // step)
+    last = int((cx + 640.0 / z + 120.0) // step) + 1
+    for j in range(first, last + 1):
+        wx = j * step + 28.0 * (_rnd(j, 71) - 0.5)
+        sx = w / 2.0 + (wx - cx) * z * f
+        if sx < -60 or sx > w + 60:
+            continue
+        hh = (26.0 + 22.0 * _rnd(j, 72)) * (0.9 + 0.1 * z)
+        sway = math.sin(ts * 2.1 + j * 0.8) * 5.0
+        base = h + 6.0
+        for dx, k in ((-9, 0.7), (0, 1.0), (9, 0.82)):
+            c.poly([(sx + dx - 4, base), (sx + dx + sway * k, base - hh * k), (sx + dx + 4, base)], fill=darker(col, 0.14) if dx else col)

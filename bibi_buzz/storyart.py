@@ -243,6 +243,11 @@ def pose_for(name, t, phase=0.0, moving=False, amp=None, face=1, seed=0.0, speed
         P.arm_l, P.arm_r = 34 + w * 5, 40 + w * 5
         P.look = (face * 2.0, 5.0)
         P.mouth = "smile"
+    elif name == "angry":                                   # stamping with fury: a scowl, clenched arms, a quick stamp-stamp
+        P.eyes, P.mouth, P.mouth_amt = "angry", "open", 0.45
+        P.arm_l = P.arm_r = 18
+        P.bob = abs(s(t * 8 + seed)) * 7
+        P.dx = s(t * 21) * 2.4
     elif name == "curtsy":                                  # a little curtsy: dips down and up again, the skirt widens a bit
         w = 0.5 - 0.5 * math.cos(t * 3.0)
         P.sq = 1.0 - 0.09 * w
@@ -424,6 +429,27 @@ def held(r, kind, hand):
         r.ell(hx - 34, hy - 15, 6, 11, "#F2DFAE", INK, 2.2)
         r.ell(hx + 34, hy - 15, 6, 11, "#F2DFAE", INK, 2.2)
         r.rrect(hx - 7, hy - 28, hx + 7, hy - 2, 2, "#E2574C", INK, 2)
+    elif kind == "apple":                                                                # one big, shiny red apple with a stalk and a leaf
+        r.ell(hx - 7, hy - 21, 17, 19, "#E2362F", INK, 2.8)
+        r.ell(hx + 8, hy - 21, 17, 19, "#E2362F", INK, 2.8)
+        r.ell(hx, hy - 20, 22, 18, "#E2362F", None)
+        r.ell(hx - 11, hy - 28, 5.5, 9, "#FF9C94", None, ang=24)
+        r.line([(hx, hy - 38), (hx + 3, hy - 50)], "#6B4423", 4.2)
+        r.ell(hx + 14, hy - 50, 11, 5.2, "#3DB54A", INK, 2, ang=-24)
+    elif kind == "apples":                                                               # a basket piled high with red apples
+        r.arc(hx, hy - 10, 25, 34, 180, 360, "#9B5C2E", 4.5)
+        for ax, ay in ((-15, -26), (14, -27), (-1, -35), (-26, -17), (26, -16)):
+            r.dot(hx + ax, hy + ay, 12.5, "#E2362F")
+            r.dot(hx + ax - 4, hy + ay - 4, 3.6, "#FF9C94")
+        r.rrect(hx - 29, hy - 12, hx + 29, hy + 22, 8, "#D9A066", INK, 2.4)
+        r.line([(hx - 29, hy + 4), (hx + 29, hy + 4)], "#B8733A", 2)
+        for i in range(3):
+            r.line([(hx - 16 + i * 16, hy - 10), (hx - 16 + i * 16, hy + 20)], "#B8733A", 1.8)
+    elif kind == "pickaxe":                                                              # a miner's pickaxe: a wooden handle and a curved iron head
+        r.line([(hx - 6, hy + 16), (hx + 16, hy - 86)], INK, 12)
+        r.line([(hx - 6, hy + 16), (hx + 16, hy - 86)], "#A5703A", 7)
+        r.poly([(hx - 34, hy - 70), (hx - 8, hy - 91), (hx + 16, hy - 95), (hx + 42, hy - 91), (hx + 66, hy - 70), (hx + 44, hy - 79), (hx + 16, hy - 80), (hx - 12, hy - 79)], "#B7C0CE", INK, 2.8)
+        r.poly([(hx - 8, hy - 91), (hx + 16, hy - 95), (hx + 42, hy - 91), (hx + 16, hy - 87)], "#E4EAF2", None)
     elif kind in ("slipper", "cushion"):                                                 # a glass slipper (on a red velvet cushion with tassels)
         if kind == "cushion":
             r.rrect(hx - 44, hy - 24, hx + 44, hy - 4, 10, "#D93A52", INK, 2.8)
@@ -473,6 +499,12 @@ def hat(r, kind, y, color=None):
         r.dot(0, y, 8, darker(color or "#FF5C8A", 0.12))
     elif kind == "crown":
         r.poly([(-30, y + 10), (-34, y - 24), (-16, y - 6), (0, y - 32), (16, y - 6), (34, y - 24), (30, y + 10)], "#FFD21F", INK, 3)
+    elif kind == "pointy":                                                               # a tall, floppy pointed cap (a dwarf's) with a pompom at the bent tip
+        col = color or "#E2574C"
+        r.poly([(-46, y + 10), (46, y + 10), (32, y - 34), (16, y - 70), (-8, y - 94), (-38, y - 100), (-52, y - 86), (-30, y - 74), (-22, y - 44), (-36, y - 16)], col, INK, 3)
+        r.poly([(-46, y + 10), (46, y + 10), (43, y - 6), (-43, y - 6)], darker(col, 0.14), INK, 2.6)
+        r.dot(-52, y - 88, 9.5, "#FFFFFF")
+        r.ell(14, y - 36, 6, 18, mix(col, "#FFFFFF", 0.35), None, ang=-18)
 
 
 # ------------------------------------------------------------------------------------------------ pig
@@ -686,10 +718,10 @@ def tortoise(c, x, y, k=1.0, t=0.0, P=None, shell="#4FB05A", hold=None, **_):
 
 # ------------------------------------------------------------------------------------------------ girl
 def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=None, hood=None, granny=None, gramps=None,
-         gown=None, prince=None, wings=None, hat_kind=None, hat_color=None, shoe=None, **_):
+         gown=None, prince=None, wings=None, hat_kind=None, hat_color=None, shoe=None, beard=None, **_):
     """A person. dress/hair = colours; hood = red riding hood; granny = a shawl and a bun; gramps = a grandpa's cardigan; gown = a sparkly ball gown
     with glass slippers; prince = a prince's coat, white tights and short hair; wings = fairy wings; hat_kind / hat_color = a hat() on top of the head;
-    shoe = the colour of the shoes (a gown wears glass slippers unless the shoes are given)."""
+    shoe = the colour of the shoes (a gown wears glass slippers unless the shoes are given); beard = the colour of a long, bushy beard (a dwarf's)."""
     P = P or Pose()
     r = Rig(c, x + P.dx * k, y - P.bob * k + P.lower * k, k, P.face, P.lean, P.sq)
     skin = "#FFDDBF"
@@ -799,6 +831,11 @@ def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=No
         for a in range(0, 5):
             r.ell(-32 + a * 16, -192 + (a % 2) * 3, 10, 9, hair, None)
     sh = P.face * 3
+    if beard:                                                                            # a long, bushy beard that hides the chin, with a few wavy strands
+        r.poly([(-43, -164), (43, -164), (50, -138), (41, -112), (17, -88), (0, -83), (-17, -88), (-41, -112), (-50, -138)], beard, INK, 3.2)
+        for bx, by in ((-27, -126), (-6, -110), (15, -112), (28, -128)):
+            r.line([(bx, by), (bx + 3, by + 17)], darker(beard, 0.16), 2.2)
+        r.ell(-26, -134, 8, 14, mix(beard, "#FFFFFF", 0.65), None, ang=14)
     f_eyes(r, sh, -172, 17, 9.5, 12, P, pupil="#2A6FD4")
     f_cheeks(r, sh, -156, 29, "#FF9DB0", 8, 0)
     if gramps:                                                                           # bushy brows and a big white moustache
@@ -939,10 +976,40 @@ def troll(c, x, y, k=1.0, t=0.0, P=None, skin="#8CC063", tunic="#8A6A4A", hair="
     return r
 
 
+# ------------------------------------------------------------------------------------------------ the magic mirror
+def mirror(c, x, y, k=1.0, t=0.0, P=None, frame="#FFD21F", glass="#BFD9FF", mist="#EEF6FF", **_):
+    """The magic mirror: a tall oval in a golden frame set with jewels, standing on two curly feet, with a kind misty face that talks in the shiny glass."""
+    P = P or Pose()
+    r = Rig(c, x + P.dx * k, y - P.bob * k, k, P.face, P.lean, P.sq)
+    for s in (-1, 1):                                                                    # two curly feet and the stand
+        r.ell(s * 50, -9, 32, 10, frame, INK, 3)
+        r.ell(s * 76, -19, 10, 9, frame, INK, 2.6)
+    r.rrect(-28, -62, 28, -16, 7, darker(frame, 0.1), INK, 3)
+    r.ell(0, -216, 114, 170, darker(frame, 0.1), INK, 3.6)                               # the golden frame, a thick oval ...
+    r.ell(0, -216, 106, 162, frame, None)
+    for i in range(12):                                                                  # ... with round jewels all the way round
+        a = math.radians(i * 30 + 15)
+        r.dot(110 * math.cos(a), -216 + 166 * math.sin(a), 8, ("#FF5C8A", "#5FD8C2", "#FFFFFF")[i % 3])
+    r.poly(star_pts(0, -404, 31, 13), "#FFE98A", INK, 3)                                 # a star on top
+    r.ell(0, -216, 88, 142, glass, INK, 3)                                               # the glass, with two shiny arcs
+    r.arc(0, -216, 76, 128, 198, 252, "#FFFFFF", 6)
+    r.arc(0, -216, 76, 128, 262, 280, "#FFFFFF", 4)
+    for i, (sx, sy, sr) in enumerate(((-52, -300, 8), (58, -150, 6), (50, -296, 5), (-58, -140, 7))):         # twinkling stars in the glass
+        tw = 0.7 + 0.3 * math.sin(t * 3.1 + i * 1.7)
+        r.poly(star_pts(sx, sy, sr * tw, sr * tw * 0.4, 4), "#FFFFFF", None)
+    r.ell(0, -214, 56, 76, mist, None)                                                   # a misty face
+    sh = P.face * 3
+    f_eyes(r, sh, -236, 24, 11, 14, P, pupil="#3E6FD4")
+    f_cheeks(r, sh, -208, 36, "#FFB3C7", 9, 0)
+    f_mouth(r, sh, -188, P, 15)
+    return r
+
+
 # ------------------------------------------------------------------------------------------------ small helpers for Bibi's friends
 def friend(c, which, x, y, k, t, mood="smile"):
     f = {"bibi": D.bibi, "pip": D.pip, "mo": D.mo, "lila": D.lila}[which]
     f(c, x, y, k, t=t, mood=mood, look=(4, -2))
 
 
-CHARACTERS = {"pig": pig, "wolf": wolf, "bear": bear, "hare": hare, "tortoise": tortoise, "girl": girl, "ginger": ginger, "goat": goat, "troll": troll}
+CHARACTERS = {"pig": pig, "wolf": wolf, "bear": bear, "hare": hare, "tortoise": tortoise, "girl": girl, "ginger": ginger, "goat": goat, "troll": troll,
+              "mirror": mirror}

@@ -863,15 +863,18 @@ GALLERY_TALES = ["three-little-pigs", "goldilocks", "red-riding-hood", "cinderel
 
 def gallery(a):
     """Every character of some tales says its type's line with the voice, speed, pitch and effect of the daily videos' casting (bibi_buzz.tales.cast_voices with
-    BIBI_KOKORO set; the Edge voice stands in for a line Kokoro cannot make); the narrator says who is next.  One mp3 per language (gallery-<language>.mp3), every
+    BIBI_KOKORO set; the Edge voice stands in for a line Kokoro cannot make); the narrator says who is next.  One mp3 per language (gallery-<language>.mp3; English once more with the child voices of Edge: gallery-en-kidsedge.mp3), every
     line measured (GAL lines) and a warning for every pair of a tale that sounds alike (GALWARN lines)."""
     from bibi_buzz import tales as T
     from bibi_buzz import voice as VO
     from test_tale import VOICE_LINES, VOICE_NAMES
-    for lang in ("en", "tr"):
+    for lang, tag, env in (("en", "", {}), ("en", "-kidsedge", {"BIBI_KIDS": "edge"}), ("tr", "", {})):       # (English twice: the children with a Kokoro voice, and with the child voices of Edge)
         i = 0 if lang == "en" else 1
-        old = os.environ.get("BIBI_KOKORO")
+        names = ("BIBI_KOKORO", "BIBI_KIDS")
+        old = {k: os.environ.get(k) for k in names}
         os.environ["BIBI_KOKORO"] = lang
+        os.environ.pop("BIBI_KIDS", None)
+        os.environ.update(env)
         try:
             plan, items = [], []
             for key in GALLERY_TALES:
@@ -894,18 +897,19 @@ def gallery(a):
                     items.append(plan[-1][4])
             buf = io.StringIO()
             with contextlib.redirect_stdout(buf):
-                clips = VO.synth_items(items, "ffmpeg", os.path.join(OUT, "_cache_gallery_" + lang))
+                clips = VO.synth_items(items, "ffmpeg", os.path.join(OUT, "_cache_gallery_" + lang + tag))
             for ln in buf.getvalue().splitlines():
                 log("   " + ln)
         except Exception:
-            log("GALLERY %s FAILED %s" % (lang, traceback.format_exc()[-1200:]))
+            log("GALLERY %s%s FAILED %s" % (lang, tag, traceback.format_exc()[-1200:]))
             continue
         finally:
-            if old is None:
-                os.environ.pop("BIBI_KOKORO", None)
-            else:
-                os.environ["BIBI_KOKORO"] = old
-        log("---- gallery %s: GAL language tale character type F0 UTMOS WER voice" % lang)
+            for k in names:
+                if old[k] is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = old[k]
+        log("---- gallery %s%s: GAL language tale character type F0 UTMOS WER voice" % (lang, tag))
         parts, rows = [], {}
         for kind, key, who, typ, item in plan:
             y = VL.resample(clips[item], 44100, KSR)
@@ -918,7 +922,7 @@ def gallery(a):
             sc = score(y, item[0], lang)
             f0 = f0_of(y)
             rows.setdefault(key, []).append((who, typ, item[1], f0))
-            log("GAL %s %-20s %-8s %-11s F0 %5s UTMOS %.2f WER %3.0f%%  %s" % (lang, key, who, typ, ("%.0f" % f0) if f0 else "-", sc.get("mos", 0.0), 100 * sc.get("wer", 1.0), item[1]))
+            log("GAL %s %-20s %-8s %-11s F0 %5s UTMOS %.2f WER %3.0f%%  %s" % (lang + tag, key, who, typ, ("%.0f" % f0) if f0 else "-", sc.get("mos", 0.0), 100 * sc.get("wer", 1.0), item[1]))
             parts += [level(y), np.zeros(int(0.8 * KSR))]
         for key, rs in rows.items():
             for x in range(len(rs)):
@@ -928,9 +932,9 @@ def gallery(a):
                         ratio = max(a_[3], b_[3]) / min(a_[3], b_[3])
                         same = a_[2].split("|")[0] == b_[2].split("|")[0]
                         if (same and ratio < 1.25) or ratio < 1.10:
-                            log("GALWARN %s %s: %s (%s) and %s (%s) may sound alike: F0 %.0f and %.0f Hz (x%.2f)%s" % (lang, key, a_[0], a_[1], b_[0], b_[1], a_[3], b_[3], ratio,
+                            log("GALWARN %s %s: %s (%s) and %s (%s) may sound alike: F0 %.0f and %.0f Hz (x%.2f)%s" % (lang + tag, key, a_[0], a_[1], b_[0], b_[1], a_[3], b_[3], ratio,
                                                                                                                           ", the same voice" if same else ""))
-        VL.save("gallery-" + lang, np.concatenate(parts) if parts else np.zeros(KSR), KSR)
+        VL.save("gallery-" + lang + tag, np.concatenate(parts) if parts else np.zeros(KSR), KSR)
 
 
 # ------------------------------------------------------------------------------------------------------------------------ main

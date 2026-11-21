@@ -325,14 +325,41 @@ def sfx_gnaw():
     return out
 
 
+def sfx_baa():
+    """Baa! A sheep's wobbly bleat: a nasal note with a fast flutter that slides down at the end."""
+    dur = 0.85
+    t = _t(dur)
+    f = 330 + 45 * np.clip(t / 0.1, 0, 1) - 70 * np.clip((t - 0.45) / 0.4, 0, 1) + 15 * np.sin(2 * np.pi * 24 * t)
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    body = sum(np.sin(k * ph) / (k ** 0.7) for k in range(1, 15))
+    flutter = 0.62 + 0.38 * np.sin(2 * np.pi * 27 * t) ** 2
+    env = np.minimum(1.0, t / 0.04) * np.clip((dur - t) / 0.28, 0, 1)
+    y = body * flutter * env
+    return y / (np.max(np.abs(y)) + 1e-9) * 0.8
+
+
+def sfx_howl():
+    """Aroooo! A far-away wolf howl: a long note that slides up, wobbles and then sinks away."""
+    dur = 2.5
+    t = _t(dur)
+    up = np.clip(t / 0.95, 0, 1)
+    f = 300 + 290 * up ** 0.8 - 250 * np.clip((t - 1.55) / 0.95, 0, 1) ** 1.2 + 9 * np.sin(2 * np.pi * 5.2 * t) * up
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    body = sum(np.sin(k * ph) / (k ** 1.1) for k in range(1, 9))
+    breath = band_noise(dur, 500, 3000, 91) * 0.1
+    env = np.minimum(1.0, t / 0.25) * np.clip((dur - t) / 0.55, 0, 1)
+    y = (body + breath) * env
+    return y / (np.max(np.abs(y)) + 1e-9) * 0.7
+
+
 SFX = {"knock": sfx_knock, "wind": sfx_wind, "collapse": sfx_collapse, "boing": sfx_boing, "splash": sfx_splash,
        "sparkle": sfx_sparkle, "ding": sfx_ding, "pop": sfx_pop, "thud": sfx_thud, "hoof": sfx_hoof, "hoof2": sfx_hoof2, "boom": sfx_boom, "cheer": sfx_cheer,
        "creak": sfx_creak, "snore": sfx_snore, "dizzy": sfx_dizzy, "whoosh": sfx_whoosh, "beep3": sfx_beep3,
        "fanfare": sfx_fanfare, "munch": sfx_munch, "gulp": sfx_gulp, "yawn": sfx_yawn, "tada": sfx_tada, "rumble": sfx_rumble, "blub": sfx_blub, "bong": sfx_bong, "rain": sfx_rain, "thunder": sfx_thunder, "cluck": sfx_cluck, "peep": sfx_peep,
-       "roar": sfx_roar, "squeak": sfx_squeak, "snap": sfx_snap, "gnaw": sfx_gnaw}
+       "roar": sfx_roar, "squeak": sfx_squeak, "snap": sfx_snap, "gnaw": sfx_gnaw, "baa": sfx_baa, "howl": sfx_howl}
 SFX_GAIN = {"wind": 0.45, "collapse": 0.55, "boom": 0.5, "cheer": 0.5, "knock": 0.55, "creak": 0.5, "snore": 0.35,
             "fanfare": 0.4, "tada": 0.4, "beep3": 0.35, "boing": 0.4, "pop": 0.35, "sparkle": 0.45, "blub": 0.9, "bong": 0.55, "rain": 0.5, "thunder": 0.7, "cluck": 0.5, "peep": 0.45,
-            "roar": 0.6, "squeak": 0.4, "snap": 0.55, "gnaw": 0.5}
+            "roar": 0.6, "squeak": 0.4, "snap": 0.55, "gnaw": 0.5, "baa": 0.5, "howl": 0.55}
 
 
 @lru_cache(maxsize=None)

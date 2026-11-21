@@ -198,7 +198,7 @@ class Chunk:
         return min(va - sa, int(LEAD_MAX * self.sr))
 
 
-def sing_syllable(ch, i, start, end, pitch, limit_end=None):
+def sing_syllable(ch, i, start, end, pitch, limit_end=None, jitter=0.004, shimmer=0.0, seed=None):
     """Syllable i of chunk `ch` sung from sample `start` to `end` (the clock of `pitch`).  The consonants before the vowel come BEFORE
     `start`, so the vowel is on the beat.  Returns (first_output_sample, signal)."""
     y, sr, an, marks = ch.y, ch.sr, ch.an, ch.marks
@@ -234,13 +234,33 @@ def sing_syllable(ch, i, start, end, pitch, limit_end=None):
         fixed.append((max(t_out, fixed[-1][0] + 1), max(t_in, fixed[-1][1] + 1)))
     origin = start - Lo
     plan = P.Plan(fixed, lambda t, origin=origin: pitch(t + origin))
-    return origin, P.synth(y, sr, an, marks, plan, seed=1 + i)
+    return origin, P.synth(y, sr, an, marks, plan, jitter=jitter, shimmer=shimmer, seed=(1 + i) if seed is None else seed)
 
 
-def sing_line(chunks, notes, accents=None, sr=44100):
+def dynamics(n, origin, s, e, nf, sr, hp):
+    """The loudness of a sung note as a person has it: a long note swells a little in the middle, and its vibrato makes the loudness
+    waver in step with the pitch.  n samples of a syllable that starts at sample `origin` of the line's clock; the note lasts from sample s to e;
+    nf = the vibrato of the note (psola.note_curve_h(...).info)."""
+    t = (np.arange(n) + origin - s) / sr
+    d = (e - s) / sr
+    g = np.ones(n)
+    if d >= 0.4:
+        a = 0.11 * min(1.0, (d - 0.3) / 0.7)
+        u = np.clip(t / d, 0.0, 1.0)
+        g += a * (np.sin(np.pi * u) ** 1.3 - 0.5)
+    if nf["depth"] > 0.0 and hp["tremolo"] > 0.0:
+        x = t - nf["delay"]
+        env = np.clip(x / 0.35, 0.0, 1.0) * (t <= d)
+        g *= 1.0 + hp["tremolo"] * (nf["depth"] / max(1.0, hp["vib_cents"])) * env * np.sin(2.0 * np.pi * nf["rate"] * x + nf["phase"] + 0.9)
+    return g
+
+
+def sing_line(chunks, notes, accents=None, sr=44100, human=None):
     """chunks: [Chunk]; notes: [(start_s, end_s, midi)] one per syllable of all the chunks in order, on the line's own clock (seconds).
+    human: None (a flat note with a short glide and a little vibrato) or psola.human_params(): the singer is a person (see psola.note_curve_h).
     Returns (signal, t0): `signal` starts at t0 seconds of that clock (a little before the first note: its consonants)."""
-    curve = P.note_curve([(int(s * sr), int(e * sr), m) for s, e, m in notes], sr)
+    nts = [(int(s * sr), int(e * sr), m) for s, e, m in notes]
+    curve = P.note_curve(nts, sr) if human is None else P.note_curve_h(nts, sr, human)
     flat = [(c, i) for c in chunks for i in range(c.n)]
     assert len(flat) == len(notes), "%d syllables but %d notes" % (len(flat), len(notes))
     parts = []
@@ -249,7 +269,11 @@ def sing_line(chunks, notes, accents=None, sr=44100):
         if k + 1 < len(flat):
             nch, ni = flat[k + 1]
             limit_end = int(notes[k + 1][0] * sr) - nch.onset_len(ni) - int(0.01 * sr)
-        o, sig = sing_syllable(ch, i, int(s * sr), int(e * sr), curve, limit_end)
+        if human is None:
+            o, sig = sing_syllable(ch, i, int(s * sr), int(e * sr), curve, limit_end)
+        else:
+            o, sig = sing_syllable(ch, i, int(s * sr), int(e * sr), curve, limit_end, jitter=human["jitter"], shimmer=human["shimmer"],
+                                   seed=int(human["rng"].integers(1, 1 << 30)))
         w = int(0.03 * sr)
         if len(sig) > w:                                               # the same level for every syllable: that of its held vowel (not of a burst)
             cs = np.concatenate([[0.0], np.cumsum(sig ** 2)])
@@ -261,6 +285,8 @@ def sing_line(chunks, notes, accents=None, sr=44100):
         if len(sig) > 4 * f:
             sig[:f] *= np.linspace(0, 1, f)
             sig[-3 * f:] *= np.linspace(1, 0, 3 * f)
+        if human is not None and len(sig) > 8:
+            sig = sig * dynamics(len(sig), o, int(s * sr), int(e * sr), curve.info[k], sr, human)
         parts.append((o, sig * (1.0 if not accents else accents[k])))
     t_first = min(o for o, _ in parts)
     t_last = max(o + len(s) for o, s in parts)
@@ -268,3 +294,17 @@ def sing_line(chunks, notes, accents=None, sr=44100):
     for o, s in parts:
         out[o - t_first:o - t_first + len(s)] += s
     return out, t_first / sr
+
+
+def breath(sr, rng, dur=0.30, peak=0.012):
+    """An in-breath before a phrase: noise with a broad hump around 1.4 kHz that swells for about half of its length and dies away quickly
+    (about 22 dB below a sung vowel)."""
+    n = int(dur * sr)
+    x = rng.standard_normal(n)
+    f = np.fft.rfftfreq(n, 1.0 / sr)
+    h = np.exp(-(np.log(np.maximum(f, 1.0) / 1400.0) ** 2) / (2 * 0.8 ** 2))
+    y = np.fft.irfft(np.fft.rfft(x) * h, n)
+    u = np.arange(n) / n
+    env = np.where(u < 0.55, (u / 0.55) ** 1.6, ((1.0 - u) / 0.45) ** 1.3)
+    y = y * env
+    return y * (peak / (float(np.max(np.abs(y))) + 1e-12))

@@ -1158,9 +1158,178 @@ def enormous_turnip(lang="en"):
     return t
 
 
+# ================================================================================================ stone soup
+SS_X, SS_Y, SS_K = 640, 664, 1.0                 # the soup pot (the middle of its fire on the ground)
+SS_FOX = 470                                     # the fox stands on the left of the pot
+SS_GIVE = 840                                    # a friend stands here and throws a vegetable into the pot
+SS_MOUTH = (SS_X - 10, SS_Y - 150 * SS_K)        # the middle of the soup, where the vegetables land
+FOX_T = dict(fur="#E8893A", scarf="#3E8EDE")     # the hungry traveller
+PIG_V = dict(outfit="#8A6BD6", hat_kind="cap", hat_color="#FF8A3D")
+GOAT_V = dict(fur="#F7F1E3", scarf="#FF6B8B", horns=0.8)
+# the friends who bring a vegetable: id, kind, size, style, how they walk in, the vegetable, and the six lines of their visit
+SS_GUESTS = [
+    dict(id="hare", kind="hare", k=0.95, style={}, how="jump", veg="carrot", cook=0.2,
+         arrive="A hare came hopping by.", hello="Hello, Fox! What are you cooking?", offer="I am making stone soup! Would you like to help?",
+         give="Yes, please! I have a carrot for your soup.", plop="Plop! In went a bright orange carrot.", taste="Mmm! It is getting yummy. Please come back for dinner!"),
+    dict(id="pig", kind="pig", k=0.9, style=PIG_V, how=None, veg="potato", cook=0.4,
+         arrive="A pig came trotting by.", hello="Hello, Fox! What smells so good?", offer="It is my stone soup! Would you like to help?",
+         give="Oink, oink! I have a potato for your soup.", plop="Plop! In went a big brown potato.", taste="Mmm! It is getting yummier. Please come back for dinner!"),
+    dict(id="goat", kind="goat", k=0.95, style=GOAT_V, how=None, veg="cabbage", cook=0.6,
+         arrive="A goat came skipping by.", hello="Hello, Fox! Is that soup made from a stone?", offer="Yes, it is! Would you like to help?",
+         give="Maa, maa! I have a cabbage for your soup.", plop="Plop! In went a big green cabbage.", taste="Mmm! It smells so good. Please come back for dinner!"),
+    dict(id="gma", kind="girl", k=0.95, style=OLD_W, how=None, veg="onion", cook=0.8,
+         arrive="Then Granny came walking by.", hello="Hello, Fox! Soup from a stone? How wonderful!", offer="Would you like to help, Granny?",
+         give="Of course, dear! I have an onion for your soup.", plop="Plop! In went a round, golden onion.", taste="Mmm! It smells just like home. Please come back for dinner!"),
+    dict(id="kid", kind="girl", k=0.8, style=KID, how=None, veg="tomato", cook=1.0,
+         arrive="Last of all, a little girl came running by.", hello="Hello, Fox! Can I help, too?", offer="Yes, please! Every friend can help.",
+         give="I have a tomato for your soup!", plop="Plop! In went a juicy red tomato.", taste="Mmm! The soup is ready! Please tell everybody!"),
+]
+SS_COUNT = [("stone", "One! A smooth grey stone."), ("carrot", "Two! A bright orange carrot."), ("potato", "Three! A big brown potato."),
+            ("cabbage", "Four! A big green cabbage."), ("onion", "Five! A round, golden onion."), ("tomato", "Six! A juicy red tomato.")]
+SS_SEAT = {"hare": 260, "pig": 365, "fox": 470, "goat": 810, "gma": 915, "kid": 1020}      # where everybody sits at dinner
+SS_VEGS = ["carrot", "potato", "cabbage", "onion", "tomato"]
+
+
+def _ss_pot(s, done, stone=1.0, **st):
+    """The soup pot of the stone soup with the vegetables of the first `done` guests already in it."""
+    have = {v: 1.0 for v in SS_VEGS[:done]}
+    return s.prop("pot", "pot", SS_X, SS_Y, SS_K, kind="stone", water=1.0, stone=stone, stir=1.0, cook=(SS_GUESTS[done - 1]["cook"] if done else 0.0), **have, **st)
+
+
+def _ss_village(s, done):
+    """The village: two cottages behind, the pot (with the vegetables of the first `done` guests in it), the vegetables waiting to be thrown, and the fox next to the pot."""
+    s.prop("c1", "cottage", 175, 606, 0.78, wall="#FFF1D0", roof="#5FA8D3")
+    s.prop("c2", "cottage", 1135, 606, 0.82, wall="#EAF4FF", roof="#D9654F")
+    if done:
+        _ss_pot(s, done)
+    else:
+        s.prop("pot", "pot", SS_X, SS_Y, SS_K, kind="stone", water=0.0, stone=0.0, stir=0.0, cook=0.0)
+    for g in SS_GUESTS:
+        k = g["k"]
+        sx, sy = SS_GIVE - 26 * k, 650 - 110 * k
+        s.prop("v_" + g["id"], "veg", sx, sy, 1.0, kind=g["veg"], u=0.0, dx=SS_MOUTH[0] - sx, dy=SS_MOUTH[1] - sy, h=150.0, turns=1.5, size=0.8)
+    s.actor("fox", "wolf", SS_FOX, 650, 0.95, face=1, flat=True, **FOX_T)
+
+
+def _ss_visit(s, g, steam=True):
+    """One friend comes to the pot and throws a vegetable in (six beats)."""
+    gid, k = g["id"], g["k"]
+    walk = dict(at=0.2, speed=230 if g["how"] else 190)
+    if g["how"]:
+        walk["pose"] = g["how"]
+    s.actor(gid, g["kind"], 1500, 650, k, face=-1, flat=True, **g["style"])
+    s.nar(g["arrive"], ("walk", gid, SS_GIVE, 650, walk), tail=0.3)
+    s.say(gid, g["hello"], ("pose", gid, "happy"), tail=0.3)
+    s.say("fox", g["offer"], ("pose", "fox", "cheer", {"at": "30%"}), ("hop", "fox", {"at": "30%"}), ("pose", "fox", "idle", {"at": "92%"}), tail=0.3)
+    s.say(gid, g["give"], ("pose", gid, "cheer", {"at": "55%"}), tail=0.2)
+    s.nar(g["plop"], ("set", "v_" + gid, "u", 1.0, {"at": 0.0, "dur": 0.6}), ("set", "pot", g["veg"], 1.0, {"at": 0.52, "dur": 0.3}),
+          ("sfx", "splash", {"at": 0.55, "gain": 0.5}), ("pose", gid, "happy", {"at": 1.0}), ("pose", "fox", "happy", {"at": 0.5}),
+          ("fx", "sparkle", SS_MOUTH[0], SS_MOUTH[1] - 20, {"at": 0.55, "dur": 2.0, "r": 120}), tail=0.3)
+    s.say("fox", g["taste"], ("pose", "fox", "eat"), ("set", "pot", "cook", g["cook"], {"at": 0.0, "dur": 1.4}), ("sfx", "gulp", {"at": "70%", "gain": 0.6}),
+          ("pose", "fox", "happy", {"at": "80%"}), ("walk", gid, 1500, 650, {"at": 0.4, "speed": 200, "pose": "walk"}), tail=0.3)
+
+
+def stone_soup(lang="en"):
+    t = Tale("tale-stone-soup", "Stone Soup | Fairy Tale Story for Kids | Bibi Buzz TV",
+             "A hungry little fox has nothing to eat except a smooth, round stone. So he decides to make stone soup! One by one, a hare, a pig, a goat, Granny and a little girl bring "
+             "a carrot, a potato, a cabbage, an onion and a tomato. Can a stone make a yummy soup? Watch the classic folk tale about sharing, in a gentle, colorful animated story "
+             "in simple English for toddlers and preschoolers. Count the ingredients and learn the names of the vegetables, too!",
+             TAGS + ["stone soup", "stone soup story", "sharing story", "kindness story", "vegetables for kids", "learn vegetables", "counting story"],
+             {"nar": NAR, "fox": (GUY, "-4%", "+12Hz"), "hare": ("en-US-EricNeural", "+4%", "+10Hz"), "pig": (ARIA, "+4%", "+20Hz"),
+              "goat": ("en-US-ChristopherNeural", "+6%", "+16Hz"), "gma": (ARIA, "-12%", "-6Hz"), "kid": (ANA, "+2%", "+18Hz")}, lang=lang)
+    t.bubble_tint = {"fox": "#FFE4CC", "hare": "#FFF0DC", "pig": "#EDE4FF", "goat": "#FFE8F0", "gma": "#DFF4DF", "kid": "#FFE3EE"}
+    full = dict(kind="stone", water=1.0, stone=1.0, cook=1.0, stir=1.0, **{v: 1.0 for v in SS_VEGS})
+    t.cover = dict(bg="meadow_dusk", title=("STONE", "SOUP"), size=118, gap=116,
+                   props=[("pot", "pot", 330, 712, 1.55, full),
+                          ("v1", "veg", 150, 335, 1.0, dict(kind="carrot", rest=1.0, size=0.95)), ("v2", "veg", 255, 285, 1.0, dict(kind="onion", rest=1.0, size=0.95)),
+                          ("v3", "veg", 330, 350, 1.0, dict(kind="cabbage", rest=1.0, size=0.95)), ("v4", "veg", 70, 235, 1.0, dict(kind="tomato", rest=1.0, size=0.95))],
+                   actors=[("fox", "wolf", 690, 712, 1.35, 1, "cheer", dict(FOX_T)), ("hare", "hare", 840, 712, 1.1, -1, "happy", {}), ("pig", "pig", 970, 712, 1.1, -1, "happy", PIG_V),
+                           ("goat", "goat", 1080, 712, 1.1, -1, "happy", GOAT_V), ("gma", "girl", 1180, 712, 1.0, -1, "happy", OLD_W)])
+    _intro(t, ("STONE", "SOUP"), "Today's story is... Stone Soup!")
+
+    # ---------------------------------------------------------------- 1 a hungry fox finds a stone
+    s = t.scene("The long road", "meadow_open", mood="calm", title="A hungry fox")
+    s.prop("stone", "stone", 905, 656, 1.0, show=True)
+    s.actor("fox", "wolf", -160, 650, 0.95, face=1, flat=True, **FOX_T)
+    s.nar("Once upon a time, a little fox walked down a long, long road.", ("walk", "fox", 330, 650, {"fit": True}))
+    s.nar("He had walked all day, and he was very, very hungry.", ("pose", "fox", "tired", {"at": 0.3}))
+    s.nar("His tummy went rumble, rumble, rumble!", ("pose", "fox", "sad", {"at": 0.2}), ("sfx", "rumble", {"at": "38%", "gain": 0.9}), ("sfx", "rumble", {"at": "66%", "gain": 0.9}), tail=0.7)
+    s.say("fox", "Oh dear! I am so hungry. But I have no food at all.", ("pose", "fox", "sad"))
+    s.nar("Then he saw something on the road. It was a smooth, round stone.", ("walk", "fox", 640, 650, {"at": 0.4, "speed": 170}), ("pose", "fox", "surprised", {"at": "55%"}),
+          ("fx", "mark", 905, 520, {"at": "50%", "dur": 1.8, "text": "!"}))
+    s.say("fox", "A stone! I know what I will do. I will make stone soup!", ("walk", "fox", 800, 650, {"at": 0.0, "speed": 170}), ("pose", "fox", "plant", {"at": 0.9}),
+          ("hide", "stone", {"at": 1.7}), ("hold", "fox", "stone", {"at": 1.7}), ("pose", "fox", "cheer", {"at": 2.1}), ("hop", "fox", {"at": 2.3}), ("fx", "sparkle", 840, 440, {"at": 2.0, "dur": 2.0, "r": 160}))
+    s.nar("So off he went, to find a village with a big, warm fire.", ("walk", "fox", 1480, 650, {"at": 0.3, "speed": 150, "pose": "walk"}), tail=0.3)
+
+    # ---------------------------------------------------------------- 2 the stone goes into the pot, the hare and the pig help
+    s = t.scene("The village", "meadow", mood="happy", title="Stone in the pot")
+    _ss_village(s, 0)
+    s.actor("fox", "wolf", -160, 650, 0.95, face=1, flat=True, hold="stone", **FOX_T)           # (the fox walks in from the left, with the stone)
+    s.nar("Soon, the fox came to a little village.", ("walk", "fox", SS_FOX, 650, {"fit": True}))
+    s.nar("In the middle of the village, there was a big, empty pot.", ("fx", "sparkle", SS_X, 520, {"at": 0.6, "dur": 2.4, "r": 150}))
+    s.say("fox", "Hello, everybody! I am going to make stone soup!", ("pose", "fox", "cheer", {"at": "20%"}), ("hop", "fox", {"at": "20%"}))
+    s.nar("First, he filled the pot with water. Splash!", ("set", "pot", "water", 1.0, {"at": "66%", "dur": 1.0}), ("sfx", "splash", {"at": "84%", "gain": 0.7}),
+          ("fx", "sparkle", SS_X, 520, {"at": "84%", "dur": 2.0, "r": 130}))
+    s.nar("Then he popped in the stone. Plop!", ("pose", "fox", "cheer", {"at": 0.0}), ("set", "pot", "stone", 1.0, {"at": "60%", "dur": 0.55}), ("hold", "fox", None, {"at": "56%"}),
+          ("sfx", "splash", {"at": "60%+0.45", "gain": 0.55}), ("pose", "fox", "happy", {"at": "92%"}))
+    s.nar("Now the fox stirred, and stirred, and stirred.", ("set", "pot", "stir", 1.0, {"at": 0.2, "dur": 0.6}), ("fx", "steam", SS_X, 470, {"at": 0.4, "dur": 60.0}), ("pose", "fox", "talk", {"at": 0.3}))
+    s.say("fox", "Mmm, stone soup! It will be good. But a little help would make it even better.", ("pose", "fox", "think"))
+    for g in SS_GUESTS[:2]:
+        _ss_visit(s, g)
+
+    # ---------------------------------------------------------------- 3 the goat and Granny help
+    s = t.scene("The village", "meadow", mood="happy", title="More friends help")
+    _ss_village(s, 2)
+    s.nar("The fox stirred the pot, and the soup smelled better and better.", ("fx", "steam", SS_X, 470, {"at": 0.0, "dur": 60.0}), ("pose", "fox", "happy", {"at": 0.3}))
+    for g in SS_GUESTS[2:4]:
+        _ss_visit(s, g)
+
+    # ---------------------------------------------------------------- 4 the little girl brings the last vegetable
+    s = t.scene("The village", "meadow", mood="happy", title="The last vegetable")
+    _ss_village(s, 4)
+    s.nar("The soup was almost ready. It smelled so good!", ("fx", "steam", SS_X, 470, {"at": 0.0, "dur": 60.0}), ("fx", "hearts", "fox", 0, {"at": 0.3, "dur": 3.0}), tail=0.3)
+    _ss_visit(s, SS_GUESTS[4])
+
+    # ---------------------------------------------------------------- 5 dinner time (and counting what is in the soup)
+    s = t.scene("Dinner time", "meadow_dusk", mood="triumph", title="Dinner time")
+    s.prop("pot", "pot", SS_X, SS_Y, SS_K, kind="stone", water=1.0, stone=1.0, stir=1.0, cook=1.0, **{v: 1.0 for v in SS_VEGS})
+    for i, (v, _line) in enumerate(SS_COUNT):
+        s.prop("n%d" % i, "veg", 280 + 144 * i, 262, 1.0, kind=v, rest=1.0, pop=0.0, size=1.15)
+    s.actor("fox", "wolf", SS_FOX, 650, 0.95, face=1, flat=True, **FOX_T)
+    others = [g for g in SS_GUESTS]
+    for g in others:
+        left = SS_SEAT[g["id"]] < SS_X
+        s.actor(g["id"], g["kind"], -200 if left else 1500, 650, g["k"], face=1 if left else -1, flat=True, **g["style"])
+    s.say("fox", "The soup is ready! Dinner time, my friends!", ("pose", "fox", "cheer"), ("hop", "fox", {"at": "40%"}), ("fx", "steam", SS_X, 470, {"at": 0.0, "dur": 60.0}),
+          ("fx", "sparkle", SS_X, 480, {"at": 0.3, "dur": 3.0, "r": 200}))
+    arrive = [("hare", 0.2), ("pig", 0.9), ("kid", 0.2), ("gma", 0.9), ("goat", 1.6)]
+    acts = []
+    for gid, at in arrive:
+        left = SS_SEAT[gid] < SS_X
+        acts.append(("walk", gid, SS_SEAT[gid], 650, {"at": at, "speed": 250, "pose": "walk"}))
+    s.nar("All the friends came back, with their bowls and spoons.", *acts, ("pose", "fox", "happy"), tail=0.5)
+    s.say("goat", "Maa, maa! It smells so good!", ("pose", "goat", "happy"), tail=0.3)
+    s.say("pig", "Oink, oink! I am so hungry!", ("pose", "pig", "happy"), tail=0.3)
+    allsay = ["fox", "hare", "pig", "goat", "gma", "kid"]
+    s.nar("They all tasted the soup. Yum, yum, yum!", *[("pose", a, "eat") for a in allsay], ("sfx", "munch", {"at": "30%", "gain": 0.6}), ("sfx", "munch", {"at": "55%", "gain": 0.6}),
+          ("sfx", "gulp", {"at": "85%", "gain": 0.6}), ("fx", "hearts", "gma", 0, {"at": 0.4, "dur": 3.5}))
+    s.say("hare", "This is the best soup I have ever tasted!", *[("pose", a, "happy") for a in allsay], ("hop", "hare", {"at": "50%"}))
+    s.say("gma", "And it is made from a stone!", ("pose", "gma", "laugh"))
+    s.say("fox", "A stone made the soup, but you made it the best! Thank you for sharing, my friends.", ("pose", "fox", "happy"), ("fx", "hearts", "fox", 0, {"at": "40%", "dur": 3.5}))
+    s.nar("Let us count what is in the stone soup!", *[("pose", a, "happy") for a in allsay], ("fx", "sparkle", SS_X, 300, {"at": 0.3, "dur": 3.0, "r": 320}))
+    for i, (v, line) in enumerate(SS_COUNT):                                  # the numbers and the vegetables stay until the scene ends
+        x = 280 + 144 * i
+        s.nar(line, ("set", "n%d" % i, "pop", 1.0, {"at": 0.05, "dur": 0.4}), ("fx", "mark", x, 168, {"at": 0.05, "dur": 60.0, "text": str(i + 1)}), tail=0.3)
+    s.nar("Six yummy things, and six happy friends!", *[("hop", a, {"at": "%d%%" % (15 + 11 * j)}) for j, a in enumerate(allsay)], *[("pose", a, "cheer") for a in allsay],
+          ("fx", "sparkle", SS_X, 330, {"at": 0.2, "dur": 3.0, "r": 380}), ("fx", "confetti", 0, 0, {"at": 0.4, "dur": 60.0}), tail=0.8)
+
+    _outro(t, "Remember, little ones: when we share, there is always enough for everyone.", caption="Sharing is caring!")
+    return t
+
+
 TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_and_hare, "goldilocks": goldilocks,
          "red-riding-hood": red_riding_hood, "gingerbread-man": gingerbread_man, "three-billy-goats": three_billy_goats,
-         "enormous-turnip": enormous_turnip}
+         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup}
 
 
 def build(key, lang="en"):

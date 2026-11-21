@@ -1,5 +1,7 @@
 """The fairy tales (public-domain classics) as story scripts, told in short, simple sentences for ages 2-6."""
-from .story import Tale, ease
+import math
+
+from .story import Tale, ease, HEAD
 
 NAR = ("en-US-JennyNeural", "-6%", "+0Hz")
 ANA = "en-US-AnaNeural"
@@ -959,8 +961,201 @@ def three_billy_goats(lang="en"):
     return t
 
 
+# ================================================================================================ the enormous turnip
+KID = dict(dress="#FF8FA3", hair="#7B4A2A")                                   # the little girl
+BEAR_T = dict(fur="#7A4A25", extra="bib", outfit="#3E8EDE")
+TN_X, TN_Y, TN_K = 225, 636, 1.3                                              # the turnip's garden bed: the middle of the bed on the ground, and its size
+# everybody who pulls, nearest to the turnip first: id, kind, feet x, size, style (they all face the turnip, face -1)
+LINE = [("gpa", "girl", 500, 1.0, OLD_M), ("gma", "girl", 610, 0.95, OLD_W), ("kid", "girl", 705, 0.8, KID), ("pig", "pig", 810, 0.9, FARM_PIG),
+        ("hare", "hare", 915, 0.95, {}), ("bear", "bear", 1030, 1.0, BEAR_T), ("pip", "pip", 1150, 0.85, {})]
+LINE_Y = {"gpa": 650, "gma": 650, "kid": 650, "pig": 650, "hare": 650, "bear": 654, "pip": 658}
+HEAVE = "Heave-ho! Heave-ho!"
+STUCK = "But the turnip was still stuck!"
+SOUP_SEAT = {"gpa": 280, "gma": 395, "kid": 490, "pig": 790, "hare": 890, "bear": 1005, "pip": 1125}     # where everybody sits at the soup pot
+ARRIVE = {"gma": (300, None), "kid": (300, None), "pig": (300, None), "hare": (230, "jump"), "bear": (200, None), "pip": (260, None)}     # speed, walking pose
+
+
+def _come(new, slot):
+    """The act that brings a friend from the right edge of the screen to their place in the line."""
+    speed, pose = ARRIVE[new]
+    return ("walk", new, slot, LINE_Y[new], dict(at=0.3, speed=speed, **({"pose": pose} if pose else {})))
+
+
+def _hand(x, y, k, lean=11.0, arm=100.0):
+    """Where the front hand of a girl-shaped puller (facing left) is in the "pull" pose (see storyart.pose_for and storyart.girl)."""
+    a, ln = math.radians(arm), math.radians(lean)
+    ex, ey = -(30.0 + math.sin(a) * 40.0), -134.0 + math.cos(a) * 40.0
+    return x + (ex * math.cos(ln) - ey * math.sin(ln)) * k, y + (ex * math.sin(ln) + ey * math.cos(ln)) * k
+
+
+def _grip(px, py, pk, tx=TN_X, ty=TN_Y, tk=TN_K):
+    """The turnip's gx, gy (in its own units): its bunch of leaves ends in the front hand of the puller at (px, py), size pk."""
+    hx, hy = _hand(px, py, pk)
+    return (hx - tx) / tk, (hy - ty) / tk
+
+
+def _turnip(s, grow=1.0, bend=0.0, **st):
+    gx, gy = _grip(LINE[0][2], LINE_Y["gpa"], LINE[0][3])
+    return s.prop("tn", "turnip", TN_X, TN_Y, TN_K, grow=grow, bend=bend, gx=gx, gy=gy, gsw=8.0, **st)
+
+
+def _line(s, upto):
+    """The pulling line on a scene: the first `upto` friends stand in their places, everybody else waits out of sight, on the right."""
+    for j, (aid, kind, x, k, style) in enumerate(LINE):
+        s.actor(aid, kind, x if j < upto else 1500 + 160 * (j - upto), LINE_Y[aid], k, face=-1, flat=True, **style)
+
+
+def _poses(ids, pose, **o):
+    return [("pose", i, pose, dict(o)) if o else ("pose", i, pose) for i in ids]
+
+
+def _above(j):
+    """How far above the middle of the head of LINE[j] a number sits."""
+    _aid, kind, _x, k, _st = LINE[j]
+    return -(0.22 * HEAD[kind] * k + 46.0)
+
+
+def _round(s, j, call, came, shout, wob, stuck=True):
+    """One more friend joins the line (LINE[j]): the friend before calls, the new friend comes (and a number tells how many pull now),
+    they all heave, and the turnip is still stuck."""
+    new, _kind, slot, _k, _st = LINE[j]
+    ids = [a[0] for a in LINE[:j + 1]]
+    s.say(LINE[j - 1][0], call, *_poses(ids[:-1], "grip"), tail=0.3)
+    s.nar(came, _come(new, slot), ("fx", "mark", new, _above(j), {"at": "58%", "dur": 1.8, "text": str(j + 1)}), *_poses(ids[:-1], "grip"), tail=0.3)
+    if shout:
+        s.say(new, shout, *_poses(ids, "pull"), ("set", "tn", "wobble", wob, {"at": 0.0, "dur": 0.5}), ("sfx", "creak", {"at": "20%", "gain": 0.4}), ("sfx", "creak", {"at": "65%", "gain": 0.4}), tail=0.3)
+    if stuck:
+        s.nar(STUCK, *_poses(ids, "grip"), ("set", "tn", "wobble", 0.0, {"at": 0.0, "dur": 0.6}), ("fx", "sweat", new, 0, {"at": 0.2, "dur": 3.0}), tail=0.35)
+
+
+def _cheer_scene(t, title):
+    """The meadow after the turnip is out: the six friends in a row, Pip flying above them, the turnip lying next to its hole."""
+    s = t.scene("Hooray, we did it!", "meadow_open", mood="triumph", title=title)
+    _turnip(s, bend=0.0, out=1.0)
+    cheer_x = {"gpa": 645, "gma": 740, "kid": 820, "pig": 905, "hare": 990, "bear": 1090}
+    for aid, kind, x, k, style in LINE[:6]:
+        s.actor(aid, kind, cheer_x[aid], LINE_Y[aid], k, face=-1, flat=True, **style)
+    s.actor("pip", "pip", 1185, 350, 0.85, face=-1, flat=True, zy=900)                       # Pip flies above everybody
+    return s
+
+
+def enormous_turnip(lang="en"):
+    t = Tale("tale-enormous-turnip", "The Enormous Turnip | Fairy Tale Story for Kids | Bibi Buzz TV",
+             "Heave-ho! Heave-ho! Watch the classic fairy tale of The Enormous Turnip: a kind old grandpa plants a tiny seed, and it grows into the biggest turnip in the whole wide world. "
+             "Grandma, a little girl, a pig, a hare, a big bear and a tiny ladybug come to help him pull. Can they pull it up, all together? A gentle, colorful animated story in simple "
+             "English for toddlers and preschoolers.",
+             TAGS + ["enormous turnip", "the enormous turnip", "giant turnip", "the giant turnip story", "heave ho", "teamwork story"],
+             {"nar": NAR, "gpa": ("en-US-ChristopherNeural", "-8%", "-6Hz"), "gma": (ARIA, "-12%", "-6Hz"), "kid": (ANA, "+2%", "+18Hz"),
+              "pig": (ARIA, "+4%", "+20Hz"), "hare": ("en-US-EricNeural", "+4%", "+10Hz"), "bear": (GUY, "-14%", "-22Hz"), "pip": (ANA, "+8%", "+34Hz")}, lang=lang)
+    t.bubble_tint = {"gpa": "#E9DDFF", "gma": "#DFF4DF", "kid": "#FFE3EE", "pig": "#FFEFC4", "hare": "#FFF0DC", "bear": "#EADBC8", "pip": "#FFE0E0"}
+    gx, gy = _grip(560, 712, 1.25, 250, 706, 1.45)
+    t.cover = dict(bg="meadow_open", title=("THE ENORMOUS", "TURNIP"), size=104, gap=108,
+                   props=[("tn", "turnip", 250, 706, 1.45, dict(grow=1.0, bend=1.0, gx=gx, gy=gy))],
+                   actors=[("gpa", "girl", 560, 712, 1.25, -1, "pull", OLD_M), ("gma", "girl", 690, 712, 1.15, -1, "pull", OLD_W), ("kid", "girl", 800, 712, 0.95, -1, "pull", KID),
+                           ("pig", "pig", 915, 712, 1.1, -1, "pull", FARM_PIG), ("hare", "hare", 1035, 712, 1.15, -1, "pull", {}), ("bear", "bear", 1165, 716, 1.2, -1, "pull", BEAR_T)])
+    _intro(t, ("THE ENORMOUS", "TURNIP"), "Today's story is... The Enormous Turnip!")
+
+    # ---------------------------------------------------------------- 1 grandpa plants a seed
+    s = t.scene("Grandpa's garden", "meadow_open", mood="happy", title="Grandpa plants a seed")
+    s.prop("tn", "turnip", TN_X, TN_Y, TN_K, grow=0.0)
+    s.actor("gpa", "girl", 1180, 650, 1.0, face=-1, flat=True, **OLD_M)
+    s.nar("Once upon a time, there lived a kind old grandpa. He had a big, beautiful garden.", ("walk", "gpa", 310, 650, {"fit": True}), ("pose", "gpa", "happy", {"at": "70%"}))
+    s.nar("One sunny morning, Grandpa dug a little hole, and planted a tiny seed.", ("pose", "gpa", "plant"), ("fx", "dust", 250, 654, {"at": "45%", "dur": 1.0, "size": 0.7}))
+    s.say("gpa", "Grow, little turnip, grow! Grow big and strong!", ("pose", "gpa", "plant"), ("set", "tn", "grow", 0.22, {"at": "55%", "dur": 1.2}),
+          ("fx", "sparkle", TN_X, 590, {"at": "55%", "dur": 2.6, "r": 120}))
+    s.nar("The sun shone, and the rain fell. And the little turnip grew, and grew.", ("pose", "gpa", "happy", {"at": 0.3}), ("set", "tn", "grow", 0.55, {"at": 0.4, "dur": 4.0}),
+          ("fx", "sparkle", TN_X, 520, {"at": 0.5, "dur": 4.0, "r": 200}))
+    s.nar("It grew, and grew, and GREW! It was the biggest turnip in the whole wide world!", ("pose", "gpa", "surprised", {"at": 0.4}), ("set", "tn", "grow", 1.0, {"at": 0.3, "dur": 4.4}),
+          ("sfx", "whoosh", {"at": 0.3, "gain": 0.6}), ("fx", "sparkle", TN_X, 450, {"at": 0.3, "dur": 5.0, "r": 260}), ("walk", "gpa", 500, 650, {"at": 1.0, "dur": 3.6, "keepface": True}), tail=0.5)
+    s.say("gpa", "Wow! What an enormous turnip! Let me pull it up!", ("pose", "gpa", "cheer"), ("hop", "gpa", {"at": "45%"}))
+
+    # ---------------------------------------------------------------- 2 pull, pull, pull (grandpa, grandma, the little girl, the pig, the hare)
+    s = t.scene("Pull, pull, pull!", "meadow_open", mood="happy", title="Pull, pull, pull!")
+    _turnip(s)
+    _line(s, 1)
+    s.nar("So Grandpa took hold of the turnip's leaves. He pulled, and he pulled, and he pulled!", ("pose", "gpa", "grip"), ("set", "tn", "bend", 1.0, {"at": "20%", "dur": 0.7}),
+          ("pose", "gpa", "pull", {"at": "50%"}), ("set", "tn", "wobble", 0.3, {"at": "50%", "dur": 0.6}), ("sfx", "creak", {"at": "55%", "gain": 0.4}))
+    s.say("gpa", HEAVE, ("pose", "gpa", "pull"), ("set", "tn", "wobble", 0.35, {"at": 0.0, "dur": 0.4}), ("sfx", "creak", {"at": "20%", "gain": 0.4}), ("sfx", "creak", {"at": "65%", "gain": 0.4}), tail=0.3)
+    s.nar("But the turnip did not move. It was stuck, stuck, stuck!", ("pose", "gpa", "grip"), ("set", "tn", "wobble", 0.0, {"at": 0.0, "dur": 0.6}), ("fx", "sweat", "gpa", 0, {"at": 0.2, "dur": 3.5}))
+    _round(s, 1, "Grandma! Grandma! Please come and help me!", "Grandma came running. Now there were two friends pulling the turnip!", HEAVE, 0.45)
+    _round(s, 2, "Little girl! Please come and help us!", "The little girl came running. Now there were three friends pulling the turnip!", HEAVE, 0.55)
+    _round(s, 3, "Piggy! Piggy! Please come and help us!", "The pig came trotting. Now there were four friends pulling the turnip!", "Oink, oink! Heave-ho! Heave-ho!", 0.65)
+    _round(s, 4, "Hare! Hare! Please come and help us!", "The hare came hopping. Now there were five friends pulling the turnip!", HEAVE, 0.75)
+
+    # ---------------------------------------------------------------- 3 little Pip helps
+    s = t.scene("Little Pip helps", "meadow_open", mood="chase", title="Little Pip helps")
+    _turnip(s, bend=1.0)
+    _line(s, 5)
+    allp = [a[0] for a in LINE]
+    s.say("hare", "Big Bear! Please come and help us!", *_poses(allp[:5], "grip"), tail=0.3)
+    s.nar("The big bear came stomping. Now there were six friends pulling the turnip!", _come("bear", 1030), ("fx", "mark", "bear", _above(5), {"at": "58%", "dur": 1.8, "text": "6"}),
+          ("fx", "dust", 1260, 668, {"at": 1.5, "dur": 1.0, "size": 1.2}), ("fx", "dust", 1160, 668, {"at": 2.0, "dur": 1.0, "size": 1.2}),
+          ("fx", "dust", 1060, 668, {"at": 2.5, "dur": 1.0, "size": 1.2}), *_poses(allp[:5], "grip"), tail=0.3)
+    s.say("bear", HEAVE, *_poses(allp[:6], "pull"), ("set", "tn", "wobble", 0.85, {"at": 0.0, "dur": 0.5}), ("sfx", "creak", {"at": "20%", "gain": 0.45}), ("sfx", "creak", {"at": "65%", "gain": 0.45}), tail=0.3)
+    s.nar("But the turnip was still stuck! It was stuck, stuck, stuck!", *_poses(allp[:6], "grip"), ("set", "tn", "wobble", 0.0, {"at": 0.0, "dur": 0.6}), ("fx", "sweat", "bear", 0, {"at": 0.2, "dur": 3.5}), tail=0.35)
+    s.say("bear", "Little Pip! Please come and help us!", *_poses(allp[:6], "grip"), tail=0.3)
+    s.nar("Little Pip came flying. Now there were seven friends pulling the turnip!", _come("pip", 1150), ("hop", "pip", {"at": 1.0}), ("hop", "pip", {"at": 1.8}),
+          ("fx", "mark", "pip", _above(6), {"at": "58%", "dur": 1.8, "text": "7"}), *_poses(allp[:6], "grip"), tail=0.3)
+    s.say("pig", "Pip is so tiny. Can Pip really help?", *_poses(allp[:6], "grip"), ("pose", "pig", "think"), tail=0.3)
+    s.say("pip", "Yes, I can! I am small, but I am strong!", *_poses(allp[:6], "grip"), ("hop", "pip", {"at": "35%"}), tail=0.3)
+    s.nar("Now everyone held on tight, and they all pulled together!", *_poses(allp, "strain"), ("set", "tn", "wobble", 0.8, {"at": 0.3, "dur": 1.0}),
+          ("cam", 620, 390, 1.06, {"at": 0.3, "dur": 3.2}), ("sfx", "creak", {"at": "50%", "gain": 0.5}))
+    s.say("pip", "One, two, three... HEAVE-HO!", *_poses(allp, "strain"), ("set", "tn", "wobble", 1.0, {"at": 0.0, "dur": 0.6}), ("sfx", "creak", {"at": "30%", "gain": 0.5}),
+          ("sfx", "creak", {"at": "75%", "gain": 0.55}), tail=0.3)
+    s.nar("The turnip creaked, and it cracked. And then... POP!", *_poses(allp, "strain"), ("sfx", "creak", {"at": "15%", "gain": 0.5}), ("sfx", "creak", {"at": "42%", "gain": 0.55}),
+          *_poses(allp[1:], "surprised", at="86%"), ("pose", "gpa", "surprised", {"at": "86%"}), ("set", "tn", "bend", 0.0, {"at": "86%", "dur": 0.12}),
+          ("set", "tn", "out", 1.0, {"at": "86%", "dur": 1.2}), ("set", "tn", "wobble", 0.0, {"at": "86%", "dur": 0.2}),
+          ("fx", "burst", TN_X + 40, 400, {"at": "86%", "dur": 1.5, "text": "POP!", "sfx": "pop"}), ("fx", "dust", TN_X, 664, {"at": "86%", "dur": 1.0, "size": 1.6, "sfx": False}),
+          ("tilt", "gpa", 80, {"at": "88%", "dur": 0.4}), ("fx", "dust", 700, 668, {"at": "88%+0.38", "dur": 1.0, "size": 1.1}),
+          ("fx", "dust", TN_X + 195, 668, {"at": "86%+1.0", "dur": 1.0, "size": 1.3}), ("cam", 640, 360, 1.0, {"at": "86%", "dur": 0.8}), tail=0.2)
+    falls = [("gma", 76, "42%"), ("kid", 84, "54%"), ("pig", 72, "66%"), ("hare", 86, "78%"), ("bear", 78, "90%")]
+    acts = [("pose", "pip", "surprised"), ("hop", "pip", {"at": "30%"})]
+    for aid, deg, when in falls:
+        _a, _kd, fx_, fk, _s = LINE[allp.index(aid)]
+        acts += [("tilt", aid, deg, {"at": when, "dur": 0.4}), ("fx", "dust", fx_ + 150 * fk, 668, {"at": when + "+0.38", "dur": 1.0, "size": 0.9 + 0.3 * fk})]
+    s.nar("Out flew the turnip! And everybody fell down. Bump, bump, bump, bump, bump, bump!", *acts, tail=0.3)
+    s.nar("Nobody was hurt. They were just a little bit dizzy.", *_poses(allp[:6], "dizzy"), ("pose", "pip", "surprised"), tail=0.3)
+    acts = [("hop", "pip", {"at": 1.0})]
+    for aid, at in (("gpa", 0.0), ("gma", 0.2), ("kid", 0.4), ("pig", 0.6), ("hare", 0.8), ("bear", 1.0)):
+        acts += [("tilt", aid, 0, {"at": at, "dur": 0.5}), ("pose", aid, "cheer", {"at": at + 0.3})]
+    s.wait(1.8, *acts)
+    s.say("bear", "Ha ha ha! We did it! We pulled up the enormous turnip!", *_poses(allp[:6], "laugh"), ("pose", "bear", "laugh"), tail=0.4)
+
+    # ---------------------------------------------------------------- 4 hooray (and counting the friends)
+    s = _cheer_scene(t, "Hooray, we did it!")
+    s.say("pip", "Hooray! Even a tiny friend can help!", *_poses(allp[:6], "cheer"), ("hop", "pip", {"at": "30%"}), ("fx", "confetti", 0, 0, {"at": 0.3, "dur": 60.0}))
+    s.nar("The tiniest friend had made a big difference!", *_poses(allp[:6], "happy"), ("fx", "sparkle", 640, 360, {"at": 0.2, "dur": 4.0, "r": 360}), ("fx", "hearts", "pip", 0, {"at": 0.4, "dur": 3.5}))
+    s.nar("Let us count the friends who helped!", *_poses(allp[:6], "happy"), ("hop", "pip", {"at": "60%"}))
+    for i, (aid, word) in enumerate(zip(allp, ("One!", "Two!", "Three!", "Four!", "Five!", "Six!", "Seven!"))):      # the numbers stay until the scene ends
+        s.nar(word, ("hop", aid, {"at": 0.05}), ("fx", "mark", aid, _above(i) - (18 if aid == "pip" else 0), {"at": 0.0, "dur": 60.0, "text": str(i + 1)}), *_poses(allp[:6], "happy"), tail=0.12)
+    s.nar("Seven good friends, and one enormous turnip!", *[("hop", aid, {"at": "%d%%" % (20 + 9 * j)}) for j, aid in enumerate(allp)], *_poses(allp[:6], "cheer"),
+          ("fx", "sparkle", 640, 330, {"at": 0.2, "dur": 3.0, "r": 380}), tail=0.3)
+    s = _cheer_scene(t, None)                                               # the same picture without the numbers (a scene change nobody notices)
+    s.say("gma", "Thank you, my friends! Let us go home, and cook some turnip soup!", ("pose", "gma", "cheer"), ("hop", "gma", {"at": "40%"}), *_poses(["gpa", "kid", "pig", "hare", "bear"], "happy"),
+          ("hop", "pip", {"at": "20%"}), ("fx", "confetti", 0, 0, {"at": 0.0, "dur": 60.0}), tail=0.5)
+
+    # ---------------------------------------------------------------- 5 turnip soup
+    s = t.scene("Turnip soup", "meadow_dusk", mood="triumph", title="Turnip soup for everyone")
+    s.prop("pot", "pot", 640, 660, 1.05)
+    for aid, kind, x, k, style in LINE:
+        s.actor(aid, kind, SOUP_SEAT[aid], LINE_Y[aid] - 8, k, face=1 if SOUP_SEAT[aid] < 640 else -1, flat=True, **style)
+    s.nar("That evening, Grandma cooked a big pot of yummy turnip soup.", ("fx", "steam", 640, 470, {"at": 0.0, "dur": 60.0}), ("pose", "gma", "happy"), ("fx", "sparkle", 640, 470, {"at": 0.4, "dur": 3.0, "r": 150}))
+    names = ["gpa", "gma", "kid", "pig", "hare", "bear", "pip"]
+    s.nar("There was enough for everyone: Grandpa, Grandma, the little girl, the pig, the hare, the big bear, and tiny Pip.",
+          *[("hop", aid, {"at": "%d%%" % (18 + 10 * i)}) for i, aid in enumerate(names)], *_poses(names[:6], "happy"))
+    s.say("kid", "Mmm! This turnip soup is so yummy!", *_poses(["gpa", "gma", "kid", "pig", "hare", "bear"], "eat"), ("sfx", "gulp", {"at": "80%", "gain": 0.6}))
+    s.say("bear", "It is the best soup in the whole world!", ("pose", "bear", "eat"), ("sfx", "munch", {"at": "30%", "gain": 0.6}))
+    s.nar("They all ate, and ate, and ate. Yum, yum, yum!", ("sfx", "munch", {"at": "35%", "gain": 0.6}), ("sfx", "munch", {"at": "55%", "gain": 0.6}), ("sfx", "gulp", {"at": "80%", "gain": 0.6}),
+          ("fx", "hearts", "gma", 0, {"at": 0.3, "dur": 4.0}))
+    s.nar("And from that day on, the friends always helped each other.", *_poses(names[:6], "happy"), ("fx", "sparkle", 640, 330, {"at": 0.2, "dur": 4.0, "r": 380}), ("hop", "pip", {"at": "50%"}), tail=0.8)
+
+    _outro(t, "Remember, little ones: when we work together, even the biggest job becomes easy.", caption="Together, big jobs become easy!")
+    return t
+
+
 TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_and_hare, "goldilocks": goldilocks,
-         "red-riding-hood": red_riding_hood, "gingerbread-man": gingerbread_man, "three-billy-goats": three_billy_goats}
+         "red-riding-hood": red_riding_hood, "gingerbread-man": gingerbread_man, "three-billy-goats": three_billy_goats,
+         "enormous-turnip": enormous_turnip}
 
 
 def build(key, lang="en"):

@@ -60,6 +60,7 @@ class ActorTL:
         self.faces = [(-1.0, d.face)]
         self.vis = [(-1.0, 1 if d.show else 0)]
         self.scales = []                    # (t0, t1, k0, k1)
+        self.tilts = []                     # (t0, t1, d0, d1): extra lean in degrees (head to the right, like Pose.lean): falling over
         self.hops = []
         self.holds = [(-1.0, d.style.get("hold"))]
         self.free_at = 0.0
@@ -134,6 +135,16 @@ class ActorTL:
             if t < t1:
                 break
         return k
+
+    def tilt_at(self, t):
+        d = 0.0
+        for (t0, t1, d0, d1) in self.tilts:
+            if t < t0:
+                break
+            d = d1 if t >= t1 else lerp(d0, d1, ease((t - t0) / (t1 - t0)))
+            if t < t1:
+                break
+        return d
 
     def hold_at(self, t):
         i = bisect.bisect_right([p[0] for p in self.holds], t) - 1
@@ -269,9 +280,10 @@ class Scene:
     def _act(self, act, b, base_end):
         verb, a, o = _split(act)
         at = o.get("at", 0.0)
-        if isinstance(at, str):                                        # "60%" = 60 % of the way through the voice line
+        if isinstance(at, str):                                        # "60%" = 60 % of the way through the voice line ("60%+0.3" = and 0.3 s later)
             base0, base1 = (b.v0, b.v1) if b.text else (b.t0, base_end)
-            ta = base0 + float(at.rstrip("%")) / 100.0 * (base1 - base0)
+            pct, _, plus = at.partition("%")
+            ta = base0 + float(pct) / 100.0 * (base1 - base0) + (float(plus) if plus else 0.0)
         else:
             ta = b.t0 + at if at >= 0 else base_end + at
         if verb in ("walk", "move"):
@@ -311,6 +323,12 @@ class Scene:
             k0 = tl.scale_at(ta)
             dur = o.get("dur", a[2] if len(a) > 2 else 0.6)
             tl.scales.append((ta, ta + dur, k0, a[1]))
+            return ta + dur
+        elif verb == "tilt":                                            # ("tilt", who, degrees, {"at", "dur"}): fall over (+ = head to the right)
+            tl = self.atl[a[0]]
+            d0 = tl.tilt_at(ta)
+            dur = o.get("dur", a[2] if len(a) > 2 else 0.5)
+            tl.tilts.append((ta, ta + dur, d0, a[1]))
             return ta + dur
         elif verb == "hop":
             self.atl[a[0]].hops.append(ta)
@@ -487,44 +505,50 @@ def envelope(y, hz=30):
 # ================================================================================================ drawing
 def _bubble(s, text, ax, ay, tint="#FFFFFF", avoid=()):
     """Speech bubble on the screen canvas; (ax, ay) is the speaker's head.
-    `avoid` = screen rects (x0, y0, x1, y1) of the other characters' faces: the bubble slides sideways, or wraps narrower, rather than cover one."""
+    `avoid` = screen rects (x0, y0, x1, y1) of the other characters' faces: the bubble slides sideways, or wraps narrower, rather than cover one;
+    when that is not enough (a small speaker next to a tall friend) it rises above them and its tail gets longer."""
     size = 40
     lh = size * 1.22
     pref = 0.30 if ax < 640 else 0.70
-    best, seen = None, set()
-    for maxw in (620, 500, 390):
-        words, lines, cur = text.split(), [], ""
-        for w in words:
-            trial = (cur + " " + w).strip()
-            if s.text_width(trial, size) > maxw and cur:
-                lines.append(cur)
-                cur = w
-            else:
-                cur = trial
-        lines.append(cur)
-        if tuple(lines) in seen:
-            continue
-        seen.add(tuple(lines))
-        tw = max(s.text_width(l, size) for l in lines)
-        bw, bh = tw + 56, lh * len(lines) + 34
-        by1 = ay - 26
-        by0 = by1 - bh
-        if by0 < 14:
-            by0 = 14
-            by1 = by0 + bh
-        for fr in (pref, 1.0 - pref, 0.5, 0.12, 0.88):
-            x0 = clamp(ax - bw * fr, 18, 1280 - 18 - bw)
-            ov = sum(max(0.0, min(x0 + bw, r[2]) - max(x0, r[0])) * max(0.0, min(by1, r[3]) - max(by0, r[1])) for r in avoid)
-            if best is None or ov < best[0] - 1e-6:
-                best = (ov, x0, bw, bh, by0, by1, lines)
-            if ov <= 1e-6:
-                break
-        if best[0] <= 1e-6:
+    best = None
+    for lift in (0, 44, 88, 132):
+        if best is not None and best[0] <= 1e-6:
             break
+        seen = set()
+        for maxw in (620, 500, 390):
+            words, lines, cur = text.split(), [], ""
+            for w in words:
+                trial = (cur + " " + w).strip()
+                if s.text_width(trial, size) > maxw and cur:
+                    lines.append(cur)
+                    cur = w
+                else:
+                    cur = trial
+            lines.append(cur)
+            if tuple(lines) in seen:
+                continue
+            seen.add(tuple(lines))
+            tw = max(s.text_width(l, size) for l in lines)
+            bw, bh = tw + 56, lh * len(lines) + 34
+            by1 = ay - 26 - lift
+            by0 = by1 - bh
+            if by0 < 14:
+                by0 = 14
+                by1 = by0 + bh
+            for fr in (pref, 1.0 - pref, 0.5, 0.12, 0.88):
+                x0 = clamp(ax - bw * fr, 18, 1280 - 18 - bw)
+                ov = sum(max(0.0, min(x0 + bw, r[2]) - max(x0, r[0])) * max(0.0, min(by1, r[3]) - max(by0, r[1])) for r in avoid)
+                if best is None or ov < best[0] - 1e-6:
+                    best = (ov, x0, bw, bh, by0, by1, lines)
+                if ov <= 1e-6:
+                    break
+            if best[0] <= 1e-6:
+                break
     _, bx0, bw, bh, by0, by1, lines = best
     s.rrect(bx0 + 4, by0 + 6, bx0 + bw + 4, by1 + 6, 30, fill="#00000026")
     tipx = clamp(ax, bx0 + 40, bx0 + bw - 40)
-    s.poly([(tipx - 22, by1 - 6), (tipx + 22, by1 - 6), (clamp(ax, tipx - 50, tipx + 50), min(ay - 6, by1 + 54))], fill=tint, outline=D.INK, width=3.5)
+    rise = max(0.0, (ay - 26) - by1)                                       # how far the bubble was lifted: the tail stretches down to the speaker
+    s.poly([(tipx - 22, by1 - 6), (tipx + 22, by1 - 6), (clamp(ax, tipx - 50, tipx + 50), min(ay - 6, by1 + 54 + rise))], fill=tint, outline=D.INK, width=3.5)
     s.rrect(bx0, by0, bx0 + bw, by1, 30, fill=tint, outline=D.INK, width=3.5)
     s.rect(tipx - 20, by1 - 8, tipx + 20, by1 - 1, tint)
     for i, l in enumerate(lines):
@@ -578,6 +602,7 @@ def _draw_actor(view, scene, tl, ts, near, far, tale, amp_of):
         f(view.c, view.X(x), view.Y(y - hop) - HEAD[d.kind] * 0.4 * kk * view.z, kk * view.z * 0.9, **kw)
         return
     P = A.pose_for(name, ts, phase=phase, moving=moving, amp=amp, face=face, seed=d.seed, speed=speed / 150.0)
+    P.lean += tl.tilt_at(ts)
     style = d.style
     if d.kind in ("girl", "bear", "troll"):
         style = dict(style)

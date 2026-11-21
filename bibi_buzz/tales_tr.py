@@ -152,6 +152,9 @@ META = {
 FOOTER = ["Bibi Buzz TV'de her gün yeni masallar ve öğretici videolar!",
           "Seslendirme için metin okuma (TTS) sesleri kullanılmıştır. Tüm çizimler ve müzikler Bibi Buzz TV için hazırlanmıştır."]
 HASHTAGS = "#masal #çocukmasalları #uykumasalları #türkçemasal #BibiBuzzTV"
+SONG_FOOTER = ["Bibi Buzz TV'de her gün yeni şarkılar, masallar ve öğretici videolar!",
+               "Şarkıları söyleyen sesler metin okuma (TTS) sesleridir. Tüm çizimler ve müzikler Bibi Buzz TV için hazırlanmıştır."]
+SONG_HASHTAGS = "#çocukşarkıları #bebekşarkıları #birliktesöyleyelim #çocukşarkısı #BibiBuzzTV"
 CHAPTERS = "Bölümler"
 PLAYLIST = "Türkçe Masallar | Çocuklar için Masal Videoları | Bibi Buzz TV"
 

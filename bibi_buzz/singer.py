@@ -85,8 +85,8 @@ def split_syllables(an, a, b, n, min_gap=0.075, env=None):
     deepest points of the valleys between them, so that the consonants in front of a vowel go with that vowel (a fricative at the start of a
     word, like the s of 'seni', is not taken for a syllable of its own).  `env` is the loudness of the pre-emphasised voice (one row per frame):
     the sonorants l, m, n, r keep the plain loudness as high as a vowel, but they take away the energy above 1 kHz that a vowel has.
-    Where the voice has fewer peaks than syllables, the cuts are made at the deepest dips of the plain loudness, and then the longest piece is
-    cut in the middle of its voiced part."""
+    Where the voice has fewer peaks than syllables, the cuts are made at the deepest dips of the plain loudness that have a voiced vowel on both
+    sides (so that a consonant never becomes a syllable of its own), and then the longest piece is cut in the middle of its voiced part."""
     if n <= 1 or b - a < 4:
         return [(a, b)]
     db = _env_db(an)
@@ -114,9 +114,11 @@ def split_syllables(an, a, b, n, min_gap=0.075, env=None):
     cands = []
     for k in range(a + mind, b - mind):
         if sm[k] <= sm[k - 1] and sm[k] < sm[k + 1]:
-            lp = sm[max(a, k - 3 * mind):k].max()
-            rp = sm[k + 1:min(b, k + 3 * mind) + 1].max()
-            depth = min(lp, rp) - sm[k]
+            li = [i for i in range(max(a, k - 3 * mind), k) if vox[i]]           # a boundary between two syllables has a voiced vowel on both sides:
+            ri = [i for i in range(k + 1, min(b, k + 3 * mind) + 1) if vox[i]]   # the dip between a fricative and its own vowel (the ş of 'Şurada') is none
+            if not li or not ri:
+                continue
+            depth = min(sm[li].max(), sm[ri].max()) - sm[k]
             if depth > 1.5:
                 cands.append((depth, k))
     cands.sort(reverse=True)

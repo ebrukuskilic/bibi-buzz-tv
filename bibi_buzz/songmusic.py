@@ -154,7 +154,8 @@ def play_lead(buf, notes, inst="xylo", gain=0.3):
 def play_chords(buf, segs, bpm, beats, style="strum", gain=1.0, bass_gain=0.7, shift=0, origin=0.0):
     """segs: [(chord_symbol, first_beat, n_beats)] with the beats counted from the start of the song (`origin` = the beat where the bars
     of this stretch begin, so that 'beat 1 of the bar' is right); `shift` transposes by semitones.
-    style: strum | oompah | waltz | lull | pad | none"""
+    style: strum | oompah | waltz | lull | pad | roll | rollbox | none   (roll = for songs in 6/8 where a beat is a dotted quarter: three eighths
+    of a rolling arpeggio, up in the first beat of a bar and down in the second, like a boat on the waves; rollbox the same on a music box)"""
     if style == "none":
         return
     beat = 60.0 / bpm
@@ -192,6 +193,18 @@ def play_chords(buf, segs, bpm, beats, style="strum", gain=1.0, bass_gain=0.7, s
                     add(buf, t + e * beat / 4, music_box(tri[k % len(tri)] + 12, 1.2), 0.10 * gain)
                 if pos == 0:
                     add(buf, t, pluck_bass(low), 0.22 * bass_gain * gain)
+            elif style in ("roll", "rollbox"):
+                order = (0, 1, 2) if pos % 2 == 0 else (2, 1, 0)
+                for e, kk in enumerate(order):
+                    m = tri[kk % len(tri)]
+                    if style == "roll":
+                        add(buf, t + e * beat / 3, ukulele(m, 0.8), (0.17 if e == 0 else 0.12) * gain)
+                    else:
+                        add(buf, t + e * beat / 3, music_box(m + 12, 1.2), (0.11 if e == 0 else 0.085) * gain)
+                if pos % 2 == 0:
+                    add(buf, t, pluck_bass(low), (0.32 if style == "roll" else 0.22) * bass_gain * gain)
+                else:
+                    add(buf, t, pluck_bass(low + 7), (0.22 if style == "roll" else 0.15) * bass_gain * gain)
             elif style == "pad":
                 if j == 0:
                     for m in tri:
@@ -199,7 +212,8 @@ def play_chords(buf, segs, bpm, beats, style="strum", gain=1.0, bass_gain=0.7, s
 
 
 def play_drums(buf, b0, b1, bpm, beats, style="light", gain=1.0, origin=0.0):
-    """beats b0 .. b1 (counted from the start of the song; `origin` = the beat where the bars begin). styles: none | light | clap | party"""
+    """beats b0 .. b1 (counted from the start of the song; `origin` = the beat where the bars begin). styles: none | light | clap | party,
+    and for songs in 6/8 (a beat = three eighths): sway | sway_clap | sway_party (a shaker on the 2nd and 3rd eighth of every beat)"""
     if style == "none":
         return
     beat = 60.0 / bpm
@@ -208,7 +222,21 @@ def play_drums(buf, b0, b1, bpm, beats, style="light", gain=1.0, origin=0.0):
     while b < b1 - 1e-9:
         t = b * beat
         pos = (b - o) % beats
-        if style in ("light", "clap", "party"):
+        if style in ("sway", "sway_clap", "sway_party"):
+            add(buf, t + beat / 3, shaker_hit(), 0.08 * gain)
+            add(buf, t + 2 * beat / 3, shaker_hit(seed=2), 0.06 * gain)
+            if style == "sway":
+                if pos % 2 == 1:
+                    add(buf, t, wood(), 0.06 * gain)
+            else:
+                if pos % 2 == 1:
+                    add(buf, t, clap(), 0.20 * gain)
+                else:
+                    add(buf, t, kick(), 0.26 * gain if style == "sway_party" else 0.16 * gain)
+                if style == "sway_party":
+                    add(buf, t + 2 * beat / 3, tambourine(), 0.08 * gain)
+                    add(buf, t, shaker_hit(seed=3), 0.06 * gain)
+        elif style in ("light", "clap", "party"):
             add(buf, t + beat / 2, shaker_hit(), 0.09 * gain)
             if style == "light":
                 if pos % 2 == 1:

@@ -15,6 +15,7 @@ from PIL import Image
 from . import draw as D
 from . import emoji as E
 from . import schedule as SCH
+from . import vibe as VB
 from . import vocab as V
 from .draw import Canvas, SS, INK, clamp, lerp, pop, darker, mix
 
@@ -32,7 +33,8 @@ class Layout:
         if self.v:
             self.w, self.h = 720, 1280
             self.sx0, self.sy0, self.sx1, self.sy1 = 50, 190, 650, 850
-            self.bibi = (112, 1062, 0.56)
+            self.bibi = (112, 1060, 0.60)
+            self.friends = ((262, 1080, 0.46), (420, 1082, 0.43), (585, 1046, 0.50))   # Pip, Mo, Lila: (x, y, scale)
             self.cap_bottom, self.cap_w, self.cap_size = 988, 600, 38
             self.chip = (360, 92)
             self.ground = 1110
@@ -40,7 +42,8 @@ class Layout:
         else:
             self.w, self.h = 1280, 720
             self.sx0, self.sy0, self.sx1, self.sy1 = 270, 85, 1240, 585
-            self.bibi = (140, 535, 0.9)
+            self.bibi = (132, 452, 0.95)
+            self.friends = ((66, 588, 0.50), (206, 592, 0.47), (122, 232, 0.55))
             self.cap_bottom, self.cap_w, self.cap_size = 708, 1120, 40
             self.chip = (150, 46)
             self.ground = 612
@@ -98,6 +101,18 @@ def background(L, theme):
         c.ellipse(rng.uniform(0, w), rng.uniform(g - 30, h - 8), 5, 5, fill=rng.choice(th["dots"]))
     _bg[key] = c.img
     return c.img
+
+
+_LIVE = {"t": None}      # time of the frame render_frame is drawing (None for stills such as the thumbnails: nothing sways there)
+
+
+def idle(cx, cy, size):
+    """The gentle float (dy, in px) and wobble (degrees) of a picture that sits on the screen."""
+    t = _LIVE["t"]
+    if t is None:
+        return 0.0, 0.0
+    ph = cx * 0.011 + cy * 0.017
+    return math.sin(t * 1.9 + ph) * (1.5 + size * 0.014), math.sin(t * 1.3 + ph * 1.7) * 1.6
 
 
 def decor(c, L, theme, t):
@@ -169,6 +184,9 @@ def icon(c, ref, cx, cy, size, ring="#FFB400", plate_on=True, p=1.0, angle=0.0, 
     """Draws an emoji / colour dot / number / letter / shape inside an optional sticker plate."""
     if p <= 0.02:
         return
+    dy, da = idle(cx, cy, size)
+    k = clamp(p)
+    cy, angle = cy + dy * k, angle + da * k
     s = size * min(p, 1.15)
     if plate_on:
         plate(c, cx, cy, s, ring)
@@ -194,6 +212,17 @@ def burst(c, cx, cy, t, t0, n=8, r0=120, r1=260, size=18, dur=0.9):
         a = 2 * math.pi * k / n + 0.4
         rr = lerp(r0, r1, 1 - (1 - u) ** 2)
         D.star(c, cx + math.cos(a) * rr, cy + math.sin(a) * rr, size * (1 - u) + 3, cols[k % len(cols)], ang=u * 200 + k * 20)
+
+
+def hero_fx(c, cx, cy, size, t, col, p, tint=0.62):
+    """Light rays that slowly turn behind a big picture, and little stars that circle it once it has popped in."""
+    if p <= 0.05:
+        return
+    k = min(p, 1.1)
+    cy += idle(cx, cy, size)[0] * clamp(p)
+    VB.rays(c, cx, cy, size * 0.42 * k, size * 0.80 * k, t, mix(col, "#FFFFFF", tint), n=12)
+    if p > 0.9:
+        VB.orbit(c, cx, cy, size * 0.60, t, n=5, size=max(9.0, size * 0.036))
 
 
 def bubble(c, text, cx, cy, size, color, p, xmin, xmax):
@@ -269,6 +298,34 @@ def bibi_at(X, c, x, y, k):
            mouth_amt=X.amp)
 
 
+def jumps(X, seg):
+    """Every spoken line of the segment sets the next one of the three friends hopping (0..1 = the hop's height)."""
+    out, n = [0.0, 0.0, 0.0], 0
+    for cu in seg.cues:
+        if not cu.text:
+            continue
+        u = (X.t - cu.t) / 0.6
+        if 0.0 <= u <= 1.0:
+            out[n % 3] = math.sin(u * math.pi)
+        n += 1
+    return out
+
+
+def friends(X, c, seg, spots=None):
+    """Bibi's friends Pip, Mo and Lila stand around the screen and hop for joy whenever a new picture is named."""
+    L, t = X.L, X.t
+    hp = jumps(X, seg)
+    spots = spots or L.friends
+    (px, py, pk), (mx, my, mk), (lx, ly, lk) = spots
+    look = (5, -2) if not L.v else (0, -4)
+    pm = "open" if hp[0] > 0.05 else "smile"
+    mm = "open" if hp[1] > 0.05 else "smile"
+    lm = "open" if hp[2] > 0.05 else "smile"
+    D.pip(c, px + math.sin(t * 1.3) * 5 * pk, py - hp[0] * 70 * pk, pk, t, pm, look)
+    D.mo(c, mx + math.sin(t * 0.7 + 1.0) * 6 * mk, my - hp[1] * 60 * mk, mk, t, mm, look)
+    D.lila(c, lx + math.sin(t * 0.9) * 34 * lk, ly + math.sin(t * 1.4 + 0.6) * 20 * lk - hp[2] * 54 * lk, lk, t, lm, look)
+
+
 # ------------------------------------------------------------------------------ renderers
 def r_title(X, c, seg):
     L, d, t = X.L, seg.data, X.t
@@ -282,7 +339,8 @@ def r_title(X, c, seg):
         t0 = X.lesson.grid0 + k * X.beat
         dy = -16 * max(0.0, math.sin(clamp((t - t0) / 0.5) * math.pi))
         icon(c, code, x0 + k * gap, L.scy + 70 + dy, 140, RINGS[k % len(RINGS)], p=pop(t, t0, 0.45))
-    bibi_at(X, c, 150, 465, 1.25)
+    bibi_at(X, c, 140, 400, 1.15)
+    friends(X, c, seg, None if L.v else ((66, 540, 0.50), (210, 546, 0.47), (126, 188, 0.55)))
 
 
 def r_card(X, c, seg):
@@ -295,6 +353,7 @@ def r_card(X, c, seg):
     ang = 0.0
     if snd_i >= 0 and seg.cues[snd_i].t <= t < seg.cues[snd_i].t + seg.cues[snd_i].slot:
         ang = 7 * math.sin((t - seg.cues[snd_i].t) * 13)
+    hero_fx(c, L.scx, cy, size, t, ring, p)
     icon(c, d["code"], L.scx, cy, size * X.pulse, ring, p=p, angle=ang)
     burst(c, L.scx, cy, t, seg.cues[0].t, n=8, r0=size * 0.55, r1=size * 0.85)
     label(c, cap(d["word"]), L.scx, cy + size / 2 + (62 if not L.v else 70), 100 if not L.v else 118, ring, p, L.sw - 60)
@@ -332,6 +391,7 @@ def r_count(X, c, seg):
         label(c, total.text.rstrip("!").strip() + "!", L.scx + (0 if L.v else 130), L.sy1 - 30, 66 if not L.v else 60,
               "#3E8EDE", pop(t, total.t, 0.5), L.sw - 60)
         burst(c, L.scx + (0 if L.v else 130), L.scy, t, total.t, n=10, r0=150, r1=330, size=20, dur=1.1)
+        VB.confetti(c, L.w, L.h, t, total.t, dur=3.0, seed=2)
 
 
 def r_number(X, c, seg):
@@ -347,6 +407,7 @@ def r_number(X, c, seg):
         cx, cy, cw, ch = L.sx0 + 190, L.scy - 30, 300, 360
         region = (L.sx0 + 390, L.sy0 + 5, L.sx1, L.sy1 - 20)
     s = min(p, 1.1)
+    hero_fx(c, cx, cy, ch * 1.1, t, col, p)
     if p > 0.02:
         c.rrect(cx - cw / 2 * s, cy - ch / 2 * s, cx + cw / 2 * s, cy + ch / 2 * s, 46, fill=col, outline="#FFFFFF", width=10)
         c.text(cx, cy + 6, str(n), ch * 0.78 * s * (1.0 if n < 10 else 0.72), "#FFFFFF", stroke=8, stroke_fill=darker(col, 0.45))
@@ -378,6 +439,7 @@ def r_color(X, c, seg):
         bx, by, br = L.sx0 + 255, L.scy - 10, 205
         slots = [(L.sx0 + 640, L.scy - 140), (L.sx0 + 860, L.scy - 140), (L.sx0 + 640, L.scy + 120), (L.sx0 + 860, L.scy + 120)]
         isz = 185
+    hero_fx(c, bx, by, br * 2.0, t, hexc, p)
     if p > 0.02:
         splash(c, bx, by, br * min(p, 1.1) * X.pulse, hexc)
         c.text(bx, by, cap(d["name"]), br * 0.62 * min(p, 1.1), "#FFFFFF", stroke=max(5, br * 0.05), stroke_fill=darker(hexc, 0.5))
@@ -405,6 +467,7 @@ def r_letter(X, c, seg):
         c.rrect(cx - cw / 2 * s, cy - ch / 2 * s, cx + cw / 2 * s, cy + ch / 2 * s, 56, fill=col, outline="#FFFFFF", width=10)
         c.text(cx, cy + 8, d["L"] + d["L"].lower(), ch * 0.62 * min(p, 1.1), "#FFFFFF", stroke=8, stroke_fill=darker(col, 0.45))
     p1 = X.cue_p(seg, 1, 0.5)
+    hero_fx(c, ex, ey, esz, t, col, p1)
     icon(c, d["code"], ex, ey, esz, col, p=p1)
     burst(c, ex, ey, t, seg.cues[1].t, n=8, r0=esz * 0.6, r1=esz * 0.95)
     label(c, cap(d["word"]), ex, ey + esz / 2 + 52, 88, col, p1, L.sw * 0.5 if not L.v else L.sw - 60)
@@ -424,6 +487,7 @@ def r_shape(X, c, seg):
         lx, ly = L.sx0 + 255, L.scy + 195
         slots = [(L.sx0 + 700, L.sy0 + 90), (L.sx0 + 700, L.sy0 + 255), (L.sx0 + 700, L.sy0 + 420)]
         isz, vert = 150, True
+    hero_fx(c, sx, sy, ssz * 1.05, t, hexc, p)
     if p > 0.02:
         draw_shape(c, d["name"], sx, sy, ssz * min(p, 1.1) * X.pulse, hexc)
     burst(c, sx, sy, t, seg.cues[0].t, n=8, r0=ssz * 0.6, r1=ssz * 0.95)
@@ -455,6 +519,7 @@ def r_pair(X, c, seg):
     for k, (word, code, sz, pos, ly) in enumerate(((d["a"], d["ca"], big, pa, la), (d["b"], d["cb"], small, pb, lb))):
         p = X.cue_p(seg, k, 0.5)
         col = RINGS[(k * 3 + 1) % len(RINGS)]
+        hero_fx(c, pos[0], pos[1], sz, t, col, p)
         icon(c, code, pos[0], pos[1], sz * (X.pulse if p > 0.9 else 1.0), col, p=p)
         label(c, cap(word), pos[0], ly, 90, col, p, L.sw * 0.45 if not L.v else L.sw - 60)
         burst(c, pos[0], pos[1], t, seg.cues[k].t, n=8, r0=sz * 0.6, r1=sz * 0.9)
@@ -471,6 +536,7 @@ def r_phrase(X, c, seg):
         ex, ey, esz = L.sx0 + 118, L.scy - 40, 220
         bx, by, bw, bh = L.sx0 + 615, L.scy - 40, 690, 270
         ty = L.scy + 150
+    hero_fx(c, ex, ey, esz, t, "#FFB400", pc)
     icon(c, d["code"], ex, ey, esz, "#FFB400", p=pc)
     p1 = X.cue_p(seg, 1, 0.45)
     spoken = [cu for cu in seg.cues if cu.tag == "phrase"]
@@ -500,6 +566,9 @@ def r_review(X, c, seg):
     pos, cell = grid_pos(n, region, cols)
     size = min(cell * 0.86, 210)
     cur = X.n_started(seg, "item") - 1
+    if 0 <= cur < n:
+        x, y = pos[cur]
+        VB.rays(c, x, y, size * 0.5, size * 0.98, t, mix(GREEN, "#FFFFFF", 0.62), n=12)
     for i, ((lab, ref), (x, y)) in enumerate(zip(items, pos)):
         p = pop(t, seg.v0 + 0.05 + i * 0.07, 0.4)
         on = i == cur
@@ -526,6 +595,9 @@ def r_quiz(X, c, seg):
     osz = (190 if show else 230) if not L.v else 190
     gap = 300 if not L.v else 215
     answered = X.started(seg, 2)
+    if answered:
+        ax = L.scx + (ans - (len(opts) - 1) / 2) * gap
+        VB.rays(c, ax, oy, osz * 0.6, osz * 1.15, t, mix(GREEN, "#FFFFFF", 0.62), n=12)
     for i, (lab, ref) in enumerate(opts):
         x = L.scx + (i - (len(opts) - 1) / 2) * gap
         p = pop(t, q.t + 0.15 + 0.12 * i, 0.45)
@@ -539,10 +611,11 @@ def r_quiz(X, c, seg):
                 s = osz * 0.78
         icon(c, ref, x, oy, s, ring, p=p)
         if answered and i == ans:
-            c.arc(x, oy, s / 2 + 10, s / 2 + 10, 0, 360, GREEN, 8)
+            c.arc(x, oy + idle(x, oy, s)[0] * clamp(p), s / 2 + 10, s / 2 + 10, 0, 360, GREEN, 8)
             if ref[:2] not in ("n:", "L:", "S:") and not ref.startswith("#"):
                 label(c, cap(lab), x, oy + s / 2 + 34, 44, GREEN, 1.0, 280)
             burst(c, x, oy, t, seg.cues[2].t, n=10, r0=s * 0.6, r1=s * 1.0, size=18, dur=1.0)
+            VB.confetti(c, L.w, L.h, t, seg.cues[2].t, dur=3.0, seed=5)
     k_think = 1
     cu = seg.cues[k_think]
     if cu.t <= t < cu.t + cu.slot:
@@ -575,6 +648,7 @@ def r_outro(X, c, seg):
     for k in range(6):
         u = ((t - seg.t0) * 0.35 + k / 6.0) % 1.0
         D.heart(c, cx + math.sin(k * 2.3 + t * 1.3) * L.w * 0.38, L.sy1 - u * 520, 16 + 6 * math.sin(k), "#FF5C8A")
+    VB.confetti(c, L.w, L.h, t, seg.t0 + 0.2, dur=4.2, n=80, seed=3)
 
 
 def r_cta(X, c, seg):
@@ -597,6 +671,7 @@ def r_cta(X, c, seg):
     for k in range(6):
         u = ((X.t - seg.t0) * 0.35 + k / 6.0) % 1.0
         D.heart(c, L.w / 2 + math.sin(k * 2.3 + X.t * 1.3) * L.w * 0.38, L.sy1 - u * 520, 16 + 6 * math.sin(k), "#FF5C8A")
+    VB.confetti(c, L.w, L.h, X.t, seg.t0 + t_sub, dur=2.6, n=48, seed=4)        # a shower when the pointer presses Subscribe
 
 
 RENDERERS = {"title": r_title, "card": r_card, "count": r_count, "number": r_number, "color": r_color,
@@ -658,24 +733,43 @@ def find_seg(lesson, t):
     return segs[-1]
 
 
-def render_frame(lesson, t):
-    L = layout(lesson.fmt)
-    seg = find_seg(lesson, t)
+TRANS = 0.5          # seconds of the shaped "wipe" that opens every new segment
+WIPES = ("circle", "star", "heart")
+
+
+def draw_scene(lesson, seg, t, L, with_caption=True):
     img = background(L, lesson.theme).copy()
     c = Canvas(img, w=L.w, h=L.h)
     decor(c, L, lesson.theme, t)
+    VB.ambient(c, L, lesson.theme, t)
     chip(c, L)
     X = Ctx(lesson, L, t)
     RENDERERS[seg.kind](X, c, seg)
     if seg.kind not in OWN_BIBI:
         bx, by, bk = L.bibi
         bibi_at(X, c, bx, by, bk)
-    # caption of the active cue
-    for cu in seg.cues:
-        if cu.tag in CAPTION_TAGS and cu.shown and cu.t <= t < cu.t + cu.slot:
-            caption(c, L, cu.shown, (t - cu.t) / max(0.2, cu.dur))
-            break
-    out = c.final()
+        friends(X, c, seg)
+    if with_caption:                                           # caption of the active cue
+        for cu in seg.cues:
+            if cu.tag in CAPTION_TAGS and cu.shown and cu.t <= t < cu.t + cu.slot:
+                caption(c, L, cu.shown, (t - cu.t) / max(0.2, cu.dur))
+                break
+    return c.final()
+
+
+def render_frame(lesson, t):
+    L = layout(lesson.fmt)
+    seg = find_seg(lesson, t)
+    _LIVE["t"] = t
+    try:
+        out = draw_scene(lesson, seg, t, L)
+        k = lesson.segs.index(seg)
+        u = (t - seg.t0) / TRANS
+        if k > 0 and 0.0 <= u < 1.0:                           # the new pictures are revealed through a growing circle / star / heart
+            old = draw_scene(lesson, lesson.segs[k - 1], t, L, with_caption=False)
+            out = VB.wipe(out, old, u, WIPES[k % len(WIPES)], L.scx, L.scy)
+    finally:
+        _LIVE["t"] = None
     if t < 0.4:
         out = Image.blend(out, Image.new("RGB", out.size, "white"), 1 - t / 0.4)
     tail = lesson.duration - t

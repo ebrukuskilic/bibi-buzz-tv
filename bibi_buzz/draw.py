@@ -350,7 +350,7 @@ def bibi(c, x, y, k=1.0, t=0.0, mood="smile", look=(0, 0), flower_color=None, fl
         mini_flower(c, x + 40 * k, y - 66 * k, 26 * k * flower_pop, flower_color, t)
 
 
-def pip(c, x, y, k=1.0, t=0.0, mood="smile", look=(0, 0)):
+def pip(c, x, y, k=1.0, t=0.0, mood="smile", look=(0, 0), mouth_amt=None):
     """Pip the cheerful ladybug."""
     for s in (-1, 1):
         c.ellipse(x + s * 36 * k, y + 62 * k, 17 * k, 9 * k, fill="#2B2B2B")
@@ -367,10 +367,10 @@ def pip(c, x, y, k=1.0, t=0.0, mood="smile", look=(0, 0)):
     c.ellipse(x, y - 34 * k, 48 * k, 36 * k, fill="#2B2B2B", outline=INK, width=3.5 * k)
     eyes(c, x, y - 38 * k, k, 19, 13, 15, look, blinking(t, 3.1, 1.2))
     cheeks(c, x, y - 22 * k, k, 36)
-    mouth(c, x, y - 28 * k, k * 0.85, mood, t, color="#FFFFFF")
+    mouth(c, x, y - 28 * k, k * 0.85, mood, t, color="#FFFFFF", amt=mouth_amt)
 
 
-def mo(c, x, y, k=1.0, t=0.0, mood="smile", look=(0, 0)):
+def mo(c, x, y, k=1.0, t=0.0, mood="smile", look=(0, 0), mouth_amt=None):
     """Mo the gentle turtle with round glasses."""
     bob = math.sin(t * 2.2) * 3 * k
     c.ellipse(x, y - 14 * k, 92 * k, 66 * k, fill="#B9803D")
@@ -395,10 +395,10 @@ def mo(c, x, y, k=1.0, t=0.0, mood="smile", look=(0, 0)):
         c.ellipse(ex, ey, 18 * k, 18 * k, outline=INK, width=3.5 * k)
     c.line([(x - 5 * k, hy - 8 * k), (x + 5 * k, hy - 8 * k)], INK, 3 * k)
     cheeks(c, x, hy + 14 * k, k, 40)
-    mouth(c, x, hy + 8 * k, k * 0.9, mood, t)
+    mouth(c, x, hy + 8 * k, k * 0.9, mood, t, amt=mouth_amt)
 
 
-def lila(c, x, y, k=1.0, t=0.0, mood="smile", look=(0, 0)):
+def lila(c, x, y, k=1.0, t=0.0, mood="smile", look=(0, 0), mouth_amt=None):
     """Lila the sweet butterfly."""
     y = y + math.sin(t * 2.6 + 1) * 7 * k
     flap = 0.62 + 0.38 * abs(math.sin(t * 5))
@@ -417,7 +417,7 @@ def lila(c, x, y, k=1.0, t=0.0, mood="smile", look=(0, 0)):
     c.ellipse(x, y - 40 * k, 34 * k, 32 * k, fill="#FFE0CF", outline=INK, width=3 * k)
     eyes(c, x, y - 44 * k, k, 13, 9, 11, look, blinking(t, 3.7, 0.9), lashes=True)
     cheeks(c, x, y - 30 * k, k, 22)
-    mouth(c, x, y - 34 * k, k * 0.6, mood, t)
+    mouth(c, x, y - 34 * k, k * 0.6, mood, t, amt=mouth_amt)
     mini_flower(c, x + 24 * k, y - 66 * k, 16 * k, "#FF6FAE", t, petals=6)
 
 

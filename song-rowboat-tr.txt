@@ -1,0 +1,201 @@
+song rowboat (tr)  124.00 s  bpm 60  shift -6 semitones  voice ('tr-TR-EmelNeural', '-10%', '+0Hz')
+sync problems: none
+syllables with a pitch: 153, without: 0 | median error +0 cents, mean |error| 1 cents, within 50 cents: 100%, within 100 cents: 100%
+
+section   ln  syllable   note  exp Hz  got Hz   cents   voiced
+Verse 1 a L1  Kü         F#3    185.0   185.0      -0    87%
+Verse 1 a L1  rek        F#3    185.0   185.1      +1    78%
+Verse 1 a L1  çek,       F#3    185.0   184.8      -2    93%
+Verse 1 a L1  kü         F#3    185.0   185.0      +0    90%
+Verse 1 a L1  rek        G#3    207.7   207.6      -1    59%
+Verse 1 a L1  çek,       A#3    233.1   233.2      +1    93%
+Verse 1 a L2  Su         A#3    233.1   233.4      +3    90%
+Verse 1 a L2  da         G#3    207.7   207.8      +1    68%
+Verse 1 a L2  u          A#3    233.1   233.3      +2    86%
+Verse 1 a L2  sul        B3     246.9   247.0      +0    68%
+Verse 1 a L2  ca.        C#4    277.2   277.3      +1    96%
+Verse 1 b L3  Ne         F#4    370.0   369.5      -2    36%
+Verse 1 b L3  şey        F#4    370.0   369.8      -1    81%
+Verse 1 b L3  le         F#4    370.0   369.7      -1    63%
+Verse 1 b L3  ne         C#4    277.2   276.9      -2    36%
+Verse 1 b L3  şey        C#4    277.2   277.2      +0    81%
+Verse 1 b L3  le         C#4    277.2   277.5      +2    63%
+Verse 1 b L3  ne         A#3    233.1   232.9      -1    40%
+Verse 1 b L3  şey        A#3    233.1   233.1      -0    81%
+Verse 1 b L3  le         A#3    233.1   233.0      -1    68%
+Verse 1 b L3  ne         F#3    185.0   184.8      -2    40%
+Verse 1 b L3  şey        F#3    185.0   184.9      -1    81%
+Verse 1 b L3  le,        F#3    185.0   185.2      +2    72%
+Verse 1 b L4  Ha         C#4    277.2   277.2      -0    90%
+Verse 1 b L4  yat        B3     246.9   246.2      -5    18%
+Verse 1 b L4  bir        A#3    233.1   233.1      -0    72%
+Verse 1 b L4  rü         G#3    207.7   207.6      -1    81%
+Verse 1 b L4  ya.        F#3    185.0   185.1      +1    96%
+Verse 2 a L1  Kü         F#3    185.0   185.0      -0    87%
+Verse 2 a L1  rek        F#3    185.0   185.1      +1    78%
+Verse 2 a L1  çek,       F#3    185.0   184.8      -2    93%
+Verse 2 a L1  kü         F#3    185.0   185.0      +0    90%
+Verse 2 a L1  rek        G#3    207.7   207.6      -1    59%
+Verse 2 a L1  çek,       A#3    233.1   233.2      +1    93%
+Verse 2 a L2  Su         A#3    233.1   233.4      +3    90%
+Verse 2 a L2  da         G#3    207.7   207.8      +1    68%
+Verse 2 a L2  u          A#3    233.1   233.3      +2    86%
+Verse 2 a L2  sul        B3     246.9   247.0      +0    68%
+Verse 2 a L2  ca.        C#4    277.2   277.3      +1    96%
+Verse 2 b S0  Vak        F#4    370.0   369.9      -0    57%
+Verse 2 b S0  Vak        F#4    370.0   370.0      +0    57%
+Verse 2 b S0  Vak        C#4    277.2   277.2      +0    57%
+Verse 2 b S0  Vak        C#4    277.2   277.3      +1    57%
+Verse 2 b S0  Vak        A#3    233.1   233.0      -0    57%
+Verse 2 b S0  Vak        A#3    233.1   233.0      -1    57%
+Verse 2 b S0  Vak        F#3    185.0   185.0      +0    57%
+Verse 2 b S0  Vak!       F#3    185.0   185.0      -0    66%
+Verse 2 b H0  Mer        C#4    277.2   277.3      +0    90%
+Verse 2 b H0  ha         B3     246.9   246.7      -2    81%
+Verse 2 b H0  ba         A#3    233.1   233.2      +1    90%
+Verse 2 b H0  ör         G#3    207.7   207.6      -0    81%
+Verse 2 b H0  dek!       F#3    185.0   185.1      +1    96%
+Verse 3 a L1  Kü         F#3    185.0   185.0      -0    87%
+Verse 3 a L1  rek        F#3    185.0   185.1      +1    78%
+Verse 3 a L1  çek,       F#3    185.0   184.8      -2    93%
+Verse 3 a L1  kü         F#3    185.0   185.0      +0    90%
+Verse 3 a L1  rek        G#3    207.7   207.6      -1    59%
+Verse 3 a L1  çek,       A#3    233.1   233.2      +1    93%
+Verse 3 a L2  Su         A#3    233.1   233.4      +3    90%
+Verse 3 a L2  da         G#3    207.7   207.8      +1    68%
+Verse 3 a L2  u          A#3    233.1   233.3      +2    86%
+Verse 3 a L2  sul        B3     246.9   247.0      +0    68%
+Verse 3 a L2  ca.        C#4    277.2   277.3      +1    96%
+Verse 3 b S1  Vrak       F#4    370.0   370.4      +2    72%
+Verse 3 b S1  Vrak       F#4    370.0   370.3      +2    72%
+Verse 3 b S1  Vrak       C#4    277.2   277.6      +3    72%
+Verse 3 b S1  Vrak       C#4    277.2   277.6      +2    72%
+Verse 3 b S1  Vrak       A#3    233.1   233.5      +3    69%
+Verse 3 b S1  Vrak       A#3    233.1   233.5      +3    69%
+Verse 3 b S1  Vrak       F#3    185.0   185.2      +2    75%
+Verse 3 b S1  Vrak!      F#3    185.0   185.2      +2    84%
+Verse 3 b H1  Mer        C#4    277.2   277.1      -0    81%
+Verse 3 b H1  ha         C#4    277.2   276.9      -2    77%
+Verse 3 b H1  ba         B3     246.9   247.1      +1    68%
+Verse 3 b H1  kur        A#3    233.1   233.2      +1    90%
+Verse 3 b H1  ba         G#3    207.7   207.6      -1    81%
+Verse 3 b H1  ğa!        F#3    185.0   185.1      +1    96%
+Verse 4 a L1  Kü         F#3    185.0   185.0      -0    87%
+Verse 4 a L1  rek        F#3    185.0   185.1      +1    78%
+Verse 4 a L1  çek,       F#3    185.0   184.8      -2    93%
+Verse 4 a L1  kü         F#3    185.0   185.0      +0    90%
+Verse 4 a L1  rek        G#3    207.7   207.6      -1    59%
+Verse 4 a L1  çek,       A#3    233.1   233.2      +1    93%
+Verse 4 a L2  Su         A#3    233.1   233.4      +3    90%
+Verse 4 a L2  da         G#3    207.7   207.8      +1    68%
+Verse 4 a L2  u          A#3    233.1   233.3      +2    86%
+Verse 4 a L2  sul        B3     246.9   247.0      +0    68%
+Verse 4 a L2  ca.        C#4    277.2   277.3      +1    96%
+Verse 4 b S2  Blup       F#4    370.0   370.5      +3    78%
+Verse 4 b S2  Blup       F#4    370.0   370.4      +2    78%
+Verse 4 b S2  Blup       C#4    277.2   277.4      +1    78%
+Verse 4 b S2  Blup       C#4    277.2   277.3      +1    78%
+Verse 4 b S2  Blup       A#3    233.1   233.5      +3    75%
+Verse 4 b S2  Blup       A#3    233.1   233.4      +2    75%
+Verse 4 b S2  Blup       F#3    185.0   185.2      +2    78%
+Verse 4 b S2  Blup!      F#3    185.0   185.1      +1    87%
+Verse 4 b H2  Mer        C#4    277.2   277.3      +0    90%
+Verse 4 b H2  ha         B3     246.9   246.7      -2    81%
+Verse 4 b H2  ba         A#3    233.1   233.2      +1    88%
+Verse 4 b H2  ba         G#3    207.7   207.5      -1    81%
+Verse 4 b H2  lık!       F#3    185.0   185.3      +3    96%
+Verse 5 a L1  Kü         F#3    185.0   185.0      -0    87%
+Verse 5 a L1  rek        F#3    185.0   185.1      +1    78%
+Verse 5 a L1  çek,       F#3    185.0   184.8      -2    93%
+Verse 5 a L1  kü         F#3    185.0   185.0      +0    90%
+Verse 5 a L1  rek        G#3    207.7   207.6      -1    59%
+Verse 5 a L1  çek,       A#3    233.1   233.2      +1    93%
+Verse 5 a L2  Su         A#3    233.1   233.4      +3    90%
+Verse 5 a L2  da         G#3    207.7   207.8      +1    68%
+Verse 5 a L2  u          A#3    233.1   233.3      +2    86%
+Verse 5 a L2  sul        B3     246.9   247.0      +0    68%
+Verse 5 a L2  ca.        C#4    277.2   277.3      +1    96%
+Verse 5 b S3  Cik        F#4    370.0   369.7      -2    36%
+Verse 5 b S3  Cik        F#4    370.0   369.6      -2    36%
+Verse 5 b S3  Cik        C#4    277.2   277.2      -0    39%
+Verse 5 b S3  Cik        C#4    277.2   277.2      +0    39%
+Verse 5 b S3  Cik        A#3    233.1   233.0      -1    39%
+Verse 5 b S3  Cik        A#3    233.1   233.0      -0    39%
+Verse 5 b S3  Cik        F#3    185.0   184.8      -1    39%
+Verse 5 b S3  Cik!       F#3    185.0   184.9      -1    60%
+Verse 5 b H3  Mer        C#4    277.2   277.3      +0    90%
+Verse 5 b H3  ha         B3     246.9   246.7      -2    81%
+Verse 5 b H3  ba         A#3    233.1   233.2      +1    90%
+Verse 5 b H3  ku         G#3    207.7   207.6      -0    50%
+Verse 5 b H3  şum!       F#3    185.0   185.2      +2    96%
+Verse 6 a L1  Kü         F#3    185.0   185.0      -0    87%
+Verse 6 a L1  rek        F#3    185.0   185.1      +1    78%
+Verse 6 a L1  çek,       F#3    185.0   184.8      -2    93%
+Verse 6 a L1  kü         F#3    185.0   185.0      +0    90%
+Verse 6 a L1  rek        G#3    207.7   207.6      -1    59%
+Verse 6 a L1  çek,       A#3    233.1   233.2      +1    93%
+Verse 6 a L2  Su         A#3    233.1   233.4      +3    90%
+Verse 6 a L2  da         G#3    207.7   207.8      +1    68%
+Verse 6 a L2  u          A#3    233.1   233.3      +2    86%
+Verse 6 a L2  sul        B3     246.9   247.0      +0    68%
+Verse 6 a L2  ca.        C#4    277.2   277.3      +1    96%
+Verse 6 b L3  Ne         F#4    370.0   369.5      -2    36%
+Verse 6 b L3  şey        F#4    370.0   369.8      -1    81%
+Verse 6 b L3  le         F#4    370.0   369.7      -1    63%
+Verse 6 b L3  ne         C#4    277.2   276.9      -2    36%
+Verse 6 b L3  şey        C#4    277.2   277.2      +0    81%
+Verse 6 b L3  le         C#4    277.2   277.5      +2    63%
+Verse 6 b L3  ne         A#3    233.1   232.9      -1    40%
+Verse 6 b L3  şey        A#3    233.1   233.1      -0    81%
+Verse 6 b L3  le         A#3    233.1   233.0      -1    68%
+Verse 6 b L3  ne         F#3    185.0   184.8      -2    40%
+Verse 6 b L3  şey        F#3    185.0   184.9      -1    81%
+Verse 6 b L3  le,        F#3    185.0   185.2      +2    72%
+Verse 6 b L4  Ha         C#4    277.2   277.2      -0    90%
+Verse 6 b L4  yat        B3     246.9   246.2      -5    18%
+Verse 6 b L4  bir        A#3    233.1   233.1      -0    72%
+Verse 6 b L4  rü         G#3    207.7   207.6      -1    81%
+Verse 6 b L4  ya.        F#3    185.0   185.1      +1    96%
+
+line Verse 1 a L1  expected    4.00 ..    8.00   sound    3.98 ..    7.97
+line Verse 1 a L2  expected    8.00 ..   12.00   sound    7.89 ..   11.97
+line Verse 1 b L3  expected   12.00 ..   16.00   sound   11.96 ..   15.97
+line Verse 1 b L4  expected   16.00 ..   20.00   sound   15.98 ..   19.97
+line Verse 2 a L1  expected   20.00 ..   24.00   sound   19.98 ..   23.97
+line Verse 2 a L2  expected   24.00 ..   28.00   sound   23.89 ..   27.97
+line Verse 2 b S0  expected   28.00 ..   32.00   sound   27.94 ..   31.97
+line Verse 2 b H0  expected   32.00 ..   36.00   sound   31.96 ..   35.97
+line Verse 3 a L1  expected   36.00 ..   40.00   sound   35.98 ..   39.97
+line Verse 3 a L2  expected   40.00 ..   44.00   sound   39.89 ..   43.97
+line Verse 3 b S1  expected   44.00 ..   48.00   sound   43.92 ..   47.97
+line Verse 3 b H1  expected   48.00 ..   52.00   sound   47.96 ..   51.97
+line Verse 4 a L1  expected   52.00 ..   56.00   sound   51.98 ..   55.97
+line Verse 4 a L2  expected   56.00 ..   60.00   sound   55.89 ..   59.97
+line Verse 4 b S2  expected   60.00 ..   64.00   sound   59.93 ..   63.97
+line Verse 4 b H2  expected   64.00 ..   68.00   sound   63.96 ..   67.97
+line Verse 5 a L1  expected   68.00 ..   72.00   sound   67.98 ..   71.97
+line Verse 5 a L2  expected   72.00 ..   76.00   sound   71.89 ..   75.97
+line Verse 5 b S3  expected   76.00 ..   80.00   sound   75.90 ..   79.97
+line Verse 5 b H3  expected   80.00 ..   84.00   sound   79.96 ..   83.97
+line Verse 6 a L1  expected  100.00 ..  104.00   sound   99.98 ..  103.97
+line Verse 6 a L2  expected  104.00 ..  108.00   sound  103.89 ..  107.97
+line Verse 6 b L3  expected  108.00 ..  112.00   sound  107.96 ..  111.97
+line Verse 6 b L4  expected  112.00 ..  116.00   sound  111.98 ..  115.97
+
+{
+ "title": "Kürek Çek, Kürek Çek | Çocuk Şarkısı | Bibi Buzz TV",
+ "description": "Bibi, Pip, Mo ve Lila ile birlikte söyleyelim! Kürek çek, kürek çek, suda usulca; yolda bir ördeğe, bir kurbağaya, bir balığa ve küçük bir kuşa merhaba diyoruz. Gün doğumundan yıldızlı geceye uzanan yolculukta sözler şarkı söylenirken ekranda yanıyor. Bebekler, küçük çocuklar ve okul öncesi minikler için neşeli, sakin bir çocuk şarkısı.\n\nAbone ol: https://www.youtube.com/channel/UCfiz1ZdIyjFtTYkzFOUqqWQ?sub_confirmation=1\n\nŞarkı sözleri:\nKürek çek, kürek çek,\nSuda usulca.\n\nNeşeyle neşeyle neşeyle neşeyle,\nHayat bir rüya.\n\nVak Vak Vak Vak Vak Vak Vak Vak!\nMerhaba ördek!\n\nVrak Vrak Vrak Vrak Vrak Vrak Vrak Vrak!\nMerhaba kurbağa!\n\nBlup Blup Blup Blup Blup Blup Blup Blup!\nMerhaba balık!\n\nCik Cik Cik Cik Cik Cik Cik Cik!\nMerhaba kuşum!\n\nBibi Buzz TV'de her gün yeni şarkılar, masallar ve öğretici videolar!\nŞarkıları söyleyen sesler metin okuma (TTS) sesleridir. Tüm çizimler ve müzikler Bibi Buzz TV için hazırlanmıştır.\n\n#çocukşarkıları #bebekşarkıları #birliktesöyleyelim #çocukşarkısı #BibiBuzzTV",
+ "tags": [
+  "kürek çek",
+  "row row row your boat türkçe",
+  "çocuk şarkıları",
+  "hayvan sesleri",
+  "bebek şarkıları",
+  "çocuk şarkısı",
+  "ninni",
+  "birlikte söyleyelim",
+  "okul öncesi şarkılar",
+  "türkçe çocuk şarkıları",
+  "Bibi Buzz TV"
+ ]
+}

@@ -286,8 +286,8 @@ def e_kokoro_tr(g2p):
     return fn
 
 
-# ------------------------------------------------------------------------------------------------------------------------ Kokoro-Turkish (a Turkish fine-tune of Kokoro-82M, Apache 2.0: huggingface.co/empiriolabsai/kokoro-turkish)
-KTR_REPO = "empiriolabsai/kokoro-turkish"
+# ------------------------------------------------------------------------------------------------------------------------ Kokoro-Turkish (a Turkish fine-tune of Kokoro-82M, Apache 2.0: huggingface.co/empiriolabsai/canora-turkish, kokoro-turkish until 21 Nov 2026)
+KTR_REPO = "empiriolabsai/canora-turkish"
 KTR_ROLES = {                         # role: (voice = a mix of the two voices of the model, speed, pitch ratio, 'shifted' = the formants move with the pitch: a smaller / bigger person)
     "nar": ({"elif": 1.0}, 0.95, 1.0, "shifted"),
     "mama": ({"elif": 0.7, "emre": 0.3}, 0.93, 0.97, "preserved"),
@@ -323,13 +323,18 @@ def ktr():
         from kokoro import KModel
         from bibi_buzz.g2p_tr import TurkishG2P                # the text-to-sounds module is kept (and was read through) in this repository: no code of the model's page is run
         torch.set_num_threads(os.cpu_count() or 2)
+        from bibi_buzz import ktts as KT0
         try:
-            log("kokoro-turkish files:", list_repo_files(KTR_REPO))
+            log("the files of the Turkish model:", list_repo_files(KT0.TR_REPOS[0]))
         except Exception:
             log("list_repo_files failed", traceback.format_exc()[-200:])
         g2p = TurkishG2P()
-        # only data is downloaded from the model's page: its config (json), its weights (loaded by kokoro with weights_only=True) and the voices (loaded below the same way)
-        net = KModel(repo_id=KTR_REPO, config=hf_hub_download(KTR_REPO, "config.json"), model=hf_hub_download(KTR_REPO, "kokoro-turkish.pth")).eval()
+        # only data is downloaded from the model's page: its config (json), its weights (loaded by kokoro with weights_only=True) and the voices (loaded below the same way);
+        # the page was renamed on 21 Nov 2026 (kokoro-turkish -> canora-turkish, the weights file with it): bibi_buzz.ktts tries the names the model has had
+        repo, config, weights = KT0._tr_fetch()
+        log("the Turkish model comes from", repo)
+        _M["ktr-repo"] = repo
+        net = KModel(repo_id=repo, config=config, model=weights).eval()
         _M["ktr"] = (g2p, net, {})
     return _M["ktr"]
 
@@ -341,7 +346,7 @@ def ktr_style(blend):
     out = None
     for name, w in blend.items():
         if name not in cache:
-            cache[name] = torch.load(hf_hub_download(KTR_REPO, "voices/%s.pt" % name), weights_only=True)
+            cache[name] = torch.load(hf_hub_download(_M.get("ktr-repo", KTR_REPO), "voices/%s.pt" % name), weights_only=True)
         out = cache[name] * w if out is None else out + cache[name] * w
     return out
 

@@ -159,10 +159,11 @@ class Plan:
         return int(self.out[-1])
 
 
-def synth(y, sr, an, marks, plan, unvoiced_hop=0.006, jitter=0.004, seed=1):
+def synth(y, sr, an, marks, plan, unvoiced_hop=0.006, jitter=0.004, seed=1, shimmer=0.0):
     """TD-PSOLA of `y` according to `plan`; returns the output signal (float64).  A voiced grain is interpolated between the two
     pitch periods that surround the input position (a held vowel changes smoothly instead of stepping from period to period), and
-    the output periods get a tiny random jitter like a real voice (no buzzing comb of identical periods)."""
+    the output periods get a tiny random jitter like a real voice (no buzzing comb of identical periods), and with `shimmer` a tiny random
+    change of loudness from period to period."""
     rng = np.random.default_rng(seed)
     n_out = plan.length
     out = np.zeros(n_out + 4 * sr // 100)
@@ -215,7 +216,7 @@ def synth(y, sr, an, marks, plan, unvoiced_hop=0.006, jitter=0.004, seed=1):
             if f <= 0:
                 f = sr / Ta
             Pn = sr / f * (1.0 + jitter * (rng.random() * 2 - 1))
-            seg = seg * np.hanning(len(seg)) * (Pn / Ta)
+            seg = seg * np.hanning(len(seg)) * (Pn / Ta) * (1.0 + shimmer * (rng.random() * 2 - 1))
             o = int(round(t)) - half
             i0, i1 = max(o, 0), min(o + len(seg), len(out))
             if i1 > i0:
@@ -267,4 +268,81 @@ def note_curve(notes, sr, glide=0.06, vib_rate=5.4, vib_cents=14.0, vib_delay=0.
             cents += amp * math.sin(2 * math.pi * vib_rate * (td - vib_delay))
         return midi_hz(m + cents / 100.0)
 
+    return f
+
+
+def _smooth01(u):
+    u = min(1.0, max(0.0, u))
+    return u * u * (3 - 2 * u)
+
+
+def human_params(seed=1, vib=1.0, spread=1.0):
+    """How alive one singer is.  Everything that is random comes from the seed (a render can be repeated, and two singers of a choir are never
+    quite the same).  vib scales the vibrato, spread the small mistakes (a note a little flat or sharp, a slow drift, a scoop into a phrase)."""
+    return dict(rng=np.random.default_rng(seed), vib_cents=22.0 * vib, vib_rate=5.5, note_cents=5.0 * spread, drift_cents=7.0 * spread,
+                scoop=1.0 * spread, sag=1.0 * spread, jitter=0.008, shimmer=0.03, glide=0.07, tremolo=0.05 * vib)
+
+
+def note_curve_h(notes, sr, hp):
+    """Like note_curve, but a person sings it: notes: [(start_out_sample, end_out_sample, midi)] -> callable(out_sample) -> Hz, with
+      - a note that is never quite in tune (a few cents flat or sharp), and a slow drift of the whole line,
+      - a scoop from below into the first note of a phrase and a small dip on a repeated note (the second 'twinkle' is a new breath),
+      - a glide into the next note that is a little longer for a leap,
+      - vibrato on the longer notes (late, slow to grow, with its own speed and depth for every note), nothing on the short ones,
+      - a note that ends a phrase sags a little at its end.
+    The callable has .info (one dict per note, in order of the notes: rate, depth, delay, phase) for the tremolo that goes with the vibrato."""
+    rng = hp["rng"]
+    ns = sorted(notes)
+    starts = [s for s, _, _ in ns]
+    info = []
+    for i, (s, e, m) in enumerate(ns):
+        d = (e - s) / sr
+        gap_b = (s - ns[i - 1][1]) / sr if i > 0 else 9.0
+        gap_a = (ns[i + 1][0] - e) / sr if i + 1 < len(ns) else 9.0
+        prev_m = ns[i - 1][2] if i > 0 else None
+        scoop = 0.0
+        if gap_b > 0.14:
+            scoop = float(rng.uniform(35.0, 70.0)) * hp["scoop"]
+        elif prev_m == m and gap_b < 0.12:
+            scoop = float(rng.uniform(6.0, 14.0)) * hp["scoop"]
+        info.append(dict(
+            off=float(np.clip(rng.normal(0.0, hp["note_cents"]), -2.2 * hp["note_cents"], 2.2 * hp["note_cents"])),
+            depth=hp["vib_cents"] * float(np.clip((d - 0.34) / 0.55, 0.0, 1.0)) * float(rng.uniform(0.8, 1.2)),
+            rate=hp["vib_rate"] * float(1.0 + 0.07 * rng.standard_normal()),
+            delay=float(rng.uniform(0.17, 0.30)), phase=float(rng.uniform(0.0, 2.0 * math.pi)),
+            scoop=scoop, sag=(float(rng.uniform(8.0, 22.0)) * hp["sag"] if (gap_a > 0.2 and d >= 0.6) else 0.0), dur=d))
+    t0 = ns[0][0] / sr
+    span = (max(e for _, e, _ in ns) - ns[0][0]) / sr + 2.0
+    k = int(span * 20) + 24
+    z = rng.standard_normal(k)
+    w = 16                                                              # 0.8 s of the 20 Hz noise
+    sm = np.convolve(np.pad(z, (w, w), mode="edge"), np.ones(w) / w, mode="valid")[:k]
+    sm = (sm - sm.mean()) / (sm.std() + 1e-9) * hp["drift_cents"]
+    grid = np.arange(k) / 20.0
+
+    def f(t):
+        i = max(0, bisect.bisect_right(starts, t) - 1)
+        s, e, m = ns[i]
+        nf = info[i]
+        cents = nf["off"] + float(np.interp(t / sr - t0, grid, sm))
+        td = (t - s) / sr
+        if i > 0 and ns[i - 1][2] != m and (s - ns[i - 1][1]) < 0.12 * sr and td < 0.5 * hp["glide"] * (1.0 + 0.12 * min(abs(m - ns[i - 1][2]), 8)):
+            g = hp["glide"] * (1.0 + 0.12 * min(abs(m - ns[i - 1][2]), 8))
+            u = _smooth01(0.5 + td / g)                                 # 0 .. 1 over the glide that straddles the note start
+            cents += (1.0 - u) * 100.0 * (ns[i - 1][2] - m)
+        elif i + 1 < len(ns) and ns[i + 1][2] != m and (ns[i + 1][0] - e) < 0.12 * sr:
+            g = hp["glide"] * (1.0 + 0.12 * min(abs(m - ns[i + 1][2]), 8))
+            if (e - t) / sr < 0.5 * g:
+                u = _smooth01(0.5 - (e - t) / sr / g)
+                cents += u * 100.0 * (ns[i + 1][2] - m)
+        if nf["scoop"] and td < 0.14:
+            cents -= nf["scoop"] * (1.0 - _smooth01((td + 0.03) / 0.17))
+        if nf["sag"]:
+            cents -= nf["sag"] * _smooth01(((e - t) / sr - 0.25) / -0.25)
+        if nf["depth"] > 0.0 and td > nf["delay"]:
+            amp = nf["depth"] * min(1.0, (td - nf["delay"]) / 0.35)
+            cents += amp * math.sin(2.0 * math.pi * nf["rate"] * (td - nf["delay"]) + nf["phase"] + 0.35 * math.sin(2.0 * math.pi * 0.8 * td))
+        return midi_hz(m + cents / 100.0)
+
+    f.info = info
     return f

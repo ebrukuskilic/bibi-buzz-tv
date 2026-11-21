@@ -5,7 +5,9 @@ plus a recipe that dresses its sections with pictures: backdrops, the four frien
 
   build("twinkle", "en") -> a Song (it renders like a tale: story.render / story.make_cover)
 """
-from . import songart  # noqa: F401  (registers the farm backdrops in storyart2.BACKDROPS)
+import re
+
+from . import songart  # noqa: F401  (registers the farm backdrops in storyart2.BACKDROPS and the props of the rainbow sheep)
 from .song import Song
 
 FAMILY = ("bibi", "pip", "mo", "lila")
@@ -426,9 +428,296 @@ def _oldmac(s):
         ("sfx", "ding", {"at": sub_t + 0.05}), ("sfx", "pop", {"at": sub_t}), ("sfx", "sparkle", {"at": sub_t + 0.1})])
 
 
+# ================================================================================================ Baa baa rainbow sheep / Mee mee gökkuşağı koyunu
+# C major, 4/4, the old tune of 'Baa baa black sheep' (it is the tune of 'Twinkle twinkle' too).  The wool of the sheep takes a new colour in every verse:
+#   Verse a   'Baa baa red sheep, have you any wool?'  (at the colour word the wool turns red)  /  'Yes sir, yes sir, four bags full!' (four sacks pop up)
+#   Verse b   'One for Bibi, one for Pip, one for Mo and one for Lila!'  (a sack for each friend, at his name; the friends take turns to be first)
+# After the six colours comes the rainbow: rainbow wool, six sacks, and the six colours are named in the order of the rainbow.
+# Every line is made below: the colour word has one, two (or, in Turkish, three or four) syllables, so the notes of its line are made to fit.
+WOOLS = [      # the colour of the wool, the sky of its verse, and the colour word in English and Turkish ('-' = syllable breaks)
+    dict(wool=songart.RAINBOW6[0], bg="farm_dawn", en="red", tr="kır-mı-zı"),
+    dict(wool=songart.RAINBOW6[1], bg="sunset", en="or-ange", tr="tu-run-cu"),
+    dict(wool=songart.RAINBOW6[2], bg="farm_open", en="yel-low", tr="sa-rı"),
+    dict(wool=songart.RAINBOW6[3], bg="meadow", en="green", tr="ye-şil"),
+    dict(wool=songart.RAINBOW6[4], bg="river", en="blue", tr="ma-vi"),
+    dict(wool=songart.RAINBOW6[5], bg="meadow_dusk", en="pur-ple", tr="mor"),
+]
+RAINBOW_WORD = dict(en="rain-bow", tr="gök-ku-şa-ğı")
+NAMES = {"bibi": dict(en="Bi-bi", tr="Bi-bi'-ye"), "pip": dict(en="Pip", tr="Pip'-e"),             # (in Turkish: 'for Bibi' = Bibi'ye)
+         "mo": dict(en="Mo", tr="Mo'-ya"), "lila": dict(en="Li-la", tr="Li-la'-ya")}
+ORDERS = [("bibi", "pip", "mo", "lila"), ("lila", "mo", "pip", "bibi"), ("bibi", "mo", "pip", "lila"),     # who gets the 1st, 2nd, 3rd and 4th sack in every verse
+          ("lila", "pip", "mo", "bibi"), ("pip", "bibi", "lila", "mo"), ("mo", "lila", "bibi", "pip")]       # (a pair is always a long name and a short one: the lines keep their syllables)
+
+_N_B = "F4 F4 E4 E4 D4 D4 C4:2"
+_N_C7 = "G4 G4 F4 F4 E4 E4 D4:2"
+_N_C8 = "G4 G4 F4 F4 E4 E4 D4 D4"
+_CH_Q, _CH_B, _CH_C = "C:4 F:2 C:2", "F:2 C:2 G:2 C:2", "C:2 F:2 C:2 G:2"
+_SLOT_EN = {1: (1.0,), 2: (0.5, 0.5)}
+_SLOT_TR = {1: (2.0,), 2: (1.0, 1.0), 3: (0.5, 0.5, 1.0), 4: (0.5, 0.5, 0.5, 0.5)}
+
+
+def _slot(pitch, beats):
+    return " ".join("%s:%g" % (pitch, d) for d in beats)
+
+
+def _q_en(nc):
+    """'Baa baa [red] sheep, have you any wool?': the colour word sits on the third beat, split into nc notes."""
+    return "C4 C4 %s G4 A4:0.5 A4:0.5 A4:0.5 A4:0.5 G4:2" % _slot("G4", _SLOT_EN[nc])
+
+
+def _q_tr(nc):
+    """'Mee mee [mavi] koyun, yünün var mı?': the colour word has two beats."""
+    return "C4 C4 %s G4:0.5 G4:0.5 A4:0.5 A4:0.5 G4 G4" % _slot("G4", _SLOT_TR[nc])
+
+
+def _n_syl(word):
+    return len(word.split("-"))
+
+
+def _plain(text):
+    return re.sub(r"[^\w]", "", text.replace("-", "")).lower()
+
+
+def _up(text, lang):
+    """A word in capitals (the Turkish i has a dot: 'mavi' = MAVİ)."""
+    t = text.replace("-", "")
+    return (t.replace("i", "İ") if lang == "tr" else t).upper()
+
+
+def _rs_lines():
+    L = {}
+    for k, w in enumerate(WOOLS):
+        L["Q%d" % k] = dict(en="Baa baa %s sheep, have you a-ny wool?" % w["en"], tr="Mee mee %s ko-yun, yü-nün var mı?" % w["tr"],
+                            notes=_q_en(_n_syl(w["en"])), tr_notes=_q_tr(_n_syl(w["tr"])), chords=_CH_Q)
+        a, b, c_, d = ORDERS[k]
+        L["P%d" % k] = dict(en="One for %s, one for %s," % (NAMES[a]["en"], NAMES[b]["en"]), tr="%s bir, %s bir," % (NAMES[a]["tr"], NAMES[b]["tr"]),
+                            notes=_N_C7, chords=_CH_C)
+        L["S%d" % k] = dict(en="One for %s and one for %s!" % (NAMES[c_]["en"], NAMES[d]["en"]), tr="%s bir, %s bir!" % (NAMES[c_]["tr"], NAMES[d]["tr"]),
+                            notes=_N_C8, tr_notes=_N_C7, chords=_CH_C)
+    L["QR"] = dict(en="Baa baa %s sheep, have you a-ny wool?" % RAINBOW_WORD["en"], tr="Mee mee %s ko-yun, yü-nün var mı?" % RAINBOW_WORD["tr"],
+                   notes=_q_en(2), tr_notes=_q_tr(4), chords=_CH_Q)
+    L["A"] = dict(en="Yes sir, yes sir, four bags full!", tr="Var var, dört çu-val do-lu!", notes=_N_B, chords=_CH_B)
+    L["AR"] = dict(en="Yes sir, yes sir, six bags full!", tr="Var var, al-tı çu-val do-lu!", notes=_N_B, tr_notes="F4 F4 E4 E4 D4 D4 C4 C4", chords=_CH_B)
+    L["PR"] = dict(en="Red and or-ange, yel-low, green,", tr="Kır-mı-zı, tu-run-cu, sa-rı, ye-şil,", notes=_N_C7,
+                   tr_notes="G4:0.5 G4:0.5 G4 F4:0.5 F4:0.5 F4 E4 E4 D4 D4", chords=_CH_C)
+    L["SR"] = dict(en="Blue and pur-ple, what a scene!", tr="Ma-vi ve mor, ne gü-zel renk!", notes=_N_C7, tr_notes=_N_C8, chords=_CH_C)
+    return L
+
+
+_RS_SING = dict(lead="xylo", lead_gain=0.20, chords="strum", chord_gain=1.0, bass_gain=0.75, drums="light")
+_RS_CLAP = dict(lead="xylo", lead_gain=0.20, chords="strum", chord_gain=1.05, bass_gain=0.8, drums="clap", drum_gain=0.85)
+_RS_BOUNCE = dict(lead="flute", lead_gain=0.20, chords="oompah", chord_gain=1.1, bass_gain=0.9, drums="clap", drum_gain=0.9)
+_RS_SOFT = dict(lead="box", lead_gain=0.22, chords="lull", chord_gain=1.0, bass_gain=0.8, drums="none")
+_RS_FINAL = dict(lead="xylo", lead_gain=0.22, chords="oompah", chord_gain=1.15, bass_gain=1.0, drums="party", drum_gain=1.0)
+_RS_DANCE = dict(lead="xylo", lead_gain=0.45, chords="oompah", chord_gain=1.1, bass_gain=0.9, drums="party", drum_gain=1.0)
+_RS_STYLES = [_RS_SING, _RS_CLAP, _RS_BOUNCE, _RS_CLAP, _RS_SOFT, _RS_BOUNCE]                      # the six colour verses
+
+
+def _rs_form():
+    form = [dict(name="Intro", mode="inst", lines=["Q0"], style=_RS_DANCE)]
+    for k in range(len(WOOLS)):
+        form += [dict(name="Verse %d a" % (k + 1), lines=["Q%d" % k, "A"], style=_RS_STYLES[k]),
+                 dict(name="Verse %d b" % (k + 1), lines=["P%d" % k, "S%d" % k], style=_RS_STYLES[k])]
+        if k == 2:
+            form.append(dict(name="Dance", mode="inst", lines=["P0", "S0"], style=_RS_DANCE))
+    form += [dict(name="Final a", lines=["QR", "AR"], style=_RS_FINAL), dict(name="Final b", lines=["PR", "SR"], style=_RS_FINAL),
+             dict(name="Outro", mode="inst", lines=["A"], post=4, style=dict(lead="xylo", lead_gain=0.5, chords="oompah", chord_gain=1.1, bass_gain=0.9,
+                                                                          drums="clap", drum_gain=0.9))]
+    return form
+
+
+def _rs_cover(lang):
+    en = lang == "en"
+    rb = songart.RAINBOW6
+    return dict(bg="meadow_open", title=("BAA BAA", "RAINBOW SHEEP") if en else ("MEE MEE", "GÖKKUŞAĞI KOYUNU"), size=104 if en else 92, gap=106 if en else 98,
+                sub="Sing along with Bibi Buzz TV" if en else "Bibi Buzz TV ile şarkı söyle",
+                props=[("rb", "rainbow", 640, 600, 1.0, dict(grow=1.0, r=300.0, band=15.0)),
+                       ("b1", "wool_bag", 440, 706, 0.95, dict(wool=rb[0], n=0)), ("b2", "wool_bag", 840, 706, 0.95, dict(wool=rb[4], n=0))],
+                actors=[("bibi", "bibi", 130, 708, 1.55, 1, "idle", {}), ("pip", "pip", 320, 714, 1.4, 1, "idle", {}),
+                        ("mo", "mo", 960, 714, 1.4, -1, "idle", {}), ("lila", "lila", 1150, 708, 1.55, -1, "idle", {}),
+                        ("sheep", "sheep", 640, 716, 1.85, 1, "happy", dict(wool=rb))],
+                fx=[])
+
+
+RAINBOWSHEEP = dict(
+    id="rainbowsheep",
+    title={"en": "Baa Baa Rainbow Sheep | Learn Colors | Kids Song & Nursery Rhyme | Bibi Buzz TV",
+           "tr": "Mee Mee Gökkuşağı Koyunu | Renkleri Öğreniyoruz | Çocuk Şarkısı | Bibi Buzz TV"},
+    blurb={
+        "en": "Sing along with Bibi, Pip, Mo and Lila! Baa baa rainbow sheep, have you any wool? Yes sir, yes sir, bags full of red, orange, yellow, green, blue "
+              "and purple wool! Learn the colors of the rainbow and count the sacks of wool, with the words lighting up as we sing. "
+              "A cheerful nursery rhyme for babies, toddlers and preschoolers.",
+        "tr": "Bibi, Pip, Mo ve Lila ile birlikte söyleyelim! Mee mee gökkuşağı koyunu, yünün var mı? Var var, kırmızı, turuncu, sarı, yeşil, mavi ve mor yün dolu çuvallar! "
+              "Gökkuşağının renklerini öğreniyor ve yün çuvallarını sayıyoruz; sözler şarkı söylenirken ekranda yanıyor. "
+              "Bebekler, küçük çocuklar ve okul öncesi minikler için neşeli bir çocuk şarkısı.",
+    },
+    tags={
+        "en": ["baa baa black sheep", "baa baa rainbow sheep", "learn colors", "colors song", "rainbow colors", "nursery rhymes", "kids songs", "sing along",
+               "songs for kids", "toddler songs", "baby songs", "children songs", "Bibi Buzz TV"],
+        "tr": ["mee mee koyun", "gökkuşağı koyunu", "renkleri öğreniyorum", "renkler şarkısı", "gökkuşağı renkleri", "çocuk şarkıları", "bebek şarkıları",
+               "çocuk şarkısı", "birlikte söyleyelim", "okul öncesi şarkılar", "türkçe çocuk şarkıları", "Bibi Buzz TV"],
+    },
+    bpm=100, beats=4, shift={"en": -2, "tr": -5},
+    lines=_rs_lines(),
+    form=_rs_form(),
+    cover={"en": _rs_cover("en"), "tr": _rs_cover("tr")},
+)
+
+_RB_X = {"bibi": 150, "pip": 345, "mo": 935, "lila": 1130}          # where the friends stand beside the sheep
+RB6 = songart.RAINBOW6
+
+
+def _rainbowsheep(s):
+    """The pictures of 'Baa baa rainbow sheep': the intro (the wool of the sheep turns through all the colours), six colour verses (the wool turns, four sacks
+    pop up, a sack for every friend), a dance, the rainbow verse, and the outro."""
+    S, lg, en, beat = s.sections, s.lang, s.lang == "en", s.beat
+    at = {sec["name"]: sec["index"] for sec in S}
+    movers = ALL4 + ("sheep",)
+
+    def flank(sc, k=1.35, y=566):
+        for w, f, d in zip(FAMILY, (1, 1, -1, -1), (-6, 4, 4, -6)):
+            sc.actor(w, w, _RB_X[w], y + d, k, face=f)
+
+    def sheep(sc, wool, x=640, y=566, k=2.0):
+        sc.actor("sheep", "sheep", x, y, k, face=1, wool=wool)
+
+    def turn(col, t, y=410, stars=170):
+        """The wool of the sheep turns into `col` at the time t: a puff of wool, a ring of stars (radius `stars`, 0 = none) and a hop."""
+        out = [("look", "sheep", "wool", col, {"at": t}), ("hop", "sheep", {"at": t}), ("sfx", "sparkle", {"at": t}), _fx("wool_burst", 640, y, t, 1.5, color=col)]
+        if stars:
+            out.append(_fx("sparkle", 640, y, t, 1.2, r=stars, n=9))
+        return out
+
+    def bag(sc, pid, x, y, k, wool, n, show=False):
+        sc.prop(pid, "wool_bag", x, y, k, show=show, wool=wool, n=n)
+
+    def pop(pid, t):
+        return ("show", pid, {"at": max(0.0, t)})
+
+    def notes_fx(sec):
+        return [_fx("notes", 90, 520, 0.0, sec["dur"]), _fx("notes", 1190, 520, 0.7, sec["dur"])]
+
+    # ---- intro: the title card; the white sheep turns red, orange, yellow, green, blue, purple, and last rainbow-coloured
+    sec = S[0]
+    sc = s.scene_for(0, "meadow_open", mood="title", drift=0.0, clouds=False)
+    for w, x, d in zip(FAMILY, (150, 395, 885, 1130), (-8, 2, 2, -8)):
+        sc.actor(w, w, x, 612 + d, 1.2)
+    sheep(sc, "#FFFFFF", 640, 626, 1.12)
+    acts = []
+    for i, w in enumerate(WOOLS):
+        acts += turn(w["wool"], (1 + i) * beat, y=470, stars=0)
+    acts += turn(RB6, 7 * beat, y=470, stars=0)
+    title = ("BAA BAA", "RAINBOW SHEEP") if en else ("MEE MEE", "GÖKKUŞAĞI KOYUNU")
+    sub = "Sing along with Bibi Buzz TV" if en else "Bibi Buzz TV ile şarkı söyle"
+    s.finish_scene(sc, dancers=ALL4, hop=1.0, hop_mode="wave", extra=acts + [
+        ("fx", "title", 0, 0, {"at": 0.0, "dur": sec["dur"], "lines": title, "sub": sub, "top": 84, "size": 104 if en else 92, "gap": 108 if en else 98,
+                               "pill": 38, "sfx": False}),
+        _fx("sparkle", 640, 440, 0.4, sec["dur"], r=330), _fx("notes", 120, 560, 0.0, sec["dur"]), _fx("notes", 1130, 560, 0.7, sec["dur"]),
+        ("sfx", "tada", {"at": 0.0})])
+
+    # ---- the six colour verses
+    prev = "#FFFFFF"
+    for k, w in enumerate(WOOLS):
+        if k == 3:                                                                                # (the dance comes after the third colour)
+            secD = S[at["Dance"]]
+            sc = s.scene_for(at["Dance"], "ballroom_day", drift=0.0, clouds=False)
+            flank(sc, 1.4, 562)
+            sheep(sc, prev, 640, 562, 1.9)
+            seq = [RB6[0], RB6[1], RB6[3], RB6[4], RB6[5], RB6[0], RB6[1], RB6[2]]              # (it ends on yellow again: the next verse starts from there)
+            acts = []
+            for i, col in enumerate(seq):
+                acts += turn(col, i * 2 * beat, stars=0)
+            s.finish_scene(sc, dancers=movers, hop=1.0, hop_mode="all", side=40, extra=_bar_pumps(s, secD) + acts + [
+                _fx("confetti", 0, 0, 0.0, secD["dur"]), ("sfx", "cheer", {"at": 0.0})])
+            prev = seq[-1]
+        secA, secB = S[at["Verse %d a" % (k + 1)]], S[at["Verse %d b" % (k + 1)]]
+        # -- a: 'Baa baa red sheep, have you any wool?' (the wool turns at the colour word) 'Yes sir, yes sir, four bags full!' (four sacks pop up)
+        sc = s.scene_for(at["Verse %d a" % (k + 1)], w["bg"], drift=0.03)
+        flank(sc)
+        sheep(sc, prev)
+        t_col = s.word_spans(secA, secA["items"][0])[2][1]
+        extra = turn(w["wool"], max(0.0, t_col - 0.05))
+        for j, bx in enumerate((455, 560, 720, 825)):
+            bag(sc, "bag%d" % j, bx, 580, 0.95, w["wool"], j + 1)
+            extra += [pop("bag%d" % j, (12 + j) * beat - 0.05)]
+        extra += notes_fx(secA) + [_fx("sparkle", 640, 300, 12 * beat, secA["dur"], r=260)]
+        s.finish_scene(sc, singers=(ALL4, ("sheep",)), dancers=movers, hop=1.0, hop_mode="wave", cam=(640, 350, 1.06), size=48, extra=extra)
+        # -- b: 'One for Bibi, one for Pip, one for Mo and one for Lila!' (a sack pops up at the feet of every friend, at his name)
+        sc = s.scene_for(at["Verse %d b" % (k + 1)], w["bg"], drift=0.0)
+        flank(sc)
+        sheep(sc, w["wool"])
+        extra = []
+        order = ORDERS[k]
+        for it, pair, off in zip(secB["items"], (order[:2], order[2:]), (0, 2)):
+            spans = s.word_spans(secB, it)
+            for j, who in enumerate(pair):
+                n = off + j + 1
+                t_n = next(a for (pl, a, b) in spans if pl == _plain(NAMES[who][lg]))
+                bx = _RB_X[who] + (62 if _RB_X[who] < 640 else -62)
+                bag(sc, "bag%d" % n, bx, 580, 0.95, w["wool"], n)
+                extra += [pop("bag%d" % n, t_n - 0.05), ("hop", who, {"at": t_n}), ("sfx", "ding", {"at": t_n}), _fx("sparkle", bx, 520, t_n, 0.9, r=70)]
+        extra += notes_fx(secB) + [_fx("hearts", 470, 400, 0.5, secB["dur"]), _fx("hearts", 810, 400, 1.1, secB["dur"])]
+        s.finish_scene(sc, singers=(ALL4,), dancers=movers, hop=2.0, hop_mode="all", cam=(640, 346, 1.04), extra=extra)
+        prev = w["wool"]
+
+    # ---- the rainbow verse
+    secA, secB = S[at["Final a"]], S[at["Final b"]]
+    RB_BAGS = [400 + 96 * j for j in range(6)]
+    sc = s.scene_for(at["Final a"], "farm_open", drift=0.03)
+    sc.prop("rb", "rainbow", 640, 478, 1.0, grow=0.0, r=370.0, band=19.0)
+    flank(sc)
+    sheep(sc, prev)
+    t_col = s.word_spans(secA, secA["items"][0])[2][1]
+    t_r = max(0.0, t_col - 0.05)
+    extra = turn(RB6, t_r) + [("set", "rb", "grow", 1.0, {"at": t_r, "dur": min(1.9, secA["dur"] - t_r - 0.4)}), ("sfx", "tada", {"at": t_r})]
+    for j, bx in enumerate(RB_BAGS):
+        bag(sc, "bag%d" % j, bx, 580, 0.72, RB6[j], j + 1)
+        extra += [pop("bag%d" % j, (10 + j) * beat - 0.05)]
+    extra += notes_fx(secA) + [_fx("confetti", 0, 0, t_r + 0.3, secA["dur"])]
+    s.finish_scene(sc, singers=(ALL4, ("sheep",)), dancers=movers, hop=1.0, hop_mode="wave", cam=(640, 350, 1.04), size=44, extra=extra)
+
+    sc = s.scene_for(at["Final b"], "farm_open", drift=0.0)
+    sc.prop("rb", "rainbow", 640, 478, 1.0, grow=1.0, r=370.0, band=19.0)
+    flank(sc)
+    sheep(sc, RB6)
+    for j, bx in enumerate(RB_BAGS):
+        bag(sc, "bag%d" % j, bx, 580, 0.72, RB6[j], j + 1, show=True)
+    extra = []
+    named = []
+    for it in secB["items"]:
+        for (pl, a, b) in s.word_spans(secB, it):
+            for j, w in enumerate(WOOLS):
+                if pl == _plain(w["en"] if en else w["tr"]):
+                    named.append((a, b, j))
+    named.sort()
+    for i, (a, b, j) in enumerate(named):
+        nxt = named[i + 1][0] if i + 1 < len(named) else secB["dur"]
+        hold = max(0.5, min(1.4, nxt - a - 0.15))
+        extra += [("fx", "word_pop", 640, 58, {"at": a, "dur": hold + 0.3, "text": _up(WOOLS[j]["en"] if en else WOOLS[j]["tr"], lg), "color": WOOLS[j]["wool"],
+                                                 "hold": hold, "size": 1.0, "sfx": False}),
+                  ("sfx", "ding", {"at": a})]
+    extra += notes_fx(secB) + _bar_pumps(s, secB, amount=0.03) + [_fx("confetti", 0, 0, 0.0, secB["dur"]), ("sfx", "cheer", {"at": 0.0})]
+    s.finish_scene(sc, singers=(ALL4,), dancers=movers, hop=1.0, hop_mode="all", side=24, extra=extra)
+
+    # ---- outro: thank you, like and subscribe
+    sc = s.scene_for(len(S) - 1, "meadow_dawn", drift=0.0)
+    sc.prop("rb", "rainbow", 640, 600, 1.0, grow=1.0, r=300.0, band=15.0)
+    for w, x, f, d in zip(FAMILY, (210, 470, 810, 1070), (1, 1, -1, -1), (-6, 4, 4, -6)):
+        sc.actor(w, w, x, 612 + d, 1.05, face=f)
+    sheep(sc, RB6, 640, 618, 1.2)
+    sec = S[-1]
+    like, sub_t = 1.7, 3.0
+    caption = "Like and subscribe for more songs!" if en else "Daha fazla şarkı için beğen ve abone ol!"
+    s.finish_scene(sc, dancers=movers, hop=2.0, hop_mode="all", extra=[
+        _fx("confetti", 0, 0, sub_t, sec["dur"]), ("fx", "cta", 640, 215, {"at": 0.0, "dur": sec["dur"], "like": like, "sub": sub_t, "sfx": False}),
+        _fx("caption", 0, 0, 0.3, sec["dur"], text=caption), _fx("hearts", 330, 380, 1.0, sec["dur"]), _fx("hearts", 950, 380, 1.4, sec["dur"]),
+        ("sfx", "pop", {"at": 0.05}), ("sfx", "pop", {"at": 0.3}), ("sfx", "ding", {"at": like + 0.05}), ("sfx", "pop", {"at": like}),
+        ("sfx", "ding", {"at": sub_t + 0.05}), ("sfx", "pop", {"at": sub_t}), ("sfx", "sparkle", {"at": sub_t + 0.1})])
+
+
 # ================================================================================================ the shelf
-SPECS = {"twinkle": TWINKLE, "oldmac": OLDMAC}
-RECIPES = {"twinkle": _twinkle, "oldmac": _oldmac}
+SPECS = {"twinkle": TWINKLE, "oldmac": OLDMAC, "rainbowsheep": RAINBOWSHEEP}
+RECIPES = {"twinkle": _twinkle, "oldmac": _oldmac, "rainbowsheep": _rainbowsheep}
 QUEUE = ["twinkle", "oldmac"]            # the order in which the songs come out (one a day: curriculum.py)
 
 

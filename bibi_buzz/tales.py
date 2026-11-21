@@ -2617,7 +2617,11 @@ LM_Y, LM_MY = 648, 690                                                          
 LM_FR = (("fox", "fox", 1500), ("hare", "hare", 1620), ("bear", "bear", 1760))       # three forest friends who greet the king
 LM_FRY = {"fox": 662, "hare": 668, "bear": 672}
 LM_FRK = {"fox": 0.95, "hare": 0.95, "bear": 0.9}
-LM_Z = {"en": (6.7, 6.6)}                                                           # seconds the lion snores (zzz) while the mouse arrives / runs over him (scene 4); the voices of each language differ in length
+# timings that must follow single words of the narration (measured with the real voices; the languages differ in length): z = seconds the lion snores (zzz) while the mouse arrives / runs
+# over him (scene 4); roar / sq / hop = the roar, the squeak and the mouse hop in "big, loud roar ... tiny, quiet squeak" (scene 2); pops = the three tickle pops, spark = the sparkle on the
+# lion's nose (seconds from the END of the beat, scene 4); gnaw = start and length of the gnawing on the three "nibbles" (from the end of the beat, scene 10)
+LMT = {"en": dict(z=(6.7, 6.6), roar=2.0, sq=4.9, hop=4.6, pops=(-2.2, -1.5, -0.85), spark=(-2.4, 2.4), gnaw=(-2.1, 1.9)),
+       "tr": dict(z=(6.6, 5.65), roar=2.45, sq=5.7, hop=5.45, pops=(-1.75, -1.3, -0.9), spark=(-1.9, 1.9), gnaw=(-2.55, 2.3))}
 
 
 def _lm_friends(s, xs, face=-1):
@@ -2626,7 +2630,8 @@ def _lm_friends(s, xs, face=-1):
 
 
 def lion_and_mouse(lang="en"):
-    lz = LM_Z.get(lang, LM_Z["en"])
+    lmt = LMT.get(lang, LMT["en"])
+    lz = lmt["z"]
     t = Tale("tale-lion-and-mouse", "The Lion and the Mouse | Fairy Tale Story for Kids | Bibi Buzz TV",
              "Can a tiny mouse help a big, strong lion? Watch this classic fable from old Greece: a lion catches a little mouse, but he lets her go. Later, the lion is stuck in a hunter's net, "
              "and the mouse runs to help him. Learn the opposites big and small and loud and quiet, count three ropes from one to three, and find out why kindness always comes back. "
@@ -2661,8 +2666,8 @@ def lion_and_mouse(lang="en"):
     s.nar("A tiny mouse lived in the forest, too.", ("walk", "mouse", 880, LM_MY, {"fit": True, "pose": "run"}), ("pose", "mouse", "happy", {"at": -0.6}), ("sfx", "squeak", {"at": "75%"}))
     s.nar("The lion was big.", ("pose", "lion", "proud"), ("fx", "burst", 420, 170, {"at": "62%", "dur": 1.7, "text": "BIG!", "color": "#E8832A"}))
     s.nar("And the mouse was small.", ("hop", "mouse", {"at": "40%"}), ("fx", "burst", 880, 470, {"at": "58%", "dur": 1.7, "text": "small", "color": "#5B8EE6", "size": 0.55}))
-    s.nar("The lion had a big, loud roar. The mouse had a tiny, quiet squeak.", ("pose", "lion", "proud"), ("sfx", "roar", {"at": 2.0, "gain": 0.5}),
-          ("sfx", "squeak", {"at": 4.9}), ("hop", "mouse", {"at": 4.6}))
+    s.nar("The lion had a big, loud roar. The mouse had a tiny, quiet squeak.", ("pose", "lion", "proud"), ("sfx", "roar", {"at": lmt["roar"], "gain": 0.5}),
+          ("sfx", "squeak", {"at": lmt["sq"]}), ("hop", "mouse", {"at": lmt["hop"]}))
     s.nar("The little mouse loved to run and play all day long.", ("walk", "mouse", 700, LM_MY, {"at": 0.2, "speed": 320, "pose": "run"}), ("walk", "mouse", 1120, LM_MY, {"speed": 320, "pose": "run"}),
           ("walk", "mouse", 860, LM_MY, {"speed": 320, "pose": "run"}), ("hop", "mouse", {"at": -0.8}), tail=0.5)
 
@@ -2685,7 +2690,7 @@ def lion_and_mouse(lang="en"):
     s.nar("She ran up his paw, over his tummy, and across his nose. Tickle, tickle, tickle!", ("walk", "mouse", 590, 686, {"at": 0.3, "speed": 110, "pose": "run"}),
           ("walk", "mouse", 650, 604, {"speed": 110, "pose": "run"}), ("walk", "mouse", 690, 528, {"speed": 110, "pose": "run"}), ("walk", "mouse", 722, 476, {"speed": 90, "pose": "run"}),
           ("pose", "mouse", "happy", {"at": 3.5}), ("walk", "mouse", 790, 566, {"at": -0.95, "speed": 200, "pose": "run"}), ("walk", "mouse", 860, 686, {"speed": 240, "pose": "run"}),
-          ("fx", "sparkle", 722, 470, {"at": -2.4, "dur": 2.4, "r": 120}), ("sfx", "pop", {"at": -2.2, "gain": 0.4}), ("sfx", "pop", {"at": -1.5, "gain": 0.4}), ("sfx", "pop", {"at": -0.85, "gain": 0.4}),
+          ("fx", "sparkle", 722, 470, {"at": lmt["spark"][0], "dur": lmt["spark"][1], "r": 120}), *[("sfx", "pop", {"at": a, "gain": 0.4}) for a in lmt["pops"]],
           ("pose", "lion", "surprised", {"at": -0.5}), ("fx", "zzz", "lion", 0, {"at": 0.0, "dur": lz[1]}))
     s.say("lion", "Roar! Who woke me up?", ("cam", 700, 430, 1.2, {"at": 0.0, "dur": 0.5}), ("pose", "lion", "angry"), ("fx", "burst", 700, 240, {"at": 0.0, "dur": 1.7, "text": "ROAR!", "color": "#E2362F"}),
           ("sfx", "roar", {"at": 0.0}), ("pose", "mouse", "scared"), ("sfx", "squeak", {"at": 0.4}), tail=0.5)
@@ -2731,6 +2736,21 @@ def lion_and_mouse(lang="en"):
           ("sfx", "creak", {"at": 2.2, "gain": 0.5}))
     s.nar("He could not get out. The lion felt very sad.", ("pose", "lion", "sad", {"at": 1.4}), tail=0.6)
 
+    # ---------------------------------------------------------------- 8b the forest friends come and try to help (but the net is too strong)
+    s = t.scene("Friends try to help", "forest", mood="tense", title="Friends try to help")
+    s.prop("net", "net", 640, LM_Y + 14, 1.0, drop=1.0)
+    s.actor("lion", "lion", 640, LM_Y, 1.2, face=1)
+    _lm_friends(s, [x for (_, _, x) in LM_FR])
+    s.wait(0.1, ("pose", "lion", "sad"), ("cam", 640, 400, 1.0, {"at": 0.0, "dur": 0.05}))
+    s.nar("The fox, the hare, and the bear heard the roar. They ran to help the lion.", ("walk", "fox", 960, LM_FRY["fox"], {"fit": True, "pose": "run"}),
+          ("walk", "hare", 1060, LM_FRY["hare"], {"fit": True, "pose": "run"}), ("walk", "bear", 1170, LM_FRY["bear"], {"fit": True, "pose": "run"}), tail=0.3)
+    s.say("fox", "Do not worry, King Lion! We will pull the net!", ("pose", "fox", "wave"), ("hop", "fox", {"at": "60%"}))
+    s.say("bear", "One, two, three, pull!", *[("pose", a, "pull", {"at": "45%"}) for a in ("fox", "hare", "bear")], ("sfx", "creak", {"at": "55%", "gain": 0.4}), tail=0.3)
+    s.nar("They tugged and tugged. But the strong net did not move.", *[("pose", a, "strain") for a in ("fox", "hare", "bear")], ("sfx", "creak", {"at": 0.6, "gain": 0.5}),
+          ("sfx", "creak", {"at": 2.0, "gain": 0.5}), ("fx", "sweat", "bear", 0, {"at": 0.5, "dur": 3.5}))
+    s.say("hare", "It is too strong for us!", ("pose", "hare", "sad"), ("pose", "fox", "sad"), ("pose", "bear", "sad"))
+    s.say("lion", "Oh no. Nobody can help me now.", ("pose", "lion", "sad"), tail=0.6)
+
     # ---------------------------------------------------------------- 9 the mouse hears the roar and runs
     s = t.scene("A friend needs help", "forest", world=2600, mood="chase", title="A friend needs help", drift=0.0)
     s.actor("mouse", "mouse", 250, LM_MY, 0.6, face=1)
@@ -2749,7 +2769,7 @@ def lion_and_mouse(lang="en"):
     s.say("mouse", "Do not worry, Mr. Lion! I am here!", ("walk", "mouse", 372, LM_MY, {"fit": True, "pose": "run"}), ("pose", "mouse", "cheer", {"at": -0.5}))
     s.say("lion", "Little mouse! You came to help me!", ("pose", "lion", "surprised"), ("pose", "lion", "happy", {"at": "60%"}), ("fx", "hearts", "lion", 0, {"at": "50%", "dur": 2.4}))
     s.nar("The little mouse had tiny, sharp teeth. She began to chew the rope. Nibble, nibble, nibble!", ("cam", 520, 470, 1.4, {"at": 0.4, "dur": 1.4}), ("pose", "mouse", "eat", {"at": 3.6}),
-          ("sfx", "gnaw", {"at": -2.1}), ("set", "net", "cut", 0.7, {"at": -2.1, "dur": 1.9}), ("pose", "lion", "sad", {"at": 3.0}))
+          ("sfx", "gnaw", {"at": lmt["gnaw"][0]}), ("set", "net", "cut", 0.7, {"at": lmt["gnaw"][0], "dur": lmt["gnaw"][1]}), ("pose", "lion", "sad", {"at": 3.0}))
     for i, line in enumerate(("Snap! The first rope was broken. One!", "Nibble, nibble, nibble! Snap! The second rope was broken. Two!", "Nibble, nibble, nibble! Snap! The third rope was broken. Three!")):
         gn = [("sfx", "gnaw", {"at": 0.2, "gain": 0.5})] if i else []
         s.nar(line, ("pose", "mouse", "eat"), *gn, ("sfx", "snap", {"at": 0.4 if i == 0 else 2.1}), ("set", "net", "cut", float(i + 1), {"at": 0.4 if i == 0 else 2.1, "dur": 0.25}),

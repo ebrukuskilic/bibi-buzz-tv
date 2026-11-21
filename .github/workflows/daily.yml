@@ -18,6 +18,10 @@ on:
         description: "Render again even if that day is already on the media branch"
         type: boolean
         default: false
+      kokoro:
+        description: "The Kokoro neural voices (bibi_buzz/ktts.py) of the narrator and the characters: en,tr (default), en, tr or no (the plain Edge voices)"
+        required: false
+        default: "en,tr"
 
 permissions:
   contents: write
@@ -32,6 +36,8 @@ jobs:
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@v5
         with:
@@ -40,13 +46,26 @@ jobs:
       - name: Install tools, font
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core espeak-ng libsndfile1
           pip install pillow numpy edge-tts gTTS
           mkdir -p assets
           curl -fL --retry 4 -o assets/Fredoka-Variable.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/fredoka/Fredoka%5Bwdth%2Cwght%5D.ttf"
           # Turkish text (ğ ş İ ı are missing in Fredoka) is set in Baloo 2
           curl -fL --retry 4 -o assets/Baloo2-Variable.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/baloo2/Baloo2%5Bwght%5D.ttf"
           ls -la assets
+
+      - uses: actions/cache@v4
+        if: github.event.inputs.kokoro != 'no'
+        with:
+          path: ~/.cache/huggingface
+          key: hf-kokoro-v1
+
+      - name: Install the Kokoro voices (CPU; without them the Edge voices are used)
+        if: github.event.inputs.kokoro != 'no'
+        continue-on-error: true
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install "kokoro>=0.9.4" soundfile
 
       - uses: actions/cache@v4
         with:
@@ -81,7 +100,7 @@ jobs:
         run: |
           mkdir -p /tmp/pub
           if git ls-remote --exit-code --heads origin media >/dev/null 2>&1; then
-            git clone --quiet --depth 1 --branch media "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" /tmp/pub-old
+            git clone --quiet --depth 1 --branch media "https://github.com/${{ github.repository }}.git" /tmp/pub-old
             cp -r /tmp/pub-old/. /tmp/pub/ && rm -rf /tmp/pub/.git
           fi
           ls -la /tmp/pub
@@ -94,6 +113,7 @@ jobs:
           DATE: ${{ steps.d.outputs.date }}
           ONLY: ${{ github.event.inputs.only }}
           FORCE: ${{ github.event.inputs.force }}
+          BIBI_KOKORO: ${{ github.event.inputs.kokoro || 'en,tr' }}
         run: |
           if [ -f "/tmp/pub/$DATE/manifest.json" ] && [ "$FORCE" != "true" ] && [ -z "$ONLY" ]; then
             echo "Day $DAY ($DATE) is already on the media branch - nothing to render."
@@ -101,7 +121,28 @@ jobs:
           fi
           ARGS=""
           if [ -n "$ONLY" ]; then ARGS="--only $ONLY"; fi
+          set +e
           python make_batch.py --day "$DAY" --date "$DATE" --out "/tmp/pub/$DATE" --sheet $ARGS
+          rc=$?
+          if [ "$rc" -ne 0 ] && [ -n "$BIBI_KOKORO" ]; then
+            # a video that could not be made with the Kokoro voices is made once more, alone, with the plain Edge voices (BIBI_KOKORO empty)
+            MISSING=$(python3 - "$DAY" "$DATE" "$ONLY" <<'PY'
+          import json, os, sys
+          sys.path.insert(0, ".")
+          from bibi_buzz import curriculum as CU
+          day, date, only = int(sys.argv[1]), sys.argv[2], {x for x in sys.argv[3].split(",") if x}
+          mp = os.path.join("/tmp/pub", date, "manifest.json")
+          have = {v["id"] for v in json.load(open(mp)).get("videos", [])} if os.path.exists(mp) else set()
+          print(",".join(l.id for l in CU.plan(day) if l.id not in have and (not only or l.id in only)))
+          PY
+            )
+            if [ -n "$MISSING" ]; then
+              echo "Not made with the Kokoro voices: $MISSING - making them again with the Edge voices"
+              BIBI_KOKORO="" python make_batch.py --day "$DAY" --date "$DATE" --out "/tmp/pub/$DATE" --sheet --only "$MISSING"
+              rc=$?
+            fi
+          fi
+          exit $rc
 
       - name: Publish the media branch
         if: always()

@@ -128,10 +128,46 @@ def _convert(ffmpeg, cache_dir, text, voice):
     os.remove(raw)
 
 
+def _lesson_kokoro(texts, ffmpeg, cache_dir):
+    """{text: clip} of the English lesson narrator made by Kokoro (ktts.py: the voice of the narrator of the tales, the Edge voice above stands in for it), or None:
+    Kokoro is not asked for (BIBI_KOKORO) or cannot make every text of the video, and the caller lets the Edge voice make the whole video, as it always did."""
+    if not texts or not ktts.enabled("en"):
+        return None
+    try:
+        nv, nr, np_, _fx = ktts.KTYPES["nar"][0]
+        spec = "%s|%s|%s|%s" % (nv, VOICE, RATE, PITCH)
+        items = [(t, spec, nr, np_, "") for t in texts]
+        todo = [it for it in items if not os.path.exists(os.path.join(cache_dir, _key2(it) + ".wav"))]
+        if todo:
+            failed = ktts.make(todo, lambda it: os.path.join(cache_dir, _tts_key(it) + ".k.wav"), ffmpeg, log=lambda m: print(m, flush=True))
+            if failed:
+                print(f"[voice] Kokoro could not make {len(failed)} text(s) of this video; the Edge voice makes the whole video", flush=True)
+                return None
+            for it in todo:
+                base = os.path.join(cache_dir, _key2(it))
+                raw = base + ".raw.wav"
+                subprocess.run([ffmpeg, "-y", "-loglevel", "error", "-i", os.path.join(cache_dir, _tts_key(it) + ".k.wav"), "-ar", str(SR), "-ac", "1", raw], check=True)
+                y = trim(_read_wav(raw))
+                peak = float(np.max(np.abs(y))) if len(y) else 1.0
+                if peak > 1e-4:
+                    y = y * (0.9 / peak)                                   # (the loudness the Edge lessons have always had)
+                _write_wav(base + ".wav", y)
+                os.remove(raw)
+        return {it[0]: _read_wav(os.path.join(cache_dir, _key2(it) + ".wav")) for it in items}
+    except BaseException as e:                                             # (nothing of Kokoro may stop a video)
+        print(f"[voice] Kokoro failed for the lesson narrator ({e!r}); the Edge voice is used", flush=True)
+        return None
+
+
 def synth_all(texts, ffmpeg, cache_dir, voice=VOICE):
-    """Returns {text: float array (mono, 44.1 kHz)} for every non-empty text of ONE video (one voice per video)."""
+    """Returns {text: float array (mono, 44.1 kHz)} for every non-empty text of ONE video (one voice per video).
+    The English narrator of the lessons (the default voice) is Kokoro's when BIBI_KOKORO asks for it (_lesson_kokoro)."""
     texts = sorted({t for t in texts if t})
     os.makedirs(cache_dir, exist_ok=True)
+    if voice == VOICE:
+        got = _lesson_kokoro(texts, ffmpeg, cache_dir)
+        if got is not None:
+            return got
 
     def todo_for(v):
         return [t for t in texts if not os.path.exists(os.path.join(cache_dir, _key(t, v) + ".wav"))]

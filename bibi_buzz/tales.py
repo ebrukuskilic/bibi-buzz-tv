@@ -966,8 +966,8 @@ KID = dict(dress="#FF8FA3", hair="#7B4A2A")                                   # 
 BEAR_T = dict(fur="#7A4A25", extra="bib", outfit="#3E8EDE")
 TN_X, TN_Y, TN_K = 225, 636, 1.3                                              # the turnip's garden bed: the middle of the bed on the ground, and its size
 # everybody who pulls, nearest to the turnip first: id, kind, feet x, size, style (they all face the turnip, face -1)
-LINE = [("gpa", "girl", 500, 1.0, OLD_M), ("gma", "girl", 610, 0.95, OLD_W), ("kid", "girl", 705, 0.8, KID), ("pig", "pig", 810, 0.9, FARM_PIG),
-        ("hare", "hare", 915, 0.95, {}), ("bear", "bear", 1030, 1.0, BEAR_T), ("pip", "pip", 1150, 0.85, {})]
+LINE = [("gpa", "girl", 500, 1.0, OLD_M), ("gma", "girl", 606, 0.95, OLD_W), ("kid", "girl", 698, 0.8, KID), ("pig", "pig", 792, 0.9, FARM_PIG),
+        ("hare", "hare", 888, 0.95, {}), ("bear", "bear", 988, 1.0, BEAR_T), ("pip", "pip", 1105, 0.85, {"zy": 900})]
 LINE_Y = {"gpa": 650, "gma": 650, "kid": 650, "pig": 650, "hare": 650, "bear": 654, "pip": 658}
 HEAVE = "Heave-ho! Heave-ho!"
 STUCK = "But the turnip was still stuck!"
@@ -1088,13 +1088,13 @@ def enormous_turnip(lang="en"):
     _line(s, 5)
     allp = [a[0] for a in LINE]
     s.say("hare", "Big Bear! Please come and help us!", *_poses(allp[:5], "grip"), tail=0.3)
-    s.nar("The big bear came stomping. Now there were six friends pulling the turnip!", _come("bear", 1030), ("fx", "mark", "bear", _above(5), {"at": "58%", "dur": 1.8, "text": "6"}),
+    s.nar("The big bear came stomping. Now there were six friends pulling the turnip!", _come("bear", LINE[5][2]), ("fx", "mark", "bear", _above(5), {"at": "58%", "dur": 1.8, "text": "6"}),
           ("fx", "dust", 1260, 668, {"at": 1.5, "dur": 1.0, "size": 1.2}), ("fx", "dust", 1160, 668, {"at": 2.0, "dur": 1.0, "size": 1.2}),
           ("fx", "dust", 1060, 668, {"at": 2.5, "dur": 1.0, "size": 1.2}), *_poses(allp[:5], "grip"), tail=0.3)
     s.say("bear", HEAVE, *_poses(allp[:6], "pull"), ("set", "tn", "wobble", 0.85, {"at": 0.0, "dur": 0.5}), ("sfx", "creak", {"at": "20%", "gain": 0.45}), ("sfx", "creak", {"at": "65%", "gain": 0.45}), tail=0.3)
     s.nar("But the turnip was still stuck! It was stuck, stuck, stuck!", *_poses(allp[:6], "grip"), ("set", "tn", "wobble", 0.0, {"at": 0.0, "dur": 0.6}), ("fx", "sweat", "bear", 0, {"at": 0.2, "dur": 3.5}), tail=0.35)
     s.say("bear", "Little Pip! Please come and help us!", *_poses(allp[:6], "grip"), tail=0.3)
-    s.nar("Little Pip came flying. Now there were seven friends pulling the turnip!", _come("pip", 1150), ("hop", "pip", {"at": 1.0}), ("hop", "pip", {"at": 1.8}),
+    s.nar("Little Pip came flying. Now there were seven friends pulling the turnip!", _come("pip", LINE[6][2]), ("hop", "pip", {"at": 1.0}), ("hop", "pip", {"at": 1.8}),
           ("fx", "mark", "pip", _above(6), {"at": "58%", "dur": 1.8, "text": "7"}), *_poses(allp[:6], "grip"), tail=0.3)
     s.say("pig", "Pip is so tiny. Can Pip really help?", *_poses(allp[:6], "grip"), ("pose", "pig", "think"), tail=0.3)
     s.say("pip", "Yes, I can! I am small, but I am strong!", *_poses(allp[:6], "grip"), ("hop", "pip", {"at": "35%"}), tail=0.3)
@@ -1106,16 +1106,21 @@ def enormous_turnip(lang="en"):
           *_poses(allp[1:], "surprised", at="86%"), ("pose", "gpa", "surprised", {"at": "86%"}), ("set", "tn", "bend", 0.0, {"at": "86%", "dur": 0.12}),
           ("set", "tn", "out", 1.0, {"at": "86%", "dur": 1.2}), ("set", "tn", "wobble", 0.0, {"at": "86%", "dur": 0.2}),
           ("fx", "burst", TN_X + 40, 400, {"at": "86%", "dur": 1.5, "text": "POP!", "sfx": "pop"}), ("fx", "dust", TN_X, 664, {"at": "86%", "dur": 1.0, "size": 1.6, "sfx": False}),
-          ("tilt", "gpa", 80, {"at": "88%", "dur": 0.4}), ("fx", "dust", 700, 668, {"at": "88%+0.38", "dur": 1.0, "size": 1.1}),
           ("fx", "dust", TN_X + 195, 668, {"at": "86%+1.0", "dur": 1.0, "size": 1.3}), ("cam", 640, 360, 1.0, {"at": "86%", "dur": 0.8}), tail=0.2)
-    falls = [("gma", 76, "42%"), ("kid", 84, "54%"), ("pig", 72, "66%"), ("hare", 86, "78%"), ("bear", 78, "90%")]
-    acts = [("pose", "pip", "surprised"), ("hop", "pip", {"at": "30%"})]
-    for aid, deg, when in falls:
+    falls = [("gpa", 80, "8%"), ("gma", 76, "22%"), ("kid", 84, "36%"), ("pig", 72, "50%"), ("hare", 86, "64%"), ("bear", 78, "78%")]
+    acts = [("pose", "pip", "surprised"), ("hop", "pip", {"at": "10%"}), ("move", "pip", LINE[6][2], 500, {"at": "25%", "dur": 0.7})]
+    for aid, deg, when in falls:                                            # everybody falls down like dominoes (the dust is silent: the thuds come with the bumps)
         _a, _kd, fx_, fk, _s = LINE[allp.index(aid)]
-        acts += [("tilt", aid, deg, {"at": when, "dur": 0.4}), ("fx", "dust", fx_ + 150 * fk, 668, {"at": when + "+0.38", "dur": 1.0, "size": 0.9 + 0.3 * fk})]
-    s.nar("Out flew the turnip! And everybody fell down. Bump, bump, bump, bump, bump, bump!", *acts, tail=0.3)
+        acts += [("tilt", aid, deg, {"at": when, "dur": 0.4}), ("fx", "dust", fx_ + 140 * fk, 668, {"at": when + "+0.38", "dur": 1.0, "size": 0.8 + 0.3 * fk, "sfx": False})]
+    s.nar("Out flew the turnip! And everybody fell down.", *acts, tail=0.3)
+    acts = []
+    for (aid, deg, _w), pct in zip(falls, (4, 21, 38, 55, 72, 88)):         # six "bump"s: one friend bounces on the ground with every word
+        _a, _kd, fx_, fk, _s = LINE[allp.index(aid)]
+        acts += [("tilt", aid, deg - 11, {"at": "%d%%-0.12" % pct, "dur": 0.12}), ("tilt", aid, deg, {"at": "%d%%" % pct, "dur": 0.16}),
+                 ("fx", "dust", fx_ + 140 * fk, 668, {"at": "%d%%" % pct, "dur": 0.9, "size": 0.7 + 0.3 * fk})]
+    s.nar("Bump, bump, bump, bump, bump, bump!", *acts, tail=0.3)
     s.nar("Nobody was hurt. They were just a little bit dizzy.", *_poses(allp[:6], "dizzy"), ("pose", "pip", "surprised"), tail=0.3)
-    acts = [("hop", "pip", {"at": 1.0})]
+    acts = [("move", "pip", LINE[6][2], LINE_Y["pip"], {"at": 0.9, "dur": 0.6}), ("hop", "pip", {"at": 1.5})]
     for aid, at in (("gpa", 0.0), ("gma", 0.2), ("kid", 0.4), ("pig", 0.6), ("hare", 0.8), ("bear", 1.0)):
         acts += [("tilt", aid, 0, {"at": at, "dur": 0.5}), ("pose", aid, "cheer", {"at": at + 0.3})]
     s.wait(1.8, *acts)
@@ -1127,7 +1132,7 @@ def enormous_turnip(lang="en"):
     s.nar("The tiniest friend had made a big difference!", *_poses(allp[:6], "happy"), ("fx", "sparkle", 640, 360, {"at": 0.2, "dur": 4.0, "r": 360}), ("fx", "hearts", "pip", 0, {"at": 0.4, "dur": 3.5}))
     s.nar("Let us count the friends who helped!", *_poses(allp[:6], "happy"), ("hop", "pip", {"at": "60%"}))
     for i, (aid, word) in enumerate(zip(allp, ("One!", "Two!", "Three!", "Four!", "Five!", "Six!", "Seven!"))):      # the numbers stay until the scene ends
-        s.nar(word, ("hop", aid, {"at": 0.05}), ("fx", "mark", aid, _above(i) - (18 if aid == "pip" else 0), {"at": 0.0, "dur": 60.0, "text": str(i + 1)}), *_poses(allp[:6], "happy"), tail=0.12)
+        s.nar(word, ("hop", aid, {"at": 0.05}), ("fx", "mark", aid, _above(i) - (18 if aid == "pip" else 0), {"at": 0.0, "dur": 60.0, "text": str(i + 1)}), *_poses(allp[:6], "happy"), tail=0.32)
     s.nar("Seven good friends, and one enormous turnip!", *[("hop", aid, {"at": "%d%%" % (20 + 9 * j)}) for j, aid in enumerate(allp)], *_poses(allp[:6], "cheer"),
           ("fx", "sparkle", 640, 330, {"at": 0.2, "dur": 3.0, "r": 380}), tail=0.3)
     s = _cheer_scene(t, None)                                               # the same picture without the numbers (a scene change nobody notices)

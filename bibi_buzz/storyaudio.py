@@ -193,6 +193,18 @@ def sfx_yawn():
     return (np.sin(2 * np.pi * np.cumsum(f) / SR) * 0.3 + band_noise(dur, 300, 1200, 37) * 0.1) * env
 
 
+def sfx_rumble():
+    """A hungry tummy: a low growl that wobbles."""
+    dur = 1.1
+    t = _t(dur)
+    f = 74 - 20 * t / dur + 8 * np.sin(2 * np.pi * 11 * t)
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    am = 0.55 + 0.45 * np.sin(2 * np.pi * 8 * t)
+    env = np.sin(np.pi * np.clip(t / dur, 0, 1)) ** 0.7
+    y = (np.sin(ph) + 0.7 * np.sin(2 * ph) + 0.5 * np.sin(3 * ph) + 0.3 * np.sin(4 * ph)) * am * env * 0.4
+    return y + band_noise(dur, 80, 320, 41) * env * 0.22
+
+
 def sfx_tada():
     out = np.zeros(int(2.2 * SR))
     for i, m in enumerate((67, 72, 76, 79, 84)):
@@ -203,7 +215,7 @@ def sfx_tada():
 SFX = {"knock": sfx_knock, "wind": sfx_wind, "collapse": sfx_collapse, "boing": sfx_boing, "splash": sfx_splash,
        "sparkle": sfx_sparkle, "ding": sfx_ding, "pop": sfx_pop, "thud": sfx_thud, "hoof": sfx_hoof, "hoof2": sfx_hoof2, "boom": sfx_boom, "cheer": sfx_cheer,
        "creak": sfx_creak, "snore": sfx_snore, "dizzy": sfx_dizzy, "whoosh": sfx_whoosh, "beep3": sfx_beep3,
-       "fanfare": sfx_fanfare, "munch": sfx_munch, "gulp": sfx_gulp, "yawn": sfx_yawn, "tada": sfx_tada}
+       "fanfare": sfx_fanfare, "munch": sfx_munch, "gulp": sfx_gulp, "yawn": sfx_yawn, "tada": sfx_tada, "rumble": sfx_rumble}
 SFX_GAIN = {"wind": 0.45, "collapse": 0.55, "boom": 0.5, "cheer": 0.5, "knock": 0.55, "creak": 0.5, "snore": 0.35,
             "fanfare": 0.4, "tada": 0.4, "beep3": 0.35, "boing": 0.4, "pop": 0.35, "sparkle": 0.45}
 

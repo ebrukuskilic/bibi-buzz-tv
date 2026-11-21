@@ -24,6 +24,12 @@ engines
   cast        the CASTING sweep (--only cast): every character type of the tales says its own line in several Kokoro voices / sizes (bibi_buzz/ktts.py speak(): a
               smaller or bigger person by shift_voice, not by a pitch shifter), measured (UTMOS, words wrong, pitch F0), plus a ladder of sizes and a comparison with
               the pitch shifter; one gallery mp3 per language (cast-<language>.mp3: the narrator says the type, then every candidate says the line)
+  palette     (--only palette) EVERY voice (English: the 28 of Kokoro-82M; Turkish: mixes of elif and emre, and voices of the English model tried on the Turkish one)
+              at several sizes, measured (PAL lines: F0, UTMOS, words wrong); palette-<language>.mp3 = the voices one after the other, the narrator says their number
+              (GALLERY lines: number = voice)
+  studio      (--only studio) the same clips as they are and through two EQ + compression chains (STUDIO lines)
+  gallery     (--only gallery) the casting of some tales the way the daily videos make it (bibi_buzz.tales.cast_voices), every character says its type's line:
+              gallery-<language>.mp3, GAL lines (F0, UTMOS, words wrong) and GALWARN lines for the pairs of one tale that may sound alike
 """
 import argparse
 import asyncio
@@ -446,9 +452,9 @@ def cbx_prepare(a):
             json.dump(job, f, ensure_ascii=False, indent=1)
 
 
-def cbx_collect(a):
+def cbx_collect(a, key="7-chatterbox", pre="_cbx_"):
     for lang in ("tr", "en"):
-        d = os.path.join(OUT, "_cbx_%s" % lang)
+        d = os.path.join(OUT, "%s%s" % (pre, lang))
         lines = get_lines(lang)
         try:
             times = json.load(open(os.path.join(d, "times.json")))
@@ -465,9 +471,56 @@ def cbx_collect(a):
                 secs += float(times.get(str(k), [0, 0])[0])
             else:
                 ys.append(None)
-        finish(lang, "7-chatterbox", ys, lines, secs)
+        finish(lang, key, ys, lines, secs)
         for k in sorted(times, key=int):
             log("   line %s: %.1f s of audio in %.1f s of work" % (k, times[k][1], times[k][0]))
+
+
+# ------------------------------------------------------------------------------------------------------------------------ the user's own voice (Chatterbox copies the voice of a short reference clip)
+MV_STYLE = {"nar": (0.45, 0.45), "mama": (0.55, 0.5), "pig1": (0.65, 0.45), "pig3": (0.6, 0.5), "wolf": (0.75, 0.4)}      # (exaggeration, cfg_weight) of the roles of the ten lines
+
+
+def myvoice_prepare(a):
+    """The reference clips are NOT in the repository: they come from the secrets MYVOICE_TR and MYVOICE_EN of the repository (base64 of a short opus clip), are decoded
+    into out/speech/_ref (a folder that is never copied to the result) and measured (UTMOS, what Whisper hears); then the job files of Chatterbox are written: the
+    ten lines of the tale, every role in the same voice (a person who reads a story aloud), with the feeling of the role."""
+    import base64
+    refdir = os.path.join(OUT, "_ref")
+    os.makedirs(refdir, exist_ok=True)
+    for lang in ("tr", "en"):
+        b64 = (os.environ.get("MYVOICE_" + lang.upper()) or "").strip()
+        if not b64:
+            log("myvoice %s: no reference clip (the secret MYVOICE_%s is empty)" % (lang, lang.upper()))
+            continue
+        try:
+            src = os.path.join(refdir, lang + ".opus")
+            with open(src, "wb") as f:
+                f.write(base64.b64decode(b64))
+            wav = os.path.join(refdir, lang + ".wav")
+            r = subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", src, "-ar", str(KSR), "-ac", "1", wav], capture_output=True, text=True)
+            if r.returncode:
+                raise RuntimeError(r.stderr[-200:])
+        except Exception:
+            log("myvoice %s: the reference clip could not be decoded" % lang, traceback.format_exc()[-300:])
+            continue
+        try:
+            with wave.open(wav) as w:
+                y = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float64) / 32768.0
+            sc = score(y, "", lang)
+            # (what she says in the clip stays private: lab.txt is public, so only the number of the words that Whisper hears is logged, never the words)
+            log("myvoice %s: reference clip %.1f s, F0 %s Hz, UTMOS %s; Whisper hears %d words" % (lang, len(y) / float(KSR), ("%.0f" % f0_of(y)) if f0_of(y) else "-",
+                                                                                                  ("%.2f" % sc["mos"]) if "mos" in sc else "-", len(sc.get("heard", "").split())))
+        except Exception:
+            log("myvoice %s: the reference clip could not be measured" % lang, traceback.format_exc()[-200:])
+        lines = get_lines(lang)
+        job = {"lang": lang, "budget": 1300, "lines": [dict(i=k, role=role, text=text, ref=wav, ex=MV_STYLE.get(role, (0.5, 0.5))[0], cfg=MV_STYLE.get(role, (0.5, 0.5))[1])
+                                                        for k, (role, text) in enumerate(lines)]}
+        with open(os.path.join(OUT, "_myvoice_%s.json" % lang), "w", encoding="utf-8") as f:
+            json.dump(job, f, ensure_ascii=False, indent=1)
+
+
+def myvoice_collect(a):
+    cbx_collect(a, key="8-myvoice", pre="_myvoice_")
 
 
 # ------------------------------------------------------------------------------------------------------------------------ the casting sweep (--only cast)
@@ -664,6 +717,217 @@ def _cast_sweep():
                 log("   %-5s %-10s x%.2f  %-11s F0 %5s  UTMOS %.2f  wrong %3.0f%%" % (typ, body, f, name, ("%.0f" % f0_of(y)) if f0_of(y) else "-", sc.get("mos", 0.0), 100 * sc.get("wer", 1.0)))
 
 
+# ------------------------------------------------------------------------------------------------------------------------ the palette: every voice, as a smaller and a bigger person
+EN_VOICES = ["af_alloy", "af_aoede", "af_bella", "af_heart", "af_jessica", "af_kore", "af_nicole", "af_nova", "af_river", "af_sarah", "af_sky",
+             "am_adam", "am_echo", "am_eric", "am_fenrir", "am_liam", "am_michael", "am_onyx", "am_puck", "am_santa",
+             "bf_alice", "bf_emma", "bf_isabella", "bf_lily", "bm_daniel", "bm_fable", "bm_george", "bm_lewis"]
+PAL_CALM = {"en": "Once upon a time, a little rabbit found a shiny red ball in the garden.",
+            "tr": "Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir top bulmuş."}
+PAL_LIVELY = {"en": "Look! I can jump so high! Come and play with me!",
+              "tr": "Bak, ne kadar yükseğe zıplayabiliyorum! Gel, benimle oyna!"}
+PAL_F = {"en": [0.85, 1.2, 1.4], "tr": [0.85, 0.92, 1.1, 1.2, 1.3]}                   # (and 1.0, for both lines)
+TR_STYLES = ["elif", "elif=0.8,emre=0.2", "elif=0.6,emre=0.4", "elif=0.4,emre=0.6", "elif=0.2,emre=0.8", "emre", "elif=1.25,emre=-0.25", "elif=-0.25,emre=1.25"]
+TR_CROSS = ["af_heart", "af_kore", "af_aoede", "af_sky", "af_sarah", "af_bella", "bf_emma", "bf_isabella", "am_michael", "am_puck", "am_fenrir", "bm_fable", "bm_george",
+            "elif=0.5,af_kore=0.5", "elif=0.5,af_sky=0.5", "emre=0.5,am_michael=0.5", "emre=0.5,bm_fable=0.5"]       # (voices of Kokoro-82M tried on the Turkish model)
+_NUM = {"en": ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen",
+               "seventeen", "eighteen", "nineteen"],
+        "tr": ["sıfır", "bir", "iki", "üç", "dört", "beş", "altı", "yedi", "sekiz", "dokuz", "on", "on bir", "on iki", "on üç", "on dört", "on beş", "on altı", "on yedi",
+               "on sekiz", "on dokuz"]}
+_TENS = {"en": ["", "", "twenty", "thirty", "forty", "fifty"], "tr": ["", "", "yirmi", "otuz", "kırk", "elli"]}
+
+
+def number_words(n, lang):
+    """1..59 in words (a voice reads words, not digits)"""
+    if n < 20:
+        return _NUM[lang][n]
+    t, u = divmod(n, 10)
+    return _TENS[lang][t] + (" " + _NUM[lang][u] if u else "")
+
+
+def palette(a):
+    """Every voice at several sizes: PAL lines (F0, UTMOS, words wrong), and one mp3 per language with the voices one after the other, the narrator says the number."""
+    os.environ["BIBI_KOKORO_INPROC"] = "1"
+    try:
+        _palette()
+    finally:
+        os.environ.pop("BIBI_KOKORO_INPROC", None)
+
+
+def _pal_one(KT, lang, body, kind, f):
+    line = (PAL_CALM if kind == "calm" else PAL_LIVELY)[lang]
+    pre = "k:" if lang == "en" else "kt:"
+    try:
+        y = KT.speak(line, pre + body, "+0%", "%+.1fHz" % ((f - 1.0) * 150))
+    except Exception:
+        log("PAL %s %s x%.2f %s FAILED %s" % (lang, body, f, kind, traceback.format_exc()[-170:].replace("\n", " | ")))
+        return None
+    sc = score(y, line, lang)
+    f0 = f0_of(y)
+    log("PAL %s %-24s x%.2f %-6s F0 %5s UTMOS %.2f WER %3.0f%% SEC %.1f" % (lang, body, f, kind, ("%.0f" % f0) if f0 else "-", sc.get("mos", 0.0), 100 * sc.get("wer", 1.0), len(y) / float(KSR)))
+    return y
+
+
+def _palette():
+    from bibi_buzz import ktts as KT
+    gap = np.zeros(int(0.30 * KSR))
+    for lang in ("en", "tr"):
+        names = EN_VOICES if lang == "en" else TR_STYLES + TR_CROSS
+        log("---- palette %s: PAL language voice factor line F0 UTMOS WER seconds   (factor 1.00 = the voice as it is; the lively line is the one that is moved)" % lang)
+        parts = []
+        for n, body in enumerate(names, 1):
+            log("GALLERY %s %d = %s" % (lang, n, body))
+            y = _pal_one(KT, lang, body, "calm", 1.0)
+            if y is not None:
+                try:
+                    parts += [KT.speak(number_words(n, lang), "k:af_heart" if lang == "en" else "kt:elif", "-6%", "+0Hz"), gap, y, np.zeros(int(0.8 * KSR))]
+                except Exception:
+                    log("   announcer failed", traceback.format_exc()[-150:].replace("\n", " | "))
+            for f in [1.0] + PAL_F[lang]:
+                _pal_one(KT, lang, body, "lively", f)
+        VL.save("palette-" + lang, np.concatenate(parts) if parts else np.zeros(KSR), KSR)
+
+
+# ------------------------------------------------------------------------------------------------------------------------ a studio chain (EQ and compression) for the clips
+STUDIO = {
+    "s0": "",
+    "s1": "highpass=f=70,equalizer=f=3000:t=q:w=1.1:g=2,treble=g=1.5:f=8000,acompressor=threshold=0.09:ratio=2:attack=10:release=150:makeup=1.2",
+    "s2": "highpass=f=80,equalizer=f=250:t=q:w=1.0:g=1.2,equalizer=f=3500:t=q:w=1.2:g=2.5,treble=g=2:f=9000,acompressor=threshold=0.08:ratio=2.5:attack=8:release=120:makeup=1.3",
+}
+STUDIO_VOICES = {                                             # role -> (voice spec, rate, pitch): the casting of the first test of the whole tale
+    "en": {"nar": ("k:af_heart", "-6%", "+0Hz"), "mama": ("k:af_bella", "-4%", "+12Hz"), "pig1": ("k:am_puck", "+2%", "+27Hz"), "wolf": ("k:am_fenrir", "-10%", "-28Hz")},
+    "tr": {"nar": ("kt:elif", "-6%", "+0Hz"), "mama": ("kt:elif=0.8,emre=0.2", "-8%", "-18Hz"), "pig1": ("kt:emre", "+4%", "+37Hz"), "wolf": ("kt:emre", "-10%", "-36Hz")},
+}
+
+
+def _chain(y, chain):
+    import tempfile
+    with tempfile.TemporaryDirectory() as d:
+        src, dst = os.path.join(d, "a.wav"), os.path.join(d, "b.wav")
+        from bibi_buzz import ktts as KT
+        KT.write_wav(src, y, KSR)
+        r = subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", src, "-af", chain, "-ar", str(KSR), "-ac", "1", dst], capture_output=True, text=True)
+        if r.returncode:
+            raise RuntimeError("ffmpeg: " + r.stderr[-200:])
+        z, _sr = KT.read_wav(dst)
+        return z
+
+
+def studio_ab(a):
+    """The same four clips of each language as they are and through two studio chains: does the chain cost naturalness (UTMOS sees the band below 8 kHz only)?"""
+    os.environ["BIBI_KOKORO_INPROC"] = "1"
+    try:
+        from bibi_buzz import ktts as KT
+        for lang in ("en", "tr"):
+            want = {}
+            for role, text in get_lines(lang):
+                want.setdefault(role, text)
+            clips = {}
+            for role, (v, r, p) in STUDIO_VOICES[lang].items():
+                if role in want:
+                    try:
+                        clips[role] = (want[role], KT.speak(want[role], v, r, p))
+                    except Exception:
+                        log("   studio clip failed", lang, role, traceback.format_exc()[-150:].replace("\n", " | "))
+            log("---- studio %s: STUDIO language chain role UTMOS WER (s0 = as it is)" % lang)
+            parts = []
+            for name, chain in STUDIO.items():
+                ms, ws = [], []
+                for role, (text, y) in clips.items():
+                    try:
+                        z = _chain(y, chain) if chain else y
+                    except Exception:
+                        log("   chain failed", name, traceback.format_exc()[-150:].replace("\n", " | "))
+                        continue
+                    sc = score(z, text, lang)
+                    ms.append(sc.get("mos", 0.0))
+                    ws.append(sc.get("wer", 1.0))
+                    log("STUDIO %s %s %-5s UTMOS %.2f WER %3.0f%%" % (lang, name, role, sc.get("mos", 0.0), 100 * sc.get("wer", 1.0)))
+                    if role in ("nar", "mama"):
+                        parts += [level(z), np.zeros(int(0.6 * KSR))]
+                if ms:
+                    log("STUDIO %s %s MEAN UTMOS %.2f WER %.0f%%" % (lang, name, np.mean(ms), 100 * np.mean(ws)))
+                parts.append(np.zeros(int(1.0 * KSR)))
+            VL.save("studio-" + lang, np.concatenate(parts) if parts else np.zeros(KSR), KSR)
+    finally:
+        os.environ.pop("BIBI_KOKORO_INPROC", None)
+
+
+# ------------------------------------------------------------------------------------------------------------------------ the gallery: the casting of some tales, the way the videos make it
+GALLERY_TALES = ["three-little-pigs", "goldilocks", "red-riding-hood", "cinderella", "magic-porridge-pot", "gingerbread-man"]
+
+
+def gallery(a):
+    """Every character of some tales says its type's line with the voice, speed, pitch and effect of the daily videos' casting (bibi_buzz.tales.cast_voices with
+    BIBI_KOKORO set; the Edge voice stands in for a line Kokoro cannot make); the narrator says who is next.  One mp3 per language (gallery-<language>.mp3), every
+    line measured (GAL lines) and a warning for every pair of a tale that sounds alike (GALWARN lines)."""
+    from bibi_buzz import tales as T
+    from bibi_buzz import voice as VO
+    from test_tale import VOICE_LINES, VOICE_NAMES
+    for lang in ("en", "tr"):
+        i = 0 if lang == "en" else 1
+        old = os.environ.get("BIBI_KOKORO")
+        os.environ["BIBI_KOKORO"] = lang
+        try:
+            plan, items = [], []
+            for key in GALLERY_TALES:
+                cv = T.cast_voices(key, lang)
+                nar = cv["nar"]
+                title = T.build(key, lang).title
+                plan.append(("title", key, None, None, (title,) + tuple(nar)))
+                items.append(plan[-1][4])
+                seen, count = {}, {}
+                for who, spec in T.CASTING[key].items():
+                    typ = spec if isinstance(spec, str) else spec[0]
+                    seen[typ] = seen.get(typ, 0) + 1
+                for who, spec in T.CASTING[key].items():
+                    typ = spec if isinstance(spec, str) else spec[0]
+                    count[typ] = count.get(typ, 0) + 1
+                    name = VOICE_NAMES[typ][i] + ((" " + number_words(count[typ], lang)) if seen[typ] > 1 else "")
+                    plan.append(("name", key, who, typ, (name,) + tuple(nar)))
+                    items.append(plan[-1][4])
+                    plan.append(("line", key, who, typ, (VOICE_LINES[typ][i],) + tuple(cv[who])))
+                    items.append(plan[-1][4])
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf):
+                clips = VO.synth_items(items, "ffmpeg", os.path.join(OUT, "_cache_gallery_" + lang))
+            for ln in buf.getvalue().splitlines():
+                log("   " + ln)
+        except Exception:
+            log("GALLERY %s FAILED %s" % (lang, traceback.format_exc()[-1200:]))
+            continue
+        finally:
+            if old is None:
+                os.environ.pop("BIBI_KOKORO", None)
+            else:
+                os.environ["BIBI_KOKORO"] = old
+        log("---- gallery %s: GAL language tale character type F0 UTMOS WER voice" % lang)
+        parts, rows = [], {}
+        for kind, key, who, typ, item in plan:
+            y = VL.resample(clips[item], 44100, KSR)
+            if kind == "title":
+                parts += [np.zeros(int(1.2 * KSR)), level(y), np.zeros(int(0.7 * KSR))]
+                continue
+            if kind == "name":
+                parts += [level(y), np.zeros(int(0.25 * KSR))]
+                continue
+            sc = score(y, item[0], lang)
+            f0 = f0_of(y)
+            rows.setdefault(key, []).append((who, typ, item[1], f0))
+            log("GAL %s %-20s %-8s %-11s F0 %5s UTMOS %.2f WER %3.0f%%  %s" % (lang, key, who, typ, ("%.0f" % f0) if f0 else "-", sc.get("mos", 0.0), 100 * sc.get("wer", 1.0), item[1]))
+            parts += [level(y), np.zeros(int(0.8 * KSR))]
+        for key, rs in rows.items():
+            for x in range(len(rs)):
+                for z in range(x + 1, len(rs)):
+                    a_, b_ = rs[x], rs[z]
+                    if a_[3] and b_[3]:
+                        ratio = max(a_[3], b_[3]) / min(a_[3], b_[3])
+                        same = a_[2].split("|")[0] == b_[2].split("|")[0]
+                        if (same and ratio < 1.25) or ratio < 1.10:
+                            log("GALWARN %s %s: %s (%s) and %s (%s) may sound alike: F0 %.0f and %.0f Hz (x%.2f)%s" % (lang, key, a_[0], a_[1], b_[0], b_[1], a_[3], b_[3], ratio,
+                                                                                                                          ", the same voice" if same else ""))
+        VL.save("gallery-" + lang, np.concatenate(parts) if parts else np.zeros(KSR), KSR)
+
+
 # ------------------------------------------------------------------------------------------------------------------------ main
 ENGINES = [                                                   # (language, key, function)
     ("en", "1-cur", e_cur), ("en", "2-edge-multi", e_edge(EDGE_MULTI)), ("en", "3-kokoro", e_kokoro), ("en", "4-prod-kokoro", e_prod),
@@ -684,14 +948,16 @@ def job_main(a):
             log("  ", m, "MISSING", repr(e)[:120])
     list_edge_voices()
     only = [x for x in (a.only or "").split(",") if x]
-    if "cast" in only:
-        try:
-            cast_sweep(a)
-        except Exception:
-            log("CAST SWEEP FAILED", traceback.format_exc()[-1500:])
-        only = [x for x in only if x != "cast"]
-        if not only:
-            return
+    special = [("cast", cast_sweep), ("palette", palette), ("studio", studio_ab), ("gallery", gallery)]            # (jobs of their own: not an engine of the ten lines)
+    for key, fn in special:
+        if key in only:
+            try:
+                fn(a)
+            except Exception:
+                log("%s FAILED" % key.upper(), traceback.format_exc()[-1500:])
+            only = [x for x in only if x != key]
+            if not only:
+                return
     for lang, key, fn in ENGINES:
         if only and key.split("-", 1)[1] not in only and key not in only:
             continue
@@ -710,7 +976,7 @@ def job_main(a):
 def main():
     global OUT
     ap = argparse.ArgumentParser()
-    ap.add_argument("job", choices=["main", "cbx-prepare", "cbx-collect"])
+    ap.add_argument("job", choices=["main", "cbx-prepare", "cbx-collect", "myvoice-prepare", "myvoice-collect"])
     ap.add_argument("--out", default="out/speech")
     ap.add_argument("--only", default="", help="engine keys, comma separated (main only)")
     a = ap.parse_args()
@@ -720,8 +986,8 @@ def main():
     VL._LOG = open(os.path.join(OUT, "lab.txt"), "a", encoding="utf-8")
     log("=" * 20, a.job, time.strftime("%H:%M:%S"))
     try:
-        {"main": job_main, "cbx-prepare": cbx_prepare, "cbx-collect": cbx_collect}[a.job](a)
-        if a.job == "cbx-collect":
+        {"main": job_main, "cbx-prepare": cbx_prepare, "cbx-collect": cbx_collect, "myvoice-prepare": myvoice_prepare, "myvoice-collect": myvoice_collect}[a.job](a)
+        if a.job in ("cbx-collect", "myvoice-collect"):
             summary()
     except Exception:
         log("JOB FAILED:", a.job, "\n" + traceback.format_exc()[-2500:])

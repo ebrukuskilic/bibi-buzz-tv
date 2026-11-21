@@ -326,6 +326,17 @@ def f_arms(r, P, shoulder_x, shoulder_y, length, w, skin, hand=None, sleeve=None
     return out
 
 
+def star_pts(cx, cy, ro, ri=None, n=5):
+    """The corners of an n-pointed star (one point up) around (cx, cy)."""
+    ri = ri if ri is not None else ro * 0.45
+    pts = []
+    for i in range(n * 2):
+        ang = math.radians(-90.0 + 180.0 * i / n)
+        rr = ro if i % 2 == 0 else ri
+        pts.append((cx + math.cos(ang) * rr, cy + math.sin(ang) * rr))
+    return pts
+
+
 def held(r, kind, hand):
     """A small item in the hand at local position `hand`."""
     if not kind:
@@ -355,6 +366,22 @@ def held(r, kind, hand):
     elif kind == "stone":                                                                # a smooth, round stone
         r.ell(hx, hy - 8, 19, 14, "#9EA7B3", INK, 2.6, ang=-8)
         r.ell(hx - 6, hy - 13, 7, 3.6, "#CDD3DB", None, ang=-20)
+    elif kind == "pot":                                                                  # the little magic pot (black, with a golden star)
+        for sx in (-1, 1):
+            r.arc(hx + sx * 33, hy - 33, 10, 11, -90 if sx > 0 else 90, 90 if sx > 0 else 270, INK, 5)
+        r.ell(hx, hy - 26, 32, 27, "#34344A", INK, 3.0)
+        r.rrect(hx - 30, hy - 53, hx + 30, hy - 41, 4, "#24243A", INK, 2.6)
+        r.ell(hx, hy - 53, 26, 5, "#FFF0C2", INK, 1.8)
+        r.poly(star_pts(hx, hy - 26, 14, 6), "#FFD21F", INK, 2.0)
+        r.ell(hx - 18, hy - 35, 5, 9, "#6A6A86", None, ang=20)
+    elif kind == "bowl":                                                                 # a bowl of porridge with a spoon in it
+        r.line([(hx + 8, hy - 44), (hx + 31, hy - 80)], "#C98A52", 5.2)
+        r.ell(hx + 33, hy - 85, 6.5, 9, "#D9A066", INK, 2.0, ang=-30)
+        r.poly([(hx + 32 * math.cos(math.radians(a)), hy - 30 + 26 * math.sin(math.radians(a))) for a in range(0, 181, 15)], "#6CB7FF", INK, 2.8)
+        r.line([(hx - 25, hy - 18), (hx + 25, hy - 18)], "#FFFFFF", 2.6)
+        r.ell(hx, hy - 30, 32, 9, "#EAF4FF", INK, 2.6)
+        r.poly([(hx - 26, hy - 31), (hx - 19, hy - 43), (hx - 6, hy - 50), (hx + 6, hy - 50), (hx + 19, hy - 43), (hx + 26, hy - 31)], "#FFF8E1", INK, 2.4)
+        r.ell(hx - 8, hy - 42, 7.5, 3, "#FFFFFF", None, ang=-15)
     elif kind == "club":                                                                 # the troll's big, knobbly stick
         r.line([(hx, hy + 16), (hx + 12, hy - 92)], INK, 22)
         r.line([(hx, hy + 16), (hx + 12, hy - 92)], "#8B5A2B", 15)

@@ -138,10 +138,111 @@ def synth_all(texts, ffmpeg, cache_dir, voice=VOICE):
 
 
 # ---------------------------------------------------------------------------------------------------------- stories
-# Fairy-tale videos use several voices (narrator + one per character): items are (text, voice, rate, pitch).
-def _key2(item):
-    text, voice, rate, pitch = item
+# Fairy-tale videos use several voices (narrator + one per character): items are (text, voice, rate, pitch, fx).
+#
+# fx is "" or a character effect: the same text-to-speech clip is made higher or deeper (the pitch AND the voice colour move together, like a smaller or
+# a bigger person), wobbly, growly, nasal or echoing, so a mouse squeaks, a wolf growls, a granny quavers and a giant booms. fx is a "+" separated list of
+# presets (FX_PRESETS) and key@value settings; a later setting wins over an earlier one ("pig+p@1.34" = the pig voice, but higher):
+#   p@1.3          pitch factor (1.3 = 30 % higher, 0.8 = 20 % lower)      pm@1.06   multiplies the pitch factor
+#   vib@5,0.45     wobble: speed in Hz, depth 0..1                          trem@50,0.12   growl: speed in Hz, depth 0..1
+#   bass@3 treb@2  boost (dB) of the low / high end                         nasal@6   boost (dB) around 1.2 kHz (a snout)
+#   lp@5500 hp@120 low-pass / high-pass filter (Hz)                         hall / echo@0.4 / chorus   room, big echo, shimmer
+FX_PRESETS = {
+    "boy": "p@1.30",
+    "tiny": "p@1.32",
+    "elf": "p@1.36",
+    "dwarf": "p@1.12+bass@2",
+    "pig": "p@1.28+nasal@6",
+    "hen": "p@1.12+vib@9,0.35",
+    "goat": "vib@8,0.45",
+    "hare": "p@1.08",
+    "tortoise": "p@0.90+vib@4,0.25+lp@6500",
+    "fox": "p@0.97+lp@6000",
+    "bear": "p@0.86+bass@3",
+    "lion": "p@0.80+bass@4+hall",
+    "wolf": "p@0.82+bass@3+trem@52,0.10",
+    "troll": "p@0.76+bass@5+trem@62,0.15+lp@5200",
+    "giant": "p@0.72+bass@5+trem@46,0.14+hall",
+    "oldwoman": "p@0.96+vib@5.2,0.45+lp@5500",
+    "oldman": "p@0.92+vib@4.6,0.35+lp@6000",
+    "witch": "p@0.84+vib@6,0.4+trem@40,0.12",
+    "queen": "p@0.90+hall",
+    "king": "p@0.85+bass@3+hall",
+    "mirror": "p@0.92+echo@0.45+treb@2",
+    "fairy": "p@1.06+chorus+treb@3+echo@0.25",
+}
+
+
+def fx_parse(spec, _depth=0):
+    """-> {setting: [numbers]} of an effect spec; raises ValueError for a name that does not exist (so a typo shows up when a tale is built)."""
+    out = {}
+    for tok in (t.strip() for t in (spec or "").split("+")):
+        if not tok:
+            continue
+        if "@" in tok:
+            k, v = tok.split("@", 1)
+            out[k] = [float(x) for x in v.split(",")]
+        elif tok in FX_PRESETS and _depth < 4:
+            out.update(fx_parse(FX_PRESETS[tok], _depth + 1))
+        elif tok in ("hall", "chorus"):
+            out[tok] = [1.0]
+        else:
+            raise ValueError("unknown voice effect %r" % (tok,))
+    return out
+
+
+def fx_chain(spec, sr=SR):
+    """The ffmpeg audio filter chain of an effect spec ("" when there is nothing to do)."""
+    e = fx_parse(spec)
+    if not e:
+        return ""
+    af = ["aresample=%d" % sr, "volume=0.8"]
+    f = e.get("p", [1.0])[0] * e.get("pm", [1.0])[0]
+    if abs(f - 1.0) > 0.005:                                                  # resample = pitch and voice colour together, atempo gives the length back
+        af += ["asetrate=%d" % round(sr * f), "aresample=%d" % sr, "atempo=%.5f" % (1.0 / f)]
+    if "vib" in e:
+        af.append("vibrato=f=%.2f:d=%.3f" % tuple(e["vib"][:2]))
+    if "trem" in e:
+        af.append("tremolo=f=%.1f:d=%.3f" % tuple(e["trem"][:2]))
+    if "bass" in e:
+        af.append("bass=g=%.1f:f=140:w=0.7" % e["bass"][0])
+    if "nasal" in e:
+        af.append("equalizer=f=1250:t=q:w=1.1:g=%.1f" % e["nasal"][0])
+    if "treb" in e:
+        af.append("treble=g=%.1f:f=5000" % e["treb"][0])
+    if "hp" in e:
+        af.append("highpass=f=%d" % e["hp"][0])
+    if "lp" in e:
+        af.append("lowpass=f=%d" % e["lp"][0])
+    if "hall" in e or "echo" in e or "chorus" in e:
+        af.append("apad=pad_dur=0.6")                                          # room for the echo tail (silence at the end is trimmed again)
+    if "hall" in e:
+        af.append("aecho=0.8:0.7:45|90:0.25|0.15")
+    if "echo" in e:
+        a = e["echo"][0]
+        af.append("aecho=0.8:0.88:140|280:%.2f|%.2f" % (a, a * 0.6))
+    if "chorus" in e:
+        af.append("chorus=0.7:0.9:55|65:0.4|0.3:0.25|0.35:2|2.3")
+    af.append("alimiter=limit=0.9:attack=3:release=50:level=disabled")
+    return ",".join(af)
+
+
+def _norm(item):
+    """(text, voice, rate, pitch, fx) of an item; older items have no fx."""
+    return tuple(item[:4]) + ((item[4] if len(item) > 4 else ""),)
+
+
+def _tts_key(item):
+    """The key of the plain text-to-speech clip (the same clip serves every effect)."""
+    text, voice, rate, pitch, _fx = _norm(item)
     return hashlib.sha1(f"v2|{voice}|{rate}|{pitch}|{text}".encode()).hexdigest()[:20]
+
+
+def _key2(item):
+    fx = _norm(item)[4]
+    if not fx:
+        return _tts_key(item)
+    return hashlib.sha1(f"{_tts_key(item)}|fx={fx}".encode()).hexdigest()[:20]
 
 
 def _fallback_voice(voice):
@@ -153,8 +254,8 @@ def _gen_edge2(todo, cache_dir):
     import edge_tts
 
     async def one(sem, item):
-        text, voice, rate, pitch = item
-        mp3 = os.path.join(cache_dir, _key2(item) + ".mp3")
+        text, voice, rate, pitch, _fx = _norm(item)
+        mp3 = os.path.join(cache_dir, _tts_key(item) + ".mp3")
         async with sem:
             for attempt in range(5):
                 v = voice if attempt < 3 else _fallback_voice(voice)     # a voice that is not available -> the language's default voice
@@ -169,15 +270,30 @@ def _gen_edge2(todo, cache_dir):
 
     async def run():
         sem = asyncio.Semaphore(4)
-        await asyncio.gather(*(one(sem, it) for it in todo))
+        once = {}
+        for it in todo:                                                  # one clip per (text, voice, rate, pitch), whatever the effect
+            k = _tts_key(it)
+            if k not in once and not (os.path.exists(os.path.join(cache_dir, k + ".mp3")) and os.path.getsize(os.path.join(cache_dir, k + ".mp3")) > 800):
+                once[k] = it
+        await asyncio.gather(*(one(sem, it) for it in once.values()))
 
     asyncio.run(run())
 
 
 def _convert2(ffmpeg, cache_dir, item):
+    fx = _norm(item)[4]
+    src = os.path.join(cache_dir, _tts_key(item) + ".mp3")
     base = os.path.join(cache_dir, _key2(item))
     raw = base + ".raw.wav"
-    subprocess.run([ffmpeg, "-y", "-loglevel", "error", "-i", base + ".mp3", "-ar", str(SR), "-ac", "1", raw], check=True)
+    chain = fx_chain(fx)
+    plain = [ffmpeg, "-y", "-loglevel", "error", "-i", src, "-ar", str(SR), "-ac", "1", raw]
+    if chain:
+        r = subprocess.run([ffmpeg, "-y", "-loglevel", "error", "-i", src, "-af", chain, "-ar", str(SR), "-ac", "1", raw], capture_output=True, text=True)
+        if r.returncode:                                                 # an effect this ffmpeg cannot do: the plain voice is better than no voice
+            print(f"[voice] effect {fx!r} failed ({r.stderr.strip()[:200]}); using the plain voice", flush=True)
+            subprocess.run(plain, check=True)
+    else:
+        subprocess.run(plain, check=True)
     y = trim(_read_wav(raw))
     peak = float(np.max(np.abs(y))) if len(y) else 1.0
     if peak > 1e-4:
@@ -187,7 +303,7 @@ def _convert2(ffmpeg, cache_dir, item):
 
 
 def synth_items(items, ffmpeg, cache_dir):
-    """Returns {item: float array (mono, 44.1 kHz)} for every (text, voice, rate, pitch) of ONE story video."""
+    """Returns {item: float array (mono, 44.1 kHz)} for every (text, voice, rate, pitch[, fx]) of ONE story video."""
     items = sorted({it for it in items if it[0]})
     os.makedirs(cache_dir, exist_ok=True)
     todo = [it for it in items if not os.path.exists(os.path.join(cache_dir, _key2(it) + ".wav"))]
@@ -200,13 +316,13 @@ def synth_items(items, ffmpeg, cache_dir):
         except Exception as e:
             print(f"[voice] edge-tts failed ({e!r}); falling back to gTTS (one voice) for this video", flush=True)
             for it in todo:
-                alt = (it[0], "gtts-tr" if it[1].startswith("tr-") else "gtts-en-us", "", "")
+                alt = (it[0], "gtts-tr" if it[1].startswith("tr-") else "gtts-en-us", "", "", _norm(it)[4])
                 remap[it] = alt
             alt_todo = [a for a in set(remap.values()) if not os.path.exists(os.path.join(cache_dir, _key2(a) + ".wav"))]
             try:
                 from gtts import gTTS
                 for a in alt_todo:
-                    mp3 = os.path.join(cache_dir, _key2(a) + ".mp3")
+                    mp3 = os.path.join(cache_dir, _tts_key(a) + ".mp3")
                     for attempt in range(4):
                         try:
                             if a[1] == "gtts-tr":

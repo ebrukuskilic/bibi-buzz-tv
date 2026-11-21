@@ -481,6 +481,39 @@ def held(r, kind, hand):
         r.line([(hx - 8, hy + 10), (hx + 22, hy - 74)], INK, 6.5)
         r.line([(hx - 8, hy + 10), (hx + 22, hy - 74)], "#E4EAF2", 3.2)
         r.ell(hx + 21, hy - 69, 3, 6.4, "#FFFFFF", INK, 1.8, ang=-20)
+    elif kind == "sack":                                                                 # a sack of wheat / flour with a red string round its neck
+        r.ell(hx, hy - 30, 32, 38, "#E7D7AE", INK, 2.8)
+        r.poly([(hx - 15, hy - 64), (hx + 15, hy - 64), (hx + 22, hy - 82), (hx + 6, hy - 74), (hx - 6, hy - 85), (hx - 21, hy - 76)], "#E7D7AE", INK, 2.4)
+        r.line([(hx - 15, hy - 64), (hx + 15, hy - 64)], "#C9482F", 4.2)
+        r.ell(hx - 9, hy - 36, 11, 7, "#FFFFFF", None, ang=-25)
+    elif kind == "sheaf":                                                                # a tied sheaf of golden wheat
+        for i in range(8):
+            lean = (i - 3.5) * 3.2
+            r.line([(hx + (i - 3.5) * 2.2, hy + 6), (hx + lean * 1.8, hy - 96)], INK, 6.6)
+            r.line([(hx + (i - 3.5) * 2.2, hy + 6), (hx + lean * 1.8, hy - 96)], "#E9B93F", 3.8)
+        for i in range(8):
+            lean = (i - 3.5) * 3.2
+            r.ell(hx + lean * 1.8, hy - 112, 7.4, 19, "#F0BE44", INK, 2, ang=lean * 1.5)
+        r.rrect(hx - 24, hy - 46, hx + 24, hy - 34, 4, "#E2362F", INK, 2.4)
+    elif kind == "sickle":                                                               # a little curved blade on a wooden handle
+        r.line([(hx - 2, hy + 8), (hx + 8, hy - 42)], INK, 11)
+        r.line([(hx - 2, hy + 8), (hx + 8, hy - 42)], "#B8733A", 6.4)
+        r.poly([(hx + 4, hy - 44), (hx + 34, hy - 70), (hx + 62, hy - 60), (hx + 70, hy - 40), (hx + 52, hy - 54), (hx + 32, hy - 56), (hx + 14, hy - 38)], "#C9D2DE", INK, 2.6)
+    elif kind == "loaf":                                                                 # a hot loaf of bread on a white plate, with a little steam
+        r.ell(hx, hy - 8, 58, 11, "#FFFFFF", INK, 2.6)
+        r.ell(hx, hy - 30, 44, 26, "#C97A2E", INK, 2.8)
+        r.ell(hx, hy - 35, 38, 19, "#E8A24A", None)
+        for i in range(3):
+            r.line([(hx - 19 + i * 19, hy - 48), (hx - 8 + i * 19, hy - 31)], "#A85E1E", 2.8)
+        for i in range(2):
+            r.line([(hx - 12 + i * 24 + 5 * math.sin(j * 1.6 + i), hy - 58 - j * 11) for j in range(4)], "#FFFFFF", 3.4)
+    elif kind == "dough":                                                                # a pink mixing bowl with a soft ball of dough and a wooden spoon
+        r.line([(hx + 10, hy - 36), (hx + 34, hy - 76)], "#C98A52", 5.4)
+        r.ell(hx + 36, hy - 81, 7, 10, "#D9A066", INK, 2, ang=-30)
+        r.poly([(hx + 34 * math.cos(math.radians(a)), hy - 30 + 26 * math.sin(math.radians(a))) for a in range(0, 181, 15)], "#FF6B8B", INK, 2.8)
+        r.ell(hx, hy - 30, 34, 9, darker("#FF6B8B", 0.1), INK, 2.4)
+        r.ell(hx, hy - 40, 26, 17, "#FFF4DA", INK, 2.4)
+        r.ell(hx - 8, hy - 46, 8, 4, "#FFFFFF", None, ang=-15)
     elif kind in ("slipper", "cushion"):                                                 # a glass slipper (on a red velvet cushion with tassels)
         if kind == "cushion":
             r.rrect(hx - 44, hy - 24, hx + 44, hy - 4, 10, "#D93A52", INK, 2.8)
@@ -1036,6 +1069,93 @@ def mirror(c, x, y, k=1.0, t=0.0, P=None, frame="#FFD21F", glass="#BFD9FF", mist
     return r
 
 
+# ------------------------------------------------------------------------------------------------ hen
+def hen(c, x, y, k=1.0, t=0.0, P=None, feathers="#E4573D", comb="#E2362F", apron=None, hold=None, **_):
+    """A hen on two legs: a round, fluffy body with a fan of tail feathers, two wings that act as arms, a big head with a red comb and wattle,
+    and a pointy orange beak that opens when she speaks. `apron` = the colour of a little apron."""
+    P = P or Pose()
+    r = Rig(c, x + P.dx * k, y - P.bob * k + min(P.lower, 0.0) * k, k, P.face, P.lean, P.sq)   # "@70" lifts her onto a stool; "sit" does not sink her through the floor
+    dark, light, beak, leg = darker(feathers, 0.22), mix(feathers, "#FFE9C8", 0.55), "#FFA11F", "#F29A2E"
+    sh = 5
+    for s in (-1, 1):                                                                    # thin orange legs and three-toed feet
+        sw, lift = P.leg(s)
+        hip, foot = (s * 17, -44), (s * 19 + sw, -9 - lift)
+        r.limb(hip, foot, 8, leg)
+        for tx in (-15, 0, 15):
+            r.line([(foot[0], foot[1] + 1), (foot[0] + tx, foot[1] + 8)], INK, 8.4)
+        for tx in (-15, 0, 15):
+            r.line([(foot[0], foot[1] + 1), (foot[0] + tx, foot[1] + 8)], leg, 4.2)
+    for i, a in enumerate((58, 34, 10)):                                                 # a fan of three tail feathers
+        sway = 3 * math.sin(t * 2.4 + i)
+        r.ell(-48 - 11 * math.sin(math.radians(a)) * 2.2, -108 - 30 * math.cos(math.radians(a)), 13, 36, (dark, feathers, light)[i], INK, 3, ang=-(a + sway))
+    r.ell(0, -88, 54, 50, feathers, INK, 3.2)                                            # the round body
+    r.ell(7, -80, 34, 34, light, None)
+    for i in range(3):                                                                   # little feather scallops on the belly
+        r.arc(-6 + i * 14, -84 + (i % 2) * 8, 8, 6, 20, 160, mix(light, dark, 0.35), 2.2)
+    if apron:
+        r.poly([(-27, -122), (27, -122), (40, -54), (-40, -54)], apron, INK, 3)
+        r.rrect(-14, -88, 14, -68, 4, darker(apron, 0.1), INK, 2)
+        r.dot(0, -108, 6, "#FF7AA8")
+    hands = []
+    for s, ang in ((-1, P.arm_l), (1, P.arm_r)):                                         # the wings are the arms
+        a = math.radians(ang)
+        sx, sy, L = s * 44, -108, 46
+        ex, ey = sx + s * math.sin(a) * L, sy + math.cos(a) * L
+        mx, my = (sx + ex) / 2, (sy + ey) / 2
+        r.ell(mx, my, 17, 31, dark, INK, 3, ang=-s * ang)
+        r.ell(mx - s * 2, my - 3, 9, 20, mix(dark, "#FFFFFF", 0.22), None, ang=-s * ang)
+        hands.append((ex, ey))
+    held(r, hold, hands[1])
+    for dx, dy, rr in ((-16, -200, 11), (7, -210, 14.5), (29, -199, 11)):               # the red comb on top
+        r.ell(dx, dy, rr, rr * 1.15, comb, INK, 3)
+    r.ell(5, -160, 45, 41, feathers, INK, 3.2)                                           # the head
+    r.ell(sh, -150, 30, 22, light, None)
+    op = 0.0
+    if P.mouth in ("open", "wow", "grin"):
+        op = 3 + 10 * (P.mouth_amt if P.mouth_amt is not None else 0.4)
+    r.ell(sh, -126 + op * 0.8, 8, 11, comb, INK, 2.2)                                    # the wattle
+    if op > 0.5:                                                                          # the mouth is open: dark inside, the lower beak drops
+        r.poly([(sh - 11, -149), (sh + 11, -149), (sh + 8, -140 + op), (sh - 8, -140 + op)], "#7A1F2E", INK, 2)
+    r.poly([(sh - 10, -148 + op), (sh + 10, -148 + op), (sh + 6, -138 + op), (sh, -134 + op), (sh - 6, -138 + op)], darker(beak, 0.08), INK, 2.4)
+    r.poly([(sh - 15, -160), (sh + 15, -160), (sh + 10, -148), (sh, -143), (sh - 10, -148)], beak, INK, 2.6)
+    r.line([(sh - 9, -148), (sh + 9, -148)], darker(beak, 0.3), 1.8)
+    f_eyes(r, sh * 1.4, -170, 21, 10.5, 13, P)
+    f_cheeks(r, sh, -148, 38, "#FF8A6B", 8, P.puff)
+    return r
+
+
+# ------------------------------------------------------------------------------------------------ chick
+def chick(c, x, y, k=1.0, t=0.0, P=None, fur="#FFD84A", **_):
+    """A fluffy little chick: one big round yellow ball with a tuft on top, tiny wings, orange legs and a small beak that peeps."""
+    P = P or Pose()
+    r = Rig(c, x + P.dx * k, y - P.bob * k + min(P.lower, 0.0) * k, k, P.face, P.lean, P.sq)
+    belly, beak, leg = mix(fur, "#FFFFFF", 0.5), "#FF9A1F", "#F29A2E"
+    sh = 4
+    for s in (-1, 1):
+        sw, lift = P.leg(s)
+        foot = (s * 15 + sw * 0.6, -6 - lift * 0.6)
+        r.limb((s * 14, -24), foot, 6, leg)
+        r.ell(foot[0] + s * 3, foot[1] + 1, 13, 5.5, leg, INK, 2.2)
+    r.ell(0, -54, 47, 45, fur, INK, 3.2)
+    r.ell(0, -40, 29, 25, belly, None)
+    for s, ang in ((-1, P.arm_l), (1, P.arm_r)):                                         # tiny wings
+        a = math.radians(ang)
+        sx, sy, L = s * 43, -50, 20
+        ex, ey = sx + s * math.sin(a) * L, sy + math.cos(a) * L
+        r.ell((sx + ex) / 2, (sy + ey) / 2, 9.5, 17, darker(fur, 0.1), INK, 2.6, ang=-s * ang)
+    for i, (dx, rot) in enumerate(((-7, -22), (0, 0), (7, 22))):                         # a tuft of three feathers
+        r.ell(dx, -101 - (4 if i == 1 else 0), 4.6, 12, fur, INK, 2.2, ang=rot)
+    f_eyes(r, sh * 1.2, -62, 16, 8.5, 10.5, P)
+    f_cheeks(r, sh, -46, 30, "#FF9A8A", 6.5, P.puff)
+    op = 0.0
+    if P.mouth in ("open", "wow", "grin"):
+        op = 2 + 6 * (P.mouth_amt if P.mouth_amt is not None else 0.4)
+    if op > 0.5:
+        r.ell(sh, -41 + op * 0.4, 7, 3 + op * 0.55, "#7A1F2E", INK, 1.8)
+    r.poly([(sh - 10, -52), (sh + 10, -52), (sh + 6, -43), (sh, -38), (sh - 6, -43)], beak, INK, 2.2)
+    return r
+
+
 # ------------------------------------------------------------------------------------------------ small helpers for Bibi's friends
 def friend(c, which, x, y, k, t, mood="smile"):
     f = {"bibi": D.bibi, "pip": D.pip, "mo": D.mo, "lila": D.lila}[which]
@@ -1043,4 +1163,4 @@ def friend(c, which, x, y, k, t, mood="smile"):
 
 
 CHARACTERS = {"pig": pig, "wolf": wolf, "bear": bear, "hare": hare, "tortoise": tortoise, "girl": girl, "ginger": ginger, "goat": goat, "troll": troll,
-              "mirror": mirror}
+              "mirror": mirror, "hen": hen, "chick": chick}

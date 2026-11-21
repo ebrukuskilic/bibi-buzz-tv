@@ -629,6 +629,57 @@ def water(c, x, y, k, t, st):
     return None
 
 
+# ================================================================================================ the three billy goats' world
+@prop
+def bridge(c, x, y, k, t, st):
+    """A wooden bridge over the gorge. (x, y) = the middle of the walking surface, where the goats' feet stand;
+    st["shake"] (0..1) makes the deck tremble under heavy hooves. The troll lives in the dark between the two big posts."""
+    sh = clamp(st.get("shake", 0.0))
+    half = 346
+    wood, light, dark = "#B8793C", "#D9A062", "#7A4A25"
+    r = Rig(c, x, y, k)
+    _tint(c, [r.P(-half + 20, 30), r.P(half - 20, 30), r.P(half - 70, 178), r.P(-half + 70, 178)], "#1B2A44", 0.30)    # the shade under the bridge
+    for sx in (-1, 1):
+        px = sx * 134
+        r.rrect(px - 15, 26, px + 15, 270, 4, wood, INK, 3)                                 # two big posts that stand in the stream
+        for gy in (84, 144, 204):
+            r.line([(px - 8, gy), (px + 8, gy + 6)], dark, 2)
+        r.limb((px, 110), (px + sx * 98, 28), 13, wood, INK, 2.6)                           # a brace under the deck
+    rd = Rig(c, x, y + math.sin(t * 38.0) * 2.8 * sh * k, k)
+    for px in range(-300, 301, 100):                                                      # the railing, behind the walkers
+        rd.rrect(px - 7, -92, px + 7, -6, 4, wood, INK, 2.6)
+        rd.ell(px, -94, 9, 6, light, INK, 2.2)
+    rd.rrect(-half + 8, -76, half - 8, -62, 4, light, INK, 2.6)
+    rd.rrect(-half + 8, -44, half - 8, -30, 4, light, INK, 2.6)
+    rd.rrect(-half - 6, -9, half + 6, 3, 2, light, INK, 2.4)                              # the walking surface
+    rd.rrect(-half, 0, half, 28, 4, wood, INK, 3.2)                                       # the front of the deck
+    for i in range(-5, 6):
+        rd.line([(i * 62, 4), (i * 62, 25)], dark, 2)
+    rd.rrect(-half + 6, 3, half - 6, 9, 2, light, None)
+    rd.rrect(-half, 22, half, 38, 3, dark, INK, 2.6)                                      # the beam below it
+    return rd
+
+
+@prop
+def gorge_water(c, x, y, k, t, st):
+    """The front of the stream at the bottom of the gorge: see-through water that hides the feet of whoever stands in it. Put it at y = 700, in front of everyone."""
+    from .storyart2 import gorge_x
+    top = st.get("top", 668.0)
+    xl0, xr0 = gorge_x(top)
+    xl1, xr1 = gorge_x(722)
+    n = 40
+    wave = [(lerp(xl0, xr0, i / n), top + 3.5 * math.sin(lerp(xl0, xr0, i / n) / 30.0 + t * 2.1) + 2.0 * math.sin(lerp(xl0, xr0, i / n) / 13.0 - t * 2.9)) for i in range(n + 1)]
+    _tint(c, wave + [(xr1, 722), (xl1, 722)], "#3E9BE8", 0.58)
+    c.line(wave, "#E9F7FF", 3.2)
+    for i in range(4):                                                                        # a few ripples
+        ph = (t * 0.5 + i * 0.25) % 1.0
+        yy = top + 14 + i * 12
+        xa, xb = gorge_x(yy)
+        cx = lerp(xa + 40, xb - 40, (i * 0.37 + ph * 0.3) % 1.0)
+        c.line([(cx - 22, yy), (cx - 8, yy - 3), (cx + 8, yy + 3), (cx + 22, yy)], "#D5F1FF", 2.4)
+    return None
+
+
 # ================================================================================================ effects
 @fx
 def wind(c, s, x, y, dt, dir=1, power=1.0, dx=0, **_):

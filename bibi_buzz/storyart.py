@@ -324,6 +324,13 @@ def held(r, kind, hand):
         r.line([(hx - 10, hy - 26), (hx, hy), (hx + 10, hy - 26)], "#E2574C", 4)
         r.dot(hx, hy + 6, 11, "#FFD21F")
         r.dot(hx, hy + 6, 6, "#FFE98A")
+    elif kind == "club":                                                                 # the troll's big, knobbly stick
+        r.line([(hx, hy + 16), (hx + 12, hy - 92)], INK, 22)
+        r.line([(hx, hy + 16), (hx + 12, hy - 92)], "#8B5A2B", 15)
+        r.ell(hx + 15, hy - 112, 25, 36, "#8B5A2B", INK, 3, ang=8)
+        r.ell(hx + 8, hy - 122, 8, 13, "#B07B45", None, ang=8)
+        for dx, dy in ((-12, -104), (30, -100), (4, -134)):
+            r.dot(hx + 15 + dx, hy + dy, 3.6, "#C9A36A")
 
 
 def shadow(c, x, y, rx, color="#00000030"):
@@ -697,10 +704,97 @@ def ginger(c, x, y, k=1.0, t=0.0, P=None, dough="#C98A4B", icing="#FFF8EC", **_)
     return r
 
 
+# ------------------------------------------------------------------------------------------------ billy goat
+def goat(c, x, y, k=1.0, t=0.0, P=None, fur="#F5EFE0", scarf="#FF6B8B", horn="#E8D8A6", horns=1.0, **_):
+    """A billy goat on two legs: curly horns (`horns` = their size), floppy ears, a pointy beard and a scarf with a little bell."""
+    P = P or Pose()
+    r = Rig(c, x + P.dx * k, y - P.bob * k, k, P.face, P.lean, P.sq)
+    belly, hoof = mix(fur, "#FFFFFF", 0.55), "#5B4A44"
+    beard = mix(fur, "#FFFFFF", 0.3) if sum(D.hex2rgb(fur)) < 480 else darker(fur, 0.12)
+    for s in (-1, 1):                                                                    # legs with split hooves
+        sw, lift = P.leg(s)
+        hip, foot = (s * 21, -52), (s * 23 + sw, -13 - lift)
+        r.limb(hip, foot, 21, fur)
+        r.rrect(foot[0] - 13, foot[1] + 1, foot[0] + 13, foot[1] + 15, 6, hoof, INK, 2.6)
+        r.line([(foot[0], foot[1] + 4), (foot[0], foot[1] + 14)], INK, 1.8)
+    r.ell(-50, -88, 10, 17, fur, INK, 2.8, ang=-32)                                      # a little upturned tail
+    r.ell(0, -98, 52, 54, fur, INK, 3.2)                                                 # body
+    r.ell(0, -90, 32, 35, belly, None)
+    f_arms(r, P, 46, -122, 40, 18, fur, hand=hoof)
+    r.rrect(-40, -148, 40, -130, 9, scarf, INK, 3)                                       # the scarf and its bell
+    r.poly([(14, -136), (40, -134), (47, -94), (27, -97)], scarf, INK, 3)
+    r.dot(-24, -123, 8, "#FFD21F")
+    r.dot(-26.5, -126, 3, "#FFF3B0")
+    for s in (-1, 1):                                                                    # horns that sweep up and curl outward, behind the head
+        pts = [(s * (24 + d * horns), -212 - u * horns) for d, u in ((0, 0), (5, 22), (15, 42), (30, 56), (48, 61), (63, 54))]
+        wd = [19, 17, 15, 12.5, 10, 7.5]
+        for i in range(len(pts) - 1):
+            r.line([pts[i], pts[i + 1]], INK, wd[i] * (0.6 + 0.4 * horns ** 0.5) + 5)
+        r.line([pts[-2], pts[-1]], INK, wd[-1] * (0.6 + 0.4 * horns ** 0.5) + 5)
+        for i in range(len(pts) - 1):
+            r.line([pts[i], pts[i + 1]], horn, wd[i] * (0.6 + 0.4 * horns ** 0.5))
+        for i in (1, 2, 3):
+            px, py = pts[i]
+            r.line([(px - 5 * s, py + 4), (px + 5 * s, py - 4)], darker(horn, 0.3), 2)
+    for s in (-1, 1):                                                                    # floppy ears
+        r.ell(s * 60, -190, 25, 11.5, fur, INK, 3, ang=s * 20)
+        r.ell(s * 61, -189, 15, 6, "#FFB3C7", None, ang=s * 20)
+    sh = P.face * 4
+    r.poly([(sh - 11, -142), (sh + 11, -142), (sh + 4, -108), (sh, -100), (sh - 4, -108)], beard, INK, 2.6)   # pointy beard
+    r.ell(0, -182, 50, 49, fur, INK, 3.2)                                                # head
+    r.ell(sh, -160, 29, 23, belly, INK, 2.8)                                             # muzzle
+    r.ell(sh - 9, -168, 3.4, 5, hoof, None)
+    r.ell(sh + 9, -168, 3.4, 5, hoof, None)
+    f_eyes(r, sh * 1.5, -192, 22, 10.5, 12.5, P)
+    f_cheeks(r, sh, -172, 41, "#FF9DB0", 8, P.puff)
+    f_mouth(r, sh, -150, P, 11)
+    return r
+
+
+# ------------------------------------------------------------------------------------------------ troll
+def troll(c, x, y, k=1.0, t=0.0, P=None, skin="#8CC063", tunic="#8A6A4A", hair="#4F7A3A", hold=None, **_):
+    """A grumpy, lumpy troll: big flat feet, a round tummy in a patched tunic, pointy ears, wild hair, one bushy eyebrow and two tusks."""
+    P = P or Pose()
+    r = Rig(c, x + P.dx * k, y - P.bob * k, k, P.face, P.lean, P.sq)
+    dark, nose = darker(skin, 0.2), mix(skin, "#F4F2A0", 0.4)
+    for s in (-1, 1):                                                                    # thick legs, big flat feet
+        sw, lift = P.leg(s)
+        hip, foot = (s * 31, -66), (s * 35 + sw, -15 - lift)
+        r.limb(hip, foot, 38, dark)
+        r.ell(foot[0] + s * 5, foot[1] + 6, 31, 14, skin, INK, 2.8)
+        for i in (-1, 0, 1):
+            r.dot(foot[0] + s * 5 + i * 13, foot[1] + 13, 4.8, mix(skin, "#FFF6C8", 0.6))
+    r.ell(0, -120, 77, 74, tunic, INK, 3.3)                                              # the tunic
+    r.rrect(-48, -94, -22, -68, 3, "#B58A55", INK, 2.2)                                  # a patch, with stitches
+    for i in range(3):
+        r.line([(-46 + i * 11, -91), (-46 + i * 11, -86)], INK, 1.6)
+    r.rrect(-74, -112, 74, -98, 5, "#C9A36A", INK, 2.6)                                  # a rope belt with a knot
+    r.ell(10, -105, 11, 11, "#B58A55", INK, 2.4)
+    hands = f_arms(r, P, 76, -150, 58, 32, skin, hand=dark)
+    held(r, hold, hands[1])
+    r.poly([(-46, -262), (-40, -300), (-24, -270), (-14, -312), (2, -272), (16, -308), (26, -268), (42, -298), (46, -258)], hair, INK, 3)   # wild hair
+    for s in (-1, 1):                                                                    # big pointy ears
+        r.poly([(s * 60, -228), (s * 102, -258), (s * 90, -206)], skin, INK, 3)
+        r.poly([(s * 68, -228), (s * 92, -244), (s * 85, -215)], "#FFB3C7", None)
+    r.ell(0, -214, 70, 58, skin, INK, 3.3)                                               # head
+    for dx, dy, rr in ((-40, -240, 4.5), (47, -232, 3.8), (-54, -206, 3.4)):             # a few warts
+        r.dot(dx, dy, rr, dark)
+    sh = P.face * 5
+    r.ell(sh * 1.3, -250, 46, 9, hair, INK, 2.6)                                          # one big bushy eyebrow
+    f_eyes(r, sh * 1.4, -228, 27, 13, 15, P, white="#FFF9D0")
+    r.ell(sh, -198, 26, 19, nose, INK, 3)                                                 # a big lumpy nose
+    r.ell(sh - 8, -194, 4.2, 5.4, dark, None)
+    r.ell(sh + 8, -194, 4.2, 5.4, dark, None)
+    f_mouth(r, sh, -172, P, 22, teeth=True)
+    for s in (-1, 1):                                                                    # two tusks
+        r.poly([(sh + s * 20, -164), (sh + s * 13, -186), (sh + s * 8, -164)], "#FFFFFF", INK, 2.2)
+    return r
+
+
 # ------------------------------------------------------------------------------------------------ small helpers for Bibi's friends
 def friend(c, which, x, y, k, t, mood="smile"):
     f = {"bibi": D.bibi, "pip": D.pip, "mo": D.mo, "lila": D.lila}[which]
     f(c, x, y, k, t=t, mood=mood, look=(4, -2))
 
 
-CHARACTERS = {"pig": pig, "wolf": wolf, "bear": bear, "hare": hare, "tortoise": tortoise, "girl": girl, "ginger": ginger}
+CHARACTERS = {"pig": pig, "wolf": wolf, "bear": bear, "hare": hare, "tortoise": tortoise, "girl": girl, "ginger": ginger, "goat": goat, "troll": troll}

@@ -385,6 +385,11 @@ def held(r, kind, hand):
         r.line([(hx - 22, hy + 8), (hx + 22, hy + 8)], "#B8733A", 2)
         for i, col in enumerate(("#FF6B8B", "#FFD23F", "#B58CFF")):
             r.dot(hx - 12 + i * 12, hy - 8 - (i % 2) * 4, 6.5, col)
+    elif kind == "crook":                                                                # a shepherd's staff: a long wooden stick with a curled top
+        r.line([(hx, hy + 52), (hx, hy - 132)], INK, 9)
+        r.line([(hx, hy + 52), (hx, hy - 132)], "#A8703A", 5.6)
+        r.arc(hx + 15, hy - 132, 15, 15, 180, 420, INK, 9)
+        r.arc(hx + 15, hy - 132, 15, 15, 180, 420, "#A8703A", 5.6)
     elif kind == "flag":
         r.line([(hx, hy + 10), (hx, hy - 120)], "#8B5A2B", 5)
         r.poly([(hx, hy - 120), (hx + 62, hy - 100), (hx, hy - 80)], "#E2574C", INK, 2.6)
@@ -782,10 +787,11 @@ def tortoise(c, x, y, k=1.0, t=0.0, P=None, shell="#4FB05A", hold=None, **_):
 
 # ------------------------------------------------------------------------------------------------ girl
 def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=None, hood=None, granny=None, gramps=None,
-         gown=None, prince=None, wings=None, hat_kind=None, hat_color=None, shoe=None, beard=None, **_):
+         gown=None, prince=None, wings=None, hat_kind=None, hat_color=None, shoe=None, beard=None, boy=None, **_):
     """A person. dress/hair = colours; hood = red riding hood; granny = a shawl and a bun; gramps = a grandpa's cardigan; gown = a sparkly ball gown
     with glass slippers; prince = a prince's coat, white tights and short hair; wings = fairy wings; hat_kind / hat_color = a hat() on top of the head;
-    shoe = the colour of the shoes (a gown wears glass slippers unless the shoes are given); beard = the colour of a long, bushy beard (a dwarf's)."""
+    shoe = the colour of the shoes (a gown wears glass slippers unless the shoes are given); beard = the colour of a long, bushy beard (a dwarf's);
+    boy = a village boy: a simple tunic in that colour with a belt, brown trousers, boots and short hair."""
     P = P or Pose()
     r = Rig(c, x + P.dx * k, y - P.bob * k + P.lower * k, k, P.face, P.lean, P.sq)
     skin = "#FFDDBF"
@@ -803,6 +809,10 @@ def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=No
             r.limb(hip, foot, 20, "#7A5A3A", INK, 2.6)
             r.ell(foot[0] + s * 2, foot[1] + 22, 19, 10, "#3B2A1E", INK, 2.6)
             continue
+        if boy:                                                                          # brown trousers and boots
+            r.limb(hip, foot, 17, "#8A6238", INK, 2.6)
+            r.ell(foot[0] + s * 2, foot[1] + 22, 19, 10, "#4A3020", INK, 2.6)
+            continue
         if prince:                                                                       # white tights and dark boots
             r.limb(hip, foot, 17, "#F2F2F8", INK, 2.6)
             r.ell(foot[0] + s * 2, foot[1] + 22, 19, 10, "#3B2A1E", INK, 2.6)
@@ -812,7 +822,7 @@ def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=No
         r.ell(foot[0] + s * 2, foot[1] + 22, 17, 9, shoe or ("#BFE6FF" if gown else "#E2574C"), INK, 2.6)     # (glass slippers with a ball gown)
         if gown and not shoe:
             r.ell(foot[0] + s * 2 - 5, foot[1] + 19, 6, 2.4, "#FFFFFF", None)
-    if not hood and not granny and not gramps and not prince:
+    if not hood and not granny and not gramps and not prince and not boy:
         for s in (-1, 1):                                                                # long hair behind
             r.ell(s * 50, -148, 21, 38, hair, INK, 3)
     if hood:                                                                             # a red hooded cloak instead of the dress
@@ -846,6 +856,13 @@ def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=No
             r.dot(0, yy, 4.2, "#FFD21F")
         r.rrect(-42, -86, 42, -76, 3, "#FFD21F", INK, 2.2)
         r.ell(0, -58, 44, 8, darker(dress, 0.1), INK, 2.6)
+    elif boy:                                                                            # a simple tunic with a belt and a little buckle
+        dress = boy
+        r.poly([(-28, -142), (28, -142), (44, -62), (-44, -62)], dress, INK, 3.2)
+        r.poly([(-13, -142), (13, -142), (0, -118)], mix(dress, "#FFFFFF", 0.55), INK, 2.2)
+        r.rrect(-44, -96, 44, -83, 3, "#8B5A2B", INK, 2.4)
+        r.rrect(-7, -97, 7, -82, 2, "#FFD21F", INK, 2)
+        r.ell(0, -62, 44, 8, darker(dress, 0.1), INK, 2.6)
     else:
         r.poly([(-28, -140), (28, -140), (60, -52), (-60, -52)], dress, INK, 3.2)       # dress
         r.ell(0, -52, 60, 9, darker(dress, 0.1), INK, 2.6)
@@ -872,7 +889,7 @@ def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=No
         for s in (-1, 1):
             r.ell(s * 44, -186, 14, 16, hair, INK, 2.6)
             r.ell(s * 47, -164, 11, 15, hair, INK, 2.6)
-    elif prince:                                                                         # short, neat hair with a little quiff
+    elif prince or boy:                                                                  # short, neat hair with a little quiff
         for a in range(195, 346, 25):
             r.ell(50 * math.cos(math.radians(a)) * 0.92, -176 + 46 * math.sin(math.radians(a)), 14, 13, hair, INK, 2.6)
         r.ell(14, -220, 26, 13, hair, INK, 2.8, ang=-10)

@@ -412,8 +412,138 @@ def far_sunset(c, w):
     c.rect(0, 545, w, WH, "#4C8F5A")
 
 
+# ---------------------------------------------------------------- the night garden, the castle and the ballroom (Cinderella)
+def far_night(c, w, castle=False, seed=7):
+    """A starry night with a big moon over dark hills (castle=True: a palace with lit windows on the hill)."""
+    rng = random.Random(seed)
+    vgrad(c, [(0, "#0F1A4C"), (0.55, "#2A3B88"), (1, "#5B5FAA")], 0, 580)
+    for i in range(80):
+        D.star(c, rng.uniform(0, w), rng.uniform(10, 420), rng.choice((3, 4, 5, 6)), rng.choice(("#FFF3A8", "#FFFFFF", "#CFE3FF")))
+    mx = w * 0.82 if w < 1500 else 1120
+    for i, a in enumerate((2.3, 1.75, 1.35)):
+        c.ellipse(mx, 125, 58 * a, 58 * a, fill=mix("#2A3B88", "#FFF3B0", 0.1 + 0.12 * i))
+    c.ellipse(mx, 125, 58, 58, fill="#FFF8D0")
+    c.ellipse(mx - 17, 113, 10, 10, fill="#F0E6B0")
+    c.ellipse(mx + 14, 140, 8, 8, fill="#F0E6B0")
+    c.ellipse(mx + 18, 106, 6, 6, fill="#F0E6B0")
+    hills(c, w, 470, 54, 190, 0.6, "#34558A")
+    if castle:
+        cx = w * 0.5
+        roof, wall, lit = "#6C5FC7", "#C9CCE8", "#FFE27A"
+        for dx, th, tw in ((-190, 150, 34), (190, 150, 34), (-110, 210, 40), (110, 210, 40)):          # the towers
+            x = cx + dx
+            c.rect(x - tw, 468 - th, x + tw, 470, wall)
+            c.poly([(x - tw - 8, 468 - th), (x + tw + 8, 468 - th), (x, 468 - th - 78)], fill=roof)
+            c.rect(x - 6, 468 - th * 0.72 - 14, x + 6, 468 - th * 0.72 + 14, lit)
+            c.rect(x - 6, 468 - th * 0.3 - 14, x + 6, 468 - th * 0.3 + 14, lit)
+        c.line([(cx - 110, 468 - 210 - 78), (cx - 110, 468 - 210 - 112)], "#5A4A3A", 3)
+        c.poly([(cx - 110, 468 - 210 - 112), (cx - 80, 468 - 210 - 102), (cx - 110, 468 - 210 - 92)], fill="#E2574C")
+        c.line([(cx + 110, 468 - 210 - 78), (cx + 110, 468 - 210 - 112)], "#5A4A3A", 3)
+        c.poly([(cx + 110, 468 - 210 - 112), (cx + 140, 468 - 210 - 102), (cx + 110, 468 - 210 - 92)], fill="#E2574C")
+        c.rect(cx - 90, 330, cx + 90, 470, wall)                                                    # the main hall
+        for k in range(7):
+            c.rect(cx - 90 + k * 30, 316, cx - 76 + k * 30, 332, wall)                              # battlements
+        c.poly([(cx - 34, 470), (cx - 34, 410), (cx, 386), (cx + 34, 410), (cx + 34, 470)], fill="#7A5A3A")
+        for dx in (-62, -22, 22, 62):
+            c.rrect(cx + dx - 8, 350, cx + dx + 8, 392, 8, fill=lit)
+    hills(c, w, 520, 40, 150, 2.2, "#25456B")
+    c.rect(0, 540, w, WH, "#1F3D5C")
+
+
+def near_night(c, w, seed=8):
+    rng = random.Random(seed)
+    vgrad(c, [(0, "#2C7A62"), (0.4, "#226553"), (1, "#184A41")], 520, WH)
+    round_tree(c, 70, 560, 250, "#1E5E52")
+    round_tree(c, w - 80, 556, 270, "#216657")
+    bush(c, 230, 548, 1.0, "#1F6A57")
+    bush(c, w - 250, 546, 1.1, "#1F6A57")
+    for _ in range(34):                                                                           # glowing flowers
+        x, y = rng.uniform(0, w), rng.uniform(545, 705)
+        flower_dot(c, x, y, 0.7 + (y - 520) / 300, rng.choice(("#FFE27A", "#FF9DC3", "#BFD2FF", "#FFFFFF")))
+    for _ in range(30):
+        tuft(c, rng.uniform(0, w), rng.uniform(530, 710), 0.8 + rng.random() * 0.6, rng.choice(["#2D8A5E", "#3A9A66"]))
+    for _ in range(26):                                                                           # fireflies
+        D.star(c, rng.uniform(40, w - 40), rng.uniform(380, 690), rng.choice((3, 4)), "#FFF59A")
+
+
+def near_castle(c, w):
+    """The palace terrace: a wide staircase with a red carpet up to the doors, the stone ground in front of it."""
+    cx = w * 0.5
+    vgrad(c, [(0, "#8E94B8"), (1, "#6F7599")], 476, WH)
+    for i in range(6):
+        yt = 478 + 26 * i
+        hw = 250 + 26 * i
+        c.rect(cx - hw, yt, cx + hw, yt + 26, "#B9B3C8")
+        c.rect(cx - hw, yt, cx + hw, yt + 9, "#E9E4F2")
+        c.rect(cx - 66 - i * 3, yt, cx + 66 + i * 3, yt + 26, "#C9314D")
+        c.rect(cx - 66 - i * 3, yt, cx + 66 + i * 3, yt + 9, "#EF5A74")
+        c.rect(cx - 70 - i * 3, yt, cx - 66 - i * 3, yt + 26, "#FFD21F")
+        c.rect(cx + 66 + i * 3, yt, cx + 70 + i * 3, yt + 26, "#FFD21F")
+    for s in (-1, 1):                                                                             # stone posts with lamps
+        x = cx + s * 300
+        c.rrect(x - 16, 400, x + 16, 620, 5, fill="#CFC9DE", outline="#9993B0", width=2)
+        c.rrect(x - 22, 392, x + 22, 410, 4, fill="#E9E4F2", outline="#9993B0", width=2)
+        c.ellipse(x, 372, 15, 20, fill="#FFE27A", outline="#B8933A", width=2)
+    for y in range(646, WH, 30):                                                                  # paving
+        c.rect(0, y, w, y + 2, "#7A80A4")
+
+
+def far_ballroom(c, w):
+    """A golden ballroom: tall arched windows with the night outside, gold pillars, chandeliers and a shiny chequered floor."""
+    vgrad(c, [(0, "#FFF6DC"), (1, "#F6DDA2")], 0, 560)
+    cx = w * 0.5
+    for dx in (-390, 0, 390):                                                                     # arched windows
+        x = cx + dx
+        c.rect(x - 84, 150, x + 84, 440, "#F1C85A")
+        c.ellipse(x, 150, 84, 84, fill="#F1C85A")
+        c.rect(x - 70, 152, x + 70, 430, "#1F2C78")
+        c.ellipse(x, 152, 70, 70, fill="#1F2C78")
+        for k in range(7):
+            D.star(c, x - 52 + (k * 37) % 104, 110 + (k * 53) % 250, 4 + k % 3, "#FFF3A8")
+        if dx == 0:
+            c.ellipse(x + 20, 190, 26, 26, fill="#FFF8D0")
+        c.rect(x - 3, 90, x + 3, 430, "#F1C85A")
+        c.rect(x - 70, 290, x + 70, 296, "#F1C85A")
+    for dx in (-195, 195, -585, 585):                                                             # gold pillars
+        x = cx + dx
+        c.rect(x - 24, 0, x + 24, 540, "#E8B93E")
+        c.rect(x - 24, 0, x - 10, 540, "#F8DE7C")
+        c.rect(x + 14, 0, x + 24, 540, "#C99A25")
+        c.rrect(x - 36, 500, x + 36, 548, 6, fill="#D9A82E", outline="#B98A1E", width=2)
+        c.rrect(x - 36, 0, x + 36, 36, 6, fill="#D9A82E", outline="#B98A1E", width=2)
+    for dx in (-290, 290):                                                                        # chandeliers
+        x = cx + dx
+        c.line([(x, 0), (x, 60)], "#B98A1E", 5)
+        c.poly([(x - 84, 150), (x + 84, 150), (x + 46, 100), (x - 46, 100)], fill="#E8B93E", outline="#B98A1E", width=2.5)
+        c.ellipse(x, 150, 84, 13, fill="#D9A82E", outline="#B98A1E", width=2)
+        c.ellipse(x, 98, 16, 12, fill="#D9A82E")
+        for k in range(-3, 4):
+            c.rect(x + k * 24 - 3.5, 118 + abs(k) * 5, x + k * 24 + 3.5, 140 + abs(k) * 2, "#FFFFFF")
+            c.ellipse(x + k * 24, 112 + abs(k) * 5, 6, 10, fill="#FFE27A")
+        for k in range(-3, 4):
+            c.line([(x + k * 24, 158), (x + k * 24, 184 + (k % 2) * 14)], "#FFFFFF", 2.2)
+            D.star(c, x + k * 24, 192 + (k % 2) * 14, 6, "#FFF3A8")
+    c.rect(0, 520, w, 548, "#C99A25")                                                             # the dado
+    def tw(y):
+        return 36 + (y - 540) * 0.72                                                               # a tile is wider the closer it is
+    for row, (y0, y1) in enumerate(((540, 556), (556, 576), (576, 600), (600, 630), (630, 668), (668, WH + 2))):    # the chequered floor in perspective
+        for k in range(-int(cx // 36) - 3, int(cx // 36) + 4):
+            col = "#FFF3D6" if (k + row) % 2 == 0 else "#F3B9C4"
+            c.poly([(cx + (k - 0.5) * tw(y0), y0), (cx + (k + 0.5) * tw(y0), y0), (cx + (k + 0.5) * tw(y1), y1), (cx + (k - 0.5) * tw(y1), y1)], fill=col)
+
+
+def near_ballroom(c, w):
+    cx = w * 0.5
+    c.poly([(cx - 150, 548), (cx + 150, 548), (cx + 330, WH), (cx - 330, WH)], fill="#C9314D")
+    c.poly([(cx - 150, 548), (cx - 138, 548), (cx - 300, WH), (cx - 330, WH)], fill="#FFD21F")
+    c.poly([(cx + 150, 548), (cx + 138, 548), (cx + 300, WH), (cx + 330, WH)], fill="#FFD21F")
+
+
 BACKDROPS = {
     "meadow": (far_meadow, near_meadow),
+    "garden_night": (far_night, near_night),
+    "castle_night": (lambda c, w: far_night(c, w, castle=True), near_castle),
+    "ballroom": (far_ballroom, near_ballroom),
     "meadow_dawn": (lambda c, w: far_meadow(c, w, "dawn"), near_meadow),
     "meadow_dusk": (lambda c, w: far_meadow(c, w, "dusk"), lambda c, w: near_meadow(c, w, path=False)),
     "meadow_open": (far_meadow, lambda c, w: near_meadow(c, w, path=False, flowers=60, trees=False, fence_on=False)),

@@ -1529,9 +1529,235 @@ def magic_porridge_pot(lang="en"):
     return t
 
 
+# ================================================================================================ cinderella
+CIN_RAGS = dict(dress="#A7A7B8", hair="#F2B33D")                                          # Cinderella in her old grey dress
+CIN_GOWN = dict(gown="#5FD8C2", hair="#F2B33D", hat_kind="crown")                         # ... and in her sparkly ball gown, with glass slippers
+STEP_MA = dict(gown="#8E3B8A", hair="#2B2330", shoe="#5A2A57")                            # the stepmother
+STEP_1 = dict(gown="#FF9A3D", hair="#C8452B", shoe="#E2574C", hat_kind="bow", hat_color="#FF5C8A")      # the first stepsister
+STEP_2 = dict(gown="#8FD14F", hair="#3B2A22", shoe="#3E7A2A", hat_kind="bow", hat_color="#FFD21F")      # the second stepsister
+FAIRY = dict(dress="#B58CFF", hair="#EFE6FF", granny="#E6D3FF", wings="#BDEBFF")           # the fairy godmother
+PRINCE = dict(prince="#3E7BE0", hair="#6B3A1E", hat_kind="crown")
+CK_X, CK_Y, CK_K = 1170, 650, 0.78                                                        # the big clock of the ballroom
+CIN_HOUSES = ((220, "#FFE9E0", "#7B5EA7"), (640, "#FFF1D0", "#5FA8D3"), (1060, "#EAF4FF", "#D9654F"))
+NUMBERS = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve"]
+
+
+def _swap(old, new, at, y=70):
+    """Cinderella changes her clothes behind a magic flash: the old actor goes away, the new one pops up in the very same place."""
+    return [("fx", "poof", old, y, {"at": at, "dur": 1.1, "sfx": "tada"}), ("hide", old, {"at": at + 0.3}), ("show", new, {"at": at + 0.3})]
+
+
+def _hooves(n, at=0.0, gap=0.3):
+    return [("sfx", "hoof" if i % 2 else "hoof2", {"at": at + i * gap, "gain": 0.55}) for i in range(n)]
+
+
+def cinderella(lang="en"):
+    t = Tale("tale-cinderella", "Cinderella | Fairy Tale Story for Kids | Bibi Buzz TV",
+             "Cinderella is a kind girl who works hard for her stepmother and her two stepsisters. When the prince invites everybody to a royal ball, her fairy godmother "
+             "turns a pumpkin into a golden carriage, and gives her a sparkly gown and glass slippers. But the magic ends at midnight! Count the twelve strikes of the big "
+             "clock, and see who can wear the glass slipper. Watch the classic fairy tale about kindness and courage, in a gentle, colorful animated story in simple "
+             "English for toddlers and preschoolers.",
+             TAGS + ["cinderella", "cinderella story", "cinderella fairy tale", "glass slipper", "fairy godmother", "princess story", "counting story", "kindness story"],
+             {"nar": NAR, "cin": (ANA, "+0%", "+10Hz"), "cing": (ANA, "+0%", "+10Hz"), "sm": (ARIA, "-8%", "-14Hz"), "s1": (ANA, "+12%", "+34Hz"),
+              "s2": (ANA, "-2%", "+2Hz"), "fg": (ARIA, "-12%", "+4Hz"), "pr": (GUY, "-2%", "+0Hz")}, lang=lang)
+    t.bubble_tint = {"cin": "#E3F4FF", "cing": "#DDF7F1", "sm": "#EBDDFF", "s1": "#FFE9D2", "s2": "#E4F5D8", "fg": "#F1E6FF", "pr": "#DDEBFF"}
+    t.cover = dict(bg="castle_night", title=("CINDERELLA",), size=124, gap=124,
+                   props=[("coach", "carriage", 250, 706, 1.3, dict(morph=1.0, glow=1.0))],
+                   actors=[("cin", "girl", 620, 712, 1.55, 1, "curtsy", dict(CIN_GOWN)), ("pr", "girl", 930, 712, 1.45, -1, "happy", dict(PRINCE)),
+                           ("fg", "girl", 1140, 700, 1.15, -1, "wave", dict(FAIRY, hold="wand"))])
+    _intro(t, ("CINDERELLA",), "Today's story is... Cinderella!")
+
+    # ---------------------------------------------------------------- 1 a kind girl and her unkind family (counting 1-4)
+    s = t.scene("Cinderella's house", "room", mood="calm", title="A kind girl")
+    s.prop("fp", "fireplace", 140, 640, 0.85)
+    s.actor("cin", "girl", 370, 652, 0.95, face=1, hold="broom", **CIN_RAGS)
+    s.actor("sm", "girl", 1500, 652, 0.95, face=-1, **STEP_MA)
+    s.actor("s1", "girl", 1700, 652, 0.95, face=-1, **STEP_1)
+    s.actor("s2", "girl", 1900, 652, 0.95, face=-1, **STEP_2)
+    s.nar("Once upon a time, there was a kind girl named Cinderella.", ("pose", "cin", "sweep", {"at": 0.2}), ("fx", "sparkle", "cin", 0, {"at": 0.6, "dur": 3.0, "r": 110}))
+    s.nar("She lived with her stepmother and her two stepsisters.", ("pose", "cin", "sweep"), ("walk", "sm", 610, 652, {"at": 0.3, "speed": 260}),
+          ("walk", "s1", 850, 652, {"at": 0.6, "speed": 300}), ("walk", "s2", 1090, 652, {"at": 0.9, "speed": 330}))
+    s.nar("Let us count them!", ("pose", "cin", "sweep"), ("fx", "sparkle", 640, 400, {"at": 0.2, "dur": 2.5, "r": 330}), tail=0.3)
+    s.nar("One! Cinderella, the kind girl.", ("hop", "cin", {"at": 0.3}), ("fx", "mark", "cin", -95, {"at": 0.35, "dur": 11.0, "text": "1"}))
+    s.nar("Two! Her stepmother.", ("hop", "sm", {"at": 0.3}), ("fx", "mark", "sm", -95, {"at": 0.35, "dur": 8.4, "text": "2"}))
+    s.nar("Three! The first stepsister.", ("hop", "s1", {"at": 0.3}), ("fx", "mark", "s1", -95, {"at": 0.35, "dur": 5.7, "text": "3"}))
+    s.nar("Four! The second stepsister.", ("hop", "s2", {"at": 0.3}), ("fx", "mark", "s2", -95, {"at": 0.35, "dur": 3.0, "text": "4"}), tail=0.5)
+    s.nar("But the stepmother and the stepsisters were not kind.", ("pose", "sm", "proud"), ("pose", "s1", "proud"), ("pose", "s2", "proud"), ("pose", "cin", "sad", {"at": 0.4}))
+    s.say("sm", "Cinderella! Sweep the floor, and wash the dishes!", ("pose", "sm", "proud"), ("pose", "cin", "sad"))
+    s.say("s1", "And make my bed!", ("pose", "s1", "proud"))
+    s.say("s2", "And polish my shoes!", ("pose", "s2", "proud"))
+    s.say("cin", "Yes, stepmother. I will do it right away!", ("pose", "cin", "sweep"), ("pose", "sm", "proud"))
+    s.nar("Cinderella worked hard all day long, and she never stopped smiling.", ("pose", "cin", "sweep"), ("fx", "sparkle", "cin", 0, {"at": 0.5, "dur": 3.5, "r": 120}),
+          ("fx", "hearts", "cin", 0, {"at": 1.0, "dur": 3.5}))
+
+    # ---------------------------------------------------------------- 2 the invitation to the royal ball
+    s = t.scene("The invitation", "room", mood="happy", title="The royal ball")
+    s.prop("fp", "fireplace", 140, 640, 0.85)
+    s.actor("cin", "girl", 370, 652, 0.95, face=1, hold="broom", **CIN_RAGS)
+    s.actor("sm", "girl", 610, 652, 0.95, face=-1, hold="scroll", **STEP_MA)
+    s.actor("s1", "girl", 850, 652, 0.95, face=-1, **STEP_1)
+    s.actor("s2", "girl", 1090, 652, 0.95, face=-1, **STEP_2)
+    s.nar("One day, a letter came from the castle.", ("pose", "cin", "sweep"), ("pose", "sm", "wave", {"at": 0.4}), ("fx", "sparkle", "sm", 0, {"at": 0.5, "dur": 3.0, "r": 120}))
+    s.say("sm", "Girls! The prince is having a royal ball!", ("pose", "sm", "cheer"), ("pose", "s1", "surprised", {"at": "50%"}), ("pose", "s2", "surprised", {"at": "50%"}))
+    s.say("s1", "A ball? I will wear my prettiest dress!", ("pose", "s1", "cheer"), ("hop", "s1", {"at": "60%"}), ("pose", "sm", "happy"))
+    s.say("s2", "And I will dance with the prince!", ("pose", "s2", "cheer"), ("hop", "s2", {"at": "60%"}), ("pose", "s1", "happy"))
+    s.say("cin", "May I go to the ball, too?", ("pose", "cin", "happy"), ("walk", "cin", 450, 652, {"at": 0.2, "speed": 100, "pose": "walk"}), ("pose", "s1", "idle"), ("pose", "s2", "idle"))
+    s.say("sm", "You? No, Cinderella! You have too much work to do.", ("pose", "sm", "proud"), ("pose", "cin", "sad", {"at": "30%"}), ("pose", "s1", "laugh"), ("pose", "s2", "laugh"))
+    s.nar("The stepsisters put on their fancy dresses, and off they went to the ball.", ("pose", "s1", "cheer"), ("pose", "s2", "cheer"), ("pose", "sm", "proud"),
+          ("walk", "s1", 1500, 652, {"at": 0.6, "speed": 190}), ("walk", "s2", 1650, 652, {"at": 0.9, "speed": 190}), ("walk", "sm", 1800, 652, {"at": 1.2, "speed": 190}))
+    s.nar("Cinderella was left all alone, and she began to cry.", ("pose", "cin", "sad"), ("hold", "cin", None, {"at": 0.4}), tail=0.7)
+
+    # ---------------------------------------------------------------- 3 the fairy godmother and her magic
+    s = t.scene("The garden", "garden_night", mood="night", title="The fairy godmother")
+    s.prop("coach", "carriage", 960, 664, 1.0, morph=0.0)
+    s.actor("cin", "girl", -160, 652, 0.95, face=1, **CIN_RAGS)
+    s.actor("cing", "girl", 340, 652, 0.95, face=1, show=False, **CIN_GOWN)
+    s.actor("fg", "girl", 640, 640, 0.95, face=-1, show=False, **FAIRY)
+    s.nar("Cinderella ran out into the garden, and she cried and cried.", ("walk", "cin", 340, 652, {"fit": True, "pose": "run"}), ("pose", "cin", "sad", {"at": -0.05}))
+    s.nar("Then, suddenly, there was a bright light!", ("fx", "poof", 640, 520, {"at": 0.7, "dur": 1.1, "sfx": "sparkle"}), ("show", "fg", {"at": 1.0}), ("pose", "fg", "wave", {"at": 1.0}),
+          ("pose", "cin", "surprised", {"at": 1.0}), ("fx", "mark", "cin", -95, {"at": 1.2, "dur": 2.0, "text": "!"}))
+    s.nar("It was her fairy godmother!", ("pose", "fg", "happy"), ("fx", "sparkle", "fg", 0, {"at": 0.3, "dur": 3.0, "r": 140}))
+    s.say("fg", "Do not cry, Cinderella! You will go to the ball!", ("pose", "fg", "cheer", {"at": "50%"}), ("pose", "cin", "surprised"))
+    s.say("cin", "But I have no dress, and no carriage!", ("pose", "cin", "sad"), ("pose", "fg", "idle"))
+    s.say("fg", "Do not worry, my dear. I have some magic for you!", ("pose", "fg", "happy"), ("hold", "fg", "wand", {"at": "55%"}), ("fx", "sparkle", "fg", -20, {"at": "60%", "dur": 2.5, "r": 150}))
+    s.nar("She pointed her wand at the big, orange pumpkin.", ("cam", 800, 440, 1.25, {"at": 0.3, "dur": 1.4}), ("pose", "fg", "cheer", {"at": 0.8}),
+          ("set", "coach", "glow", 1.0, {"at": 1.0, "dur": 0.6}), ("set", "coach", "shake", 1.0, {"at": 1.2, "dur": 0.4}), ("fx", "sparkle", 960, 540, {"at": 0.9, "dur": 3.0, "r": 150}))
+    s.nar("Sparkle, sparkle, sparkle! The pumpkin turned into a golden carriage!", ("fx", "sparkle", 960, 480, {"at": 0.2, "dur": 5.0, "r": 230}), ("fx", "poof", 960, 520, {"at": 1.7, "dur": 1.1, "r": 270, "sfx": "tada"}),
+          ("set", "coach", "morph", 1.0, {"at": 2.0, "dur": 0.15}), ("set", "coach", "shake", 0.0, {"at": 2.4, "dur": 0.4}), ("cam", 640, 360, 1.0, {"at": 3.6, "dur": 1.2}), tail=0.6)
+    s.nar("Then she waved her wand again. Cinderella's old dress turned into a beautiful, sparkly gown, with glass slippers!", ("pose", "fg", "cheer", {"at": 0.5}), *_swap("cin", "cing", 2.2),
+          ("pose", "cing", "surprised", {"at": 2.6}), ("pose", "fg", "happy", {"at": 3.4}), ("fx", "sparkle", "cing", 0, {"at": 2.6, "dur": 5.0, "r": 150}), tail=0.6)
+    s.say("cing", "Oh, thank you! It is so beautiful!", ("pose", "cing", "cheer"), ("hop", "cing", {"at": "55%"}))
+    s.say("fg", "But remember, the magic will end at midnight. You must be home before the clock strikes twelve!", ("pose", "fg", "talk"), ("fx", "mark", "fg", -95, {"at": "75%", "dur": 3.0, "text": "12"}),
+          ("pose", "cing", "surprised", {"at": "60%"}))
+    s.say("cing", "I will remember! Thank you, fairy godmother!", ("pose", "cing", "cheer"), ("hop", "cing", {"at": "55%"}), ("pose", "fg", "wave", {"at": "50%"}))
+    s.nar("Cinderella climbed into the golden carriage, and off she went to the castle.", ("pose", "fg", "wave", {"at": 0.2}), ("fx", "poof", "fg", 65, {"at": 0.9, "dur": 1.1, "r": 210, "sfx": "sparkle"}),
+          ("hide", "fg", {"at": 1.2}), ("walk", "cing", 820, 664, {"at": 0.4, "speed": 170}), ("hide", "cing", {"at": 3.4}),
+          ("set", "coach", "dx", 700, {"at": 3.7, "dur": 3.3}), *_hooves(10, at=3.8, gap=0.33), ("fx", "sparkle", 1010, 480, {"at": 3.7, "dur": 3.5, "r": 260}), tail=0.5)
+
+    # ---------------------------------------------------------------- 4 dancing at the ball
+    s = t.scene("The ballroom", "ballroom", mood="happy", title="Dancing at the ball")
+    s.prop("ck", "clock", CK_X, CK_Y, CK_K, h=11.0, mn=52.0)
+    s.actor("sm", "girl", 110, 668, 0.95, face=1, **STEP_MA)
+    s.actor("s1", "girl", 255, 672, 0.95, face=1, **STEP_1)
+    s.actor("s2", "girl", 400, 668, 0.95, face=1, **STEP_2)
+    s.actor("cing", "girl", 1500, 676, 0.95, face=-1, **CIN_GOWN)
+    s.actor("pr", "girl", 1500, 676, 0.95, face=-1, **PRINCE)
+    s.nar("At the castle, the royal ball had begun.", ("walk", "cing", 570, 676, {"speed": 215, "pose": "walk"}), ("fx", "sparkle", 640, 330, {"at": 0.5, "dur": 4.0, "r": 380}))
+    s.nar("Everybody looked at the beautiful girl in the sparkly gown.", ("pose", "sm", "surprised"), ("pose", "s1", "surprised"), ("pose", "s2", "surprised"), ("pose", "cing", "happy"))
+    s.nar("Even her stepsisters did not know who she was!", ("fx", "mark", "sm", -95, {"at": 0.5, "dur": 3.0, "text": "?"}), ("fx", "mark", "s1", -95, {"at": 0.8, "dur": 3.0, "text": "?"}),
+          ("fx", "mark", "s2", -95, {"at": 1.1, "dur": 3.0, "text": "?"}), tail=0.5)
+    s.nar("The prince walked up to her, and bowed.", ("walk", "pr", 750, 676, {"fit": True}), ("face", "cing", 1, {"at": 0.3}), ("pose", "pr", "happy", {"at": "70%"}), ("pose", "cing", "curtsy", {"at": "70%"}),
+          ("pose", "sm", "idle"), ("pose", "s1", "idle"), ("pose", "s2", "idle"))
+    s.say("pr", "Hello! May I have this dance?", ("pose", "pr", "happy"), ("pose", "cing", "curtsy"))
+    s.say("cing", "Yes, please!", ("pose", "cing", "happy"), ("hop", "cing", {"at": "50%"}))
+    s.nar("They danced, and danced, and danced.", ("pose", "cing", "dance", {"at": 0.4}), ("pose", "pr", "dance", {"at": 0.4}), ("fx", "hearts", "cing", 0, {"at": 0.8, "dur": 6.0}),
+          ("fx", "sparkle", 660, 430, {"at": 0.4, "dur": 6.0, "r": 300}), tail=0.6)
+    s.say("pr", "You are a wonderful dancer!", ("pose", "cing", "dance"), ("pose", "pr", "dance"))
+    s.say("cing", "This is the best night of my life!", ("pose", "cing", "dance"), ("pose", "pr", "dance"), ("fx", "hearts", "pr", 0, {"at": "40%", "dur": 4.0}))
+    s.nar("Cinderella was so happy that she forgot all about the time.", ("pose", "cing", "dance"), ("pose", "pr", "dance"), ("fx", "sparkle", 660, 430, {"at": 0.3, "dur": 4.0, "r": 300}), ("set", "ck", "mn", 54.0, {"at": 0.3, "dur": 3.2}), tail=0.5)
+
+    # ---------------------------------------------------------------- 5 the clock strikes twelve (counting 1-12)
+    s = t.scene("Midnight", "ballroom", mood="tense", title="Midnight!")
+    s.prop("ck", "clock", CK_X, CK_Y, CK_K, h=11.0, mn=54.0)
+    s.actor("cing", "girl", 570, 676, 0.95, face=1, **CIN_GOWN)
+    s.actor("pr", "girl", 750, 676, 0.95, face=-1, **PRINCE)
+    s.nar("But then, the big clock began to strike midnight!", ("pose", "cing", "dance"), ("pose", "pr", "dance"), ("cam", 800, 420, 1.2, {"at": 0.2, "dur": 1.6}),
+          ("set", "ck", "mn", 60.0, {"at": 0.5, "dur": 1.6}), ("pose", "cing", "surprised", {"at": 1.3}), ("pose", "pr", "surprised", {"at": 1.3}),
+          ("fx", "mark", "cing", -95, {"at": 1.5, "dur": 2.5, "text": "!"}))
+    s.nar("Let us count the bongs!", ("fx", "sparkle", CK_X, 330, {"at": 0.2, "dur": 2.5, "r": 170}), tail=0.35)
+    for i, word in enumerate(NUMBERS, 1):
+        s.nar(word + "!", ("sfx", "bong", {"at": 0.0, "gain": 0.6}), ("set", "ck", "n", float(i), {"at": 0.0, "dur": 0.02}), ("set", "ck", "hit", 1.0, {"at": 0.0, "dur": 0.05}),
+              ("set", "ck", "hit", 0.0, {"at": 0.3, "dur": 0.25}), ("fx", "mark", CK_X, 185, {"at": 0.05, "dur": 1.3, "text": str(i)}), tail=0.22 if i < 12 else 0.6)
+    s.say("cing", "Oh no! It is midnight! I must go home!", ("pose", "cing", "scared"), ("hop", "cing", {"at": "55%"}), ("set", "ck", "n", 0.0, {"at": 0.3, "dur": 0.3}), ("pose", "pr", "surprised"))
+    s.nar("Cinderella ran out of the ballroom as fast as she could!", ("cam", 640, 360, 1.0, {"at": 0.2, "dur": 1.2}), ("walk", "cing", -260, 690, {"at": 0.3, "speed": 430, "pose": "run"}),
+          ("pose", "pr", "scared"), ("fx", "mark", "pr", -95, {"at": 1.0, "dur": 2.0, "text": "!"}))
+    s.say("pr", "Wait! Please wait! Come back!", ("pose", "pr", "scared"), ("walk", "pr", 260, 690, {"at": 0.3, "speed": 230, "pose": "run"}), tail=0.5)
+
+    # ---------------------------------------------------------------- 6 she loses a glass slipper on the castle steps
+    s = t.scene("The castle steps", "castle_night", mood="sad", title="The glass slipper")
+    s.prop("coach", "carriage", 230, 690, 0.85, morph=1.0)
+    s.prop("sl", "slipper", 610, 604, 0.8, show=False)
+    s.actor("cing", "girl", 640, 500, 0.95, face=-1, **CIN_GOWN)
+    s.actor("cin", "girl", 520, 690, 0.95, face=-1, show=False, **CIN_RAGS)
+    s.actor("pr", "girl", 660, 505, 0.95, face=-1, show=False, **PRINCE)
+    s.nar("Cinderella ran down the castle steps, as fast as she could.", ("walk", "cing", 600, 600, {"fit": True, "pose": "run"}))
+    s.nar("One of her glass slippers fell off, but she did not stop!", ("show", "sl", {"at": 0.4}), ("fx", "sparkle", 610, 560, {"at": 0.5, "dur": 6.0, "r": 120}),
+          ("walk", "cing", 520, 690, {"at": 0.2, "speed": 300, "pose": "run"}), ("sfx", "ding", {"at": 0.4}))
+    s.nar("Poof! The magic was over.", *_swap("cing", "cin", 0.4), ("fx", "poof", 230, 560, {"at": 0.4, "dur": 1.1, "r": 260}), ("set", "coach", "morph", 0.0, {"at": 0.7, "dur": 0.15}),
+          ("pose", "cin", "sad", {"at": 0.9}), tail=0.5)
+    s.nar("Her gown was an old dress again, and the golden carriage was a pumpkin.", ("pose", "cin", "sad"))
+    s.nar("Cinderella ran all the way home.", ("pose", "cin", "sad", {"at": 0.0}), ("walk", "cin", -250, 690, {"at": 0.4, "speed": 330, "pose": "run"}), tail=0.3)
+    s.nar("The prince ran after her, but she was gone.", ("show", "pr", {"at": 0.3}), ("walk", "pr", 640, 640, {"at": 0.5, "speed": 220, "pose": "run"}), ("pose", "pr", "surprised", {"at": 2.2}),
+          ("fx", "mark", "pr", -95, {"at": 2.4, "dur": 2.0, "text": "?"}))
+    s.nar("On the steps, he found something shiny. It was a little glass slipper!", ("walk", "pr", 640, 612, {"at": 0.3, "speed": 120}), ("pose", "pr", "think", {"at": 1.4}),
+          ("hide", "sl", {"at": 3.4}), ("hold", "pr", "slipper", {"at": 3.4}), ("pose", "pr", "happy", {"at": 3.4}), ("sfx", "ding", {"at": 3.4}), ("fx", "sparkle", "pr", 0, {"at": 3.4, "dur": 3.0, "r": 130}))
+    s.say("pr", "I will find the girl who fits this glass slipper, and she will be my princess!", ("pose", "pr", "cheer"), ("hop", "pr", {"at": "60%"}), ("cam", 640, 450, 1.25, {"dur": 2.0}), tail=0.6)
+
+    # ---------------------------------------------------------------- 7 the prince looks for the girl
+    s = t.scene("The search", "meadow", mood="calm", title="The search")
+    for i, (cx, wall, roof) in enumerate(CIN_HOUSES):
+        s.prop("h%d" % i, "cottage", cx, 606, 0.8, wall=wall, roof=roof, door=0.0)
+    s.actor("pr", "girl", -160, 652, 0.95, face=1, hold="cushion", **PRINCE)
+    s.actor("vg", "girl", 640, 642, 0.95, face=-1, show=False, dress="#FF8FB8", hair="#7A4A2A")
+    s.nar("The next day, the prince carried the glass slipper to every house in the land.", ("walk", "pr", 390, 652, {"fit": True}), ("fx", "sparkle", "pr", 0, {"at": 1.0, "dur": 4.0, "r": 120}))
+    s.nar("He asked every girl to try it on.", ("pose", "pr", "talk"), ("set", "h1", "door", 1.0, {"at": 0.3, "dur": 0.6}), ("show", "vg", {"at": 0.9}),
+          ("walk", "vg", 530, 650, {"at": 1.1, "speed": 110}), ("pose", "vg", "happy", {"at": 2.4}))
+    s.nar("But the slipper did not fit anyone.", ("pose", "pr", "shrug"), ("pose", "vg", "sad"), ("fx", "mark", "vg", -95, {"at": 0.3, "dur": 1.7, "text": "?"}),
+          ("hide", "vg", {"at": 2.4}), ("set", "h1", "door", 0.0, {"at": 2.6, "dur": 0.6}))
+    s.nar("At last, the prince came to Cinderella's house.", ("walk", "pr", 1500, 652, {"at": 0.3, "speed": 230, "pose": "walk"}), ("pose", "pr", "happy", {"at": 0.0}))
+
+    s = t.scene("Cinderella's house", "room", mood="happy", title="Try the slipper")
+    s.actor("sm", "girl", 130, 640, 0.95, face=1, **STEP_MA)
+    s.actor("s2", "girl", 330, 648, 0.95, face=1, **STEP_2)
+    s.actor("s1", "girl", 520, 650, 0.95, face=1, **STEP_1)
+    s.actor("pr", "girl", 1500, 652, 0.95, face=-1, hold="cushion", **PRINCE)
+    s.actor("cin", "girl", 1500, 664, 0.95, face=-1, hold="broom", **CIN_RAGS)
+    s.actor("cing", "girl", 1150, 664, 0.95, face=-1, show=False, **CIN_GOWN)
+    s.nar("Knock, knock, knock! The prince was at the door.", ("sfx", "knock", {"at": 0.5, "gain": 0.9}), ("walk", "pr", 880, 652, {"at": 1.3, "speed": 210}),
+          ("pose", "sm", "surprised", {"at": 1.4}), ("pose", "s1", "surprised", {"at": 1.4}), ("pose", "s2", "surprised", {"at": 1.4}))
+    s.say("pr", "Please, everybody! Try on the glass slipper.", ("pose", "pr", "happy"), ("pose", "sm", "idle"), ("pose", "s1", "happy"), ("pose", "s2", "happy"))
+    s.nar("One! The first stepsister tried.", ("walk", "s1", 720, 650, {"at": 0.2, "speed": 230}), ("fx", "mark", "s1", -95, {"at": 1.2, "dur": 6.5, "text": "1"}))
+    s.say("s1", "Ouch! It is too small for me!", ("pose", "s1", "scared"), ("hop", "s1", {"at": "60%"}))
+    s.nar("Two! The second stepsister tried.", ("pose", "s1", "sad"), ("walk", "s1", 520, 650, {"at": 0.0, "speed": 260}), ("walk", "s2", 720, 650, {"at": 0.9, "speed": 210}),
+          ("fx", "mark", "s2", -95, {"at": 2.0, "dur": 6.5, "text": "2"}))
+    s.say("s2", "Oh dear! It is too small for me, too!", ("pose", "s2", "scared"), ("hop", "s2", {"at": "60%"}))
+    s.nar("Then Cinderella came out of the kitchen.", ("pose", "s2", "sad"), ("walk", "s2", 330, 648, {"at": 0.0, "speed": 260}), ("walk", "cin", 1150, 664, {"at": 0.3, "speed": 250}),
+          ("pose", "sm", "surprised", {"at": 1.0}))
+    s.say("cin", "May I try the slipper, please?", ("pose", "cin", "happy"), ("hold", "cin", None, {"at": "20%"}))
+    s.say("sm", "Cinderella? Do not be silly!", ("pose", "sm", "proud"), ("pose", "cin", "sad", {"at": "40%"}))
+    s.say("pr", "Every girl can try. Please, try it on.", ("walk", "pr", 1020, 652, {"at": 0.2, "speed": 200}), ("pose", "pr", "happy"), ("pose", "cin", "happy", {"at": "40%"}))
+    s.nar("Three! Then Cinderella tried.", ("fx", "mark", "cin", -95, {"at": 0.4, "dur": 7.0, "text": "3"}), ("pose", "cin", "think"))
+    s.nar("And the glass slipper fit her perfectly!", ("hold", "pr", None, {"at": 0.6}), ("sfx", "tada", {"at": 0.9}), ("fx", "sparkle", "cin", 0, {"at": 0.8, "dur": 3.5, "r": 150}),
+          ("pose", "cin", "cheer", {"at": 0.9}), ("hop", "cin", {"at": 1.3}), ("pose", "pr", "surprised", {"at": 0.8}), ("fx", "hearts", "pr", 0, {"at": 1.6, "dur": 3.0}))
+    s.say("cin", "And here is the other slipper!", ("hold", "cin", "slipper", {"at": "35%"}), ("pose", "cin", "happy"), ("fx", "sparkle", "cin", 0, {"at": "40%", "dur": 2.5, "r": 130}))
+    s.nar("Sparkle, sparkle! Her sparkly gown was back again!", ("hold", "cin", None, {"at": 0.5}), *_swap("cin", "cing", 0.7), ("pose", "cing", "cheer", {"at": 1.4}),
+          ("fx", "sparkle", "cing", 0, {"at": 1.2, "dur": 4.0, "r": 150}), ("pose", "sm", "surprised"), ("pose", "s1", "surprised"), ("pose", "s2", "surprised"))
+    s.say("pr", "It is you! You are the girl from the ball!", ("pose", "pr", "cheer"), ("hop", "pr", {"at": "50%"}), ("pose", "cing", "happy"))
+
+    # ---------------------------------------------------------------- 8 happily ever after
+    s = t.scene("The royal wedding", "ballroom", mood="triumph", title="Happily ever after")
+    s.actor("sm", "girl", 130, 628, 0.95, face=1, **STEP_MA)
+    s.actor("s1", "girl", 300, 636, 0.95, face=1, **STEP_1)
+    s.actor("s2", "girl", 460, 628, 0.95, face=1, **STEP_2)
+    s.actor("cing", "girl", 640, 676, 0.95, face=1, **CIN_GOWN)
+    s.actor("pr", "girl", 820, 676, 0.95, face=-1, **PRINCE)
+    s.actor("fg", "girl", 1090, 640, 0.95, face=-1, hold="wand", **FAIRY)
+    s.nar("Cinderella and the prince were married, in the big, beautiful castle.", ("pose", "cing", "dance", {"at": 0.4}), ("pose", "pr", "dance", {"at": 0.4}), ("pose", "fg", "cheer", {"at": 0.8}),
+          ("fx", "hearts", "cing", 0, {"at": 0.8, "dur": 5.0}), ("fx", "sparkle", 730, 430, {"at": 0.4, "dur": 5.0, "r": 320}))
+    s.say("sm", "We are so sorry, Cinderella. We were not kind to you.", ("pose", "sm", "sad"), ("pose", "s1", "sad"), ("pose", "s2", "sad"), ("pose", "cing", "idle"), ("pose", "pr", "idle"))
+    s.say("cing", "That is all right. I forgive you.", ("pose", "cing", "happy"), ("pose", "sm", "surprised", {"at": "60%"}), ("fx", "hearts", "cing", 0, {"at": "40%", "dur": 3.5}))
+    s.nar("Cinderella was kind to everybody, even to people who were not kind to her.", ("pose", "sm", "happy"), ("pose", "s1", "happy"), ("pose", "s2", "happy"), ("pose", "cing", "happy"),
+          ("pose", "pr", "happy"), ("fx", "sparkle", 640, 420, {"at": 0.4, "dur": 5.0, "r": 340}))
+    s.nar("And they all lived happily ever after.", *[("pose", i, "cheer", {"at": 0.4}) for i in ("sm", "s1", "s2", "cing", "pr", "fg")], ("hop", "cing", {"at": 0.9}), ("hop", "pr", {"at": 1.2}),
+          ("fx", "confetti", 0, 0, {"at": 0.4, "dur": 60.0}), ("fx", "sparkle", 640, 330, {"at": 0.3, "dur": 5.0, "r": 380}), tail=0.8)
+
+    _outro(t, "Remember, little ones: be kind and brave, and good things will come to you.", caption="Be kind and brave!")
+    return t
+
+
 TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_and_hare, "goldilocks": goldilocks,
          "red-riding-hood": red_riding_hood, "gingerbread-man": gingerbread_man, "three-billy-goats": three_billy_goats,
-         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup, "magic-porridge-pot": magic_porridge_pot}
+         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup, "magic-porridge-pot": magic_porridge_pot, "cinderella": cinderella}
 
 
 def build(key, lang="en"):

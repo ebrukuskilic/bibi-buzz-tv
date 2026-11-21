@@ -604,7 +604,7 @@ def _draw_actor(view, scene, tl, ts, near, far, tale, amp_of):
     P = A.pose_for(name, ts, phase=phase, moving=moving, amp=amp, face=face, seed=d.seed, speed=speed / 150.0)
     P.lean += tl.tilt_at(ts)
     style = d.style
-    if d.kind in ("girl", "bear", "troll"):
+    if d.kind in ("girl", "bear", "troll", "wolf"):
         style = dict(style)
         style["hold"] = tl.hold_at(ts)
     P.look = (face * 3.0, -1.0) if P.look == (0.0, 0.0) and name in ("idle", "talk", "walk", "wave") else P.look

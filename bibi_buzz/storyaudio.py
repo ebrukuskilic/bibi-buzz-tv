@@ -279,12 +279,60 @@ def sfx_peep():
     return out
 
 
+def sfx_roar():
+    """A big, friendly lion roar: a low, rough growl that swells at the start, wobbles and then trails away."""
+    dur = 1.5
+    t = _t(dur)
+    f = 122 - 42 * (t / dur) + 9 * np.sin(2 * np.pi * 6.0 * t)                     # a low note that slowly sinks
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    rough = 0.5 + 0.5 * np.sin(2 * np.pi * 27 * t) ** 2                             # the growl: a fast flutter of the volume
+    body = sum(np.sin(k * ph) / (k ** 0.85) for k in range(1, 13))
+    env = np.minimum(1.0, t / 0.06) * np.clip((dur - t) / 0.6, 0, 1) ** 1.3
+    y = (body * 0.5 + band_noise(dur, 160, 1900, 71) * 0.9) * rough * env
+    return y / (np.max(np.abs(y)) + 1e-9) * 0.85
+
+
+def sfx_squeak():
+    """Eek! A tiny mouse squeak: two quick, high, wobbling chirps."""
+    out = np.zeros(int(0.5 * SR))
+    for t0, f0, f1 in ((0.0, 2100, 3400), (0.19, 1900, 3100)):
+        n = int(0.15 * SR)
+        t = np.arange(n) / SR
+        f = f0 + (f1 - f0) * np.clip(t / 0.08, 0, 1) - 600 * np.clip((t - 0.08) / 0.07, 0, 1) + 60 * np.sin(2 * np.pi * 36 * t)
+        ph = 2 * np.pi * np.cumsum(f) / SR
+        y = (np.sin(ph) + 0.22 * np.sin(2 * ph)) * np.sin(np.pi * np.clip(t / 0.15, 0, 1)) ** 0.6
+        add(out, t0, y, 0.45)
+    return out
+
+
+def sfx_snap():
+    """Snap! A rope strand breaks: a sharp crack and a quick twang."""
+    dur = 0.5
+    t = _t(dur)
+    y = band_noise(dur, 1200, 7000, 77) * np.exp(-t * 55) * 0.9 + np.sin(2 * np.pi * (520 - 140 * t / dur) * t) * np.exp(-t * 14) * 0.5
+    y *= np.minimum(1.0, t / 0.002)
+    return y / (np.max(np.abs(y)) + 1e-9) * 0.8
+
+
+def sfx_gnaw():
+    """Nibble, nibble, nibble: a fast run of tiny, scratchy bites."""
+    out = np.zeros(int(1.3 * SR))
+    for i in range(9):
+        n = int(0.06 * SR)
+        t = np.arange(n) / SR
+        bite = band_noise(0.06, 1500, 6500, 80 + i) * np.exp(-t * 55) + 0.35 * np.sin(2 * np.pi * (900 + 60 * (i % 3)) * t) * np.exp(-t * 70)
+        add(out, 0.03 + i * 0.125 + (0.02 if i % 2 else 0.0), bite, 0.5)
+    return out
+
+
 SFX = {"knock": sfx_knock, "wind": sfx_wind, "collapse": sfx_collapse, "boing": sfx_boing, "splash": sfx_splash,
        "sparkle": sfx_sparkle, "ding": sfx_ding, "pop": sfx_pop, "thud": sfx_thud, "hoof": sfx_hoof, "hoof2": sfx_hoof2, "boom": sfx_boom, "cheer": sfx_cheer,
        "creak": sfx_creak, "snore": sfx_snore, "dizzy": sfx_dizzy, "whoosh": sfx_whoosh, "beep3": sfx_beep3,
-       "fanfare": sfx_fanfare, "munch": sfx_munch, "gulp": sfx_gulp, "yawn": sfx_yawn, "tada": sfx_tada, "rumble": sfx_rumble, "blub": sfx_blub, "bong": sfx_bong, "rain": sfx_rain, "thunder": sfx_thunder, "cluck": sfx_cluck, "peep": sfx_peep}
+       "fanfare": sfx_fanfare, "munch": sfx_munch, "gulp": sfx_gulp, "yawn": sfx_yawn, "tada": sfx_tada, "rumble": sfx_rumble, "blub": sfx_blub, "bong": sfx_bong, "rain": sfx_rain, "thunder": sfx_thunder, "cluck": sfx_cluck, "peep": sfx_peep,
+       "roar": sfx_roar, "squeak": sfx_squeak, "snap": sfx_snap, "gnaw": sfx_gnaw}
 SFX_GAIN = {"wind": 0.45, "collapse": 0.55, "boom": 0.5, "cheer": 0.5, "knock": 0.55, "creak": 0.5, "snore": 0.35,
-            "fanfare": 0.4, "tada": 0.4, "beep3": 0.35, "boing": 0.4, "pop": 0.35, "sparkle": 0.45, "blub": 0.9, "bong": 0.55, "rain": 0.5, "thunder": 0.7, "cluck": 0.5, "peep": 0.45}
+            "fanfare": 0.4, "tada": 0.4, "beep3": 0.35, "boing": 0.4, "pop": 0.35, "sparkle": 0.45, "blub": 0.9, "bong": 0.55, "rain": 0.5, "thunder": 0.7, "cluck": 0.5, "peep": 0.45,
+            "roar": 0.6, "squeak": 0.4, "snap": 0.55, "gnaw": 0.5}
 
 
 @lru_cache(maxsize=None)

@@ -1,6 +1,7 @@
 """The fairy tales (public-domain classics) as story scripts, told in short, simple sentences for ages 2-6."""
 import math
 
+from . import voice as VO
 from .story import Tale, ease, HEAD
 
 NAR = ("en-US-JennyNeural", "-6%", "+0Hz")
@@ -3008,10 +3009,97 @@ TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_a
          "enormous-turnip": enormous_turnip, "stone-soup": stone_soup, "magic-porridge-pot": magic_porridge_pot, "cinderella": cinderella, "snow-white": snow_white, "elves-and-shoemaker": elves_shoemaker, "princess-and-pea": princess_pea, "little-red-hen": little_red_hen, "lion-and-mouse": lion_and_mouse, "boy-who-cried-wolf": boy_who_cried_wolf}
 
 
+# ================================================================================================ voice casting
+# Every character is a TYPE (a girl, a boy, a granny, a wolf, a giant...). The type decides the text-to-speech voice, the speaking speed and the
+# effects of voice.FX_PRESETS (higher, deeper, wobbly, growly, nasal, echoing), so a mouse squeaks, a wolf growls, a granny quavers and a giant booms.
+# Turkish has only two voices (Emel, Ahmet), so there the effects do most of the work. A tale only says which type each of its characters is
+# (CASTING); ("pig", 1.06) is the same type, but 6 % higher, to tell two characters of one type apart.
+_EMEL, _AHMET = "tr-TR-EmelNeural", "tr-TR-AhmetNeural"
+_JENNY, _ANA, _ERIC, _GUY, _ARIA, _CHRIS = ("en-US-JennyNeural", "en-US-AnaNeural", "en-US-EricNeural", "en-US-GuyNeural", "en-US-AriaNeural",
+                                            "en-US-ChristopherNeural")
+TYPES = {      # type: ((English voice, rate, pitch, effect), (Turkish voice, rate, pitch, effect))
+    "nar": ((_JENNY, "-6%", "+0Hz", ""), (_EMEL, "-6%", "+0Hz", "")),
+    # people
+    "girl": ((_ANA, "-2%", "+10Hz", ""), (_EMEL, "-2%", "+8Hz", "p@1.2")),
+    "teen": ((_ANA, "-2%", "+4Hz", "p@0.96"), (_EMEL, "-2%", "+2Hz", "p@1.1")),
+    "boy": ((_ERIC, "+2%", "+8Hz", "boy"), (_AHMET, "+4%", "+0Hz", "p@1.38")),
+    "baby": ((_ANA, "+0%", "+16Hz", "p@1.2"), (_EMEL, "+0%", "+0Hz", "p@1.36")),
+    "woman": ((_ARIA, "-4%", "+0Hz", ""), (_EMEL, "-8%", "-6Hz", "")),
+    "granny": ((_ARIA, "-12%", "-10Hz", "oldwoman"), (_EMEL, "-14%", "-12Hz", "oldwoman")),
+    "fakegranny": ((_ARIA, "-10%", "-8Hz", "p@0.92+trem@45,0.10"), (_EMEL, "-12%", "-12Hz", "p@0.92+trem@45,0.10")),
+    "man": ((_CHRIS, "-8%", "-6Hz", ""), (_AHMET, "-6%", "+0Hz", "")),
+    "grandpa": ((_CHRIS, "-12%", "-8Hz", "oldman"), (_AHMET, "-12%", "-6Hz", "oldman")),
+    "prince": ((_ERIC, "+0%", "+0Hz", ""), (_AHMET, "-2%", "+4Hz", "")),
+    "king": ((_GUY, "-14%", "-20Hz", "king"), (_AHMET, "-14%", "-14Hz", "king")),
+    "lord": ((_CHRIS, "-12%", "-14Hz", "p@0.88+bass@2"), (_AHMET, "-12%", "-10Hz", "p@0.88+bass@2")),
+    "queen": ((_ARIA, "-12%", "-14Hz", "queen"), (_EMEL, "-12%", "-14Hz", "queen")),
+    "stepmother": ((_ARIA, "-8%", "-14Hz", "p@0.9+trem@38,0.08"), (_EMEL, "-10%", "-14Hz", "p@0.9+trem@38,0.08")),
+    "stepsister": ((_ANA, "+6%", "+22Hz", "p@1.08"), (_EMEL, "+6%", "+10Hz", "p@1.2")),
+    "witch": ((_ARIA, "-12%", "-20Hz", "witch"), (_EMEL, "-14%", "-20Hz", "witch")),
+    # magic folk
+    "fairy": ((_ARIA, "-10%", "+4Hz", "fairy"), (_EMEL, "-10%", "+4Hz", "fairy")),
+    "mirror": ((_GUY, "-20%", "-8Hz", "mirror"), (_AHMET, "-16%", "-8Hz", "mirror")),
+    "dwarf": ((_GUY, "+8%", "+14Hz", "dwarf"), (_AHMET, "+8%", "+14Hz", "dwarf")),
+    "elf": ((_GUY, "+12%", "+20Hz", "elf"), (_AHMET, "+10%", "+12Hz", "elf")),
+    "elfgirl": ((_ANA, "+12%", "+22Hz", "elf"), (_EMEL, "+10%", "+10Hz", "elf")),
+    "troll": ((_CHRIS, "-16%", "-20Hz", "troll"), (_AHMET, "-16%", "-20Hz", "troll")),
+    "giant": ((_CHRIS, "-16%", "-26Hz", "giant"), (_AHMET, "-16%", "-26Hz", "giant")),
+    # animals
+    "pig": ((_ERIC, "+2%", "+10Hz", "pig"), (_EMEL, "+4%", "+6Hz", "pig")),
+    "wolf": ((_GUY, "-10%", "-8Hz", "wolf"), (_AHMET, "-10%", "-10Hz", "wolf")),
+    "hare": ((_ERIC, "+8%", "+6Hz", "hare"), (_AHMET, "+8%", "+8Hz", "hare")),
+    "tortoise": ((_CHRIS, "-18%", "-6Hz", "tortoise"), (_AHMET, "-18%", "-6Hz", "tortoise")),
+    "bear": ((_GUY, "-12%", "-10Hz", "bear"), (_AHMET, "-10%", "-10Hz", "bear")),
+    "mamabear": ((_ARIA, "-6%", "-8Hz", "p@0.9+bass@2"), (_EMEL, "-10%", "-10Hz", "p@0.9+bass@2")),
+    "goat_little": ((_ANA, "+4%", "+20Hz", "p@1.12+vib@8,0.45"), (_EMEL, "+4%", "+10Hz", "p@1.25+vib@8,0.45")),
+    "goat_mid": ((_ERIC, "+0%", "+4Hz", "p@1.05+vib@8,0.45"), (_AHMET, "+2%", "+10Hz", "p@1.2+vib@8,0.45")),
+    "goat_big": ((_GUY, "-12%", "-12Hz", "p@0.88+vib@7,0.45+bass@2"), (_AHMET, "-10%", "-12Hz", "p@0.88+vib@7,0.45+bass@2")),
+    "hen": ((_ARIA, "+2%", "+8Hz", "hen"), (_EMEL, "+2%", "+6Hz", "hen")),
+    "fox": ((_GUY, "-4%", "+4Hz", "fox"), (_AHMET, "-4%", "+4Hz", "fox")),
+    "tiny": ((_ANA, "+4%", "+20Hz", "tiny"), (_EMEL, "+8%", "+10Hz", "tiny")),          # a mouse, a ladybird, a chick
+    "lion": ((_CHRIS, "-12%", "-20Hz", "lion"), (_AHMET, "-12%", "-20Hz", "lion")),
+}
+
+CASTING = {    # tale: {character id of the tale: type, or (type, pitch factor)}
+    "three-little-pigs": {"mama": "woman", "pig1": ("pig", 1.06), "pig2": ("pig", 0.99), "pig3": ("pig", 0.92), "wolf": "wolf"},
+    "tortoise-and-hare": {"hare": "hare", "tort": "tortoise", "bear": "bear", "pig1": ("pig", 1.06), "pig2": ("pig", 0.99), "pig3": ("pig", 0.92)},
+    "goldilocks": {"gold": "girl", "papa": "bear", "mama": "mamabear", "baby": "baby"},
+    "red-riding-hood": {"red": "girl", "mama": "woman", "granny": "granny", "wolf": "wolf", "wolfg": "fakegranny", "wood": "man"},
+    "gingerbread-man": {"gm": ("boy", 1.06), "woman": "granny", "man": "grandpa", "pig": "pig", "bear": "bear", "fox": "fox"},
+    "three-billy-goats": {"lit": "goat_little", "mid": "goat_mid", "big": "goat_big", "troll": "troll"},
+    "enormous-turnip": {"gpa": "grandpa", "gma": "granny", "kid": "girl", "pig": "pig", "hare": "hare", "bear": "bear", "pip": "tiny"},
+    "stone-soup": {"fox": "fox", "hare": "hare", "pig": "pig", "goat": "goat_mid", "gma": "granny", "kid": "girl"},
+    "magic-porridge-pot": {"kid": "girl", "mama": "woman", "old": "granny", "gpa": "grandpa", "gma": "granny", "nei": ("girl", 1.06)},
+    "cinderella": {"cin": "teen", "cing": "teen", "sm": "stepmother", "s1": ("stepsister", 1.05), "s2": "stepsister", "fg": "fairy", "pr": "prince"},
+    "snow-white": {"snow": "teen", "queen": "queen", "mir": "mirror", "dw": "dwarf", "old": "witch", "pr": "prince"},
+    "elves-and-shoemaker": {"shoe": "man", "wife": "woman", "lady": "teen", "lord": "lord", "e1": "elf", "e2": "elfgirl"},
+    "princess-and-pea": {"prince": "prince", "king": "king", "queen": "woman", "prn": "teen"},
+    "little-red-hen": {"hen": "hen", "pig": "pig", "goat": "goat_mid", "hare": "hare"},
+    "lion-and-mouse": {"lion": "lion", "mouse": "tiny", "fox": "fox", "hare": "hare", "bear": "bear"},
+    "boy-who-cried-wolf": {"boy": "boy", "farmer": "grandpa", "granny": "granny", "mum": "woman"},
+}
+
+
+def cast_voices(key, lang="en"):
+    """{character id: (voice, rate, pitch, effect)} of a tale, from its CASTING and the TYPES (the narrator included)."""
+    i = 0 if lang == "en" else 1
+    out = {}
+    for who, spec in dict(CASTING[key], nar="nar").items():
+        typ, mult = (spec, 1.0) if isinstance(spec, str) else spec
+        v, r, p, fx = TYPES[typ][i]
+        if abs(mult - 1.0) > 1e-6:
+            fx = (fx + "+" if fx else "") + "pm@%.3f" % mult
+        VO.fx_parse(fx)                                                                # a typo in an effect name fails here, when the tale is built
+        out[who] = (v, r, p, fx)
+    return out
+
+
 def build(key, lang="en"):
     """A fresh Tale of TALES[key] in `lang` ("en", or "tr" = the Turkish lines, voices, title and description of tales_tr.py)."""
     t = TALES[key](lang)
     if lang != "en":
         from . import tales_tr
         tales_tr.localize(t, key)
+    if key in CASTING:                                                                   # the voices by character type (a character without a type keeps its old voice)
+        t.voices = dict(t.voices, **cast_voices(key, lang))
     return t

@@ -1178,7 +1178,31 @@ CRITTERS = {"cat": ("#F5A04A", "#FFF1DC"), "dog": ("#C98A52", "#FFF1DC"), "mouse
             "fox": ("#E2762E", "#FFF4E8"), "sheep": ("#3F3636", "#FFFFFF"), "cow": ("#FFFFFF", "#FFC4CF")}
 
 
-def critter(c, x, y, k=1.0, t=0.0, P=None, species="cat", fur=None, belly=None, accent=None, stripes=False, patch=None, apron=None, bow=None, hold=None, **_):
+def _band_of(v, v0, v1, n):
+    return min(n - 1, max(0, int((v - v0) / (v1 - v0) * n)))
+
+
+def _ell_stripes(r, cx, cy, rx, ry, colors, across="y"):
+    """An ellipse (local units) filled with stripes of the given colours and no outline: across="y" = bands from top to bottom, "x" = from left to right."""
+    n = len(colors)
+    for i, col in enumerate(colors):
+        pa, pb = [], []
+        for j in range(7):
+            u = j / 6.0
+            if across == "y":
+                y = cy - ry + 2 * ry * (i + u * (1.0 + (0.04 if i < n - 1 else 0.0))) / n
+                w = rx * math.sqrt(max(0.0, 1 - ((y - cy) / ry) ** 2))
+                pa.append((cx - w, y))
+                pb.append((cx + w, y))
+            else:
+                x = cx - rx + 2 * rx * (i + u * (1.0 + (0.04 if i < n - 1 else 0.0))) / n
+                h = ry * math.sqrt(max(0.0, 1 - ((x - cx) / rx) ** 2))
+                pa.append((x, cy - h))
+                pb.append((x, cy + h))
+        r.poly(pa + pb[::-1], col, None)
+
+
+def critter(c, x, y, k=1.0, t=0.0, P=None, species="cat", fur=None, belly=None, accent=None, stripes=False, patch=None, apron=None, bow=None, hold=None, wool=None, **_):
     """One kit for seven furry friends on two legs (species = cat, dog, mouse, lion, fox, sheep or cow): the same round body, arms and face, with
     their own ears, muzzle, tail and extras. fur / belly = colours; accent = the colour of a lion's mane or of a cow's spots; stripes = tabby stripes;
     patch = a dog's eye patch; apron = a little apron; bow = a bow on the head."""
@@ -1186,6 +1210,7 @@ def critter(c, x, y, k=1.0, t=0.0, P=None, species="cat", fur=None, belly=None, 
     r = Rig(c, x + P.dx * k, y - P.bob * k + min(P.lower, 0.0) * k, k, P.face, P.lean, P.sq)
     f0, b0 = CRITTERS[species]
     fur, belly = fur or f0, belly or b0
+    wools = [wool] if isinstance(wool, str) else list(wool or ["#FFFFFF"])             # a sheep's wool: one colour, or a list of colours (a rainbow)
     dark = darker(fur, 0.28)
     sh = 3
     sway = math.sin(t * 2.4)
@@ -1206,7 +1231,7 @@ def critter(c, x, y, k=1.0, t=0.0, P=None, species="cat", fur=None, belly=None, 
         r.ell(-64, -90, 42, 25, fur, INK, 3.2, ang=-38)
         r.ell(-90, -108, 18, 15, "#FFFFFF", INK, 2.6, ang=-38)
     elif species == "sheep":
-        r.ell(-42, -80, 15, 15, "#FFFFFF", INK, 2.8)
+        r.ell(-42, -80, 15, 15, wools[-1], INK, 2.8)
     elif species == "cow":
         r.line([(-36, -72), (-62, -62), (-66, -30)], INK, 8)
         r.line([(-36, -72), (-62, -62), (-66, -30)], "#FFFFFF", 4)
@@ -1217,10 +1242,19 @@ def critter(c, x, y, k=1.0, t=0.0, P=None, species="cat", fur=None, belly=None, 
         r.limb(hip, foot, 16, legc)
         r.ell(foot[0] + s * 4, foot[1] + 5, 20, 9, "#3A3030" if species == "cow" else legc, INK, 2.8)
     if species == "sheep":                                                               # a body of fluffy wool
+        nw = len(wools)
         for i in range(10):
             a = 2 * math.pi * i / 10
-            r.ell(46 * math.cos(a), -92 + 50 * math.sin(a), 24, 24, "#FFFFFF", INK, 3)
-        r.ell(0, -92, 46, 50, "#FFFFFF", None)
+            py = -92 + 50 * math.sin(a)
+            r.ell(46 * math.cos(a), py, 24, 24, wools[_band_of(py, -142, -42, nw)], INK, 3)
+        if nw > 1:
+            _ell_stripes(r, 0, -92, 46, 50, wools, "y")
+        else:
+            r.ell(0, -92, 46, 50, wools[0], None)
+            if wools[0].upper() != "#FFFFFF":                                            # (coloured wool needs a few lighter tufts to look fluffy)
+                hl = mix(wools[0], "#FFFFFF", 0.42)
+                r.ell(-17, -122, 18, 10, hl, None, ang=-28)
+                r.ell(22, -60, 13, 7, hl, None, ang=-18)
     else:
         r.ell(0, -92, 44, 48, fur, INK, 3.2)
         r.ell(0, -84, 27, 32, belly, None)
@@ -1267,8 +1301,13 @@ def critter(c, x, y, k=1.0, t=0.0, P=None, species="cat", fur=None, belly=None, 
     if species == "sheep":                                                               # the head: a dark face inside a fluffy wool cap
         r.ell(0, -158, 46, 42, fur, INK, 3.2)
         for i in range(7):
-            r.ell(-36 + 12 * i, -196 + 4 * abs(i - 3), 15, 14, "#FFFFFF", INK, 2.8)
-        r.ell(0, -190, 36, 12, "#FFFFFF", None)
+            r.ell(-36 + 12 * i, -196 + 4 * abs(i - 3), 15, 14, wools[i % len(wools)], INK, 2.8)
+        if len(wools) > 1:
+            _ell_stripes(r, 0, -190, 36, 12, wools, "x")
+        else:
+            r.ell(0, -190, 36, 12, wools[0], None)
+            if wools[0].upper() != "#FFFFFF":
+                r.ell(-12, -199, 11, 5, mix(wools[0], "#FFFFFF", 0.42), None, ang=-10)
     else:
         r.ell(0, -158, 48, 43, fur if species != "cow" else "#FFFFFF", INK, 3.2)
     if species in ("cat", "mouse", "lion", "fox", "dog"):                                # muzzle and nose

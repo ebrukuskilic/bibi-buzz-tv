@@ -231,6 +231,24 @@ def pose_for(name, t, phase=0.0, moving=False, amp=None, face=1, seed=0.0, speed
         P.arm_l = 20
         P.mouth = "smile"
         P.look = (face * 3.0, 3.0)
+    elif name == "dance":                                   # a waltz: sways from side to side with the arms out (partners use the same time, so they sway together)
+        w = s(t * 2.2)
+        P.dx, P.lean = w * 12, w * 5
+        P.bob = abs(s(t * 2.2 + 0.8)) * 6
+        P.arm_l, P.arm_r = 58 + w * 12, 58 - w * 12
+        P.eyes, P.mouth = "happy", "smile"
+    elif name == "sweep":                                   # sweeping the floor with a broom, eyes on the floor
+        w = s(t * 3.0)
+        P.dx, P.lean = w * 9, face * (3.0 + 2.0 * w)
+        P.arm_l, P.arm_r = 34 + w * 5, 40 + w * 5
+        P.look = (face * 2.0, 5.0)
+        P.mouth = "smile"
+    elif name == "curtsy":                                  # a little curtsy: dips down and up again, the skirt widens a bit
+        w = 0.5 - 0.5 * math.cos(t * 3.0)
+        P.sq = 1.0 - 0.09 * w
+        P.arm_l = P.arm_r = 46 + 10 * w
+        P.eyes, P.mouth = "happy", "smile"
+        P.bob = 0.0
     if expr:
         E = pose_for(expr, t, phase, False, None, face, seed, speed)
         P.eyes, P.mouth, P.mouth_amt, P.look = E.eyes, E.mouth, E.mouth_amt, E.look
@@ -389,6 +407,36 @@ def held(r, kind, hand):
         r.ell(hx + 8, hy - 122, 8, 13, "#B07B45", None, ang=8)
         for dx, dy in ((-12, -104), (30, -100), (4, -134)):
             r.dot(hx + 15 + dx, hy + dy, 3.6, "#C9A36A")
+    elif kind == "wand":                                                                 # a fairy wand with a golden star on top
+        r.line([(hx - 4, hy + 8), (hx + 26, hy - 60)], INK, 8.5)
+        r.line([(hx - 4, hy + 8), (hx + 26, hy - 60)], "#F4EBFF", 5)
+        r.poly(star_pts(hx + 29, hy - 76, 21, 9), "#FFD21F", INK, 2.6)
+        r.poly(star_pts(hx + 28, hy - 77, 10, 4.5), "#FFF6BF", None)
+    elif kind == "broom":                                                                # a straw broom that reaches the floor
+        r.line([(hx + 12, hy - 96), (hx - 10, hy + 88)], INK, 9)
+        r.line([(hx + 12, hy - 96), (hx - 10, hy + 88)], "#9A6A3A", 5.4)
+        r.poly([(hx - 28, hy + 62), (hx + 6, hy + 66), (hx + 22, hy + 100), (hx - 44, hy + 94)], "#E3B857", INK, 2.6)
+        r.rrect(hx - 30, hy + 60, hx + 8, hy + 72, 3, "#C9482F", INK, 2.2)
+        for i in range(4):
+            r.line([(hx - 30 + i * 9, hy + 76), (hx - 38 + i * 12, hy + 96)], "#C79A3F", 2)
+    elif kind == "scroll":                                                               # a rolled invitation with a red ribbon
+        r.rrect(hx - 34, hy - 26, hx + 34, hy - 4, 9, "#FFF4D6", INK, 2.6)
+        r.ell(hx - 34, hy - 15, 6, 11, "#F2DFAE", INK, 2.2)
+        r.ell(hx + 34, hy - 15, 6, 11, "#F2DFAE", INK, 2.2)
+        r.rrect(hx - 7, hy - 28, hx + 7, hy - 2, 2, "#E2574C", INK, 2)
+    elif kind in ("slipper", "cushion"):                                                 # a glass slipper (on a red velvet cushion with tassels)
+        if kind == "cushion":
+            r.rrect(hx - 44, hy - 24, hx + 44, hy - 4, 10, "#D93A52", INK, 2.8)
+            r.rrect(hx - 36, hy - 21, hx + 30, hy - 16, 3, "#EF6D82", None)
+            for sx in (-1, 1):
+                r.dot(hx + sx * 44, hy - 4, 5.2, "#FFD21F")
+        base = hy - 24 if kind == "cushion" else hy - 4
+        sh_pts = [(-30, 0), (-31, -26), (-24, -37), (-11, -35), (-5, -23), (9, -17), (25, -14), (36, -8), (38, 0)]      # a high-heeled shoe, seen from the side
+        r.rrect(hx - 36, base - 2, hx - 24, base + 9, 3, "#BFE6FF", INK, 2.4)                    # the heel
+        r.poly([(hx + 1.25 * px + 4, base - 2 + 1.25 * py) for px, py in sh_pts], "#BFE6FF", INK, 2.8)
+        r.poly([(hx + 1.25 * px + 4, base - 2 + 1.25 * py) for px, py in ((-28, -4), (-29, -24), (-23, -33), (-14, -30), (-17, -12))], "#E6F6FF", None)
+        r.dot(hx + 30, base - 14, 4, "#FF8FB8")                                                  # a little pink gem on the toe
+        r.poly(star_pts(hx + 20, base - 40, 10, 4, 4), "#FFFFFF", None)
 
 
 def shadow(c, x, y, rx, color="#00000030"):
@@ -637,10 +685,19 @@ def tortoise(c, x, y, k=1.0, t=0.0, P=None, shell="#4FB05A", hold=None, **_):
 
 
 # ------------------------------------------------------------------------------------------------ girl
-def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=None, hood=None, granny=None, gramps=None, **_):
+def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=None, hood=None, granny=None, gramps=None,
+         gown=None, prince=None, wings=None, hat_kind=None, hat_color=None, shoe=None, **_):
+    """A person. dress/hair = colours; hood = red riding hood; granny = a shawl and a bun; gramps = a grandpa's cardigan; gown = a sparkly ball gown
+    with glass slippers; prince = a prince's coat, white tights and short hair; wings = fairy wings; hat_kind / hat_color = a hat() on top of the head;
+    shoe = the colour of the shoes (a gown wears glass slippers unless the shoes are given)."""
     P = P or Pose()
     r = Rig(c, x + P.dx * k, y - P.bob * k + P.lower * k, k, P.face, P.lean, P.sq)
     skin = "#FFDDBF"
+    if wings:                                                                            # fairy wings behind everything
+        for s in (-1, 1):
+            r.ell(s * 62, -158, 30, 66, wings, INK, 3, ang=s * 24)
+            r.ell(s * 54, -112, 20, 42, mix(wings, "#FFFFFF", 0.35), INK, 2.6, ang=s * 56)
+            r.ell(s * 66, -170, 9, 36, "#FFFFFF", None, ang=s * 24)
     for s in (-1, 1):                                                                    # legs, socks, shoes
         sw, lift = P.leg(s)
         hip, foot = (s * 17, -58), (s * 18 + sw, -14 - lift)
@@ -650,10 +707,16 @@ def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=No
             r.limb(hip, foot, 20, "#7A5A3A", INK, 2.6)
             r.ell(foot[0] + s * 2, foot[1] + 22, 19, 10, "#3B2A1E", INK, 2.6)
             continue
+        if prince:                                                                       # white tights and dark boots
+            r.limb(hip, foot, 17, "#F2F2F8", INK, 2.6)
+            r.ell(foot[0] + s * 2, foot[1] + 22, 19, 10, "#3B2A1E", INK, 2.6)
+            continue
         r.limb(hip, foot, 14, skin)
         r.limb((foot[0], foot[1] + 6), (foot[0], foot[1] + 18), 15, "#FFFFFF", INK, 2.4)
-        r.ell(foot[0] + s * 2, foot[1] + 22, 17, 9, "#E2574C", INK, 2.6)
-    if not hood and not granny and not gramps:
+        r.ell(foot[0] + s * 2, foot[1] + 22, 17, 9, shoe or ("#BFE6FF" if gown else "#E2574C"), INK, 2.6)     # (glass slippers with a ball gown)
+        if gown and not shoe:
+            r.ell(foot[0] + s * 2 - 5, foot[1] + 19, 6, 2.4, "#FFFFFF", None)
+    if not hood and not granny and not gramps and not prince:
         for s in (-1, 1):                                                                # long hair behind
             r.ell(s * 50, -148, 21, 38, hair, INK, 3)
     if hood:                                                                             # a red hooded cloak instead of the dress
@@ -669,6 +732,24 @@ def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=No
         for yy in (-92, -78):
             r.dot(0, yy, 4.2, "#FFD21F")
         r.ell(0, -62, 40, 8, darker(dress, 0.1), INK, 2.6)
+    elif gown:                                                                           # a ball gown: a snug top, a wide bell skirt, a golden sash
+        dress = gown
+        r.poly([(-26, -140), (26, -140), (106, -50), (-106, -50)], dress, INK, 3.2)
+        r.poly([(-26, -140), (26, -140), (30, -112), (-30, -112)], mix(dress, "#FFFFFF", 0.22), None)
+        r.ell(0, -50, 106, 11, darker(dress, 0.1), INK, 2.6)
+        for sx, sy, sr in ((-74, -64, 7), (-38, -82, 5), (8, -66, 7), (46, -90, 5), (76, -62, 6), (-10, -98, 5), (-58, -60, 5), (30, -70, 4)):
+            r.poly(star_pts(sx, sy, sr, sr * 0.4, 4), "#FFFFFF", None)                    # glitter on the skirt
+        r.rrect(-29, -118, 29, -106, 5, "#FFD21F", INK, 2.4)
+        r.dot(0, -112, 5.5, "#FFF1A0")
+    elif prince:                                                                         # a coat with golden buttons, a frilly collar and golden shoulders
+        dress = prince
+        r.poly([(-30, -142), (30, -142), (44, -58), (-44, -58)], dress, INK, 3.2)
+        r.poly([(-13, -142), (13, -142), (0, -100)], "#FFFFFF", INK, 2.4)
+        r.line([(0, -100), (0, -60)], darker(dress, 0.25), 2.6)
+        for yy in (-94, -80, -66):
+            r.dot(0, yy, 4.2, "#FFD21F")
+        r.rrect(-42, -86, 42, -76, 3, "#FFD21F", INK, 2.2)
+        r.ell(0, -58, 44, 8, darker(dress, 0.1), INK, 2.6)
     else:
         r.poly([(-28, -140), (28, -140), (60, -52), (-60, -52)], dress, INK, 3.2)       # dress
         r.ell(0, -52, 60, 9, darker(dress, 0.1), INK, 2.6)
@@ -695,6 +776,12 @@ def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=No
         for s in (-1, 1):
             r.ell(s * 44, -186, 14, 16, hair, INK, 2.6)
             r.ell(s * 47, -164, 11, 15, hair, INK, 2.6)
+    elif prince:                                                                         # short, neat hair with a little quiff
+        for a in range(195, 346, 25):
+            r.ell(50 * math.cos(math.radians(a)) * 0.92, -176 + 46 * math.sin(math.radians(a)), 14, 13, hair, INK, 2.6)
+        r.ell(14, -220, 26, 13, hair, INK, 2.8, ang=-10)
+        for s in (-1, 1):
+            r.ell(s * 45, -178, 10, 17, hair, INK, 2.6)
     elif granny:
         r.ell(0, -224, 20, 17, hair, INK, 3)                                             # the bun
         for i, a in enumerate(range(200, 341, 18)):
@@ -723,6 +810,8 @@ def girl(c, x, y, k=1.0, t=0.0, P=None, dress="#6CB7FF", hair="#FFC83D", hold=No
         for s in (-1, 1):
             r.ell(sh + s * 17, -172, 14.5, 15, None, "#7A5A3A", 2.8)
         r.line([(sh - 3, -172), (sh + 3, -172)], "#7A5A3A", 2.6)
+    if hat_kind:
+        hat(r, hat_kind, -216, hat_color)
     return r
 
 

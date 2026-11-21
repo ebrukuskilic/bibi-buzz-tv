@@ -2745,7 +2745,7 @@ def lion_and_mouse(lang="en"):
     s.nar("The fox, the hare, and the bear heard the roar. They ran to help the lion.", ("walk", "fox", 960, LM_FRY["fox"], {"fit": True, "pose": "run"}),
           ("walk", "hare", 1060, LM_FRY["hare"], {"fit": True, "pose": "run"}), ("walk", "bear", 1170, LM_FRY["bear"], {"fit": True, "pose": "run"}), tail=0.3)
     s.say("fox", "Do not worry, King Lion! We will pull the net!", ("pose", "fox", "wave"), ("hop", "fox", {"at": "60%"}))
-    s.say("bear", "One, two, three, pull!", *[("pose", a, "pull", {"at": "45%"}) for a in ("fox", "hare", "bear")], ("sfx", "creak", {"at": "55%", "gain": 0.4}), tail=0.3)
+    s.say("bear", "One, two, three, pull!", *[("pose", a, "pull", {"at": "74%"}) for a in ("fox", "hare", "bear")], ("sfx", "creak", {"at": "82%", "gain": 0.4}), tail=0.3)
     s.nar("They tugged and tugged. But the strong net did not move.", *[("pose", a, "strain") for a in ("fox", "hare", "bear")], ("sfx", "creak", {"at": 0.6, "gain": 0.5}),
           ("sfx", "creak", {"at": 2.0, "gain": 0.5}), ("fx", "sweat", "bear", 0, {"at": 0.5, "dur": 3.5}))
     s.say("hare", "It is too strong for us!", ("pose", "hare", "sad"), ("pose", "fox", "sad"), ("pose", "bear", "sad"))
@@ -2804,9 +2804,208 @@ def lion_and_mouse(lang="en"):
     return t
 
 
+# ================================================================================================ the boy who cried wolf
+BW_Y = 690                                                                          # the people's feet on the grass
+BW_BOY = dict(boy="#4C9AE6", hair="#8B5A2B", hat_kind="straw", hat_color="#E2574C", hold="crook")
+BW_FARMER = dict(gramps="#7FB069", hair="#FFFFFF", hat_kind="straw", hat_color="#3E8EDE", hold="sheaf")
+BW_GRANNY = dict(granny="#E86A92", hair="#E8E8EE", hold="broom")
+BW_MUM = dict(dress="#FF9B5E", hair="#6B3A1E", hold="basket")
+BW_WOLF = dict(fur="#7B879B", scarf=None)
+BW_MARK = ("#E2574C", "#F2A93B", "#3DB54A", "#3E8EDE", "#9B5CD6")
+BW_SX = (740, 850, 960, 1070, 1180)                                                  # the five sheep, in a row on the hill
+BW_SY = (706, 698, 710, 700, 708)
+BW_SK = 0.8
+BW_DX = (300, 410, 520, 630, 740)                                                  # the sheep at dusk (the wolf comes from the right)
+BW_BX = 980                                                                          # the boy at dusk
+BW_FX = (700, 800, 900, 1000, 1100)                                                  # the sheep in the dark forest
+BW_VX = (150, 275, 400)                                                              # the three villagers (farmer, granny, mum), left of the boy
+
+
+def _bw_sheep(s, xs=BW_SX, face=-1, ys=BW_SY):
+    for i, (x, y) in enumerate(zip(xs, ys)):
+        s.actor("sh%d" % (i + 1), "sheep", x, y, BW_SK, face=face)
+
+
+def _bw_folk(s, xs=BW_VX, face=1, y=BW_Y):
+    s.actor("farmer", "girl", xs[0], y, 1.0, face=face, **BW_FARMER)
+    s.actor("granny", "girl", xs[1], y, 1.0, face=face, **BW_GRANNY)
+    s.actor("mum", "girl", xs[2], y, 1.0, face=face, **BW_MUM)
+
+
+def _bw_poses(pose, ids=("farmer", "granny", "mum"), at=0.0, **o):
+    return [("pose", a, pose, dict(at=at + 0.12 * i, **o)) for i, a in enumerate(ids)]
+
+
+def _bw_village(s, cx=(230, 640, 1050)):
+    for i, (x, wall, roof) in enumerate(zip(cx, ("#FFE9C9", "#FFF1D0", "#E9F3FF"), ("#D9654F", "#3E8EDE", "#8E6BD6"))):
+        s.prop("home%d" % i, "cottage", x, 560, 0.46, wall=wall, roof=roof)
+
+
+def boy_who_cried_wolf(lang="en"):
+    t = Tale("tale-boy-who-cried-wolf", "The Boy Who Cried Wolf | Fairy Tale Story for Kids | Bibi Buzz TV",
+             "Why should we always tell the truth? Watch this classic fable from old Greece: a bored little shepherd boy shouts \"Wolf! Wolf!\" just for fun, and the villagers run to help him, "
+             "again and again. But when a real wolf comes, nobody believes him! Count five fluffy sheep from one to five, learn that a lie can make people sad, "
+             "and find out why we should always tell the truth. A gentle, colorful animated story in simple English for toddlers and preschoolers.",
+             TAGS + ["the boy who cried wolf", "boy who cried wolf story", "aesop fables", "fables for kids", "honesty story", "always tell the truth", "never tell lies",
+                     "counting to five", "counting sheep", "moral stories for kids"],
+             {"nar": NAR, "boy": ("en-US-EricNeural", "+4%", "+28Hz"), "farmer": (GUY, "-8%", "-10Hz"), "granny": (ARIA, "-6%", "-16Hz"), "mum": (ARIA, "+2%", "+6Hz")}, lang=lang)
+    t.bubble_tint = {"boy": "#DCEBFF", "farmer": "#E3F2D4", "granny": "#FFE0EA", "mum": "#FFE8D2"}
+    t.cover = dict(bg="meadow", title=("THE BOY WHO", "CRIED WOLF"), size=100, gap=100, props=[],
+                   actors=[("boy", "girl", 430, 722, 1.5, 1, "scared", dict(BW_BOY, hold=None)), ("sheep", "sheep", 720, 730, 1.15, -1, "scared", {}), ("wolf", "wolf", 960, 722, 1.4, -1, "sly", BW_WOLF)])
+    _intro(t, ("THE BOY WHO", "CRIED WOLF"), "Today's story is... The Boy Who Cried Wolf!")
+
+    # ---------------------------------------------------------------- 1 a little shepherd boy and his five sheep
+    s = t.scene("A little shepherd", "meadow_dawn", mood="happy", title="A little shepherd")
+    _bw_village(s, (230, 470))
+    s.actor("boy", "girl", -170, BW_Y, 1.0, face=1, **BW_BOY)
+    _bw_sheep(s, face=-1)
+    s.nar("Once upon a time, a little shepherd boy lived near a village.", ("walk", "boy", 560, BW_Y, {"fit": True, "pose": "walk"}), ("pose", "boy", "wave", {"at": -1.0}))
+    s.nar("Every day, he took his sheep to a big, green hill.", ("face", "boy", 1), ("pose", "boy", "happy", {"at": 0.3}), *[("hop", "sh%d" % (i + 1), {"at": 1.4 + 0.3 * i}) for i in range(5)])
+    s.nar("He loved his sheep, and he counted them every day.", ("pose", "boy", "proud", {"at": 0.3}), *[("pose", "sh%d" % (i + 1), "happy", {"at": 1.0}) for i in range(5)], ("fx", "hearts", "boy", 0, {"at": 1.2, "dur": 2.6}), tail=0.3)
+    s.nar("One, two, three, four, five!", ("pose", "boy", "talk"), *[("fx", "mark", BW_SX[i], 500, {"at": 0.35 + 0.46 * i, "dur": 1.6, "text": str(i + 1), "color": BW_MARK[i]}) for i in range(5)],
+          *[("hop", "sh%d" % (i + 1), {"at": 0.35 + 0.46 * i}) for i in range(5)], ("sfx", "baa", {"at": 0.6, "gain": 0.35}), ("sfx", "baa", {"at": 1.9, "gain": 0.3}), tail=0.5)
+
+    # ---------------------------------------------------------------- 2 a very boring day
+    s = t.scene("A boring day", "meadow", mood="calm", title="A boring day")
+    _bw_sheep(s)
+    s.actor("boy", "girl", 560, BW_Y, 1.0, face=1, **BW_BOY)
+    s.nar("But some days were very, very boring.", ("pose", "boy", "tired"), ("sfx", "yawn", {"at": 1.0}))
+    s.nar("The boy sat on the hill. He watched the sheep. Nothing happened. Nothing at all!", ("pose", "boy", "sit", {"at": 0.4}), ("cam", 700, 400, 1.08, {"at": 0.4, "dur": 3.0}),
+          *[("pose", "sh%d" % (i + 1), "eat", {"at": 0.6}) for i in range(5)], tail=0.4)
+    s.say("boy", "I am so bored! I want to have some fun!", ("pose", "boy", "sad"), ("cam", 640, 360, 1.0, {"at": 0.0, "dur": 0.8}), tail=0.4)
+    s.nar("Then the boy had a naughty idea.", ("pose", "boy", "sly", {"at": 0.4}), ("fx", "mark", "boy", -30, {"at": 1.2, "dur": 2.2, "text": "!", "color": "#F2A93B"}), ("sfx", "ding", {"at": 1.2, "gain": 0.5}), tail=0.5)
+
+    # ---------------------------------------------------------------- 3 Wolf! Wolf!
+    s = t.scene("Wolf! Wolf!", "meadow", mood="tense", title="Wolf! Wolf!")
+    _bw_sheep(s)
+    s.actor("boy", "girl", 560, BW_Y, 1.0, face=-1, **BW_BOY)
+    s.wait(0.1, ("pose", "boy", "sly"))
+    s.say("boy", "Wolf! Wolf! A wolf is eating my sheep! Help! Help!", ("pose", "boy", "scared"), ("cam", 560, 420, 1.25, {"at": 0.0, "dur": 0.6}),
+          ("fx", "burst", 560, 190, {"at": 0.0, "dur": 1.7, "text": "WOLF!", "color": "#E2362F"}), ("hop", "boy", {"at": "30%"}), ("hop", "boy", {"at": "60%"}), tail=0.5)
+    s.nar("But there was no wolf! It was only a joke.", ("cam", 640, 360, 1.0, {"at": 0.0, "dur": 1.0}), ("pose", "boy", "laugh", {"at": 0.6}), ("hop", "boy", {"at": 1.4}),
+          *[("pose", "sh%d" % (i + 1), "idle") for i in range(5)], tail=0.5)
+
+    # ---------------------------------------------------------------- 4 the villagers run up the hill
+    s = t.scene("Running to help", "meadow", mood="chase", title="Running to help")
+    _bw_village(s)
+    _bw_folk(s, (360, 560, 760), face=1)
+    s.wait(0.1, ("pose", "farmer", "idle"), ("pose", "granny", "sweep"), ("pose", "mum", "idle"))
+    s.nar("In the village, the people heard the boy shouting.", *_bw_poses("surprised", at=0.8), *[("fx", "mark", a, -10, {"at": 0.9 + 0.12 * i, "dur": 2.0, "text": "!"}) for i, a in enumerate(("farmer", "granny", "mum"))])
+    s.say("farmer", "A wolf! Quick! We must help the boy!", ("pose", "farmer", "scared"), ("hop", "farmer", {"at": "50%"}), tail=0.3)
+    s.nar("They ran up the hill as fast as they could.", ("walk", "farmer", 1500, BW_Y, {"fit": True, "pose": "run"}), ("walk", "granny", 1560, BW_Y, {"fit": True, "pose": "run"}),
+          ("walk", "mum", 1620, BW_Y, {"fit": True, "pose": "run"}), ("fx", "speed", "farmer", 0, {"dur": 6.0, "dir": 1}), tail=0.2)
+
+    # ---------------------------------------------------------------- 5 just a joke
+    s = t.scene("Just a joke", "meadow", mood="sneaky", title="Just a joke")
+    _bw_sheep(s)
+    _bw_folk(s, (-180, -300, -420), face=1)
+    s.actor("boy", "girl", 660, BW_Y, 1.0, face=-1, **BW_BOY)
+    s.wait(0.1, ("pose", "boy", "laugh"))
+    s.nar("The villagers ran and ran. At last, they came to the hill.", ("walk", "farmer", 170, BW_Y, {"fit": True, "pose": "run"}), ("walk", "granny", 330, BW_Y, {"fit": True, "pose": "run"}),
+          ("walk", "mum", 490, BW_Y, {"fit": True, "pose": "run"}), tail=0.2)
+    s.nar("They looked, and they looked. But there was no wolf!", *_bw_poses("think"), ("face", "farmer", 1), ("pose", "boy", "laugh"), ("fx", "mark", "farmer", -10, {"at": 0.8, "dur": 2.4, "text": "?"}), tail=0.3)
+    s.say("boy", "Ha, ha, ha! I tricked you! There is no wolf!", ("pose", "boy", "laugh"), ("hop", "boy", {"at": "35%"}), ("hop", "boy", {"at": "70%"}), tail=0.3)
+    s.say("farmer", "That was not funny! You must not tell lies!", ("pose", "farmer", "angry"), ("fx", "burst", "farmer", -60, {"at": "20%", "dur": 1.7, "text": "GRR!", "color": "#E2362F", "size": 0.7}), tail=0.3)
+    s.say("granny", "A good shepherd always tells the truth!", ("pose", "granny", "angry"), ("pose", "mum", "angry"), ("pose", "boy", "sad", {"at": "40%"}), tail=0.5)
+
+    # ---------------------------------------------------------------- 6 the same joke again
+    s = t.scene("Again!", "meadow", mood="sneaky", title="Again!")
+    _bw_sheep(s)
+    s.actor("boy", "girl", 660, BW_Y, 1.0, face=-1, **BW_BOY)
+    _bw_folk(s, (-180, -300, -420), face=1)
+    s.wait(0.1, ("pose", "boy", "tired"))
+    s.nar("The next day, the boy was bored again. Naughty idea! He shouted once more.", ("pose", "boy", "sly", {"at": 2.2}), ("sfx", "yawn", {"at": 0.6, "gain": 0.7}), tail=0.3)
+    s.say("boy", "Wolf! Wolf! Help! Help!", ("pose", "boy", "scared"), ("cam", 560, 420, 1.25, {"at": 0.0, "dur": 0.6}), ("fx", "burst", 560, 190, {"at": 0.0, "dur": 1.7, "text": "WOLF!", "color": "#E2362F"}),
+          ("hop", "boy", {"at": "40%"}), tail=0.4)
+    s.nar("The villagers ran up the hill again.", ("cam", 640, 360, 1.0, {"at": 0.0, "dur": 0.8}), ("pose", "boy", "laugh", {"at": 0.4}), ("walk", "farmer", 170, BW_Y, {"at": 0.2, "fit": True, "pose": "run"}),
+          ("walk", "granny", 330, BW_Y, {"at": 0.2, "fit": True, "pose": "run"}), ("walk", "mum", 490, BW_Y, {"at": 0.2, "fit": True, "pose": "run"}), tail=0.2)
+    s.say("boy", "Ha, ha, ha! I tricked you again!", ("pose", "boy", "laugh"), ("hop", "boy", {"at": "50%"}), tail=0.3)
+    s.say("farmer", "No more lies! Next time, we will not come!", *_bw_poses("angry"), ("fx", "burst", "farmer", -60, {"at": "20%", "dur": 1.7, "text": "GRR!", "color": "#E2362F", "size": 0.7}), tail=0.5)
+    s.nar("The villagers went home. They were very, very cross.", ("face", "farmer", -1), ("face", "granny", -1), ("face", "mum", -1), ("walk", "farmer", -300, BW_Y, {"at": 0.3, "fit": True, "pose": "walk"}),
+          ("walk", "granny", -420, BW_Y, {"at": 0.3, "fit": True, "pose": "walk"}), ("walk", "mum", -540, BW_Y, {"at": 0.3, "fit": True, "pose": "walk"}), ("pose", "boy", "sad", {"at": 1.6}), tail=0.3)
+
+    # ---------------------------------------------------------------- 7 a real wolf comes out of the forest
+    s = t.scene("A real wolf", "meadow_dusk", mood="tense", title="A real wolf")
+    _bw_sheep(s, BW_DX, face=-1)
+    s.actor("boy", "girl", BW_BX, BW_Y, 1.0, face=1, **BW_BOY)
+    s.actor("wolf", "wolf", 1600, 716, 1.0, face=-1, **BW_WOLF)
+    s.nar("That evening, a real wolf came out of the dark forest.", ("pose", "boy", "idle"), ("walk", "wolf", 1230, 716, {"at": 0.8, "dur": 3.0, "pose": "walk"}), ("pose", "wolf", "sly", {"at": 3.9}), ("sfx", "howl", {"at": 0.6, "gain": 0.45}), ("cam", 900, 420, 1.1, {"at": 0.6, "dur": 3.0}))
+    s.nar("The sheep saw the wolf. They were scared!", *[("pose", "sh%d" % (i + 1), "scared", {"at": 0.5 + 0.1 * i}) for i in range(5)], ("sfx", "baa", {"at": 1.0, "gain": 0.4}), ("sfx", "baa", {"at": 1.6, "gain": 0.35}),
+          ("sfx", "baa", {"at": 2.2, "gain": 0.3}), ("fx", "mark", BW_DX[4], 500, {"at": 0.6, "dur": 2.4, "text": "!"}), tail=0.3)
+    s.nar("The boy was scared, too. His knees shook and shook!", ("pose", "boy", "scared", {"at": 0.4}), ("fx", "sweat", "boy", 0, {"at": 0.8, "dur": 4.0}), ("cam", 760, 400, 1.0, {"at": 0.4, "dur": 1.2}), tail=0.4)
+
+    # ---------------------------------------------------------------- 8 a real call for help
+    s = t.scene("Help!", "meadow_dusk", mood="chase", title="Help!")
+    _bw_sheep(s, BW_DX, face=-1)
+    s.actor("boy", "girl", BW_BX, BW_Y, 1.0, face=-1, **BW_BOY)
+    s.actor("wolf", "wolf", 1230, 716, 1.0, face=-1, **BW_WOLF)
+    s.wait(0.1, ("pose", "boy", "scared"), ("pose", "wolf", "angry"), *[("pose", "sh%d" % (i + 1), "scared") for i in range(5)], ("cam", 760, 400, 1.0, {"at": 0.0, "dur": 0.05}))
+    s.say("boy", "Wolf! Wolf! A real wolf! Please help me!", ("pose", "boy", "scared"), ("cam", BW_BX, 430, 1.25, {"at": 0.0, "dur": 0.6}), ("fx", "burst", BW_BX, 190, {"at": 0.0, "dur": 1.7, "text": "HELP!", "color": "#E2362F"}),
+          ("hop", "boy", {"at": "40%"}), ("walk", "wolf", 1150, 716, {"at": 0.0, "speed": 40, "pose": "walk"}), tail=0.4)
+
+    # ---------------------------------------------------------------- 9 nobody comes
+    s = t.scene("Nobody came", "meadow_dusk", mood="calm", title="Nobody came")
+    _bw_village(s)
+    _bw_folk(s, (330, 530, 730), face=1)
+    s.wait(0.1, ("pose", "farmer", "think"), ("pose", "granny", "idle"), ("pose", "mum", "idle"), ("cam", 640, 400, 1.08, {"at": 0.0, "dur": 0.05}))
+    s.say("farmer", "Listen. It is the boy again.", ("pose", "farmer", "talk"), ("face", "granny", 1), tail=0.3)
+    s.say("mum", "He is only joking. He always tells lies.", ("pose", "mum", "shrug"), ("pose", "granny", "shrug", {"at": "50%"}), tail=0.3)
+    s.say("granny", "Let us stay at home.", ("pose", "granny", "talk"), ("face", "farmer", -1), tail=0.4)
+    s.nar("So nobody came to help.", ("pose", "farmer", "shrug", {"at": 0.2}), ("pose", "granny", "idle", {"at": 0.4}), *_bw_poses("sad", ids=("farmer", "mum"), at=1.0), tail=0.6)
+
+    # ---------------------------------------------------------------- 10 the wolf chases the sheep away
+    s = t.scene("All alone", "meadow_dusk", mood="chase", title="All alone")
+    _bw_sheep(s, BW_DX, face=-1)
+    s.actor("boy", "girl", BW_BX, BW_Y, 1.0, face=-1, **BW_BOY)
+    s.actor("wolf", "wolf", 1150, 716, 1.0, face=-1, **BW_WOLF)
+    s.wait(0.1, ("pose", "boy", "scared"), *[("pose", "sh%d" % (i + 1), "scared") for i in range(5)])
+    s.nar("The wolf ran at the sheep. Away they ran, into the dark forest!", ("sfx", "howl", {"at": 0.2, "gain": 0.5}),
+          *[("walk", "sh%d" % (5 - i), -260 - 90 * i, BW_SY[4 - i], {"at": 0.5 + 0.12 * i, "fit": True, "pose": "run"}) for i in range(5)],
+          ("walk", "wolf", -420, 716, {"at": 1.2, "fit": True, "pose": "run"}), ("sfx", "baa", {"at": 1.0, "gain": 0.4}), ("sfx", "baa", {"at": 1.9, "gain": 0.35}),
+          ("cam", BW_BX, 420, 1.0, {"at": 0.2, "dur": 2.0}), tail=0.3)
+    s.nar("Now the boy was all alone. He sat down and cried.", ("pose", "boy", "sad", {"at": 0.4}), ("cam", BW_BX, 440, 1.2, {"at": 0.4, "dur": 1.6}), tail=0.4)
+    s.say("boy", "Oh no! My sheep! Why did nobody come to help me?", ("pose", "boy", "sad"), tail=0.6)
+
+    # ---------------------------------------------------------------- 11 a lesson
+    s = t.scene("A lesson", "sunset", mood="calm", title="A lesson")
+    s.actor("boy", "girl", 780, BW_Y, 1.0, face=-1, **BW_BOY)
+    s.actor("farmer", "girl", -200, BW_Y, 1.0, face=1, **BW_FARMER)
+    s.wait(0.1, ("pose", "boy", "sad"))
+    s.nar("Later, the old farmer came to find the boy.", ("walk", "farmer", 440, BW_Y, {"fit": True, "pose": "walk"}), ("pose", "farmer", "happy", {"at": -0.6}))
+    s.say("boy", "I shouted for help, but nobody came!", ("pose", "boy", "sad"), ("pose", "farmer", "think", {"at": "60%"}), tail=0.3)
+    s.say("farmer", "When you tell lies, nobody believes you. Not even when you tell the truth.", ("pose", "farmer", "talk"), ("hop", "farmer", {"at": "60%"}), tail=0.3)
+    s.say("boy", "I am very sorry. I will never tell lies again. I promise!", ("pose", "boy", "sad"), ("pose", "boy", "happy", {"at": "75%"}), tail=0.3)
+    s.say("farmer", "Good. Come, let us find your sheep.", ("pose", "farmer", "happy"), ("fx", "hearts", "farmer", 0, {"at": "40%", "dur": 2.6}), tail=0.5)
+
+    # ---------------------------------------------------------------- 12 the sheep are found
+    s = t.scene("The sheep are safe", "forest_dusk", mood="calm", title="The sheep are safe")
+    _bw_sheep(s, BW_FX, face=-1)
+    s.actor("boy", "girl", -170, BW_Y, 1.0, face=1, **BW_BOY)
+    s.actor("farmer", "girl", -300, BW_Y, 1.0, face=1, **BW_FARMER)
+    s.wait(0.1, *[("pose", "sh%d" % (i + 1), "scared") for i in range(5)])
+    s.nar("They walked into the forest. They looked and looked.", ("walk", "boy", 380, BW_Y, {"fit": True, "pose": "walk"}), ("walk", "farmer", 240, BW_Y, {"fit": True, "pose": "walk"}), tail=0.2)
+    s.nar("At last, they found the sheep. Hooray!", ("pose", "boy", "cheer", {"at": 0.6}), ("pose", "farmer", "cheer", {"at": 0.6}), *[("pose", "sh%d" % (i + 1), "happy", {"at": 0.8}) for i in range(5)],
+          ("sfx", "baa", {"at": 0.9, "gain": 0.35}), ("sfx", "baa", {"at": 1.4, "gain": 0.3}), ("fx", "sparkle", 880, 520, {"at": 0.7, "dur": 3.0, "r": 300}), tail=0.3)
+    s.nar("One, two, three, four, five! All the sheep were safe.", ("pose", "boy", "happy"), *[("fx", "mark", BW_FX[i], 470, {"at": 0.3 + 0.5 * i, "dur": 1.6, "text": str(i + 1), "color": BW_MARK[i]}) for i in range(5)],
+          *[("hop", "sh%d" % (i + 1), {"at": 0.3 + 0.5 * i}) for i in range(5)], ("fx", "hearts", "boy", 0, {"at": 3.0, "dur": 3.0}), tail=0.5)
+
+    # ---------------------------------------------------------------- 13 a new day
+    s = t.scene("Always the truth", "meadow_dawn", mood="triumph", title="Always the truth")
+    _bw_village(s, (230, 470))
+    _bw_sheep(s)
+    s.actor("boy", "girl", 560, BW_Y, 1.0, face=-1, **BW_BOY)
+    _bw_folk(s, (130, 260, 390), face=1)
+    s.wait(0.1, ("pose", "boy", "happy"))
+    s.nar("From that day on, the boy always told the truth.", ("pose", "boy", "proud", {"at": 0.3}), ("fx", "sparkle", 560, 440, {"at": 0.6, "dur": 3.0, "r": 240}), tail=0.3)
+    s.nar("And the villagers always believed him.", *_bw_poses("wave", at=0.3), ("pose", "boy", "wave", {"at": 0.3}), ("fx", "hearts", "boy", 0, {"at": 0.6, "dur": 3.0}), ("fx", "confetti", 0, 0, {"at": 0.8, "dur": 90.0}), tail=0.6)
+
+    _outro(t, "Remember, little ones: always tell the truth. Then people will believe you when you really need their help!", caption="Always tell the truth!")
+    return t
+
+
 TALES = {"three-little-pigs": three_little_pigs, "tortoise-and-hare": tortoise_and_hare, "goldilocks": goldilocks,
          "red-riding-hood": red_riding_hood, "gingerbread-man": gingerbread_man, "three-billy-goats": three_billy_goats,
-         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup, "magic-porridge-pot": magic_porridge_pot, "cinderella": cinderella, "snow-white": snow_white, "elves-and-shoemaker": elves_shoemaker, "princess-and-pea": princess_pea, "little-red-hen": little_red_hen, "lion-and-mouse": lion_and_mouse}
+         "enormous-turnip": enormous_turnip, "stone-soup": stone_soup, "magic-porridge-pot": magic_porridge_pot, "cinderella": cinderella, "snow-white": snow_white, "elves-and-shoemaker": elves_shoemaker, "princess-and-pea": princess_pea, "little-red-hen": little_red_hen, "lion-and-mouse": lion_and_mouse, "boy-who-cried-wolf": boy_who_cried_wolf}
 
 
 def build(key, lang="en"):

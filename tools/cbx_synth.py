@@ -43,9 +43,20 @@ def main():
             break
         try:
             t1 = time.time()
-            with torch.inference_mode():
-                wav = model.generate(ln["text"], language_id=job["lang"], audio_prompt_path=ln["ref"], exaggeration=ln["ex"], cfg_weight=ln["cfg"])
-            y = wav.squeeze().detach().cpu().numpy().astype(np.float32)
+            y, n = None, len(ln["text"].strip())
+            for attempt in range(3):                                    # (the model sometimes stops far too early or never stops: such a try is made again)
+                torch.manual_seed(1234 + attempt)
+                with torch.inference_mode():
+                    wav = model.generate(ln["text"], language_id=job["lang"], audio_prompt_path=ln["ref"], exaggeration=ln["ex"],
+                                         cfg_weight=min(0.8, ln["cfg"] + 0.1 * attempt))
+                cand = wav.squeeze().detach().cpu().numpy().astype(np.float32)
+                secs = len(cand) / float(model.sr)
+                good = 0.045 * n <= secs <= 0.20 * n + 2.0
+                if y is None or good:
+                    y = cand
+                if good:
+                    break
+                print("line %d: %.1f s for %d characters is not right (try %d)" % (ln["i"], secs, n, attempt + 1), flush=True)
             write_wav(os.path.join(out, "%d.wav" % ln["i"]), y, model.sr)
             times[str(ln["i"])] = [time.time() - t1, len(y) / float(model.sr)]
             print("line %d (%s): %.1f s of speech in %.1f s of work: %s" % (ln["i"], ln["role"], times[str(ln["i"])][1], times[str(ln["i"])][0], ln["text"][:60]), flush=True)

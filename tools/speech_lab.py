@@ -29,7 +29,13 @@ engines
               (GALLERY lines: number = voice)
   studio      (--only studio) the same clips as they are and through two EQ + compression chains (STUDIO lines)
   gallery     (--only gallery) the casting of some tales the way the daily videos make it (bibi_buzz.tales.cast_voices), every character says its type's line:
-              gallery-<language>.mp3, GAL lines (F0, UTMOS, words wrong) and GALWARN lines for the pairs of one tale that may sound alike
+              gallery-<language>.mp3, GAL lines (F0, UTMOS, words wrong), GALWARN lines for the pairs of one tale that may sound alike by their pitch and SIM lines:
+              the cosine of the ECAPA voice prints of every pair of one tale (speechbrain; 1.0 = the same voice; the pairs at or above SIM_ALIKE are marked)
+  world       (--only world) a smaller person without the chipmunk: the same lively line of some voices resampled (pitch and formants by one factor: what ktts.py does)
+              and made by the WORLD vocoder (pitch by a factor, the vocal tract by a smaller one): WORLD lines, world-<language>.mp3
+  ext         (the jobs ext-prepare / ext-collect around tools/ext_synth.py, which runs in its own environment) the new voice engines: Pocket TTS Turkish (six voices, emotion
+              tags; the casting of the six tales: GAL lines with the tag tr-pocket, gallery-tr-pocket.mp3) and Phonon 31m English (every English voice of its catalog):
+              EXT lines (F0, UTMOS, words wrong, seconds of work), palette-<engine>.mp3
 """
 import argparse
 import asyncio
@@ -857,6 +863,54 @@ def studio_ab(a):
         os.environ.pop("BIBI_KOKORO_INPROC", None)
 
 
+# ------------------------------------------------------------------------------------------------------------------------ voice prints: do two characters sound like two people?
+SIM_ALIKE = 0.55                                              # cos of two ECAPA voice prints from which on two characters of one tale are marked (a first guess: the lab shows what the pairs of the tales are)
+
+
+def ecapa():
+    if "ecapa" not in _M:
+        try:
+            from speechbrain.inference.speaker import EncoderClassifier
+        except Exception:
+            from speechbrain.pretrained import EncoderClassifier
+        _M["ecapa"] = EncoderClassifier.from_hparams(source="speechbrain/spkrec-ecapa-voxceleb", savedir=os.path.join(OUT, "_ecapa"), run_opts={"device": "cpu"})
+    return _M["ecapa"]
+
+
+def embed(y):
+    """the voice print of a clip (ECAPA-TDNN of speechbrain, unit length): the cosine of two of them is how much alike two voices are (the same person about 0.8 and more)"""
+    import torch
+    y16 = VL.resample(level(y), KSR, 16000).astype(np.float32)
+    with torch.no_grad():
+        e = ecapa().encode_batch(torch.from_numpy(y16)[None]).reshape(-1).cpu().numpy()
+    return e / (float(np.linalg.norm(e)) + 1e-9)
+
+
+def try_embed(y):
+    try:
+        return embed(y)
+    except Exception:
+        if "ecapa-failed" not in _M:
+            _M["ecapa-failed"] = 1
+            log("ECAPA failed (said once)", traceback.format_exc()[-400:].replace("\n", " | "))
+        return None
+
+
+def sim_report(tag, emb):
+    """SIM lines: emb = {tale: [(who, type, voice print)]}; every pair of a tale, the pairs at or above SIM_ALIKE marked"""
+    n_alike = 0
+    for key, es in emb.items():
+        for x in range(len(es)):
+            for z in range(x + 1, len(es)):
+                if es[x][2] is None or es[z][2] is None:
+                    continue
+                c = float(np.dot(es[x][2], es[z][2]))
+                alike = c >= SIM_ALIKE
+                n_alike += alike
+                log("SIM %s %-20s %-8s (%s) ~ %-8s (%s) cos %.2f%s" % (tag, key, es[x][0], es[x][1], es[z][0], es[z][1], c, "   <-- alike" if alike else ""))
+    log("SIMSUM %s pairs at or above %.2f: %d" % (tag, SIM_ALIKE, n_alike))
+
+
 # ------------------------------------------------------------------------------------------------------------------------ the gallery: the casting of some tales, the way the videos make it
 GALLERY_TALES = ["three-little-pigs", "goldilocks", "red-riding-hood", "cinderella", "magic-porridge-pot", "gingerbread-man"]
 
@@ -910,7 +964,7 @@ def gallery(a):
                 else:
                     os.environ[k] = old[k]
         log("---- gallery %s%s: GAL language tale character type F0 UTMOS WER voice" % (lang, tag))
-        parts, rows = [], {}
+        parts, rows, emb = [], {}, {}
         for kind, key, who, typ, item in plan:
             y = VL.resample(clips[item], 44100, KSR)
             if kind == "title":
@@ -922,8 +976,10 @@ def gallery(a):
             sc = score(y, item[0], lang)
             f0 = f0_of(y)
             rows.setdefault(key, []).append((who, typ, item[1], f0))
+            emb.setdefault(key, []).append((who, typ, try_embed(y)))
             log("GAL %s %-20s %-8s %-11s F0 %5s UTMOS %.2f WER %3.0f%%  %s" % (lang + tag, key, who, typ, ("%.0f" % f0) if f0 else "-", sc.get("mos", 0.0), 100 * sc.get("wer", 1.0), item[1]))
             parts += [level(y), np.zeros(int(0.8 * KSR))]
+        sim_report(lang + tag, emb)
         for key, rs in rows.items():
             for x in range(len(rs)):
                 for z in range(x + 1, len(rs)):
@@ -935,6 +991,241 @@ def gallery(a):
                             log("GALWARN %s %s: %s (%s) and %s (%s) may sound alike: F0 %.0f and %.0f Hz (x%.2f)%s" % (lang + tag, key, a_[0], a_[1], b_[0], b_[1], a_[3], b_[3], ratio,
                                                                                                                           ", the same voice" if same else ""))
         VL.save("gallery-" + lang + tag, np.concatenate(parts) if parts else np.zeros(KSR), KSR)
+
+
+# ------------------------------------------------------------------------------------------------------------------------ WORLD: a smaller person without the chipmunk (--only world)
+WORLD_BODIES = {"en": ["af_sarah", "bf_isabella", "af_river"], "tr": ["elif=0.8,emre=0.2", "elif"]}
+WORLD_SET = [("resample", 1.2, 1.0), ("resample", 1.35, 1.0), ("resample", 1.5, 1.0),             # (method, pitch factor, formant factor)
+             ("world", 1.2, 1.06), ("world", 1.35, 1.10), ("world", 1.35, 1.18), ("world", 1.5, 1.12), ("world", 1.5, 1.22)]
+
+
+def world_test(a):
+    """The same lively line of some voices made a smaller person in two ways: resampling (pitch and formants by one factor: what bibi_buzz/ktts.py does) and the WORLD
+    vocoder (the pitch by a factor, the vocal tract by a smaller one).  WORLD lines (F0, UTMOS, words wrong); world-<language>.mp3: per voice the plain clip, then
+    resample 1.2 / 1.35 / 1.5, then WORLD 1.2/1.06, 1.35/1.10, 1.35/1.18, 1.5/1.12, 1.5/1.22 (pitch factor / formant factor)."""
+    os.environ["BIBI_KOKORO_INPROC"] = "1"
+    try:
+        _world()
+    finally:
+        os.environ.pop("BIBI_KOKORO_INPROC", None)
+
+
+def _world():
+    try:
+        import pyworld  # noqa: F401
+    except Exception:
+        log("WORLD: pyworld is not installed", traceback.format_exc()[-200:].replace("\n", " | "))
+        return
+    import ext_synth as ES
+    from bibi_buzz import ktts as KT
+    gap = np.zeros(int(0.30 * KSR))
+    for lang in ("en", "tr"):
+        pre = "k:" if lang == "en" else "kt:"
+        line = PAL_LIVELY[lang]
+        log("---- world %s: WORLD language voice method pitch-factor formant-factor F0 UTMOS WER seconds   (resample: pitch and formants move by the pitch factor)" % lang)
+        parts = []
+        for body in WORLD_BODIES[lang]:
+            try:
+                base = KT.speak(line, pre + body, "+0%", "+0Hz")
+            except Exception:
+                log("WORLD %s %s FAILED %s" % (lang, body, traceback.format_exc()[-170:].replace("\n", " | ")))
+                continue
+            for method, pf, ef in [("plain", 1.0, 1.0)] + WORLD_SET:
+                try:
+                    if method == "plain":
+                        y = base
+                    elif method == "resample":
+                        y = KT.speak(line, pre + body, "+0%", "%+.1fHz" % ((pf - 1.0) * 150))
+                    else:
+                        t0 = time.time()
+                        y = ES.world_shift(base, KSR, pf, ef)
+                        if body == WORLD_BODIES[lang][0] and (pf, ef) == (1.2, 1.06):
+                            log("   WORLD analysis + synthesis of %.1f s of speech took %.1f s" % (len(base) / float(KSR), time.time() - t0))
+                except Exception:
+                    log("WORLD %s %s %s x%.2f e%.2f FAILED %s" % (lang, body, method, pf, ef, traceback.format_exc()[-170:].replace("\n", " | ")))
+                    continue
+                sc = score(y, line, lang)
+                f0 = f0_of(y)
+                log("WORLD %s %-22s %-8s f0x%.2f envx%.2f F0 %5s UTMOS %.2f WER %3.0f%% SEC %.1f" % (lang, body, method, pf, ef, ("%.0f" % f0) if f0 else "-", sc.get("mos", 0.0),
+                                                                                                    100 * sc.get("wer", 1.0), len(y) / float(KSR)))
+                parts += [level(y), gap]
+            parts.append(np.zeros(int(0.8 * KSR)))
+        if parts:
+            VL.save("world-" + lang, np.concatenate(parts), KSR)
+
+
+# ------------------------------------------------------------------------------------------------------------------------ the new engines (tools/ext_synth.py runs in its own environment)
+# type -> (Pocket TTS Turkish voice, emotion, pitch factor, formant factor) or a list of them (the 1st, 2nd, 3rd character of that type in one tale): a first casting to listen to
+POCKET_CAST = {
+    "nar": ("female_2", None, 1.0, 1.0),
+    "woman": ("female_2", "sakin", 1.0, 1.0),
+    "girl": [("female_1", "mutlu", 1.25, 1.10), ("female_3", "mutlu", 1.18, 1.08)],
+    "teen": ("female_1", None, 1.0, 1.0),
+    "boy": ("male_2", "mutlu", 1.30, 1.12),
+    "baby": ("female_1", "mutlu", 1.55, 1.22),
+    "tiny": ("female_1", "şaşkın", 1.60, 1.25),
+    "granny": [("female_3", "sakin", 0.88, 0.97), ("female_2", "sakin", 0.90, 0.97)],
+    "fakegranny": ("male_3", None, 1.10, 1.05),
+    "man": ("male_3", None, 1.0, 1.0),
+    "grandpa": ("male_1", "sakin", 0.90, 0.96),
+    "prince": ("male_2", None, 1.0, 1.0),
+    "king": ("male_1", "kızgın", 0.85, 0.94),
+    "lord": ("male_3", None, 0.92, 0.97),
+    "queen": ("female_3", "kızgın", 0.95, 1.0),
+    "stepmother": ("female_3", "kızgın", 0.92, 0.98),
+    "stepsister": [("female_1", "kızgın", 1.05, 1.03), ("female_3", "kızgın", 1.12, 1.05)],
+    "witch": ("female_3", "kızgın", 0.80, 0.93),
+    "fairy": ("female_2", "mutlu", 1.12, 1.05),
+    "mirror": ("male_1", "sakin", 0.82, 0.94),
+    "dwarf": ("male_2", "mutlu", 1.15, 1.06),
+    "elf": ("male_2", "mutlu", 1.35, 1.14),
+    "elfgirl": ("female_1", "mutlu", 1.35, 1.14),
+    "troll": ("male_1", "kızgın", 0.70, 0.88),
+    "giant": ("male_1", "kızgın", 0.62, 0.84),
+    "pig": [("male_2", None, 1.10, 1.04), ("male_3", None, 1.05, 1.02), ("male_1", None, 1.15, 1.06)],
+    "wolf": ("male_1", "kızgın", 0.80, 0.92),
+    "hare": ("male_2", "mutlu", 1.18, 1.08),
+    "tortoise": ("male_1", "sakin", 0.90, 0.96),
+    "bear": ("male_1", "kızgın", 0.75, 0.90),
+    "mamabear": ("female_3", "kızgın", 0.80, 0.94),
+    "goat_little": ("female_1", "mutlu", 1.40, 1.16),
+    "goat_mid": ("male_2", None, 1.0, 1.0),
+    "goat_big": ("male_1", "kızgın", 0.75, 0.90),
+    "hen": ("female_1", "mutlu", 1.15, 1.06),
+    "fox": ("male_3", "şaşkın", 1.0, 1.0),
+    "lion": ("male_1", "kızgın", 0.72, 0.89),
+}
+POCKET_VOICES = ["female_1", "female_2", "female_3", "male_1", "male_2", "male_3"]
+POCKET_EMOTIONS = [("mutlu", "mutlu"), ("üzgün", "uzgun"), ("kızgın", "kizgin"), ("şaşkın", "sasgin"), ("sakin", "sakin")]       # (the tag, the same without the Turkish letters for a file name)
+
+
+def ext_prepare(a):
+    """The job file of tools/ext_synth.py: Pocket TTS Turkish (palette: its six voices with a calm and a lively line, the five emotions of two voices, WORLD lifts of two voices;
+    the casting of the six tales: every character says its type's line) and Phonon 31m English (palette: every English voice of its catalog, a calm and a lively line)."""
+    from bibi_buzz import tales as T
+    from test_tale import VOICE_LINES, VOICE_NAMES
+    items, plan = [], []
+    calm, lively = PAL_CALM["tr"], PAL_LIVELY["tr"]
+    for key in GALLERY_TALES:
+        plan.append(dict(kind="title", key=key, text=T.build(key, "tr").title))
+        seen, count = {}, {}
+        for who, spec in T.CASTING[key].items():
+            typ = spec if isinstance(spec, str) else spec[0]
+            seen[typ] = seen.get(typ, 0) + 1
+        for who, spec in T.CASTING[key].items():
+            typ = spec if isinstance(spec, str) else spec[0]
+            count[typ] = count.get(typ, 0) + 1
+            plan.append(dict(kind="name", key=key, who=who, typ=typ, text=VOICE_NAMES[typ][1] + ((" " + number_words(count[typ], "tr")) if seen[typ] > 1 else "")))
+            c = POCKET_CAST.get(typ) or POCKET_CAST["woman"]
+            voice, emo, f0, env = c[min(count[typ] - 1, len(c) - 1)] if isinstance(c, list) else c
+            iid = "pg-%s-%s" % (key, who)
+            plan.append(dict(kind="line", key=key, who=who, typ=typ, id=iid, text=VOICE_LINES[typ][1]))
+            items.append(dict(id=iid, engine="pocket", voice=voice, emotion=emo, text=VOICE_LINES[typ][1], f0=f0, env=env, group="gallery", lang="tr"))
+    for v in POCKET_VOICES:
+        items.append(dict(id="pk-%s-calm" % v, engine="pocket", voice=v, emotion=None, text=calm, group="palette", lang="tr"))
+        items.append(dict(id="pk-%s-lively" % v, engine="pocket", voice=v, emotion="mutlu", text=lively, group="palette", lang="tr"))
+    for v in ("female_2", "male_1"):
+        for emo, tag in POCKET_EMOTIONS:
+            items.append(dict(id="pk-%s-emo-%s" % (v, tag), engine="pocket", voice=v, emotion=emo, text=lively, group="emotion", lang="tr"))
+    for v, f0, env in (("female_1", 1.25, 1.10), ("female_1", 1.5, 1.20), ("male_2", 1.3, 1.12)):
+        items.append(dict(id="pk-%s-world-%.2f-%.2f" % (v, f0, env), engine="pocket", voice=v, emotion="mutlu", text=lively, f0=f0, env=env, group="world", lang="tr"))
+    items.append(dict(id="ph-calm-*", engine="phonon", voice="*", text=PAL_CALM["en"], group="palette-en", lang="en"))
+    items.append(dict(id="ph-lively-*", engine="phonon", voice="*", text=PAL_LIVELY["en"], group="palette-en", lang="en"))
+    with open(os.path.join(OUT, "_ext.json"), "w", encoding="utf-8") as f:
+        json.dump({"budget": 2400, "items": items}, f, ensure_ascii=False, indent=1)
+    with open(os.path.join(OUT, "_ext_plan.json"), "w", encoding="utf-8") as f:
+        json.dump(plan, f, ensure_ascii=False, indent=1)
+    log("ext-prepare: %d clips to make (%d lines of the tales)" % (len(items), sum(1 for e in plan if e["kind"] == "line")))
+
+
+def _read_wav24(path):
+    with wave.open(path) as w:
+        y = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float64) / 32768.0
+        sr = w.getframerate()
+    return VL.resample(y, sr, KSR) if sr != KSR else y
+
+
+def ext_collect(a):
+    """Measures what tools/ext_synth.py made: EXT lines for the palettes, GAL and SIM lines for the casting of the tales with Pocket TTS Turkish, and the mp3s to listen to."""
+    os.environ["BIBI_KOKORO_INPROC"] = "1"
+    try:
+        _ext_collect()
+    finally:
+        os.environ.pop("BIBI_KOKORO_INPROC", None)
+
+
+def _ext_collect():
+    from bibi_buzz import ktts as KT
+    d = os.path.join(OUT, "_ext")
+    try:
+        man = json.load(open(os.path.join(d, "manifest.json"), encoding="utf-8"))
+    except Exception:
+        log("ext: nothing was made (no manifest.json)")
+        return
+    by = {m["id"]: m for m in man if m.get("ok")}
+    log("ext: %d clips made, %d failed" % (len(by), sum(1 for m in man if not m.get("ok"))))
+    for m in man:
+        if not m.get("ok"):
+            log("EXTFAIL %s %s" % (m.get("id"), (m.get("error") or "")[-200:].replace("\n", " | ")))
+    gap = np.zeros(int(0.30 * KSR))
+    pal = ("palette", "palette-en", "emotion", "world")
+    for engine, lang in (("pocket", "tr"), ("phonon", "en")):
+        voices = []
+        for m in man:
+            if m.get("ok") and m["engine"] == engine and m["group"] in pal and m["voice"] not in voices:
+                voices.append(m["voice"])
+        parts = []
+        log("---- ext %s: EXT engine group voice emotion pitch-factor formant-factor F0 UTMOS WER seconds-of-audio seconds-of-work" % engine)
+        for n, v in enumerate(voices, 1):
+            log("EXTPAL %s %d = %s" % (engine, n, v))
+            try:
+                parts += [KT.speak(number_words(n, lang), "k:af_heart" if lang == "en" else "kt:elif", "-6%", "+0Hz"), gap]
+            except Exception:
+                log("   announcer failed", traceback.format_exc()[-150:].replace("\n", " | "))
+            for m in man:
+                if not (m.get("ok") and m["engine"] == engine and m["voice"] == v and m["group"] in pal):
+                    continue
+                y = _read_wav24(os.path.join(d, m["id"] + ".wav"))
+                sc = score(y, m["text"], m["lang"])
+                f0 = f0_of(y)
+                log("EXT %-7s %-10s %-12s %-8s f0x%.2f envx%.2f F0 %5s UTMOS %.2f WER %3.0f%% SEC %.1f WORK %.1f%s" % (
+                    engine, m["group"], v, m.get("emotion") or "-", m.get("f0", 1.0), m.get("env", 1.0), ("%.0f" % f0) if f0 else "-", sc.get("mos", 0.0),
+                    100 * sc.get("wer", 1.0), m["audio"], m["work"], ("  [" + m["catalog"][:70] + "]") if m.get("catalog") else ""))
+                parts += [level(y), gap]
+            parts.append(np.zeros(int(0.8 * KSR)))
+        if parts:
+            VL.save("palette-" + engine, np.concatenate(parts), KSR)
+    try:
+        plan = json.load(open(os.path.join(OUT, "_ext_plan.json"), encoding="utf-8"))
+    except Exception:
+        plan = []
+    parts, emb, tag = [], {}, "tr-pocket"
+    log("---- gallery %s: GAL language tale character type F0 UTMOS WER voice" % tag)
+    for e in plan:
+        if e["kind"] in ("title", "name"):
+            try:
+                y = KT.speak(e["text"], "kt:elif", "-5%", "+0Hz")
+            except Exception:
+                log("   announcer failed", traceback.format_exc()[-150:].replace("\n", " | "))
+                continue
+            parts += [np.zeros(int(1.2 * KSR)), level(y), np.zeros(int(0.7 * KSR))] if e["kind"] == "title" else [level(y), np.zeros(int(0.25 * KSR))]
+            continue
+        m = by.get(e["id"])
+        if not m:
+            log("GALFAIL %s %s %s: no audio" % (tag, e["key"], e["who"]))
+            continue
+        y = _read_wav24(os.path.join(d, e["id"] + ".wav"))
+        sc = score(y, e["text"], "tr")
+        f0 = f0_of(y)
+        emb.setdefault(e["key"], []).append((e["who"], e["typ"], try_embed(y)))
+        log("GAL %s %-20s %-8s %-11s F0 %5s UTMOS %.2f WER %3.0f%%  pocket:%s/%s/f0x%.2f/envx%.2f" % (
+            tag, e["key"], e["who"], e["typ"], ("%.0f" % f0) if f0 else "-", sc.get("mos", 0.0), 100 * sc.get("wer", 1.0), m["voice"], m.get("emotion") or "-",
+            m.get("f0", 1.0), m.get("env", 1.0)))
+        parts += [level(y), np.zeros(int(0.8 * KSR))]
+    if emb:
+        sim_report(tag, emb)
+    if parts:
+        VL.save("gallery-" + tag, np.concatenate(parts), KSR)
 
 
 # ------------------------------------------------------------------------------------------------------------------------ main
@@ -957,7 +1248,7 @@ def job_main(a):
             log("  ", m, "MISSING", repr(e)[:120])
     list_edge_voices()
     only = [x for x in (a.only or "").split(",") if x]
-    special = [("cast", cast_sweep), ("palette", palette), ("studio", studio_ab), ("gallery", gallery)]            # (jobs of their own: not an engine of the ten lines)
+    special = [("cast", cast_sweep), ("palette", palette), ("studio", studio_ab), ("gallery", gallery), ("world", world_test)]            # (jobs of their own: not an engine of the ten lines)
     for key, fn in special:
         if key in only:
             try:
@@ -985,7 +1276,7 @@ def job_main(a):
 def main():
     global OUT
     ap = argparse.ArgumentParser()
-    ap.add_argument("job", choices=["main", "cbx-prepare", "cbx-collect", "myvoice-prepare", "myvoice-collect"])
+    ap.add_argument("job", choices=["main", "cbx-prepare", "cbx-collect", "myvoice-prepare", "myvoice-collect", "ext-prepare", "ext-collect"])
     ap.add_argument("--out", default="out/speech")
     ap.add_argument("--only", default="", help="engine keys, comma separated (main only)")
     a = ap.parse_args()
@@ -995,7 +1286,8 @@ def main():
     VL._LOG = open(os.path.join(OUT, "lab.txt"), "a", encoding="utf-8")
     log("=" * 20, a.job, time.strftime("%H:%M:%S"))
     try:
-        {"main": job_main, "cbx-prepare": cbx_prepare, "cbx-collect": cbx_collect, "myvoice-prepare": myvoice_prepare, "myvoice-collect": myvoice_collect}[a.job](a)
+        {"main": job_main, "cbx-prepare": cbx_prepare, "cbx-collect": cbx_collect, "myvoice-prepare": myvoice_prepare, "myvoice-collect": myvoice_collect,
+         "ext-prepare": ext_prepare, "ext-collect": ext_collect}[a.job](a)
         if a.job in ("cbx-collect", "myvoice-collect"):
             summary()
     except Exception:

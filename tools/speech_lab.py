@@ -973,6 +973,80 @@ def nearest_report(tag, emb):
 
 # ------------------------------------------------------------------------------------------------------------------------ the gallery: the casting of some tales, the way the videos make it
 GALLERY_TALES = ["three-little-pigs", "goldilocks", "red-riding-hood", "cinderella", "magic-porridge-pot", "gingerbread-man"]
+GALLERY_LINES_B = {                                                                        # (the second line of every type, Turkish: the casting is judged on two lines, so that the luck of one sentence does not decide)
+    "nar": "Ertesi sabah güneş doğdu ve ormandaki herkes uyandı.",
+    "girl": "Annem bana kırmızı bir şapka verdi. Çok güzel, değil mi?",
+    "teen": "Bu akşam ne giyeceğimi hiç bilmiyorum, elbiselerim çok eski.",
+    "boy": "Hadi gel, birlikte nehre gidip balık tutalım!",
+    "baby": "Bu yatak tam benim boyuma göre, çok rahat!",
+    "woman": "Sofra hazır çocuklar, ellerinizi yıkayıp gelin.",
+    "granny": "Sepeti büyükannene götür, yolda kimseyle konuşma, tamam mı?",
+    "fakegranny": "Ne kadar güzel kokuyorsun, biraz daha yaklaş bakalım.",
+    "man": "Sabahtan beri odun kesiyorum, biraz dinlenmek istiyorum.",
+    "grandpa": "Bu bahçeyi yıllar önce ellerimle yaptım, hâlâ çiçek açıyor.",
+    "prince": "Seni nerede bulacağımı bilmiyordum ama hiç vazgeçmedim.",
+    "king": "Bu ülkede herkes benim sözümü dinler, anlaşıldı mı?",
+    "lord": "Sofrayı hazırlayın, bu akşam önemli misafirlerimiz var.",
+    "queen": "Bu sarayda herkes benim emirlerime uymak zorundadır!",
+    "stepmother": "Bütün bu kapları akşama kadar yıkamanı istiyorum!",
+    "stepsister": "Ayakkabıyı ben giyeceğim, bana çok yakışır!",
+    "witch": "Hı hı hı, kimse beni durduramayacak, kimse!",
+    "fairy": "Üzülme tatlım, dileğin birazdan gerçek olacak.",
+    "mirror": "Evet kraliçem, ama ormanda daha güzel biri var.",
+    "dwarf": "Hey, kim benim küçük sandalyemde oturmuş?",
+    "elf": "Bütün gece çalıştık, ayakkabılar hazır!",
+    "elfgirl": "Bak, bu deri çok yumuşak, çok güzel dikiş olur!",
+    "troll": "Kim benim köprümden geçmeye cesaret ediyor, söyle!",
+    "giant": "Kim benim fasulye sırığımdan tırmanıyor? Seni yakalayacağım!",
+    "pig": "Evimi sağlam tuğlalardan yaptım, kurt gelse de korkmam.",
+    "wolf": "Bu küçük evi tek nefeste yıkıp içindekileri yiyeceğim!",
+    "hare": "Ben biraz uyuyayım, o yavaş kaplumbağa beni yakalayamaz.",
+    "tortoise": "Acele etme, adım adım gidersen sen de varırsın.",
+    "bear": "Biri benim büyük sandalyemde oturmuş, kimdir bu?",
+    "mamabear": "Biri benim orta boy kasemden yemek yemiş!",
+    "goat_little": "Lütfen bekle, arkamdan daha büyük bir kardeşim geliyor.",
+    "goat_mid": "Ben ortancayım, benden sonra büyük kardeşim gelecek.",
+    "goat_big": "İki boynuzumla sana öyle bir vururum ki nehre düşersin!",
+    "hen": "Kim bana buğdayı değirmene götürmek için yardım eder?",
+    "fox": "Ben yalnızca bir kaşık çorba istiyorum, hepsini içmeyeceğim.",
+    "tiny": "Ben küçük bir fareyim ama ipi kemirmeyi çok iyi bilirim.",
+    "lion": "Burası benim ormanım ve kuralları ben koyarım!",
+}
+V5_TR = {                                                                                 # (the transplant casting of run 30: the 'new' voices the hybrid is mixed from)
+    "girl": (("kt:elif:p=1,bf_emma:t=1", "-2%", "+0Hz", ""), ("kt:elif:p=1,af_heart:t=1", "-2%", "+30Hz", "")),
+    "teen": ("kt:elif:p=1,bf_emma:t=1", "-2%", "+0Hz", ""),
+    "boy": (("kt:emre:p=1,am_adam:t=1", "+4%", "+30Hz", ""), ("kt:emre:p=1,am_eric:t=1", "+4%", "+45Hz", "")),
+    "baby": ("kt:elif:p=1,af_heart:t=1", "+0%", "+30Hz", ""),
+    "woman": ("kt:elif:p=1,af_river:t=1", "-8%", "-8Hz", ""),
+    "granny": (("kt:elif:p=1,af_river:t=1", "-14%", "-23Hz", "lp@7000"), None, ("kt:elif:p=1,bf_isabella:t=1", "-14%", "-23Hz", "lp@7000")),
+    "fakegranny": ("kt:emre:p=1,am_echo:t=1", "-8%", "+30Hz", ""),
+    "man": ("kt:emre:p=1,am_adam:t=1", "-6%", "-23Hz", ""),
+    "grandpa": ("kt:emre:p=1,am_michael:t=1", "-12%", "-23Hz", "lp@7000"),
+    "prince": ("kt:emre:p=1,am_michael:t=1", "-2%", "+15Hz", ""),
+    "king": ("kt:emre:p=1,am_echo:t=1", "-14%", "-23Hz", "room@0.07,0.5"),
+    "lord": ("kt:emre:p=1,bm_fable:t=1", "-10%", "+0Hz", ""),
+    "queen": ("kt:elif:p=1,af_river:t=1", "-12%", "-8Hz", "room@0.06,0.5"),
+    "stepmother": ("kt:elif:p=1,bf_isabella:t=1", "-10%", "-23Hz", ""),
+    "stepsister": (("kt:elif:p=1,af_river:t=1", "+6%", "-23Hz", ""), ("kt:elif:p=1,af_heart:t=1", "+6%", "+30Hz", "")),
+    "witch": ("kt:elif:p=1,af_bella:t=1", "-14%", "-23Hz", "lp@7000"),
+    "fairy": ("kt:elif:p=1,af_alloy:t=1", "-14%", "-8Hz", "room@0.14,0.9"),
+    "mirror": ("kt:emre:p=1,am_fenrir:t=1", "-16%", "-23Hz", "room@0.16,0.9"),
+    "dwarf": ("kt:emre:p=1,am_fenrir:t=1", "+8%", "+30Hz", ""),
+    "elf": ("kt:emre:p=1,am_santa:t=1", "+10%", "+45Hz", ""),
+    "elfgirl": ("kt:elif:p=1,af_heart:t=1", "+10%", "+30Hz", ""),
+    "pig": (("kt:emre:p=1,am_santa:t=1", "+4%", "+0Hz", ""), ("kt:emre:p=1,am_liam:t=1", "+4%", "+15Hz", ""), ("kt:emre:p=1,am_adam:t=1", "+4%", "+30Hz", "")),
+    "wolf": ("kt:emre:p=1,bm_fable:t=1", "-10%", "-23Hz", "bass@2"),
+    "hare": ("kt:emre:p=1,am_michael:t=1", "+8%", "+45Hz", ""),
+    "tortoise": ("kt:emre:p=1,am_michael:t=1", "-20%", "-23Hz", "lp@7000"),
+    "bear": ("kt:emre:p=1,bm_fable:t=1", "-12%", "-8Hz", ""),
+    "mamabear": ("kt:elif:p=1,af_bella:t=1", "-10%", "-23Hz", ""),
+    "goat_little": ("kt:emre:p=1,am_echo:t=1", "+4%", "+45Hz", ""),
+    "goat_mid": ("kt:emre:p=1,am_adam:t=1", "+2%", "+30Hz", ""),
+    "goat_big": ("kt:emre:p=1,bm_fable:t=1", "-10%", "-8Hz", "bass@2"),
+    "hen": ("kt:elif:p=1,af_heart:t=1", "+2%", "+30Hz", ""),
+    "fox": ("kt:emre:p=1,am_liam:t=1", "-4%", "+15Hz", ""),
+    "tiny": ("kt:elif:p=1,af_heart:t=1", "+8%", "+30Hz", ""),
+}
 
 
 def gallery(a):
@@ -982,9 +1056,18 @@ def gallery(a):
     from bibi_buzz import tales as T
     from bibi_buzz import voice as VO
     from test_tale import VOICE_LINES, VOICE_NAMES
+    from bibi_buzz import ktts as KT
     rest = [k for k in T.CASTING if k not in GALLERY_TALES]                  # (the other tales: measured too, so that every type of the casting has a line)
-    for lang, tag, env, keys in (("en", "", {}, GALLERY_TALES), ("en", "-kidsedge", {"BIBI_KIDS": "edge"}, GALLERY_TALES), ("tr", "", {}, GALLERY_TALES),         # (English twice: the children with a
-                                 ("tr", "-xplant", {"BIBI_XPLANT": "1"}, GALLERY_TALES), ("tr", "-rest", {}, rest), ("tr", "-xplant-rest", {"BIBI_XPLANT": "1"}, rest)):  # Kokoro voice, and with the child voices of Edge; Turkish twice: KTYPES and XPLANT_TR)
+    everything = list(T.CASTING)
+    if os.environ.get("GALLERY_SET", "") == "legacy":                          # (English twice: the children with a Kokoro voice, and with the child voices of Edge; Turkish twice: KTYPES and XPLANT_TR)
+        passes = (("en", "", {}, GALLERY_TALES, None, "A"), ("en", "-kidsedge", {"BIBI_KIDS": "edge"}, GALLERY_TALES, None, "A"), ("tr", "", {}, GALLERY_TALES, None, "A"),
+                  ("tr", "-xplant", {"BIBI_XPLANT": "1"}, GALLERY_TALES, None, "A"), ("tr", "-rest", {}, rest, None, "A"), ("tr", "-xplant-rest", {"BIBI_XPLANT": "1"}, rest, None, "A"))
+    else:                                                                      # (the hybrid casting of XPLANT_TR on the first line, and all three castings on the second line)
+        passes = (("tr", "-xplant", {"BIBI_XPLANT": "1"}, GALLERY_TALES, None, "A"), ("tr", "-xplant-rest", {"BIBI_XPLANT": "1"}, rest, None, "A"),
+                  ("tr", "-B", {}, everything, None, "B"), ("tr", "-v5-B", {"BIBI_XPLANT": "1"}, everything, V5_TR, "B"), ("tr", "-xplant-B", {"BIBI_XPLANT": "1"}, everything, None, "B"))
+    memo = {}                                                                  # (a clip that was made and measured once is not measured again: the same type in several tales, the same voice in several castings)
+    saved_table = KT.XPLANT_TR
+    for lang, tag, env, keys, table, which in passes:
         i = 0 if lang == "en" else 1
         names = ("BIBI_KOKORO", "BIBI_KIDS", "BIBI_XPLANT")
         old = {k: os.environ.get(k) for k in names}
@@ -992,6 +1075,7 @@ def gallery(a):
         os.environ.pop("BIBI_KIDS", None)
         os.environ.pop("BIBI_XPLANT", None)
         os.environ.update(env)
+        KT.XPLANT_TR = table if table is not None else saved_table
         try:
             plan, items = [], []
             for key in keys:
@@ -1010,17 +1094,18 @@ def gallery(a):
                     name = VOICE_NAMES[typ][i] + ((" " + number_words(count[typ], lang)) if seen[typ] > 1 else "")
                     plan.append(("name", key, who, typ, (name,) + tuple(nar)))
                     items.append(plan[-1][4])
-                    plan.append(("line", key, who, typ, (VOICE_LINES[typ][i],) + tuple(cv[who])))
+                    plan.append(("line", key, who, typ, ((GALLERY_LINES_B[typ] if which == "B" else VOICE_LINES[typ][i]),) + tuple(cv[who])))
                     items.append(plan[-1][4])
             buf = io.StringIO()
             with contextlib.redirect_stdout(buf):
-                clips = VO.synth_items(items, "ffmpeg", os.path.join(OUT, "_cache_gallery_" + lang + tag))
+                clips = VO.synth_items(items, "ffmpeg", os.path.join(OUT, "_cache_gallery_" + lang))
             for ln in buf.getvalue().splitlines():
                 log("   " + ln)
         except Exception:
             log("GALLERY %s%s FAILED %s" % (lang, tag, traceback.format_exc()[-1200:]))
             continue
         finally:
+            KT.XPLANT_TR = saved_table
             for k in names:
                 if old[k] is None:
                     os.environ.pop(k, None)
@@ -1036,10 +1121,10 @@ def gallery(a):
             if kind == "name":
                 parts += [level(y), np.zeros(int(0.25 * KSR))]
                 continue
-            sc = score(y, item[0], lang)
-            f0 = f0_of(y)
+            if (lang, item) not in memo:
+                memo[(lang, item)] = (score(y, item[0], lang), f0_of(y), try_embed(y))
+            sc, f0, e_ = memo[(lang, item)]
             rows.setdefault(key, []).append((who, typ, item[1], f0))
-            e_ = try_embed(y)
             emb.setdefault(key, []).append((who, typ, e_))
             dump.append({"tale": key, "who": who, "type": typ, "spec": item[1], "f0": round(f0, 1) if f0 else None, "mos": round(sc.get("mos", 0.0), 3), "wer": round(sc.get("wer", 1.0), 3),
                          "emb": [round(float(x), 4) for x in e_] if e_ is not None else None})
@@ -1059,7 +1144,8 @@ def gallery(a):
                         if (same and ratio < 1.25) or ratio < 1.10:
                             log("GALWARN %s %s: %s (%s) and %s (%s) may sound alike: F0 %.0f and %.0f Hz (x%.2f)%s" % (lang + tag, key, a_[0], a_[1], b_[0], b_[1], a_[3], b_[3], ratio,
                                                                                                                           ", the same voice" if same else ""))
-        VL.save("gallery-" + lang + tag, np.concatenate(parts) if parts else np.zeros(KSR), KSR)
+        if which == "A":                                                       # (the second line is only measured: no mp3)
+            VL.save("gallery-" + lang + tag, np.concatenate(parts) if parts else np.zeros(KSR), KSR)
 
 
 # ------------------------------------------------------------------------------------------------------------------------ the voice grid: how many different people can the Kokoro models make? (--only grid)

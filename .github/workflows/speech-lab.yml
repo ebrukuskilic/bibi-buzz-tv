@@ -22,10 +22,10 @@ on:
         description: "Also try the new voice engines (Pocket TTS Turkish, Phonon English; they need their own python environment): yes or no"
         default: "no"
       vox:
-        description: "With ext=yes: also VoxCPM2 (2B parameters, voice design for characters; its own python environment, slow on the CPU, at most about 30 minutes of it): yes or no"
+        description: "With ext=yes: also VoxCPM2 (2B parameters, voice design for characters; its own python environment, slow on the CPU, at most about 30 minutes of it): yes (the palette of designed voices), foundry (only VoxCPM2: the three-pigs scene with a designed voice per role kept by cloning, a speed test, children's voices) or no"
         default: "no"
       myvoice:
-        description: "Chatterbox speaks in the voice of the reference clips of the secrets MYVOICE_TR and MYVOICE_EN (the voice of the channel's owner, who agreed to it; the scenes are published only encrypted): yes or no"
+        description: "A copy of the voice of the reference clips of the secrets MYVOICE_TR and MYVOICE_EN (the voice of the channel's owner, who agreed to it; the scenes are published only encrypted): yes (Chatterbox), vox (VoxCPM2) or no"
         default: "no"
   push:
     branches: [main]
@@ -39,7 +39,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: bibi-speech-lab-${{ github.event.inputs.myvoice == 'yes' && 'myvoice' || 'main' }}          # (a run with the owner's voice and a run of the other tests do not stop each other)
+  group: bibi-speech-lab-${{ (github.event.inputs.myvoice == 'yes' || github.event.inputs.myvoice == 'vox') && 'myvoice' || 'main' }}          # (a run with the owner's voice and a run of the other tests do not stop each other)
   cancel-in-progress: true
 
 jobs:
@@ -119,7 +119,7 @@ jobs:
           } 2>&1 | tee out/speech/ext_install.txt
 
       - name: Install VoxCPM2 in an environment of its own (voice design for characters; a speed test on the CPU)
-        if: env.EXT == 'yes' && env.VOX == 'yes'
+        if: (env.EXT == 'yes' && (env.VOX == 'yes' || env.VOX == 'foundry')) || env.MYVOICE == 'vox'
         continue-on-error: true
         timeout-minutes: 25
         run: |
@@ -140,8 +140,10 @@ jobs:
         run: |
           test -x /opt/ext/bin/python || { echo "there is no environment for the new engines"; exit 1; }
           python tools/speech_lab.py ext-prepare --out out/speech
-          EXT_ENGINES=pocket,phonon timeout 3000 /opt/ext/bin/python tools/ext_synth.py out/speech/_ext.json out/speech/_ext 2>&1 | tee out/speech/ext_run.txt || true
-          if [ "$VOX" = "yes" ] && [ -x /opt/vox/bin/python ]; then
+          if [ "$VOX" != "foundry" ]; then
+            EXT_ENGINES=pocket,phonon timeout 3000 /opt/ext/bin/python tools/ext_synth.py out/speech/_ext.json out/speech/_ext 2>&1 | tee out/speech/ext_run.txt || true
+          fi
+          if { [ "$VOX" = "yes" ] || [ "$VOX" = "foundry" ]; } && [ -x /opt/vox/bin/python ]; then
             EXT_ENGINES=vox EXT_BUDGET=1700 timeout 2400 /opt/vox/bin/python tools/ext_synth.py out/speech/_ext.json out/speech/_ext 2>&1 | tee out/speech/vox_run.txt || true
           fi
           python tools/speech_lab.py ext-collect --out out/speech
@@ -190,6 +192,22 @@ jobs:
             fi
           done
           python tools/speech_lab.py myvoice-collect --out out/speech
+
+      - name: Your voice with VoxCPM2 - the reference clips (from the secrets; they are never part of the result)
+        if: env.MYVOICE == 'vox'
+        continue-on-error: true
+        env:
+          MYVOICE_TR: ${{ secrets.MYVOICE_TR }}
+          MYVOICE_EN: ${{ secrets.MYVOICE_EN }}
+        run: python tools/speech_lab.py myvox-prepare --out out/speech
+
+      - name: VoxCPM2 speaks in your voice
+        if: env.MYVOICE == 'vox'
+        continue-on-error: true
+        run: |
+          test -x /opt/vox/bin/python || { echo "there is no VoxCPM2 environment"; exit 1; }
+          EXT_ENGINES=vox EXT_BUDGET=1500 timeout 2000 /opt/vox/bin/python tools/ext_synth.py out/speech/_myvox.json out/speech/_myvox 2>&1 | tee out/speech/myvox_run.txt || true
+          python tools/speech_lab.py myvox-collect --out out/speech
 
       - name: Collect the result (mp3 scenes and text files only)
         if: ${{ !cancelled() }}

@@ -1151,7 +1151,7 @@ def gallery(a):
     from bibi_buzz import ktts as KT
     rest = [k for k in T.CASTING if k not in GALLERY_TALES]                  # (the other tales: measured too, so that every type of the casting has a line)
     everything = list(T.CASTING)
-    which_set = os.environ.get("GALLERY_SET", "half")
+    which_set = os.environ.get("GALLERY_SET", "final")
     if which_set == "legacy":                                                  # (English twice: the children with a Kokoro voice, and with the child voices of Edge; Turkish twice: KTYPES and XPLANT_TR)
         passes = (("en", "", {}, GALLERY_TALES, None, "A"), ("en", "-kidsedge", {"BIBI_KIDS": "edge"}, GALLERY_TALES, None, "A"), ("tr", "", {}, GALLERY_TALES, None, "A"),
                   ("tr", "-xplant", {"BIBI_XPLANT": "1"}, GALLERY_TALES, None, "A"), ("tr", "-rest", {}, rest, None, "A"), ("tr", "-xplant-rest", {"BIBI_XPLANT": "1"}, rest, None, "A"))

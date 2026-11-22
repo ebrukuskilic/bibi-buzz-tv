@@ -226,16 +226,28 @@ def _tr_pack(name):
 
 
 def _tr_style(blend):
-    out, total = None, 0.0
-    for name, w in blend.items():
+    """The style of a blend of voices.  A voice pack is 256 numbers per length of the phonemes: the first 128 are the TIMBRE (they go to the decoder of the model: who it sounds
+    like), the last 128 the way of SPEAKING (durations, pitch, energy: they go to its predictor).  A name may say which half it gives: "af_kore:t" is the timbre of af_kore only,
+    "elif:p" the way of speaking of elif only, so "elif:p=1,af_kore:t=1" speaks the Turkish the way elif does with another person's voice (the pronunciation stays Turkish, and
+    the speaking stays a woman's: take a timbre of the same sex).  A name without a half is the whole pack: the old blends (kt:elif=0.7,emre=0.3) give the very same style as before."""
+    import torch
+    half = {"t": [None, 0.0], "p": [None, 0.0]}
+    for key, w in blend.items():
+        name, _, part = key.partition(":")
+        if part not in ("", "t", "p"):
+            raise ValueError("not a half of a voice: %r" % (key,))
         pack = _tr_pack(name)
-        if out is not None and pack.shape != out.shape:
-            raise ValueError("the voices %s do not fit together" % ", ".join(blend))
-        out = pack * w if out is None else out + pack * w
-        total += w
-    if abs(total) < 0.2:
-        raise ValueError("the weights of %r add up to nothing" % (blend,))
-    return out / total
+        for h, sl in (("t", slice(0, 128)), ("p", slice(128, 256))):
+            if part in ("", h):
+                x = pack[..., sl] * w
+                if half[h][0] is not None and x.shape != half[h][0].shape:
+                    raise ValueError("the voices %s do not fit together" % ", ".join(blend))
+                half[h][0] = x if half[h][0] is None else half[h][0] + x
+                half[h][1] += w
+    for h in ("t", "p"):
+        if half[h][0] is None or abs(half[h][1]) < 0.2:
+            raise ValueError("the weights of %r add up to nothing (%s)" % (blend, h))
+    return torch.cat([half["t"][0] / half["t"][1], half["p"][0] / half["p"][1]], dim=-1)
 
 
 def _speak_tr(text, blend, speed):

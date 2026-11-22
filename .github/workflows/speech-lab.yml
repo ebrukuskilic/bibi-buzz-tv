@@ -21,6 +21,9 @@ on:
       ext:
         description: "Also try the new voice engines (Pocket TTS Turkish, Phonon English; they need their own python environment): yes or no"
         default: "no"
+      vox:
+        description: "With ext=yes: also VoxCPM2 (2B parameters, voice design for characters; its own python environment, slow on the CPU, at most about 30 minutes of it): yes or no"
+        default: "no"
       myvoice:
         description: "Chatterbox speaks in the voice of the reference clips of the secrets MYVOICE_TR and MYVOICE_EN (the voice of the channel's owner, who agreed to it; the scenes are published only encrypted): yes or no"
         default: "no"
@@ -47,6 +50,7 @@ jobs:
       ONLY: ${{ github.event.inputs.only || 'gallery' }}      # (a run started by a push does only the newest job: the gallery, the casting of some tales the way the videos make it)
       CBX: ${{ github.event.inputs.cbx || 'no' }}
       EXT: ${{ github.event.inputs.ext || 'no' }}
+      VOX: ${{ github.event.inputs.vox || 'no' }}
       MYVOICE: ${{ github.event.inputs.myvoice || 'no' }}
     steps:
       - uses: actions/checkout@v4
@@ -114,13 +118,32 @@ jobs:
             /opt/ext/bin/python -c "import ptts; print('ptts imports fine', getattr(ptts, '__version__', '?'))"
           } 2>&1 | tee out/speech/ext_install.txt
 
+      - name: Install VoxCPM2 in an environment of its own (voice design for characters; a speed test on the CPU)
+        if: env.EXT == 'yes' && env.VOX == 'yes'
+        continue-on-error: true
+        timeout-minutes: 25
+        run: |
+          mkdir -p out/speech
+          {
+            python -m venv /opt/vox
+            /opt/vox/bin/pip install --upgrade pip
+            /opt/vox/bin/pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+            /opt/vox/bin/pip install numpy scipy soundfile
+            /opt/vox/bin/pip install voxcpm
+            /opt/vox/bin/pip list 2>/dev/null | grep -i -E "^(torch|torchaudio|voxcpm|transformers|numpy|scipy|soundfile|funasr|modelscope|einops) " || true
+            /opt/vox/bin/python -c "import voxcpm; print('voxcpm imports fine', getattr(voxcpm, '__version__', '?'))"
+          } 2>&1 | tee out/speech/vox_install.txt
+
       - name: The new voice engines speak
         if: env.EXT == 'yes'
         continue-on-error: true
         run: |
           test -x /opt/ext/bin/python || { echo "there is no environment for the new engines"; exit 1; }
           python tools/speech_lab.py ext-prepare --out out/speech
-          timeout 3000 /opt/ext/bin/python tools/ext_synth.py out/speech/_ext.json out/speech/_ext 2>&1 | tee out/speech/ext_run.txt || true
+          EXT_ENGINES=pocket,phonon timeout 3000 /opt/ext/bin/python tools/ext_synth.py out/speech/_ext.json out/speech/_ext 2>&1 | tee out/speech/ext_run.txt || true
+          if [ "$VOX" = "yes" ] && [ -x /opt/vox/bin/python ]; then
+            EXT_ENGINES=vox EXT_BUDGET=1700 timeout 2400 /opt/vox/bin/python tools/ext_synth.py out/speech/_ext.json out/speech/_ext 2>&1 | tee out/speech/vox_run.txt || true
+          fi
           python tools/speech_lab.py ext-collect --out out/speech
 
       - name: Install Chatterbox in its own environment (python 3.11)

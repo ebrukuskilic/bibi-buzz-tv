@@ -911,6 +911,15 @@ def sim_report(tag, emb):
     log("SIMSUM %s pairs at or above %.2f: %d" % (tag, SIM_ALIKE, n_alike))
 
 
+def nearest_report(tag, emb):
+    """NEAR lines: for every voice of an engine the other voice it is most alike (cosine of the ECAPA voice prints): which voices are really different people"""
+    names = [n for n in emb if emb[n] is not None]
+    for n in names:
+        best = max(((float(np.dot(emb[n], emb[o])), o) for o in names if o != n), default=None)
+        if best:
+            log("NEAR %s %-12s ~ %-12s cos %.2f%s" % (tag, n, best[1], best[0], "   <-- alike" if best[0] >= SIM_ALIKE else ""))
+
+
 # ------------------------------------------------------------------------------------------------------------------------ the gallery: the casting of some tales, the way the videos make it
 GALLERY_TALES = ["three-little-pigs", "goldilocks", "red-riding-hood", "cinderella", "magic-porridge-pot", "gingerbread-man"]
 
@@ -1097,6 +1106,24 @@ POCKET_CAST = {
 }
 POCKET_VOICES = ["female_1", "female_2", "female_3", "male_1", "male_2", "male_3"]
 POCKET_EMOTIONS = [("mutlu", "mutlu"), ("üzgün", "uzgun"), ("kızgın", "kizgin"), ("şaşkın", "sasgin"), ("sakin", "sakin")]       # (the tag, the same without the Turkish letters for a file name)
+NARR = {"en": "Once upon a time, in a little house at the edge of a big green forest, there lived three small pigs. One sunny morning, they said goodbye to their mother, and off they went to build houses of their own.",
+        "tr": "Bir varmış, bir yokmuş. Büyük, yeşil bir ormanın kenarındaki küçük bir evde üç küçük domuz yaşarmış. Güneşli bir sabah anneleriyle vedalaşmışlar ve kendi evlerini yapmak için yola çıkmışlar."}      # (a paragraph of a tale: how does a voice carry a longer text?)
+PHONON_NARR = ["Everly", "Hadley", "Juniper", "Delia", "Hugh", "Imogen", "Harper", "Maeve"]                 # (the calmer voices of the catalog read the paragraph)
+PHONON_KIDS = [("Freya", 1.15, 1.04), ("Freya", 1.30, 1.10), ("Elodie-Rose", 1.20, 1.06), ("Micah", 1.25, 1.08), ("Alfie", 1.30, 1.10)]      # (voice, pitch factor, formant factor: a child out of a young voice)
+VOX_DESIGNS = [               # (who, the type whose line it says, the English description VoxCPM2 designs the voice from), the most important first (the time of the test is limited)
+    ("narrator", "nar", "A warm, kind woman reading a bedtime story to small children, gentle, clear and lively"),
+    ("girl", "girl", "A cheerful five-year-old girl, high-pitched, bright and playful, a small child's voice"),
+    ("wolf", "wolf", "A big bad wolf, low, growly and sly, scary but funny, a cartoon villain for small children"),
+    ("mother", "woman", "A kind, warm mother in her thirties, soft and caring"),
+    ("boy", "boy", "A cheeky six-year-old boy, high-pitched, excited and full of energy, a small child's voice"),
+    ("baby", "baby", "A tiny toddler, very high-pitched, sweet and a little shy, a very small child's voice"),
+    ("granny", "granny", "An old grandmother, a little shaky, warm and slow"),
+    ("pig", "pig", "A nervous little pig, squeaky, fast and worried, a cartoon animal"),
+    ("fairy", "fairy", "A magical fairy, light, airy and sweet, with a little sparkle"),
+    ("witch", "witch", "A cackling old witch, raspy and nasty, a cartoon villain"),
+    ("king", "king", "A booming king, deep, proud and royal"),
+    ("man", "man", "A friendly father, a deep, warm and relaxed voice"),
+]
 
 
 def ext_prepare(a):
@@ -1131,6 +1158,21 @@ def ext_prepare(a):
         items.append(dict(id="pk-%s-world-%.2f-%.2f" % (v, f0, env), engine="pocket", voice=v, emotion="mutlu", text=lively, f0=f0, env=env, group="world", lang="tr"))
     items.append(dict(id="ph-calm-*", engine="phonon", voice="*", text=PAL_CALM["en"], group="palette-en", lang="en"))
     items.append(dict(id="ph-lively-*", engine="phonon", voice="*", text=PAL_LIVELY["en"], group="palette-en", lang="en"))
+    for v in PHONON_NARR:                                         # a paragraph of a tale: calm voices of Phonon (English) and the three women of Pocket (Turkish)
+        items.append(dict(id="ph-narr-%s" % v, engine="phonon", voice=v, text=NARR["en"], group="narr-en", lang="en"))
+    for v in ("female_1", "female_2", "female_3"):
+        items.append(dict(id="pk-narr-%s" % v, engine="pocket", voice=v, emotion=None, text=NARR["tr"], group="narr-tr", lang="tr"))
+    for v, f0, env in PHONON_KIDS:                                # a child out of a young voice (WORLD: the pitch by a factor, the vocal tract by a smaller one)
+        items.append(dict(id="ph-kid-%s-%.2f-%.2f" % (v, f0, env), engine="phonon", voice=v, text=PAL_LIVELY["en"], f0=f0, env=env, group="world", lang="en"))
+    if os.environ.get("VOX") == "yes":                            # VoxCPM2: voice design (the description of the voice in parentheses), in Turkish and in English, the important voices first
+        def vx(lang, i, para=False):
+            who, typ, design = VOX_DESIGNS[i]
+            return dict(id="vx-%s-%s%s" % (lang, who, "-paragraph" if para else ""), engine="vox", voice=who, design=design, seed=7, group="vox", lang=lang,
+                        text=NARR[lang] if para else VOICE_LINES[typ][0 if lang == "en" else 1], catalog=design + (" (a paragraph)" if para else ""))
+        for lang in ("tr", "en"):
+            items += [vx(lang, 0), vx(lang, 0, True)] + [vx(lang, i) for i in (1, 2, 3)]
+        for i in range(4, len(VOX_DESIGNS)):
+            items += [vx(lang, i) for lang in ("tr", "en")]
     with open(os.path.join(OUT, "_ext.json"), "w", encoding="utf-8") as f:
         json.dump({"budget": 2400, "items": items}, f, ensure_ascii=False, indent=1)
     with open(os.path.join(OUT, "_ext_plan.json"), "w", encoding="utf-8") as f:
@@ -1168,33 +1210,38 @@ def _ext_collect():
         if not m.get("ok"):
             log("EXTFAIL %s %s" % (m.get("id"), (m.get("error") or "")[-200:].replace("\n", " | ")))
     gap = np.zeros(int(0.30 * KSR))
-    pal = ("palette", "palette-en", "emotion", "world")
-    for engine, lang in (("pocket", "tr"), ("phonon", "en")):
+    pal = ("palette", "palette-en", "emotion", "world", "narr-en", "narr-tr", "vox")
+    for engine, lang in (("pocket", "tr"), ("phonon", "en"), ("vox", "tr"), ("vox", "en")):
         voices = []
         for m in man:
-            if m.get("ok") and m["engine"] == engine and m["group"] in pal and m["voice"] not in voices:
+            if m.get("ok") and m["engine"] == engine and m.get("lang") == lang and m["group"] in pal and m["voice"] not in voices:
                 voices.append(m["voice"])
-        parts = []
-        log("---- ext %s: EXT engine group voice emotion pitch-factor formant-factor F0 UTMOS WER seconds-of-audio seconds-of-work" % engine)
+        if not voices:
+            continue
+        parts, pal_emb = [], {}
+        log("---- ext %s %s: EXT engine group voice emotion pitch-factor formant-factor F0 UTMOS WER seconds-of-audio seconds-of-work" % (engine, lang))
         for n, v in enumerate(voices, 1):
-            log("EXTPAL %s %d = %s" % (engine, n, v))
+            log("EXTPAL %s %s %d = %s" % (engine, lang, n, v))
             try:
                 parts += [KT.speak(number_words(n, lang), "k:af_heart" if lang == "en" else "kt:elif", "-6%", "+0Hz"), gap]
             except Exception:
                 log("   announcer failed", traceback.format_exc()[-150:].replace("\n", " | "))
             for m in man:
-                if not (m.get("ok") and m["engine"] == engine and m["voice"] == v and m["group"] in pal):
+                if not (m.get("ok") and m["engine"] == engine and m.get("lang") == lang and m["voice"] == v and m["group"] in pal):
                     continue
                 y = _read_wav24(os.path.join(d, m["id"] + ".wav"))
                 sc = score(y, m["text"], m["lang"])
                 f0 = f0_of(y)
+                if v not in pal_emb and m["group"] in ("palette", "palette-en", "vox") and not m.get("f0"):
+                    pal_emb[v] = try_embed(y)
                 log("EXT %-7s %-10s %-12s %-8s f0x%.2f envx%.2f F0 %5s UTMOS %.2f WER %3.0f%% SEC %.1f WORK %.1f%s" % (
                     engine, m["group"], v, m.get("emotion") or "-", m.get("f0", 1.0), m.get("env", 1.0), ("%.0f" % f0) if f0 else "-", sc.get("mos", 0.0),
                     100 * sc.get("wer", 1.0), m["audio"], m["work"], ("  [" + m["catalog"][:70] + "]") if m.get("catalog") else ""))
                 parts += [level(y), gap]
             parts.append(np.zeros(int(0.8 * KSR)))
+        nearest_report(engine + "-" + lang, pal_emb)
         if parts:
-            VL.save("palette-" + engine, np.concatenate(parts), KSR)
+            VL.save("palette-" + engine + ("-" + lang if engine == "vox" else ""), np.concatenate(parts), KSR)
     try:
         plan = json.load(open(os.path.join(OUT, "_ext_plan.json"), encoding="utf-8"))
     except Exception:

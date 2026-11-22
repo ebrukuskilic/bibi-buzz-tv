@@ -407,43 +407,89 @@ def _main(argv):
 # ("kt:af_kore"): they separate the characters better, but they mispronounce about one word in eight, which is not acceptable in a tale for children, so they are not used.
 KTYPES = {
     "nar": (("k:af_heart", "-8%", "+0Hz", ""), ("kt:elif", "-5%", "+0Hz", "")),
-    "girl": ((("k:af_sarah", "-2%", "+30Hz", ""), ("k:bf_isabella", "-2%", "+30Hz", "")), (("kt:elif:p=1,bf_emma:t=1", "-2%", "+0Hz", ""), ("kt:elif:p=1,af_heart:t=1", "-2%", "+30Hz", ""))),
-    "teen": (("k:af_river", "-2%", "+0Hz", ""), ("kt:elif:p=1,bf_emma:t=1", "-2%", "+0Hz", "")),
-    "boy": ((("k:am_eric", "+4%", "+30Hz", ""), ("k:am_eric", "+4%", "+30Hz", "")), (("kt:emre:p=1,am_adam:t=1", "+4%", "+30Hz", ""), ("kt:emre:p=1,am_eric:t=1", "+4%", "+45Hz", ""))),
-    "baby": (("k:bf_isabella", "+0%", "+53Hz", ""), ("kt:elif:p=1,af_heart:t=1", "+0%", "+30Hz", "")),
-    "woman": (("k:af_sky", "-4%", "-8Hz", ""), ("kt:elif:p=1,af_river:t=1", "-8%", "-8Hz", "")),
-    "granny": ((("k:af_kore", "-14%", "-15Hz", ""), None, ("k:af_river", "-14%", "+0Hz", "")), (("kt:elif:p=1,af_river:t=1", "-14%", "-23Hz", "lp@7000"), None, ("kt:elif:p=1,bf_isabella:t=1", "-14%", "-23Hz", "lp@7000"))),
-    "fakegranny": (("k:am_eric", "-8%", "+8Hz", ""), ("kt:emre:p=1,am_echo:t=1", "-8%", "+30Hz", "")),
-    "man": (("k:am_adam", "-6%", "+0Hz", ""), ("kt:emre:p=1,am_adam:t=1", "-6%", "-23Hz", "")),
-    "grandpa": (("k:am_echo", "-14%", "-23Hz", ""), ("kt:emre:p=1,am_michael:t=1", "-12%", "-23Hz", "lp@7000")),
-    "prince": (("k:bm_george", "+0%", "+0Hz", ""), ("kt:emre:p=1,am_michael:t=1", "-2%", "+15Hz", "")),
-    "king": (("k:am_echo", "-14%", "+0Hz", "room@0.07,0.5"), ("kt:emre:p=1,am_echo:t=1", "-14%", "-23Hz", "room@0.07,0.5")),
-    "lord": (("k:am_echo", "-8%", "-8Hz", ""), ("kt:emre:p=1,bm_fable:t=1", "-10%", "+0Hz", "")),
-    "queen": (("k:af_sky", "-10%", "-8Hz", "room@0.06,0.5"), ("kt:elif:p=1,af_river:t=1", "-12%", "-8Hz", "room@0.06,0.5")),
-    "stepmother": (("k:af_kore", "-12%", "+0Hz", ""), ("kt:elif:p=1,bf_isabella:t=1", "-10%", "-23Hz", "")),
-    "stepsister": ((("k:bf_isabella", "+6%", "+30Hz", ""), ("k:bf_alice", "+6%", "-23Hz", "")), (("kt:elif:p=1,af_river:t=1", "+6%", "-23Hz", ""), ("kt:elif:p=1,af_heart:t=1", "+6%", "+30Hz", ""))),
-    "witch": (("k:af_kore", "-14%", "-15Hz", ""), ("kt:elif:p=1,af_bella:t=1", "-14%", "-23Hz", "lp@7000")),
-    "fairy": (("k:af_sarah", "-8%", "+30Hz", "room@0.12,0.8"), ("kt:elif:p=1,af_alloy:t=1", "-14%", "-8Hz", "room@0.14,0.9")),
-    "mirror": (("k:am_echo", "-18%", "+0Hz", "room@0.16,0.9"), ("kt:emre:p=1,am_fenrir:t=1", "-16%", "-23Hz", "room@0.16,0.9")),
-    "dwarf": (("k:am_eric", "+6%", "+8Hz", ""), ("kt:emre:p=1,am_fenrir:t=1", "+8%", "+30Hz", "")),
-    "elf": (("k:am_eric", "+10%", "+53Hz", ""), ("kt:emre:p=1,am_santa:t=1", "+10%", "+45Hz", "")),
-    "elfgirl": (("k:bf_isabella", "+10%", "+30Hz", ""), ("kt:elif:p=1,af_heart:t=1", "+10%", "+30Hz", "")),
+    "girl": ((("k:af_sarah", "-2%", "+30Hz", ""), ("k:bf_isabella", "-2%", "+30Hz", "")), (("kt:elif=0.8,emre=0.2", "-2%", "+30Hz", ""), ("kt:elif=1.25,emre=-0.25", "-2%", "+22Hz", ""))),
+    "teen": (("k:af_river", "-2%", "+0Hz", ""), ("kt:elif=0.8,emre=0.2", "-2%", "+30Hz", "")),
+    "boy": ((("k:am_eric", "+4%", "+30Hz", ""), ("k:am_eric", "+4%", "+30Hz", "")), (("kt:elif=0.2,emre=0.8", "+4%", "+30Hz", ""), ("kt:elif=0.6,emre=0.4", "+4%", "+8Hz", ""))),
+    "baby": (("k:bf_isabella", "+0%", "+53Hz", ""), ("kt:elif=1.25,emre=-0.25", "+0%", "+22Hz", "")),
+    "woman": (("k:af_sky", "-4%", "-8Hz", ""), ("kt:elif=0.6,emre=0.4", "-8%", "+8Hz", "")),
+    "granny": ((("k:af_kore", "-14%", "-15Hz", ""), None, ("k:af_river", "-14%", "+0Hz", "")), (("kt:elif=0.8,emre=0.2", "-14%", "-23Hz", "lp@7000"), None, ("kt:elif=0.4,emre=0.6", "-14%", "-15Hz", "lp@7000"))),
+    "fakegranny": (("k:am_eric", "-8%", "+8Hz", ""), ("kt:elif=0.4,emre=0.6", "-8%", "-15Hz", "")),
+    "man": (("k:am_adam", "-6%", "+0Hz", ""), ("kt:emre", "-6%", "-23Hz", "")),
+    "grandpa": (("k:am_echo", "-14%", "-23Hz", ""), ("kt:elif=-0.25,emre=1.25", "-12%", "-23Hz", "lp@7000")),
+    "prince": (("k:bm_george", "+0%", "+0Hz", ""), ("kt:emre", "-2%", "+0Hz", "")),
+    "king": (("k:am_echo", "-14%", "+0Hz", "room@0.07,0.5"), ("kt:elif=-0.25,emre=1.25", "-14%", "+0Hz", "room@0.07,0.5")),
+    "lord": (("k:am_echo", "-8%", "-8Hz", ""), ("kt:elif=0.2,emre=0.8", "-10%", "-23Hz", "")),
+    "queen": (("k:af_sky", "-10%", "-8Hz", "room@0.06,0.5"), ("kt:elif=0.6,emre=0.4", "-12%", "+8Hz", "room@0.06,0.5")),
+    "stepmother": (("k:af_kore", "-12%", "+0Hz", ""), ("kt:elif=0.4,emre=0.6", "-10%", "-8Hz", "")),
+    "stepsister": ((("k:bf_isabella", "+6%", "+30Hz", ""), ("k:af_bella", "+6%", "+0Hz", "")), (("kt:elif=0.8,emre=0.2", "+6%", "-15Hz", ""), ("kt:elif=1.25,emre=-0.25", "+6%", "+22Hz", ""))),
+    "witch": (("k:af_kore", "-14%", "-15Hz", ""), ("kt:elif=0.8,emre=0.2", "-14%", "-23Hz", "lp@7000")),
+    "fairy": (("k:af_sarah", "-8%", "+30Hz", "room@0.12,0.8"), ("kt:elif=0.6,emre=0.4", "-14%", "+15Hz", "room@0.14,0.9")),
+    "mirror": (("k:am_echo", "-18%", "+0Hz", "room@0.16,0.9"), ("kt:elif=-0.25,emre=1.25", "-16%", "+0Hz", "room@0.16,0.9")),
+    "dwarf": (("k:am_eric", "+6%", "+8Hz", ""), ("kt:elif=0.4,emre=0.6", "+8%", "-15Hz", "")),
+    "elf": (("k:am_eric", "+10%", "+53Hz", ""), ("kt:elif=0.4,emre=0.6", "+10%", "+8Hz", "")),
+    "elfgirl": (("k:bf_isabella", "+10%", "+30Hz", ""), ("kt:elif=1.25,emre=-0.25", "+10%", "+22Hz", "")),
     "troll": (("k:am_onyx", "-16%", "+0Hz", "bass@2"), ("kt:elif=-0.25,emre=1.25", "-16%", "-23Hz", "bass@2")),
     "giant": (("k:am_fenrir", "-16%", "-45Hz", "room@0.10,0.7"), ("kt:emre", "-18%", "-58Hz", "room@0.10,0.7")),
-    "pig": ((("k:am_michael", "+2%", "+22Hz", ""), ("k:bm_george", "+2%", "+0Hz", ""), ("k:am_eric", "+2%", "+53Hz", "")), (("kt:emre:p=1,am_santa:t=1", "+4%", "+0Hz", ""), ("kt:emre:p=1,am_liam:t=1", "+4%", "+15Hz", ""), ("kt:emre:p=1,am_adam:t=1", "+4%", "+30Hz", ""))),
-    "wolf": (("k:am_echo", "-10%", "-8Hz", "bass@2"), ("kt:emre:p=1,bm_fable:t=1", "-10%", "-23Hz", "bass@2")),
-    "hare": (("k:am_fenrir", "+8%", "+22Hz", ""), ("kt:emre:p=1,am_michael:t=1", "+8%", "+45Hz", "")),
-    "tortoise": (("k:am_adam", "-20%", "+0Hz", "lp@7000"), ("kt:emre:p=1,am_michael:t=1", "-20%", "-23Hz", "lp@7000")),
-    "bear": (("k:am_onyx", "-12%", "+0Hz", ""), ("kt:emre:p=1,bm_fable:t=1", "-12%", "-8Hz", "")),
-    "mamabear": (("k:af_kore", "-8%", "+0Hz", ""), ("kt:elif:p=1,af_bella:t=1", "-10%", "-23Hz", "")),
-    "goat_little": (("k:am_eric", "+4%", "+53Hz", ""), ("kt:emre:p=1,am_echo:t=1", "+4%", "+45Hz", "")),
-    "goat_mid": (("k:bm_george", "+0%", "+0Hz", ""), ("kt:emre:p=1,am_adam:t=1", "+2%", "+30Hz", "")),
-    "goat_big": (("k:am_echo", "-14%", "+0Hz", "bass@2"), ("kt:emre:p=1,bm_fable:t=1", "-10%", "-8Hz", "bass@2")),
-    "hen": (("k:af_jessica", "+4%", "+15Hz", ""), ("kt:elif:p=1,af_heart:t=1", "+2%", "+30Hz", "")),
-    "fox": (("k:am_adam", "-4%", "+0Hz", ""), ("kt:emre:p=1,am_liam:t=1", "-4%", "+15Hz", "")),
-    "tiny": (("k:bf_isabella", "+8%", "+53Hz", ""), ("kt:elif:p=1,af_heart:t=1", "+8%", "+30Hz", "")),
+    "pig": ((("k:am_puck", "+2%", "+60Hz", ""), ("k:bm_george", "+2%", "+0Hz", ""), ("k:am_eric", "+2%", "+53Hz", "")), (("kt:emre", "+4%", "+15Hz", ""), ("kt:elif=0.2,emre=0.8", "+4%", "+8Hz", ""), ("kt:elif=0.4,emre=0.6", "+4%", "+8Hz", ""))),
+    "wolf": (("k:am_echo", "-10%", "-8Hz", "bass@2"), ("kt:elif=-0.25,emre=1.25", "-10%", "-23Hz", "bass@2")),
+    "hare": (("k:am_fenrir", "+8%", "+45Hz", ""), ("kt:elif=0.6,emre=0.4", "+8%", "+8Hz", "")),
+    "tortoise": (("k:am_adam", "-20%", "+0Hz", "lp@7000"), ("kt:elif=-0.25,emre=1.25", "-20%", "-23Hz", "lp@7000")),
+    "bear": (("k:am_onyx", "-12%", "+15Hz", ""), ("kt:emre", "-12%", "-23Hz", "")),
+    "mamabear": (("k:af_kore", "-8%", "+0Hz", ""), ("kt:elif=0.6,emre=0.4", "-10%", "+0Hz", "")),
+    "goat_little": (("k:am_eric", "+4%", "+53Hz", ""), ("kt:elif=0.6,emre=0.4", "+4%", "+0Hz", "")),
+    "goat_mid": (("k:bm_george", "+0%", "+0Hz", ""), ("kt:elif=0.2,emre=0.8", "+2%", "+15Hz", "")),
+    "goat_big": (("k:am_echo", "-14%", "+0Hz", "bass@2"), ("kt:emre", "-10%", "-23Hz", "bass@2")),
+    "hen": (("k:af_jessica", "+4%", "+15Hz", ""), ("kt:elif=1.25,emre=-0.25", "+2%", "+8Hz", "")),
+    "fox": (("k:am_adam", "-4%", "+0Hz", ""), ("kt:elif=-0.25,emre=1.25", "-4%", "+22Hz", "")),
+    "tiny": (("k:bf_isabella", "+8%", "+53Hz", ""), ("kt:elif=1.25,emre=-0.25", "+8%", "+22Hz", "")),
     "lion": (("k:am_echo", "-12%", "-23Hz", "room@0.10,0.8"), ("kt:elif=-0.25,emre=1.25", "-12%", "-23Hz", "room@0.10,0.8")),
 }
+
+
+# The same Turkish types made the other way (BIBI_XPLANT=1): a Turkish character speaks the Turkish the way elif (women) or emre (men) does, with the TIMBRE of a voice of
+# Kokoro-82M ("kt:elif:p=1,af_river:t=1", see _tr_style), so that the characters of a tale differ in WHO they sound like and not only in how high they sit.  The entries come
+# from a search over the voice grid of the speech lab (tools/speech_lab.py --only grid: ECAPA voice prints of every Kokoro voice at several pitches) and are checked on the
+# lines of the gallery (tools/speech_lab.py --only gallery, the "-xplant" pass).  Off by default: the daily videos keep KTYPES until the gallery says (and a listener agrees)
+# that these are better.  A type that is not in this table keeps its entry of KTYPES.
+XPLANT_TR = {
+    "girl": (("kt:elif:p=1,bf_emma:t=1", "-2%", "+0Hz", ""), ("kt:elif:p=1,af_heart:t=1", "-2%", "+30Hz", "")),
+    "teen": ("kt:elif:p=1,bf_emma:t=1", "-2%", "+0Hz", ""),
+    "boy": (("kt:emre:p=1,am_adam:t=1", "+4%", "+30Hz", ""), ("kt:emre:p=1,am_eric:t=1", "+4%", "+45Hz", "")),
+    "baby": ("kt:elif:p=1,af_heart:t=1", "+0%", "+30Hz", ""),
+    "woman": ("kt:elif:p=1,af_river:t=1", "-8%", "-8Hz", ""),
+    "granny": (("kt:elif:p=1,af_river:t=1", "-14%", "-23Hz", "lp@7000"), None, ("kt:elif:p=1,bf_isabella:t=1", "-14%", "-23Hz", "lp@7000")),
+    "fakegranny": ("kt:emre:p=1,am_echo:t=1", "-8%", "+30Hz", ""),
+    "man": ("kt:emre:p=1,am_adam:t=1", "-6%", "-23Hz", ""),
+    "grandpa": ("kt:emre:p=1,am_michael:t=1", "-12%", "-23Hz", "lp@7000"),
+    "prince": ("kt:emre:p=1,am_michael:t=1", "-2%", "+15Hz", ""),
+    "king": ("kt:emre:p=1,am_echo:t=1", "-14%", "-23Hz", "room@0.07,0.5"),
+    "lord": ("kt:emre:p=1,bm_fable:t=1", "-10%", "+0Hz", ""),
+    "queen": ("kt:elif:p=1,af_river:t=1", "-12%", "-8Hz", "room@0.06,0.5"),
+    "stepmother": ("kt:elif:p=1,bf_isabella:t=1", "-10%", "-23Hz", ""),
+    "stepsister": (("kt:elif:p=1,af_river:t=1", "+6%", "-23Hz", ""), ("kt:elif:p=1,af_heart:t=1", "+6%", "+30Hz", "")),
+    "witch": ("kt:elif:p=1,af_bella:t=1", "-14%", "-23Hz", "lp@7000"),
+    "fairy": ("kt:elif:p=1,af_alloy:t=1", "-14%", "-8Hz", "room@0.14,0.9"),
+    "mirror": ("kt:emre:p=1,am_fenrir:t=1", "-16%", "-23Hz", "room@0.16,0.9"),
+    "dwarf": ("kt:emre:p=1,am_fenrir:t=1", "+8%", "+30Hz", ""),
+    "elf": ("kt:emre:p=1,am_santa:t=1", "+10%", "+45Hz", ""),
+    "elfgirl": ("kt:elif:p=1,af_heart:t=1", "+10%", "+30Hz", ""),
+    "pig": (("kt:emre:p=1,am_santa:t=1", "+4%", "+0Hz", ""), ("kt:emre:p=1,am_liam:t=1", "+4%", "+15Hz", ""), ("kt:emre:p=1,am_adam:t=1", "+4%", "+30Hz", "")),
+    "wolf": ("kt:emre:p=1,bm_fable:t=1", "-10%", "-23Hz", "bass@2"),
+    "hare": ("kt:emre:p=1,am_michael:t=1", "+8%", "+45Hz", ""),
+    "tortoise": ("kt:emre:p=1,am_michael:t=1", "-20%", "-23Hz", "lp@7000"),
+    "bear": ("kt:emre:p=1,bm_fable:t=1", "-12%", "-8Hz", ""),
+    "mamabear": ("kt:elif:p=1,af_bella:t=1", "-10%", "-23Hz", ""),
+    "goat_little": ("kt:emre:p=1,am_echo:t=1", "+4%", "+45Hz", ""),
+    "goat_mid": ("kt:emre:p=1,am_adam:t=1", "+2%", "+30Hz", ""),
+    "goat_big": ("kt:emre:p=1,bm_fable:t=1", "-10%", "-8Hz", "bass@2"),
+    "hen": ("kt:elif:p=1,af_heart:t=1", "+2%", "+30Hz", ""),
+    "fox": ("kt:emre:p=1,am_liam:t=1", "-4%", "+15Hz", ""),
+    "tiny": ("kt:elif:p=1,af_heart:t=1", "+8%", "+30Hz", ""),
+}
+
+
+def xplant_on():
+    return os.environ.get("BIBI_XPLANT", "").strip().lower() in ("1", "yes", "on", "true")
 
 
 KID_TYPES = ("girl", "boy", "baby", "tiny", "elfgirl", "goat_little")        # (children and small animals: the Edge casting has real child voices for them in English, Ana and Maisie)
@@ -472,7 +518,10 @@ def cast(typ, lang, edge, off=0):
         return None
     if lang == "en" and typ in KID_TYPES and os.environ.get("BIBI_KIDS", KIDS_DEFAULT).strip().lower() == "edge":
         return None                                                          # (the child voices of Edge speak them, tales.TYPES)
-    (v, r, p, fx), off = _pick(KTYPES[typ][0 if lang == "en" else 1], off)
+    entry = KTYPES[typ][0 if lang == "en" else 1]
+    if lang == "tr" and typ in XPLANT_TR and xplant_on():
+        entry = XPLANT_TR[typ]
+    (v, r, p, fx), off = _pick(entry, off)
     if off:
         p = "%+dHz" % (int(p[:-2]) + off)
     return ("%s|%s|%s|%s" % (v, edge[0], edge[1], edge[2]), r, p, fx)

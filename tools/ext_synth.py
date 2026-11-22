@@ -9,6 +9,9 @@ job.json: {"budget": seconds, "items": [{"id", "engine": "pocket" | "phonon", "v
   pocket   Pocket TTS Turkish (wite-tech/pocket-tts-turkish, CC-BY-4.0; built on Kyutai's Pocket TTS): voices female_1..3 and male_1..3, emotion tags
            mutlu / uzgun / kizgin / sasgin / sakin (written with the Turkish letters), about 5x real time on one CPU thread
   phonon   Phonon 31m English (gradium/phonon-31m-en, Apache-2.0; a Rust runtime, no PyTorch): voice "*" = every English voice of the catalog
+  vox      VoxCPM2 (openbmb/VoxCPM2, Apache-2.0, 2B parameters, 48 kHz, 30 languages with Turkish) in an environment of its own (python -m venv /opt/vox: torch, voxcpm):
+           voice DESIGN: the "design" (an English description of the voice) goes in parentheses before the text; a fixed "seed"; "ref" = a clip to keep a voice for a whole tale
+  EXT_ENGINES (the engines this python environment makes, default all) and EXT_BUDGET (seconds) are read from the environment; a second call adds to manifest.json
   f0, env  WORLD vocoder (pyworld): the pitch x f0 and the spectral envelope (the vocal tract = the formants) x env; 1.0 = untouched.  A plain resampling moves both
            by the same factor (a smaller person, and above x1.2 a chipmunk); here the pitch can move a lot and the vocal tract a little.
 outdir: <id>.wav (24 kHz, mono), manifest.json (everything that was made: engine, voice, emotion, seconds of work and of audio)
@@ -75,10 +78,16 @@ def phonon_catalog():
         print(r.stdout[:6000], flush=True)
         if r.stderr.strip():
             print("stderr:", r.stderr[-600:], flush=True)
-        for ln in r.stdout.splitlines():
-            m = re.match(r"\s*([A-Za-z0-9_\-]+)\s+(.*)$", ln)
-            if m and re.search(r"(^|[\s(\[,|:])en([-_ )\],|:]|$)", m.group(2) or "", re.I):
-                names.append((m.group(1), ln.strip()))
+        lines = r.stdout.splitlines()
+        for ln in lines:                                                      # the list is "Name<TAB>language<TAB>id<TAB>description" (seen in lab run 17)
+            cols = [c.strip() for c in ln.split("\t")]
+            if len(cols) >= 2 and cols[0] and re.split(r"[-_]", cols[1].lower())[0] == "en":
+                names.append((cols[0], ln.strip()))
+        if not names:                                                         # another format: the first word is the name, and the line has to say 'en'
+            for ln in lines:
+                m = re.match(r"\s*([A-Za-z0-9_\-]+)\s+(.*)$", ln)
+                if m and re.search(r"(^|[\s(\[,|:])en([-_ )\],|:]|$)", m.group(2) or "", re.I):
+                    names.append((m.group(1), ln.strip()))
     except Exception:
         print("the voice catalog could not be listed", traceback.format_exc()[-400:], flush=True)
     seen, out = set(), []
@@ -95,10 +104,27 @@ def main():
     job = json.load(open(sys.argv[1], encoding="utf-8"))
     out = sys.argv[2]
     os.makedirs(out, exist_ok=True)
-    budget = float(job.get("budget", 2400))
+    budget = float(os.environ.get("EXT_BUDGET") or job.get("budget", 2400))
+    only = set(x.strip() for x in (os.environ.get("EXT_ENGINES") or "pocket,phonon,vox").split(",") if x.strip())      # (every python environment makes the clips of its own engines)
     t_all = time.time()
     eng = {}
-    manifest = []
+    mpath = os.path.join(out, "manifest.json")
+    try:
+        manifest = json.load(open(mpath, encoding="utf-8"))                       # (a second call, for the engines of another environment, adds to it)
+    except Exception:
+        manifest = []
+
+    def vox():
+        if "vox" not in eng:
+            t0 = time.time()
+            from voxcpm import VoxCPM
+            try:
+                eng["vox"] = VoxCPM.from_pretrained("openbmb/VoxCPM2", load_denoiser=False, optimize=False)
+            except TypeError:
+                eng["vox"] = VoxCPM.from_pretrained("openbmb/VoxCPM2", load_denoiser=False)
+            tm = getattr(eng["vox"], "tts_model", None)
+            print("VoxCPM2 loaded in %.1f s, sample rate %s, device %s" % (time.time() - t0, getattr(tm, "sample_rate", "?"), getattr(tm, "device", "?")), flush=True)
+        return eng["vox"]
 
     def pocket():
         if "pocket" not in eng:
@@ -131,6 +157,7 @@ def main():
         else:
             items.append(it)
 
+    items = [it for it in items if it.get("engine") in only]
     for it in items:
         if time.time() - t_all > budget:
             print("the time budget is spent: the rest is not made", flush=True)
@@ -138,7 +165,22 @@ def main():
         t0 = time.time()
         rec = dict(it)
         try:
-            if it["engine"] == "pocket":
+            if it["engine"] == "vox":
+                tts = vox()
+                text = ("(" + it["design"] + ")" if it.get("design") else "") + it["text"]            # voice design: the description of the voice in parentheses before the text
+                kw = dict(text=text, cfg_value=float(it.get("cfg", 2.0)), inference_timesteps=int(it.get("steps", 10)))
+                if it.get("ref"):
+                    kw["reference_wav_path"] = it["ref"]
+                if it.get("seed") is not None:
+                    kw["seed"] = int(it["seed"])
+                try:
+                    w = tts.generate(**kw)
+                except TypeError:
+                    kw.pop("seed", None)
+                    w = tts.generate(**kw)
+                y = np.asarray(w, dtype=np.float64).reshape(-1)
+                sr = int(tts.tts_model.sample_rate)
+            elif it["engine"] == "pocket":
                 tts = pocket()
                 kw = {"voice": it["voice"]}
                 if it.get("emotion"):
@@ -166,7 +208,7 @@ def main():
             rec.update(ok=False, error=traceback.format_exc()[-400:])
             print("FAILED", it.get("id"), traceback.format_exc()[-400:], flush=True)
         manifest.append(rec)
-        with open(os.path.join(out, "manifest.json"), "w", encoding="utf-8") as f:
+        with open(mpath, "w", encoding="utf-8") as f:
             json.dump(manifest, f, ensure_ascii=False, indent=1)
     print("done: %d of %d clips in %.0f s" % (sum(1 for m in manifest if m.get("ok")), len(items), time.time() - t_all), flush=True)
 

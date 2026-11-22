@@ -1053,6 +1053,69 @@ def gallery(a):
         VL.save("gallery-" + lang + tag, np.concatenate(parts) if parts else np.zeros(KSR), KSR)
 
 
+# ------------------------------------------------------------------------------------------------------------------------ the voice grid: how many different people can the Kokoro models make? (--only grid)
+GRID_LINES = {"tr": ["Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir top bulmuş.",
+                     "Ağaçların arasından geçen yaşlı kurt, yavru kuzuların çiçekli çayırda koştuğunu görünce gülümsedi."],
+              "en": ["Once upon a time, a little rabbit found a shiny red ball in the garden.",
+                     "The old wolf walked between the tall trees and smiled when he saw the baby lambs running through the flowery meadow."]}   # (a calm line, and a harder one for the voice at its own size)
+GRID_PITCH = {"tr": [-45, -23, -8, 0, 15, 30, 45], "en": [-45, -23, 0, 22, 45]}              # (Hz in the way of the casting: a factor of 1 + Hz / 150)
+
+
+def _grid_candidates(lang):
+    """[(spec body, [pitches], harder line too?)].  Turkish: the blends of elif and emre the tales use now (the baseline), then every voice of Kokoro-82M as a TIMBRE on the Turkish
+    way of speaking ("elif:p=1,af_kore:t=1": the durations, pitch and energy of elif, the voice of af_kore; a woman's timbre on elif, a man's on emre) at every pitch, then the same
+    with half of the own timbre of elif / emre in it (a more Turkish voice, less far from what the model knows)."""
+    out = []
+    if lang == "en":
+        return [(v, GRID_PITCH["en"], False) for v in EN_VOICES]
+    out += [(b, GRID_PITCH["tr"], False) for b in TR_STYLES]
+    for v in EN_VOICES:
+        p = "elif" if v[1] == "f" else "emre"
+        out.append(("%s:p=1,%s:t=1" % (p, v), GRID_PITCH["tr"], True))
+    for v in EN_VOICES:
+        p = "elif" if v[1] == "f" else "emre"
+        out.append(("%s:p=1,%s:t=0.5,%s:t=0.5" % (p, p, v), [0], True))
+    return out
+
+
+def voice_grid(a):
+    """GRID lines (F0, UTMOS, words wrong, seconds) of every candidate at every pitch and, in grid-<language>.txt, one JSON line per clip with its ECAPA voice print, so that the
+    casting of the tales can be chosen OFFLINE (the voices of one tale as far apart as can be) from one measurement."""
+    os.environ["BIBI_KOKORO_INPROC"] = "1"                              # (the model is loaded once, in this process)
+    try:
+        _voice_grid()
+    finally:
+        os.environ.pop("BIBI_KOKORO_INPROC", None)
+
+
+def _voice_grid():
+    from bibi_buzz import ktts as KT
+    for lang in ("tr", "en"):
+        pre = "k:" if lang == "en" else "kt:"
+        rows = []
+        log("---- voice grid %s: GRID language spec pitch(Hz) line F0 UTMOS WER seconds   (line 1 is the harder one: only at the pitch 0)" % lang)
+        for body, pitches, hard in _grid_candidates(lang):
+            for hz in pitches:
+                for k, line in enumerate(GRID_LINES[lang][:2] if (hard and hz == 0) else GRID_LINES[lang][:1]):
+                    try:
+                        y = KT.speak(line, pre + body, "+0%", "%+dHz" % hz)
+                    except Exception:
+                        log("GRID %s %s %+d L%d FAILED %s" % (lang, body, hz, k, traceback.format_exc()[-150:].replace("\n", " | ")))
+                        continue
+                    sc = score(y, line, lang)
+                    f0 = f0_of(y)
+                    e = try_embed(y)
+                    wer = sc.get("wer", 1.0)
+                    log("GRID %s %-34s %+4d L%d F0 %5s UTMOS %.2f WER %3.0f%% SEC %.1f%s" % (lang, body, hz, k, ("%.0f" % f0) if f0 else "-", sc.get("mos", 0.0), 100 * wer, len(y) / float(KSR),
+                                                                                           ("  heard: " + sc.get("heard", "")) if wer > 0.12 else ""))
+                    rows.append({"spec": body, "hz": hz, "line": k, "f0": round(f0, 1) if f0 else None, "mos": round(sc.get("mos", 0.0), 3), "wer": round(wer, 3), "sec": round(len(y) / float(KSR), 2),
+                                 "emb": [round(float(x), 4) for x in e] if e is not None else None})
+        with open(os.path.join(OUT, "grid-%s.txt" % lang), "w", encoding="utf-8") as f:
+            for r in rows:
+                f.write(json.dumps(r) + "\n")
+        log("GRIDSUM %s: %d clips, mean UTMOS %.2f, mean words wrong %.0f%%" % (lang, len(rows), np.mean([r["mos"] for r in rows]) if rows else 0.0, 100 * np.mean([r["wer"] for r in rows]) if rows else 0.0))
+
+
 # ------------------------------------------------------------------------------------------------------------------------ WORLD: a smaller person without the chipmunk (--only world)
 WORLD_BODIES = {"en": ["af_sarah", "bf_isabella", "af_river"], "tr": ["elif=0.8,emre=0.2", "elif"]}
 WORLD_SET = [("resample", 1.2, 1.0), ("resample", 1.35, 1.0), ("resample", 1.5, 1.0),             # (method, pitch factor, formant factor)
@@ -1476,7 +1539,7 @@ def job_main(a):
             log("  ", m, "MISSING", repr(e)[:120])
     list_edge_voices()
     only = [x for x in (a.only or "").split(",") if x]
-    special = [("cast", cast_sweep), ("palette", palette), ("studio", studio_ab), ("gallery", gallery), ("world", world_test)]            # (jobs of their own: not an engine of the ten lines)
+    special = [("cast", cast_sweep), ("palette", palette), ("studio", studio_ab), ("gallery", gallery), ("world", world_test), ("grid", voice_grid)]            # (jobs of their own: not an engine of the ten lines)
     for key, fn in special:
         if key in only:
             try:

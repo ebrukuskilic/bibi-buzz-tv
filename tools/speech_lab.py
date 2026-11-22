@@ -1059,12 +1059,15 @@ def gallery(a):
     from bibi_buzz import ktts as KT
     rest = [k for k in T.CASTING if k not in GALLERY_TALES]                  # (the other tales: measured too, so that every type of the casting has a line)
     everything = list(T.CASTING)
-    if os.environ.get("GALLERY_SET", "") == "legacy":                          # (English twice: the children with a Kokoro voice, and with the child voices of Edge; Turkish twice: KTYPES and XPLANT_TR)
+    which_set = os.environ.get("GALLERY_SET", "final")
+    if which_set == "legacy":                                                  # (English twice: the children with a Kokoro voice, and with the child voices of Edge; Turkish twice: KTYPES and XPLANT_TR)
         passes = (("en", "", {}, GALLERY_TALES, None, "A"), ("en", "-kidsedge", {"BIBI_KIDS": "edge"}, GALLERY_TALES, None, "A"), ("tr", "", {}, GALLERY_TALES, None, "A"),
                   ("tr", "-xplant", {"BIBI_XPLANT": "1"}, GALLERY_TALES, None, "A"), ("tr", "-rest", {}, rest, None, "A"), ("tr", "-xplant-rest", {"BIBI_XPLANT": "1"}, rest, None, "A"))
-    else:                                                                      # (the hybrid casting of XPLANT_TR on the first line, and all three castings on the second line)
+    elif which_set == "measure":                                               # (the hybrid casting of XPLANT_TR on the first line, and all three castings on the second line)
         passes = (("tr", "-xplant", {"BIBI_XPLANT": "1"}, GALLERY_TALES, None, "A"), ("tr", "-xplant-rest", {"BIBI_XPLANT": "1"}, rest, None, "A"),
                   ("tr", "-B", {}, everything, None, "B"), ("tr", "-v5-B", {"BIBI_XPLANT": "1"}, everything, V5_TR, "B"), ("tr", "-xplant-B", {"BIBI_XPLANT": "1"}, everything, None, "B"))
+    else:                                                                      # (final: the casting of XPLANT_TR on the first line, and the scenes with the old and the new casting)
+        passes = (("tr", "-xplant", {"BIBI_XPLANT": "1"}, GALLERY_TALES, None, "A"), ("tr", "-xplant-rest", {"BIBI_XPLANT": "1"}, rest, None, "A"))
     memo = {}                                                                  # (a clip that was made and measured once is not measured again: the same type in several tales, the same voice in several castings)
     saved_table = KT.XPLANT_TR
     for lang, tag, env, keys, table, which in passes:
@@ -1146,6 +1149,58 @@ def gallery(a):
                                                                                                                           ", the same voice" if same else ""))
         if which == "A":                                                       # (the second line is only measured: no mp3)
             VL.save("gallery-" + lang + tag, np.concatenate(parts) if parts else np.zeros(KSR), KSR)
+    if which_set == "final":
+        scene_demo()
+
+
+SCENE_TALES = [("red-riding-hood", 165.0), ("three-little-pigs", 95.0), ("cinderella", 110.0)]           # (the first scenes of a few Turkish tales: about this many seconds of speech)
+
+
+def scene_demo():
+    """The first scenes of a few Turkish tales the way the daily videos speak them, twice: with the old casting (KTYPES) and with the new one (XPLANT_TR, BIBI_XPLANT=1):
+    scene-<tale>-old.mp3 and scene-<tale>-hybrid.mp3 (the narrator and every character, one clip per line of the tale, a pause after each)."""
+    from bibi_buzz import tales as T
+    from bibi_buzz import voice as VO
+    names = ("BIBI_KOKORO", "BIBI_KIDS", "BIBI_XPLANT")
+    saved = {k: os.environ.get(k) for k in names}
+    try:
+        for key, secs in SCENE_TALES:
+            for tag, env in (("old", {}), ("hybrid", {"BIBI_XPLANT": "1"})):
+                os.environ["BIBI_KOKORO"] = "tr"
+                os.environ.pop("BIBI_KIDS", None)
+                os.environ.pop("BIBI_XPLANT", None)
+                os.environ.update(env)
+                try:
+                    t = T.build(key, "tr")
+                    chosen, est = [], 0.0
+                    for sc in t.scenes:
+                        for b in sc.beats:
+                            if b.text:
+                                v, r, p, *tail = t.voice_of(b.voice or b.who)
+                                b.key = (b.text, v, r, p, tail[0] if tail else "")
+                                chosen.append(b)
+                                est += len(b.text) / 14.0 + 0.4
+                        if est >= secs:
+                            break
+                    buf = io.StringIO()
+                    with contextlib.redirect_stdout(buf):
+                        clips = VO.synth_items([b.key for b in chosen], "ffmpeg", os.path.join(OUT, "_cache_scene"))
+                    for ln in buf.getvalue().splitlines():
+                        log("   " + ln)
+                    parts = []
+                    for b in chosen:
+                        y = VL.resample(clips[b.key], 44100, KSR)
+                        parts += [level(y), np.zeros(int((0.6 if (b.who or "nar") == "nar" else 0.4) * KSR))]
+                    VL.save("scene-%s-%s" % (key, tag), np.concatenate(parts), KSR)
+                    log("SCENE %s %s: %d lines, %.0f s, speakers %s" % (key, tag, len(chosen), sum(len(x) for x in parts) / KSR, sorted({b.who or "nar" for b in chosen})))
+                except Exception:
+                    log("SCENE %s %s FAILED %s" % (key, tag, traceback.format_exc()[-900:]))
+    finally:
+        for k in names:
+            if saved[k] is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = saved[k]
 
 
 # ------------------------------------------------------------------------------------------------------------------------ the voice grid: how many different people can the Kokoro models make? (--only grid)

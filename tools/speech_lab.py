@@ -1027,7 +1027,7 @@ def gallery(a):
                 else:
                     os.environ[k] = old[k]
         log("---- gallery %s%s: GAL language tale character type F0 UTMOS WER voice" % (lang, tag))
-        parts, rows, emb = [], {}, {}
+        parts, rows, emb, dump = [], {}, {}, []
         for kind, key, who, typ, item in plan:
             y = VL.resample(clips[item], 44100, KSR)
             if kind == "title":
@@ -1039,10 +1039,16 @@ def gallery(a):
             sc = score(y, item[0], lang)
             f0 = f0_of(y)
             rows.setdefault(key, []).append((who, typ, item[1], f0))
-            emb.setdefault(key, []).append((who, typ, try_embed(y)))
+            e_ = try_embed(y)
+            emb.setdefault(key, []).append((who, typ, e_))
+            dump.append({"tale": key, "who": who, "type": typ, "spec": item[1], "f0": round(f0, 1) if f0 else None, "mos": round(sc.get("mos", 0.0), 3), "wer": round(sc.get("wer", 1.0), 3),
+                         "emb": [round(float(x), 4) for x in e_] if e_ is not None else None})
             log("GAL %s %-20s %-8s %-11s F0 %5s UTMOS %.2f WER %3.0f%%  %s" % (lang + tag, key, who, typ, ("%.0f" % f0) if f0 else "-", sc.get("mos", 0.0), 100 * sc.get("wer", 1.0), item[1]))
             parts += [level(y), np.zeros(int(0.8 * KSR))]
         sim_report(lang + tag, emb)
+        with open(os.path.join(OUT, "gallery-emb-%s%s.txt" % (lang, tag)), "w", encoding="utf-8") as f:                       # (the voice prints of every line: the casting can be compared offline, mode against mode)
+            for r_ in dump:
+                f.write(json.dumps(r_) + "\n")
         for key, rs in rows.items():
             for x in range(len(rs)):
                 for z in range(x + 1, len(rs)):

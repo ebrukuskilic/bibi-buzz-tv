@@ -982,16 +982,19 @@ def gallery(a):
     from bibi_buzz import tales as T
     from bibi_buzz import voice as VO
     from test_tale import VOICE_LINES, VOICE_NAMES
-    for lang, tag, env in (("en", "", {}), ("en", "-kidsedge", {"BIBI_KIDS": "edge"}), ("tr", "", {})):       # (English twice: the children with a Kokoro voice, and with the child voices of Edge)
+    rest = [k for k in T.CASTING if k not in GALLERY_TALES]                  # (the other tales: measured too, so that every type of the casting has a line)
+    for lang, tag, env, keys in (("en", "", {}, GALLERY_TALES), ("en", "-kidsedge", {"BIBI_KIDS": "edge"}, GALLERY_TALES), ("tr", "", {}, GALLERY_TALES),         # (English twice: the children with a
+                                 ("tr", "-xplant", {"BIBI_XPLANT": "1"}, GALLERY_TALES), ("tr", "-rest", {}, rest), ("tr", "-xplant-rest", {"BIBI_XPLANT": "1"}, rest)):  # Kokoro voice, and with the child voices of Edge; Turkish twice: KTYPES and XPLANT_TR)
         i = 0 if lang == "en" else 1
-        names = ("BIBI_KOKORO", "BIBI_KIDS")
+        names = ("BIBI_KOKORO", "BIBI_KIDS", "BIBI_XPLANT")
         old = {k: os.environ.get(k) for k in names}
         os.environ["BIBI_KOKORO"] = lang
         os.environ.pop("BIBI_KIDS", None)
+        os.environ.pop("BIBI_XPLANT", None)
         os.environ.update(env)
         try:
             plan, items = [], []
-            for key in GALLERY_TALES:
+            for key in keys:
                 cv = T.cast_voices(key, lang)
                 nar = cv["nar"]
                 title = T.build(key, lang).title

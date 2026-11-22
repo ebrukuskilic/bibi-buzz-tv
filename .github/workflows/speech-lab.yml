@@ -4,7 +4,7 @@ name: speech-lab
 # (the voices of the daily videos, plain Edge voices, Edge "Multilingual" voices, Kokoro, Kokoro-Turkish, Chatterbox), every line measured (UTMOS naturalness,
 # Whisper word errors, seconds of work per second of speech). It touches neither the daily videos nor the "media" branch: the result goes to the
 # "speech-output" branch (raw files: https://raw.githubusercontent.com/<owner>/<repo>/speech-output/en-3-kokoro.mp3 ...; the numbers are in lab.txt).
-# It also runs by itself whenever tools/speech_lab.py, tools/cbx_synth.py or this file changes on main.
+# It also runs by itself whenever tools/speech_lab.py, tools/cbx_synth.py, tools/ext_synth.py or this file changes on main.
 #
 # Two jobs, so that the job which installs and runs other people's packages (pip, models) has no write permission at all:
 #   lab      (read-only token)  makes the scenes and keeps them as an artifact
@@ -18,6 +18,9 @@ on:
       cbx:
         description: "Also try Chatterbox (a big neural voice in its own python 3.11 environment, slow on the CPU): yes or no"
         default: "no"
+      ext:
+        description: "Also try the new voice engines (Pocket TTS Turkish, Phonon English; they need their own python environment): yes or no"
+        default: "no"
       myvoice:
         description: "Chatterbox speaks in the voice of the reference clips of the secrets MYVOICE_TR and MYVOICE_EN (the voice of the channel's owner, who agreed to it; the scenes are published only encrypted): yes or no"
         default: "no"
@@ -26,6 +29,7 @@ on:
     paths:
       - "tools/speech_lab.py"
       - "tools/cbx_synth.py"
+      - "tools/ext_synth.py"
       - ".github/workflows/speech-lab.yml"
 
 permissions:
@@ -42,6 +46,7 @@ jobs:
     env:
       ONLY: ${{ github.event.inputs.only || 'gallery' }}      # (a run started by a push does only the newest job: the gallery, the casting of some tales the way the videos make it)
       CBX: ${{ github.event.inputs.cbx || 'no' }}
+      EXT: ${{ github.event.inputs.ext || 'no' }}
       MYVOICE: ${{ github.event.inputs.myvoice || 'no' }}
     steps:
       - uses: actions/checkout@v4
@@ -77,12 +82,46 @@ jobs:
           ffmpeg -hide_banner -filters 2>/dev/null | grep -i rubberband || echo "NO rubberband in this ffmpeg"
           espeak-ng --version || true
 
+      - name: Install the voice-print model and the WORLD vocoder (speechbrain, pyworld)
+        continue-on-error: true
+        run: |
+          pip install speechbrain || echo "speechbrain install failed"
+          pip install cython setuptools wheel
+          pip install pyworld --no-build-isolation || pip install pyworld || echo "pyworld install failed"
+          pip list 2>/dev/null | grep -i -E "^(speechbrain|pyworld|torch|torchaudio|numpy|scipy|hyperpyyaml|kokoro) " || true
+
       - name: Speech lab (the voices of the videos, Edge, Kokoro, Kokoro-Turkish)
         run: |
           ARGS=""
           if [ "$ONLY" != "all" ]; then ARGS="--only $ONLY"; fi
           python tools/speech_lab.py main --out out/speech $ARGS
           ls -la out/speech
+
+      - name: Install the new voice engines in their own environment (Pocket TTS Turkish, Phonon, WORLD)
+        if: env.EXT == 'yes'
+        continue-on-error: true
+        run: |
+          mkdir -p out/speech
+          {
+            python -m venv /opt/ext
+            /opt/ext/bin/pip install --upgrade pip
+            /opt/ext/bin/pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+            /opt/ext/bin/pip install numpy scipy soundfile cython setuptools wheel
+            /opt/ext/bin/pip install pocket-tts-turkish ptts
+            /opt/ext/bin/pip install pyworld --no-build-isolation || /opt/ext/bin/pip install pyworld || echo "pyworld install failed"
+            /opt/ext/bin/pip list 2>/dev/null | grep -i -E "^(torch|torchaudio|pocket|ptts|pyworld|numpy|scipy|sentencepiece|soundfile|huggingface) " || true
+            /opt/ext/bin/python -c "from pocket_tts_turkish import TurkishTTS; print('pocket-tts-turkish imports fine')"
+            /opt/ext/bin/python -c "import ptts; print('ptts imports fine', getattr(ptts, '__version__', '?'))"
+          } 2>&1 | tee out/speech/ext_install.txt
+
+      - name: The new voice engines speak
+        if: env.EXT == 'yes'
+        continue-on-error: true
+        run: |
+          test -x /opt/ext/bin/python || { echo "there is no environment for the new engines"; exit 1; }
+          python tools/speech_lab.py ext-prepare --out out/speech
+          timeout 3000 /opt/ext/bin/python tools/ext_synth.py out/speech/_ext.json out/speech/_ext 2>&1 | tee out/speech/ext_run.txt || true
+          python tools/speech_lab.py ext-collect --out out/speech
 
       - name: Install Chatterbox in its own environment (python 3.11)
         if: env.CBX == 'yes' || env.MYVOICE == 'yes'

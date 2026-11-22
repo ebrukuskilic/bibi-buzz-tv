@@ -1049,6 +1049,98 @@ V5_TR = {                                                                       
 }
 
 
+def _half(entry):
+    """A transplant voice ("kt:elif:p=1,af_river:t=1": the speaking of elif, the timbre of af_river) with HALF of the timbre of the Turkish voice kept
+    ("kt:elif:p=1,elif:t=0.5,af_river:t=0.5": the same voice, more Turkish, and less far from what the model knows)."""
+    if entry is None:
+        return None
+    if isinstance(entry[0], str):
+        spec, r, p, fx = entry
+        m = re.fullmatch(r"kt:(elif|emre):p=1,([a-z]{2}_[a-z]+):t=1", spec)
+        if m:
+            spec = "kt:%s:p=1,%s:t=0.5,%s:t=0.5" % (m.group(1), m.group(1), m.group(2))
+        return (spec, r, p, fx)
+    return tuple(_half(e) for e in entry)
+
+
+HALF_TR = {typ: _half(e) for typ, e in V5_TR.items()}                               # (the transplant casting of run 30 with half of the own timbre: measured next to the old and the full transplant voices)
+
+NARR_LINES = ["Bir varmış, bir yokmuş. Büyük, yemyeşil bir ormanın yanında, küçük bir evde bir kız yaşarmış.",
+              "Kırmızı Başlıklı Kız sepetini aldı ve patikada yürümeye başladı.",
+              "Kurdun sinsi bir planı vardı. Ağaçların arasından olabildiğince hızlı koşarak uzaklaştı.",
+              "Üç küçük domuz büyüdükçe büyüdü. Bir gün, kendi evlerini yapma zamanı geldi.",
+              "Külkedisi bütün gün çok çalışmış, ama gülümsemeyi hiç bırakmamış.",
+              "Büyümüş, büyümüş, BÜYÜMÜŞ! Koca dünyanın en büyük şalgamı olmuş!",
+              "Kraliçe o kadar kıskanmış ve o kadar kızmış ki ayaklarını yere vurmuş!",
+              "Unutmayın küçükler: paylaşınca herkese yetecek kadar vardır."]            # (lines of the narrator in the Turkish tales: calm, a list, a shout)
+NARR_CANDS = [("now", "elif"),
+              ("h-nova", "elif:p=1,elif:t=0.5,af_nova:t=0.5"), ("h-sarah", "elif:p=1,elif:t=0.5,af_sarah:t=0.5"), ("h-heart", "elif:p=1,elif:t=0.5,af_heart:t=0.5"),
+              ("h-river", "elif:p=1,elif:t=0.5,af_river:t=0.5"), ("h-isabella", "elif:p=1,elif:t=0.5,bf_isabella:t=0.5"), ("h-jessica", "elif:p=1,elif:t=0.5,af_jessica:t=0.5"),
+              ("h-emma", "elif:p=1,elif:t=0.5,bf_emma:t=0.5"), ("q-nova", "elif:p=1,elif:t=0.75,af_nova:t=0.25"), ("q-sarah", "elif:p=1,elif:t=0.75,af_sarah:t=0.25"),
+              ("q-heart", "elif:p=1,elif:t=0.75,af_heart:t=0.25")]
+
+
+def narrator_lab():
+    """The narrator of the Turkish tales (kt:elif) next to the same voice with half or a quarter of an English timbre in it, on the same lines of the tales: UTMOS, words
+    wrong, F0 and the ECAPA cosine to the voice now (is it still the same person?): NARR lines (one per clip), NARRSUM lines (the mean of the lines), narr-<candidate>.mp3
+    for the voice now and for the three most natural candidates that stay the same person (cosine 0.90 and up)."""
+    from bibi_buzz import tales as T
+    from bibi_buzz import voice as VO
+    names = ("BIBI_KOKORO", "BIBI_KIDS", "BIBI_XPLANT")
+    saved = {k: os.environ.get(k) for k in names}
+    try:
+        os.environ["BIBI_KOKORO"] = "tr"
+        os.environ.pop("BIBI_KIDS", None)
+        os.environ.pop("BIBI_XPLANT", None)
+        nar = T.cast_voices("red-riding-hood", "tr")["nar"]                           # (voice with its Edge stand-in, rate, pitch, effect)
+        tail = nar[0].split("|", 1)[1]
+        items = {}
+        for label, body in NARR_CANDS:
+            for line in NARR_LINES:
+                items[(label, line)] = (line, "kt:%s|%s" % (body, tail)) + tuple(nar[1:])
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            clips = VO.synth_items(list(items.values()), "ffmpeg", os.path.join(OUT, "_cache_narr"))
+        for ln in buf.getvalue().splitlines():
+            log("   " + ln)
+        res = {}
+        for key, item in items.items():
+            y = VL.resample(clips[item], 44100, KSR)
+            res[key] = (y, score(y, key[1], "tr"), f0_of(y), try_embed(y))
+        base = {line: res[("now", line)][3] for line in NARR_LINES}
+        summary = []
+        for label, body in NARR_CANDS:
+            mos, wer, f0s, cos = [], [], [], []
+            for line in NARR_LINES:
+                y, sc, f0, e_ = res[(label, line)]
+                mos.append(sc.get("mos", 0.0))
+                wer.append(sc.get("wer", 1.0))
+                if f0:
+                    f0s.append(f0)
+                c = None
+                if e_ is not None and base[line] is not None:
+                    c = float(np.dot(e_, base[line]) / (np.linalg.norm(e_) * np.linalg.norm(base[line]) + 1e-9))
+                    cos.append(c)
+                log("NARR %-11s UTMOS %.2f WER %3.0f%% F0 %5s cos %5s  %s" % (label, mos[-1], 100 * wer[-1], ("%.0f" % f0) if f0 else "-", ("%.2f" % c) if c is not None else "-", line[:60]))
+            summary.append((label, float(np.mean(mos)), float(np.mean(wer)), float(np.mean(f0s)) if f0s else 0.0, float(np.mean(cos)) if cos else 0.0))
+        for label, m, w, f, c in summary:
+            log("NARRSUM %-11s UTMOS %.2f WER %.1f%% F0 %.0f cos-to-now %.2f" % (label, m, 100 * w, f, c))
+        keep = ["now"] + [s[0] for s in sorted((s for s in summary if s[0] != "now" and s[4] >= 0.90), key=lambda s: -s[1])[:3]]
+        for label in keep:
+            parts = []
+            for line in NARR_LINES:
+                parts += [level(res[(label, line)][0]), np.zeros(int(0.7 * KSR))]
+            VL.save("narr-" + label, np.concatenate(parts), KSR)
+    except Exception:
+        log("NARR FAILED %s" % traceback.format_exc()[-1200:])
+    finally:
+        for k in names:
+            if saved[k] is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = saved[k]
+
+
 def gallery(a):
     """Every character of some tales says its type's line with the voice, speed, pitch and effect of the daily videos' casting (bibi_buzz.tales.cast_voices with
     BIBI_KOKORO set; the Edge voice stands in for a line Kokoro cannot make); the narrator says who is next.  One mp3 per language (gallery-<language>.mp3; English once more with the child voices of Edge: gallery-en-kidsedge.mp3), every
@@ -1059,13 +1151,16 @@ def gallery(a):
     from bibi_buzz import ktts as KT
     rest = [k for k in T.CASTING if k not in GALLERY_TALES]                  # (the other tales: measured too, so that every type of the casting has a line)
     everything = list(T.CASTING)
-    which_set = os.environ.get("GALLERY_SET", "final")
+    which_set = os.environ.get("GALLERY_SET", "half")
     if which_set == "legacy":                                                  # (English twice: the children with a Kokoro voice, and with the child voices of Edge; Turkish twice: KTYPES and XPLANT_TR)
         passes = (("en", "", {}, GALLERY_TALES, None, "A"), ("en", "-kidsedge", {"BIBI_KIDS": "edge"}, GALLERY_TALES, None, "A"), ("tr", "", {}, GALLERY_TALES, None, "A"),
                   ("tr", "-xplant", {"BIBI_XPLANT": "1"}, GALLERY_TALES, None, "A"), ("tr", "-rest", {}, rest, None, "A"), ("tr", "-xplant-rest", {"BIBI_XPLANT": "1"}, rest, None, "A"))
     elif which_set == "measure":                                               # (the hybrid casting of XPLANT_TR on the first line, and all three castings on the second line)
         passes = (("tr", "-xplant", {"BIBI_XPLANT": "1"}, GALLERY_TALES, None, "A"), ("tr", "-xplant-rest", {"BIBI_XPLANT": "1"}, rest, None, "A"),
                   ("tr", "-B", {}, everything, None, "B"), ("tr", "-v5-B", {"BIBI_XPLANT": "1"}, everything, V5_TR, "B"), ("tr", "-xplant-B", {"BIBI_XPLANT": "1"}, everything, None, "B"))
+    elif which_set == "half":                                                  # (the transplant casting with half of the own timbre, on both lines, and the narrator with an English timbre mixed in)
+        passes = (("tr", "-half", {"BIBI_XPLANT": "1"}, GALLERY_TALES, HALF_TR, "A"), ("tr", "-half-rest", {"BIBI_XPLANT": "1"}, rest, HALF_TR, "A0"),
+                  ("tr", "-half-B", {"BIBI_XPLANT": "1"}, everything, HALF_TR, "B"))
     else:                                                                      # (final: the casting of XPLANT_TR on the first line, and the scenes with the old and the new casting)
         passes = (("tr", "-xplant", {"BIBI_XPLANT": "1"}, GALLERY_TALES, None, "A"), ("tr", "-xplant-rest", {"BIBI_XPLANT": "1"}, rest, None, "A"))
     memo = {}                                                                  # (a clip that was made and measured once is not measured again: the same type in several tales, the same voice in several castings)
@@ -1151,6 +1246,8 @@ def gallery(a):
             VL.save("gallery-" + lang + tag, np.concatenate(parts) if parts else np.zeros(KSR), KSR)
     if which_set == "final":
         scene_demo()
+    elif which_set == "half":
+        narrator_lab()
 
 
 SCENE_TALES = [("red-riding-hood", 165.0), ("three-little-pigs", 95.0), ("cinderella", 110.0)]           # (the first scenes of a few Turkish tales: about this many seconds of speech)

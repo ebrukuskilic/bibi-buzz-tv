@@ -534,6 +534,57 @@ def myvoice_collect(a):
     cbx_collect(a, key="8-myvoice", pre="_myvoice_")
 
 
+def myvox_prepare(a):
+    """Her voice with VoxCPM2 (instead of Chatterbox): myvoice_prepare decodes her reference clips from the secrets and measures them; the job file of tools/ext_synth.py clones
+    the ten lines of the three-pigs tale from them (the instruction in front of a line steers the feeling of its role: FD_STYLE).  Only the numbers go to the log, never her words."""
+    myvoice_prepare(a)
+    items = []
+    for lang in ("en", "tr"):
+        try:
+            job = json.load(open(os.path.join(OUT, "_myvoice_%s.json" % lang), encoding="utf-8"))
+        except Exception:
+            continue
+        for ln in job["lines"]:
+            items.append(dict(id="mv-%s-%d" % (lang, ln["i"]), engine="vox", voice="me", design=FD_STYLE.get(ln["role"], FD_STYLE["nar"]), ref=ln["ref"], text=ln["text"],
+                              group="myvox", lang=lang))
+    with open(os.path.join(OUT, "_myvox.json"), "w", encoding="utf-8") as f:
+        json.dump({"budget": 1500, "items": items}, f, ensure_ascii=False, indent=1)
+    log("myvox-prepare: %d lines to clone" % len(items))
+
+
+def myvox_collect(a):
+    """Measures her cloned lines: MYVOX lines (ECAPA cos of every line to her reference clip: the same person is 0.7 and more, two people usually below 0.5), the usual lines of the
+    lab, and tr-8-myvoice-vox.mp3 / en-8-myvoice-vox.mp3 (the word 'myvoice' in the name: the workflow publishes the scene only encrypted)."""
+    d = os.path.join(OUT, "_myvox")
+    try:
+        man = json.load(open(os.path.join(d, "manifest.json"), encoding="utf-8"))
+    except Exception:
+        log("myvox: nothing was made (no manifest.json)")
+        return
+    by = {m["id"]: m for m in man if m.get("ok")}
+    for lang in ("tr", "en"):
+        lines = get_lines(lang)
+        refw = os.path.join(OUT, "_ref", lang + ".wav")
+        ref_e = try_embed(_read_wav24(refw)) if os.path.exists(refw) else None
+        ys, secs, cs = [], 0.0, []
+        for k, (role, text) in enumerate(lines):
+            m = by.get("mv-%s-%d" % (lang, k))
+            if not m:
+                ys.append(None)
+                continue
+            y = _read_wav24(os.path.join(d, m["id"] + ".wav"))
+            ys.append(y)
+            secs += m["work"]
+            e = try_embed(y)
+            if ref_e is not None and e is not None:
+                cs.append(float(np.dot(e, ref_e)))
+                log("MYVOX %s line %d %-5s cos to her reference %.2f" % (lang, k, role, cs[-1]))
+        if cs:
+            log("MYVOXSUM %s: cos of the clones to her reference mean %.2f min %.2f (the same person: 0.7 and more; two people: usually below 0.5)" % (lang, float(np.mean(cs)), min(cs)))
+        if any(y is not None for y in ys):
+            finish(lang, "8-myvoice-vox", ys, lines, secs)
+
+
 # ------------------------------------------------------------------------------------------------------------------------ the casting sweep (--only cast)
 # type -> candidates (Kokoro voice or mix, rate, pitch); the pitch is "+X Hz" = a factor of 1 + X / 150 (a smaller / bigger person: bibi_buzz/ktts.py shift_voice)
 CAST_EN = {
@@ -1126,9 +1177,67 @@ VOX_DESIGNS = [               # (who, the type whose line it says, the English d
 ]
 
 
+# ------------------------------------------------------------------------------------------------------------------------ the VoxCPM2 "foundry": a designed voice per role, kept for a whole scene by cloning it
+FD_REFTEXT = {"en": "The little house stood at the edge of the forest, and the sun was shining on its red roof.",
+              "tr": "Küçük ev ormanın kenarında duruyordu ve güneş kırmızı çatısının üstünde parlıyordu."}      # (what the designed reference voices say: about five seconds, the same for every role)
+FD_DESIGN = {                 # role of the ten lines -> the English description of the voice VoxCPM2 designs once per language (the reference of the role)
+    "nar": "A warm, kind woman in her thirties reading a bedtime story to small children, gentle, clear and lively",
+    "mama": "A kind, warm mother in her forties, soft, caring and a little worried",
+    "pig1": "A cheerful young man, light and bouncy, excited and a little nervous",
+    "pig3": "A calm, confident young man, steady, clever and proud",
+    "wolf": "A deep, gravelly man's voice, sly and menacing but playful, like a cartoon wolf",
+}
+FD_STYLE = {                  # the instruction before every line of the role when its reference is cloned (the voice is the reference's, the instruction steers feeling and speed)
+    "nar": "a warm storyteller, calm and expressive",
+    "mama": "kind and caring, a little worried",
+    "pig1": "cheerful and excited",
+    "pig3": "calm and proud",
+    "wolf": "deep, growly and sly",
+}
+FD_KIDS = [("girl-a", "A little girl, about six years old, with a sweet, clear, cheerful voice"),
+           ("girl-b", "A young girl of seven, lively and curious, speaking clearly and brightly"),
+           ("girl-c", "A child's voice: a cheerful girl, five years old"),
+           ("boy-a", "A little boy, about six years old, with a bright, clear, excited voice"),
+           ("boy-b", "A young boy of seven, lively and curious, speaking clearly"),
+           ("boy-c", "A child's voice: a cheeky boy, five years old")]            # (the first designs of the children got a UTMOS of 1.3-1.5: which words make a child that sounds like one?)
+FD_SPEED = [("en", 10, 2.0), ("en", 4, 2.0), ("en", 6, 2.0), ("en", 16, 2.0), ("en", 10, 1.5), ("tr", 10, 2.0), ("tr", 6, 2.0)]      # (language, inference_timesteps, cfg_value): speed against quality
+
+
+def foundry_items():
+    """The job file of the VoxCPM2 foundry (EXT_ENGINES=vox; the order matters, the time of the run is limited): 1. a designed reference voice for every role of the ten lines of
+    the three-pigs tale, in Turkish and in English; 2. the ten lines of both languages, every line cloned from the reference of its role; 3. the speed test (steps and cfg of the
+    narrator's first sentences); 4. children's voices by six descriptions."""
+    refp = lambda lang, role: os.path.join(OUT, "_ext", "fd-%s-%s-ref.wav" % (lang, role))
+    items = []
+    for lang in ("tr", "en"):
+        for role in sorted({r for r, _ in get_lines(lang)}):
+            items.append(dict(id="fd-%s-%s-ref" % (lang, role), engine="vox", voice=role, design=FD_DESIGN[role], text=FD_REFTEXT[lang], group="fd-ref", lang=lang, catalog=FD_DESIGN[role]))
+    for lang in ("en", "tr"):
+        for k, (role, text) in enumerate(get_lines(lang)):
+            items.append(dict(id="fs-%s-%d" % (lang, k), engine="vox", voice=role, design=FD_STYLE[role], ref=refp(lang, role), text=text, group="fd-scene", lang=lang,
+                              catalog="clone of the %s reference, style: %s" % (role, FD_STYLE[role])))
+    sents = {l: re.split(r"(?<=[.!?])\s+", NARR[l]) for l in ("en", "tr")}
+    para = {"en": sents["en"][0], "tr": " ".join(sents["tr"][:2])}
+    for lang, steps, cfg in FD_SPEED:
+        items.append(dict(id="fv-%s-s%d-c%.1f" % (lang, steps, cfg), engine="vox", voice="nar", design=FD_STYLE["nar"], ref=refp(lang, "nar"), text=para[lang], steps=steps, cfg=cfg,
+                          group="fd-speed", lang=lang, catalog="steps %d cfg %.1f" % (steps, cfg)))
+    for name, design in FD_KIDS:
+        items.append(dict(id="fk-%s" % name, engine="vox", voice=name, design=design, text=PAL_LIVELY["en"], group="fd-probe", lang="en", catalog=design))
+    return items
+
+
 def ext_prepare(a):
     """The job file of tools/ext_synth.py: Pocket TTS Turkish (palette: its six voices with a calm and a lively line, the five emotions of two voices, WORLD lifts of two voices;
-    the casting of the six tales: every character says its type's line) and Phonon 31m English (palette: every English voice of its catalog, a calm and a lively line)."""
+    the casting of the six tales: every character says its type's line) and Phonon 31m English (palette: every English voice of its catalog, a calm and a lively line).
+    With VOX=foundry only the VoxCPM2 foundry (foundry_items)."""
+    if os.environ.get("VOX") == "foundry":
+        fitems = foundry_items()
+        with open(os.path.join(OUT, "_ext.json"), "w", encoding="utf-8") as f:
+            json.dump({"budget": 1700, "items": fitems}, f, ensure_ascii=False, indent=1)
+        with open(os.path.join(OUT, "_ext_plan.json"), "w", encoding="utf-8") as f:
+            json.dump([], f)
+        log("ext-prepare: the VoxCPM2 foundry, %d clips to make" % len(fitems))
+        return
     from bibi_buzz import tales as T
     from test_tale import VOICE_LINES, VOICE_NAMES
     items, plan = [], []
@@ -1196,6 +1305,73 @@ def ext_collect(a):
         os.environ.pop("BIBI_KOKORO_INPROC", None)
 
 
+def _foundry_collect(man, d):
+    """What the VoxCPM2 foundry made: the ten lines of the three-pigs tale in both languages (every line a clone of the designed reference of its role: the usual lines of
+    the lab and tr-9-vox-foundry.mp3 / en-9-vox-foundry.mp3), FDCONS (do two lines of one role sound like one person: ECAPA cos), FDREF (and like their designed reference),
+    SIM (are the roles of the scene different people), FDSPEED (steps and cfg against quality and time), FDPROBE (children by six descriptions: kids-vox.mp3)."""
+    by = {m["id"]: m for m in man if m.get("ok")}
+    gap = np.zeros(int(0.30 * KSR))
+    for lang in ("tr", "en"):
+        lines = get_lines(lang)
+        refs = {}
+        for role in sorted({r for r, _ in lines}):
+            m = by.get("fd-%s-%s-ref" % (lang, role))
+            if m:
+                refs[role] = try_embed(_read_wav24(os.path.join(d, m["id"] + ".wav")))
+        ys, secs, emb = [], 0.0, {}
+        for k, (role, text) in enumerate(lines):
+            m = by.get("fs-%s-%d" % (lang, k))
+            if not m:
+                ys.append(None)
+                continue
+            y = _read_wav24(os.path.join(d, m["id"] + ".wav"))
+            ys.append(y)
+            secs += m["work"]
+            emb.setdefault(role, []).append(try_embed(y))
+        if not any(y is not None for y in ys):
+            log("FDL %s: no line was made" % lang)
+            continue
+        finish(lang, "9-vox-foundry", ys, lines, secs)
+        means = []
+        for role, es in emb.items():
+            es = [e for e in es if e is not None]
+            if len(es) >= 2:
+                cs = [float(np.dot(es[i], es[j])) for i in range(len(es)) for j in range(i + 1, len(es))]
+                log("FDCONS %s %-5s %d lines: cos between its lines mean %.2f min %.2f" % (lang, role, len(es), float(np.mean(cs)), min(cs)))
+            if role in refs and refs[role] is not None and es:
+                cr = [float(np.dot(e, refs[role])) for e in es]
+                log("FDREF %s %-5s cos of its lines to the designed reference: mean %.2f min %.2f" % (lang, role, float(np.mean(cr)), min(cr)))
+            if es:
+                v = np.mean(es, axis=0)
+                means.append((role, role, v / (np.linalg.norm(v) + 1e-9)))
+        sim_report("vox-foundry-" + lang, {"ten-lines": means})
+    log("---- foundry speed test: FDSPEED language steps cfg UTMOS WER seconds-of-audio seconds-of-work real-time-factor")
+    parts = []
+    for m in man:
+        if m.get("ok") and str(m["id"]).startswith("fv-"):
+            y = _read_wav24(os.path.join(d, m["id"] + ".wav"))
+            sc = score(y, m["text"], m["lang"])
+            log("FDSPEED %s steps %2d cfg %.1f UTMOS %.2f WER %3.0f%% SEC %.1f WORK %.1f RTF %.2f" % (
+                m["lang"], m.get("steps", 10), m.get("cfg", 2.0), sc.get("mos", 0.0), 100 * sc.get("wer", 1.0), m["audio"], m["work"], m["work"] / max(0.1, m["audio"])))
+            parts += [level(y), gap]
+    if parts:
+        VL.save("speed-vox", np.concatenate(parts), KSR)
+    log("---- foundry children: FDPROBE name F0 UTMOS WER seconds-of-audio seconds-of-work [description]")
+    parts, pe = [], {}
+    for m in man:
+        if m.get("ok") and str(m["id"]).startswith("fk-"):
+            y = _read_wav24(os.path.join(d, m["id"] + ".wav"))
+            sc = score(y, m["text"], m["lang"])
+            f0 = f0_of(y)
+            pe[m["voice"]] = try_embed(y)
+            log("FDPROBE %-8s F0 %5s UTMOS %.2f WER %3.0f%% SEC %.1f WORK %.1f  [%s]" % (m["voice"], ("%.0f" % f0) if f0 else "-", sc.get("mos", 0.0), 100 * sc.get("wer", 1.0),
+                                                                                         m["audio"], m["work"], (m.get("catalog") or "")[:70]))
+            parts += [level(y), gap]
+    if parts:
+        VL.save("kids-vox", np.concatenate(parts), KSR)
+        nearest_report("vox-kids", pe)
+
+
 def _ext_collect():
     from bibi_buzz import ktts as KT
     d = os.path.join(OUT, "_ext")
@@ -1242,6 +1418,11 @@ def _ext_collect():
         nearest_report(engine + "-" + lang, pal_emb)
         if parts:
             VL.save("palette-" + engine + ("-" + lang if engine == "vox" else ""), np.concatenate(parts), KSR)
+    if any(str(m.get("group", "")).startswith("fd-") for m in man):
+        try:
+            _foundry_collect(man, d)
+        except Exception:
+            log("FOUNDRY collect failed", traceback.format_exc()[-1200:])
     try:
         plan = json.load(open(os.path.join(OUT, "_ext_plan.json"), encoding="utf-8"))
     except Exception:
@@ -1323,7 +1504,7 @@ def job_main(a):
 def main():
     global OUT
     ap = argparse.ArgumentParser()
-    ap.add_argument("job", choices=["main", "cbx-prepare", "cbx-collect", "myvoice-prepare", "myvoice-collect", "ext-prepare", "ext-collect"])
+    ap.add_argument("job", choices=["main", "cbx-prepare", "cbx-collect", "myvoice-prepare", "myvoice-collect", "myvox-prepare", "myvox-collect", "ext-prepare", "ext-collect"])
     ap.add_argument("--out", default="out/speech")
     ap.add_argument("--only", default="", help="engine keys, comma separated (main only)")
     a = ap.parse_args()
@@ -1334,8 +1515,8 @@ def main():
     log("=" * 20, a.job, time.strftime("%H:%M:%S"))
     try:
         {"main": job_main, "cbx-prepare": cbx_prepare, "cbx-collect": cbx_collect, "myvoice-prepare": myvoice_prepare, "myvoice-collect": myvoice_collect,
-         "ext-prepare": ext_prepare, "ext-collect": ext_collect}[a.job](a)
-        if a.job in ("cbx-collect", "myvoice-collect"):
+         "myvox-prepare": myvox_prepare, "myvox-collect": myvox_collect, "ext-prepare": ext_prepare, "ext-collect": ext_collect}[a.job](a)
+        if a.job in ("cbx-collect", "myvoice-collect", "myvox-collect"):
             summary()
     except Exception:
         log("JOB FAILED:", a.job, "\n" + traceback.format_exc()[-2500:])

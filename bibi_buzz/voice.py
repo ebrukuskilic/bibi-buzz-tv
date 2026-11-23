@@ -12,7 +12,7 @@ import wave
 
 import numpy as np
 
-from . import ktts
+from . import cloudtts, ktts
 
 SR = 44100
 VOICE = "en-US-AnaNeural"      # child-friendly voice
@@ -128,20 +128,16 @@ def _convert(ffmpeg, cache_dir, text, voice):
     os.remove(raw)
 
 
-def _lesson_kokoro(texts, ffmpeg, cache_dir):
-    """{text: clip} of the English lesson narrator made by Kokoro (ktts.py: the voice of the narrator of the tales, the Edge voice above stands in for it), or None:
-    Kokoro is not asked for (BIBI_KOKORO) or cannot make every text of the video, and the caller lets the Edge voice make the whole video, as it always did."""
-    if not texts or not ktts.enabled("en"):
-        return None
+def _lesson_clips(make, spec, nr, np_, label, texts, ffmpeg, cache_dir):
+    """{text: clip} of the English lesson narrator made by `make` (ktts.make or cloudtts.make) in the voice `spec` (the Edge voice above stands in for it), or None:
+    the engine cannot make every text of the video, and the caller lets the next voice (Kokoro, then Edge) make the whole video, so that a video has ONE narrator."""
     try:
-        nv, nr, np_, _fx = ktts.KTYPES["nar"][0]
-        spec = "%s|%s|%s|%s" % (nv, VOICE, RATE, PITCH)
         items = [(t, spec, nr, np_, "") for t in texts]
         todo = [it for it in items if not os.path.exists(os.path.join(cache_dir, _key2(it) + ".wav"))]
         if todo:
-            failed = ktts.make(todo, lambda it: os.path.join(cache_dir, _tts_key(it) + ".k.wav"), ffmpeg, log=lambda m: print(m, flush=True))
+            failed = make(todo, lambda it: os.path.join(cache_dir, _tts_key(it) + ".k.wav"), ffmpeg, log=lambda m: print(m, flush=True))
             if failed:
-                print(f"[voice] Kokoro could not make {len(failed)} text(s) of this video; the Edge voice makes the whole video", flush=True)
+                print(f"[voice] {label} could not make {len(failed)} text(s) of this video; the next voice makes the whole video", flush=True)
                 return None
             for it in todo:
                 base = os.path.join(cache_dir, _key2(it))
@@ -154,20 +150,39 @@ def _lesson_kokoro(texts, ffmpeg, cache_dir):
                 _write_wav(base + ".wav", y)
                 os.remove(raw)
         return {it[0]: _read_wav(os.path.join(cache_dir, _key2(it) + ".wav")) for it in items}
-    except BaseException as e:                                             # (nothing of Kokoro may stop a video)
-        print(f"[voice] Kokoro failed for the lesson narrator ({e!r}); the Edge voice is used", flush=True)
+    except BaseException as e:                                             # (nothing of a neural voice may stop a video)
+        print(f"[voice] {label} failed for the lesson narrator ({e!r}); the next voice is used", flush=True)
         return None
+
+
+def _lesson_kokoro(texts, ffmpeg, cache_dir):
+    """{text: clip} of the English lesson narrator made by Kokoro (ktts.py: the voice of the narrator of the tales, the Edge voice above stands in for it), or None:
+    Kokoro is not asked for (BIBI_KOKORO) or cannot make every text of the video, and the caller lets the Edge voice make the whole video, as it always did."""
+    if not texts or not ktts.enabled("en"):
+        return None
+    nv, nr, np_, _fx = ktts.KTYPES["nar"][0]
+    return _lesson_clips(ktts.make, "%s|%s|%s|%s" % (nv, VOICE, RATE, PITCH), nr, np_, "Kokoro", texts, ffmpeg, cache_dir)
+
+
+def _lesson_google(texts, ffmpeg, cache_dir):
+    """The same with the Google voice of the narrator (cloudtts.py: BIBI_GOOGLE and the key GOOGLE_TTS_KEY), or None."""
+    if not texts or not cloudtts.enabled("en"):
+        return None
+    gv, gr, gp = cloudtts.lesson_voice()
+    return _lesson_clips(cloudtts.make, "%s|%s|%s|%s" % (gv, VOICE, RATE, PITCH), gr, gp, "Google", texts, ffmpeg, cache_dir)
 
 
 def synth_all(texts, ffmpeg, cache_dir, voice=VOICE):
     """Returns {text: float array (mono, 44.1 kHz)} for every non-empty text of ONE video (one voice per video).
-    The English narrator of the lessons (the default voice) is Kokoro's when BIBI_KOKORO asks for it (_lesson_kokoro)."""
+    The English narrator of the lessons (the default voice) is Google's when BIBI_GOOGLE asks for it (_lesson_google), else Kokoro's when BIBI_KOKORO asks for it
+    (_lesson_kokoro), else the Edge voice."""
     texts = sorted({t for t in texts if t})
     os.makedirs(cache_dir, exist_ok=True)
     if voice == VOICE:
-        got = _lesson_kokoro(texts, ffmpeg, cache_dir)
-        if got is not None:
-            return got
+        for lesson_voice in (_lesson_google, _lesson_kokoro):
+            got = lesson_voice(texts, ffmpeg, cache_dir)
+            if got is not None:
+                return got
 
     def todo_for(v):
         return [t for t in texts if not os.path.exists(os.path.join(cache_dir, _key(t, v) + ".wav"))]
@@ -380,20 +395,43 @@ def _convert2(ffmpeg, cache_dir, item):
 
 
 def _edge_equivalent(item):
-    """The Edge item that stands in for an item of a Kokoro voice spec: the voice (and rate, pitch) named after the bars of the spec, else the language's default voice."""
+    """The Edge item that stands in for an item of a Kokoro or a Google voice spec: the voice (and rate, pitch) named after the bars of the spec, else the language's default voice."""
     text, voice, rate, pitch, fx = _norm(item)
     _eng, _body, (fv, fr, fp) = ktts.split_spec(voice)
-    return (text, fv or _fallback_voice("tr-" if ktts.language(voice) == "tr" else ""), fr or rate, fp or pitch, fx)
+    lang = cloudtts.language(voice) if cloudtts.is_spec(voice) else ktts.language(voice)
+    return (text, fv or _fallback_voice("tr-" if lang == "tr" else ""), fr or rate, fp or pitch, fx)
 
 
 def synth_items(items, ffmpeg, cache_dir):
     """Returns {item: float array (mono, 44.1 kHz)} for every (text, voice, rate, pitch[, fx]) of ONE story video.
-    A voice that is a Kokoro spec ("k:af_heart|en-US-JennyNeural|-6%|+0Hz", ktts.py) is made by Kokoro first; whatever Kokoro cannot make is made by the Edge
-    voice named in the spec, and when Edge fails too, by gTTS."""
+    A voice that is a Google spec ("g:tr:Leda|tr-TR-EmelNeural|-6%|+0Hz", cloudtts.py) is made by Google first; whatever Google cannot make is made by the Kokoro casting of
+    the same character when there is one (cloudtts.alt_of), else by the Edge voice named in the spec.  A voice that is a Kokoro spec ("k:af_heart|en-US-JennyNeural|-6%|+0Hz",
+    ktts.py) is made by Kokoro first; whatever Kokoro cannot make is made by the Edge voice named in the spec, and when Edge fails too, by gTTS."""
     items = sorted({it for it in items if it[0]})
     os.makedirs(cache_dir, exist_ok=True)
     todo = [it for it in items if not os.path.exists(os.path.join(cache_dir, _key2(it) + ".wav"))]
     remap = {}
+    goo = [it for it in todo if cloudtts.is_spec(_norm(it)[1])]
+    if goo:
+        gset = set(goo)
+        todo = [it for it in todo if it not in gset]
+        try:
+            gfailed = set(cloudtts.make(goo, lambda it: os.path.join(cache_dir, _tts_key(it) + ".k.wav"), ffmpeg, log=lambda m: print(m, flush=True)))
+        except BaseException as e:                                       # (nothing of Google may stop a video)
+            print(f"[voice] Google failed ({e!r}); the other voices are used", flush=True)
+            gfailed = set(goo)
+        for it in goo:
+            if it not in gfailed:
+                try:
+                    _convert2(ffmpeg, cache_dir, it)
+                    continue
+                except Exception as e:
+                    print(f"[voice] a Google clip could not be converted ({e!r}); another voice is used", flush=True)
+            alt = cloudtts.alt_of(_norm(it)) or _edge_equivalent(it)      # (the Kokoro casting of the character, else its Edge voice)
+            remap[it] = alt
+            if not os.path.exists(os.path.join(cache_dir, _key2(alt) + ".wav")):
+                todo.append(alt)
+        todo = list(dict.fromkeys(todo))
     kok = [it for it in todo if ktts.is_spec(_norm(it)[1])]
     if kok:
         kset = set(kok)

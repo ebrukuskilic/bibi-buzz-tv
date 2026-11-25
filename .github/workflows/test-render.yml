@@ -21,6 +21,9 @@ on:
       kokoro:
         description: "The Kokoro neural voices of bibi_buzz/ktts.py for the narrator and the characters: yes or no (an Edge voice stands in for every line Kokoro cannot make)"
         default: "no"
+      google:
+        description: "The Google voices of bibi_buzz/cloudtts.py (they need the secret GOOGLE_TTS_KEY): yes or no (Kokoro, when asked for, and then Edge stand in for every line Google cannot make)"
+        default: "no"
 
 permissions:
   contents: write
@@ -74,6 +77,8 @@ jobs:
           SECONDS_: ${{ github.event.inputs.seconds }}
           TAIL_: ${{ github.event.inputs.tail }}
           BIBI_KOKORO: ${{ github.event.inputs.kokoro == 'yes' && 'en,tr' || '' }}
+          BIBI_GOOGLE: ${{ github.event.inputs.google == 'yes' && 'all' || '' }}
+          GOOGLE_TTS_KEY: ${{ secrets.GOOGLE_TTS_KEY }}
         run: |
           python tools/test_tale.py "$TALE" "$LANG_" --out out/test --seconds "$SECONDS_" --tail "$TAIL_"
           ls -la out/test

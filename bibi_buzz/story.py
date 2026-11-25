@@ -292,7 +292,14 @@ class Scene:
     def _act(self, act, b, base_end):
         verb, a, o = _split(act)
         at = o.get("at", 0.0)
-        if isinstance(at, str):                                        # "60%" = 60 % of the way through the voice line ("60%+0.3" = and 0.3 s later)
+        if isinstance(at, str) and at.startswith("@"):                 # "@little|küçük" = when the line reaches that word (the first of the words that is in the line, so one
+            base0, base1 = (b.v0, b.v1) if b.text else (b.t0, base_end)  # anchor serves every language: "60%" of an English line is another word in Turkish); "+0.3" after it = and 0.3 s later
+            words, _, plus = at[1:].partition("+")
+            low = (b.text or "").lower()
+            pos = next((low.find(w.strip().lower()) for w in words.split("|") if w.strip() and low.find(w.strip().lower()) >= 0), -1)
+            frac = pos / float(max(1, len(low))) if pos >= 0 else 0.5
+            ta = base0 + frac * (base1 - base0) + (float(plus) if plus else 0.0)
+        elif isinstance(at, str):                                      # "60%" = 60 % of the way through the voice line ("60%+0.3" = and 0.3 s later)
             base0, base1 = (b.v0, b.v1) if b.text else (b.t0, base_end)
             pct, _, plus = at.partition("%")
             ta = base0 + float(pct) / 100.0 * (base1 - base0) + (float(plus) if plus else 0.0)

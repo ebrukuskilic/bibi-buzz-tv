@@ -23,9 +23,9 @@ on:
         required: false
         default: "en,tr"
       google:
-        description: "The Google voices (bibi_buzz/cloudtts.py; they need the secret GOOGLE_TTS_KEY) of the narrator and the characters: all, en, tr or no (default: no, until they are approved). Kokoro and Edge take over any line Google cannot make"
+        description: "The Google voices (bibi_buzz/cloudtts.py; they need the secret GOOGLE_TTS_KEY) of the narrator and the characters: all, en, tr or no (default: all). Kokoro and Edge take over only a line Google cannot make"
         required: false
-        default: "no"
+        default: "all"
 
 permissions:
   contents: write
@@ -118,7 +118,7 @@ jobs:
           ONLY: ${{ github.event.inputs.only }}
           FORCE: ${{ github.event.inputs.force }}
           BIBI_KOKORO: ${{ github.event.inputs.kokoro || 'en,tr' }}
-          BIBI_GOOGLE: ${{ github.event.inputs.google || 'no' }}
+          BIBI_GOOGLE: ${{ github.event.inputs.google || 'all' }}
           GOOGLE_TTS_KEY: ${{ secrets.GOOGLE_TTS_KEY }}
         run: |
           if [ -f "/tmp/pub/$DATE/manifest.json" ] && [ "$FORCE" != "true" ] && [ -z "$ONLY" ]; then

@@ -38,7 +38,17 @@ TALE_QUEUE = ["three-little-pigs", "tortoise-and-hare", "goldilocks", "red-ridin
 TALE_FIRST_DAY = 2
 
 
+# The channel's owner does not want pigs in the videos any more: from day NO_PIG_DAY on, the tales with a pig in them are left out of the queue
+# (the other tales move up), and a Turkish version of such a tale is not made either.
+NO_PIG_DAY = 7
+PIG_TALES = {"three-little-pigs", "tortoise-and-hare", "gingerbread-man", "enormous-turnip", "stone-soup", "princess-and-pea", "little-red-hen"}
+
+
 def tale_key(day):
+    if day >= NO_PIG_DAY:
+        rest = [k for k in TALE_QUEUE[NO_PIG_DAY - TALE_FIRST_DAY:] if k not in PIG_TALES]
+        i = day - NO_PIG_DAY
+        return rest[i] if i < len(rest) else None
     i = day - TALE_FIRST_DAY
     return TALE_QUEUE[i] if 0 <= i < len(TALE_QUEUE) else None
 
@@ -47,7 +57,8 @@ def tale_key(day):
 # premiere: the id dNNN-T2. Long videos per day: 4 lessons + the English tale + the Turkish tale; the channel can only upload
 # ~10 videos per 24 hours, so a day with a Turkish tale has one Short fewer (see _raw_plan).
 def tr_tale_key(day):
-    return tale_key(day - 1)
+    k = tale_key(day - 1)
+    return None if day >= NO_PIG_DAY and k in PIG_TALES else k
 
 
 # One song video a day replaces one Short: a song of songs.QUEUE in English on one day and the same song in Turkish on the next day, then the

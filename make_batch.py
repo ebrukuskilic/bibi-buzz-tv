@@ -49,6 +49,44 @@ def make_ep1_thumb(out_dir):
     make_thumbnail(make_background(), os.path.join(out_dir, "ep1.png"))
 
 
+def compile_day(day, manifest, out_dir, ffmpeg, failures):
+    """From curriculum.MIX_DAY on: the day's lessons (dNNN-L*) leave the upload list (manifest "parts") and are joined, with the
+    English tale, into the compilation dNNN-C1 (bibi_buzz/compilation.py), whose cover is the cover of the first lesson."""
+    import shutil
+    from bibi_buzz import compilation as CO
+    parts = {p["id"]: p for p in manifest.get("parts", [])}
+    keep = []
+    for v in manifest["videos"]:
+        if "-L" in v["id"]:
+            parts[v["id"]] = v
+        else:
+            keep.append(v)
+    manifest["videos"], manifest["parts"] = keep, [parts[k] for k in sorted(parts)]
+    if any(v["id"].endswith("-C1") for v in keep):
+        return
+    lessons = [p for p in manifest["parts"] if os.path.exists(os.path.join(out_dir, p["file"]))]
+    tale = [v for v in keep if v["id"].endswith("-T1") and os.path.exists(os.path.join(out_dir, v["file"]))]
+    if len(lessons) < 2:
+        failures.append((f"d{day:03d}-C1", "not enough lessons for the compilation"))
+        return
+    try:
+        c = CO.make(day, lessons + tale, out_dir, ffmpeg, CU.SUBSCRIBE_URL)
+        src = os.path.join(out_dir, lessons[0]["id"] + ".jpg")
+        if os.path.exists(src):
+            shutil.copyfile(src, os.path.join(out_dir, c["id"] + ".jpg"))
+        manifest["videos"].append(c)
+        manifest["videos"].sort(key=lambda v: v["id"])
+        print(f"== {c['id']}  long  {c['title']}\n   ok  {c['duration']:.1f}s (compilation of {len(lessons) + len(tale)} videos)", flush=True)
+        for p in lessons:                                         # the parts are in the compilation now: no need to publish them
+            for ext in (".mp4", ".jpg", "-sheet.png"):
+                f = os.path.join(out_dir, p["id"] + ext)
+                if os.path.exists(f):
+                    os.remove(f)
+    except Exception as e:
+        failures.append((f"d{day:03d}-C1", repr(e)))
+        print(f"   compilation FAILED: {e!r}", flush=True)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--day", type=int)
@@ -137,11 +175,15 @@ def main():
         mpath = os.path.join(a.out, "manifest.json")
         if os.path.exists(mpath):                   # partial re-run: keep what is already there
             try:
-                old = {v["id"]: v for v in json.load(open(mpath)).get("videos", [])}
+                prev = json.load(open(mpath))
+                old = {v["id"]: v for v in prev.get("videos", [])}
+                manifest["parts"] = prev.get("parts", [])
             except Exception:
                 old = {}
             old.update({v["id"]: v for v in manifest["videos"]})
             manifest["videos"] = [old[k] for k in sorted(old)]
+        if day >= CU.MIX_DAY:
+            compile_day(day, manifest, a.out, ffmpeg, failures)
         with open(mpath, "w") as f:
             json.dump(manifest, f, indent=1, ensure_ascii=False)
         print(f"manifest: {len(manifest['videos'])} videos, {len(failures)} failed")

@@ -22,6 +22,10 @@ on:
         description: "The Kokoro neural voices (bibi_buzz/ktts.py) of the narrator and the characters: en,tr (default), en, tr or no (the plain Edge voices)"
         required: false
         default: "en,tr"
+      google:
+        description: "The Google voices (bibi_buzz/cloudtts.py; they need the secret GOOGLE_TTS_KEY) of the narrator and the characters: all, en, tr or no (default: no, until they are approved). Kokoro and Edge take over any line Google cannot make"
+        required: false
+        default: "no"
 
 permissions:
   contents: write
@@ -114,6 +118,8 @@ jobs:
           ONLY: ${{ github.event.inputs.only }}
           FORCE: ${{ github.event.inputs.force }}
           BIBI_KOKORO: ${{ github.event.inputs.kokoro || 'en,tr' }}
+          BIBI_GOOGLE: ${{ github.event.inputs.google || 'no' }}
+          GOOGLE_TTS_KEY: ${{ secrets.GOOGLE_TTS_KEY }}
         run: |
           if [ -f "/tmp/pub/$DATE/manifest.json" ] && [ "$FORCE" != "true" ] && [ -z "$ONLY" ]; then
             echo "Day $DAY ($DATE) is already on the media branch - nothing to render."
@@ -124,21 +130,22 @@ jobs:
           set +e
           python make_batch.py --day "$DAY" --date "$DATE" --out "/tmp/pub/$DATE" --sheet $ARGS
           rc=$?
-          if [ "$rc" -ne 0 ] && [ -n "$BIBI_KOKORO" ]; then
-            # a video that could not be made with the Kokoro voices is made once more, alone, with the plain Edge voices (BIBI_KOKORO empty)
+          if [ "$rc" -ne 0 ] && { [ -n "$BIBI_KOKORO" ] || { [ -n "$BIBI_GOOGLE" ] && [ "$BIBI_GOOGLE" != "no" ]; }; }; then
+            # a video that could not be made with the neural voices (Google, Kokoro) is made once more, alone, with the plain Edge voices (BIBI_GOOGLE and BIBI_KOKORO empty)
             MISSING=$(python3 - "$DAY" "$DATE" "$ONLY" <<'PY'
           import json, os, sys
           sys.path.insert(0, ".")
           from bibi_buzz import curriculum as CU
           day, date, only = int(sys.argv[1]), sys.argv[2], {x for x in sys.argv[3].split(",") if x}
           mp = os.path.join("/tmp/pub", date, "manifest.json")
-          have = {v["id"] for v in json.load(open(mp)).get("videos", [])} if os.path.exists(mp) else set()
+          m = json.load(open(mp)) if os.path.exists(mp) else {}
+          have = {v["id"] for v in m.get("videos", []) + m.get("parts", [])}
           print(",".join(l.id for l in CU.plan(day) if l.id not in have and (not only or l.id in only)))
           PY
             )
             if [ -n "$MISSING" ]; then
-              echo "Not made with the Kokoro voices: $MISSING - making them again with the Edge voices"
-              BIBI_KOKORO="" python make_batch.py --day "$DAY" --date "$DATE" --out "/tmp/pub/$DATE" --sheet --only "$MISSING"
+              echo "Not made with the neural voices: $MISSING - making them again with the Edge voices"
+              BIBI_GOOGLE="" BIBI_KOKORO="" python make_batch.py --day "$DAY" --date "$DATE" --out "/tmp/pub/$DATE" --sheet --only "$MISSING"
               rc=$?
             fi
           fi
@@ -151,8 +158,8 @@ jobs:
           DATE: ${{ steps.d.outputs.date }}
         run: |
           cd /tmp/pub
-          # keep the newest two days only
-          ls -d 20??-??-?? 2>/dev/null | sort | head -n -2 | xargs -r rm -rf
+          # keep the newest three days only (a day the evening upload could not do is still there the next evening)
+          ls -d 20??-??-?? 2>/dev/null | sort | head -n -3 | xargs -r rm -rf
           python3 - <<'PY'
           import json, os
           dates = sorted(d for d in os.listdir(".") if len(d) == 10 and d[:2] == "20")

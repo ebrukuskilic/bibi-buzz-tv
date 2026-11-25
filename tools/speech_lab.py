@@ -33,6 +33,9 @@ engines
               the cosine of the ECAPA voice prints of every pair of one tale (speechbrain; 1.0 = the same voice; the pairs at or above SIM_ALIKE are marked)
   world       (--only world) a smaller person without the chipmunk: the same lively line of some voices resampled (pitch and formants by one factor: what ktts.py does)
               and made by the WORLD vocoder (pitch by a factor, the vocal tract by a smaller one): WORLD lines, world-<language>.mp3
+  google      (--only google) Google's Chirp 3 HD voices (bibi_buzz/cloudtts.py; the key is the secret GOOGLE_TTS_KEY): GOOGLE lines (what the service offers), GNARR lines and
+              gnarr-<language>.mp3 (the candidates for the narrator), the casting of the tales (GAL / SIM lines, gallery-<language>-google.mp3, scene-<tale>-<language>-google.mp3)
+  gpalette    (--only gpalette) every one of the 30 Google voices at several sizes, both languages: GPAL lines, gpal-emb-<language>.txt (voice prints), gpalette-<language>.mp3
   ext         (the jobs ext-prepare / ext-collect around tools/ext_synth.py, which runs in its own environment) the new voice engines: Pocket TTS Turkish (six voices, emotion
               tags; the casting of the six tales: GAL lines with the tag tr-pocket, gallery-tr-pocket.mp3) and Phonon 31m English (every English voice of its catalog):
               EXT lines (F0, UTMOS, words wrong, seconds of work), palette-<engine>.mp3
@@ -1161,17 +1164,22 @@ def gallery(a):
     elif which_set == "half":                                                  # (the transplant casting with half of the own timbre, on both lines, and the narrator with an English timbre mixed in)
         passes = (("tr", "-half", {"BIBI_XPLANT": "1"}, GALLERY_TALES, HALF_TR, "A"), ("tr", "-half-rest", {"BIBI_XPLANT": "1"}, rest, HALF_TR, "A0"),
                   ("tr", "-half-B", {"BIBI_XPLANT": "1"}, everything, HALF_TR, "B"))
+    elif which_set == "google":                                                # (the casting of the Google voices, bibi_buzz/cloudtts.py GTYPES, in both languages; Kokoro is off)
+        genv = lambda lng: {"BIBI_KOKORO": "", "BIBI_GOOGLE": lng}
+        passes = (("en", "-google", genv("en"), GALLERY_TALES, None, "A"), ("tr", "-google", genv("tr"), GALLERY_TALES, None, "A"),
+                  ("en", "-google-rest", genv("en"), rest, None, "A0"), ("tr", "-google-rest", genv("tr"), rest, None, "A0"))
     else:                                                                      # (final: the casting of XPLANT_TR on the first line, and the scenes with the old and the new casting)
         passes = (("tr", "-xplant", {"BIBI_XPLANT": "1"}, GALLERY_TALES, None, "A"), ("tr", "-xplant-rest", {"BIBI_XPLANT": "1"}, rest, None, "A"))
     memo = {}                                                                  # (a clip that was made and measured once is not measured again: the same type in several tales, the same voice in several castings)
     saved_table = KT.XPLANT_TR
     for lang, tag, env, keys, table, which in passes:
         i = 0 if lang == "en" else 1
-        names = ("BIBI_KOKORO", "BIBI_KIDS", "BIBI_XPLANT")
+        names = ("BIBI_KOKORO", "BIBI_KIDS", "BIBI_XPLANT", "BIBI_GOOGLE")
         old = {k: os.environ.get(k) for k in names}
         os.environ["BIBI_KOKORO"] = lang
         os.environ.pop("BIBI_KIDS", None)
         os.environ.pop("BIBI_XPLANT", None)
+        os.environ.pop("BIBI_GOOGLE", None)
         os.environ.update(env)
         KT.XPLANT_TR = table if table is not None else saved_table
         try:
@@ -1248,50 +1256,57 @@ def gallery(a):
         scene_demo()
     elif which_set == "half":
         narrator_lab()
+    elif which_set == "google":
+        scene_demo((("google", {"BIBI_KOKORO": "", "BIBI_GOOGLE": "{lang}"}),), ("en", "tr"))
 
 
 SCENE_TALES = [("red-riding-hood", 165.0), ("three-little-pigs", 95.0), ("cinderella", 110.0)]           # (the first scenes of a few Turkish tales: about this many seconds of speech)
 
 
-def scene_demo():
-    """The first scenes of a few Turkish tales the way the daily videos speak them, twice: with the old casting (KTYPES) and with the new one (XPLANT_TR, BIBI_XPLANT=1):
-    scene-<tale>-old.mp3 and scene-<tale>-hybrid.mp3 (the narrator and every character, one clip per line of the tale, a pause after each)."""
+def scene_demo(variants=(("old", {}), ("hybrid", {"BIBI_XPLANT": "1"})), langs=("tr",)):
+    """The first scenes of a few tales the way the daily videos speak them, in Turkish twice: with the old casting (KTYPES) and with the new one (XPLANT_TR, BIBI_XPLANT=1):
+    scene-<tale>-old.mp3 and scene-<tale>-hybrid.mp3 (the narrator and every character, one clip per line of the tale, a pause after each).  With other `variants` ((tag, environment),
+    "{lang}" in a value is the language) and `langs` the files are scene-<tale>-<language>-<tag>.mp3 (the Google casting: scene-<tale>-en-google.mp3)."""
     from bibi_buzz import tales as T
     from bibi_buzz import voice as VO
-    names = ("BIBI_KOKORO", "BIBI_KIDS", "BIBI_XPLANT")
+    names = ("BIBI_KOKORO", "BIBI_KIDS", "BIBI_XPLANT", "BIBI_GOOGLE")
     saved = {k: os.environ.get(k) for k in names}
+    classic = tuple(langs) == ("tr",)
     try:
-        for key, secs in SCENE_TALES:
-            for tag, env in (("old", {}), ("hybrid", {"BIBI_XPLANT": "1"})):
-                os.environ["BIBI_KOKORO"] = "tr"
-                os.environ.pop("BIBI_KIDS", None)
-                os.environ.pop("BIBI_XPLANT", None)
-                os.environ.update(env)
-                try:
-                    t = T.build(key, "tr")
-                    chosen, est = [], 0.0
-                    for sc in t.scenes:
-                        for b in sc.beats:
-                            if b.text:
-                                v, r, p, *tail = t.voice_of(b.voice or b.who)
-                                b.key = (b.text, v, r, p, tail[0] if tail else "")
-                                chosen.append(b)
-                                est += len(b.text) / 14.0 + 0.4
-                        if est >= secs:
-                            break
-                    buf = io.StringIO()
-                    with contextlib.redirect_stdout(buf):
-                        clips = VO.synth_items([b.key for b in chosen], "ffmpeg", os.path.join(OUT, "_cache_scene"))
-                    for ln in buf.getvalue().splitlines():
-                        log("   " + ln)
-                    parts = []
-                    for b in chosen:
-                        y = VL.resample(clips[b.key], 44100, KSR)
-                        parts += [level(y), np.zeros(int((0.6 if (b.who or "nar") == "nar" else 0.4) * KSR))]
-                    VL.save("scene-%s-%s" % (key, tag), np.concatenate(parts), KSR)
-                    log("SCENE %s %s: %d lines, %.0f s, speakers %s" % (key, tag, len(chosen), sum(len(x) for x in parts) / KSR, sorted({b.who or "nar" for b in chosen})))
-                except Exception:
-                    log("SCENE %s %s FAILED %s" % (key, tag, traceback.format_exc()[-900:]))
+        for lang in langs:
+            for key, secs in SCENE_TALES:
+                for tag, env in variants:
+                    os.environ["BIBI_KOKORO"] = lang
+                    os.environ.pop("BIBI_KIDS", None)
+                    os.environ.pop("BIBI_XPLANT", None)
+                    os.environ.pop("BIBI_GOOGLE", None)
+                    os.environ.update({k: v.replace("{lang}", lang) for k, v in env.items()})
+                    try:
+                        t = T.build(key, lang)
+                        chosen, est = [], 0.0
+                        for sc in t.scenes:
+                            for b in sc.beats:
+                                if b.text:
+                                    v, r, p, *tail = t.voice_of(b.voice or b.who)
+                                    b.key = (b.text, v, r, p, tail[0] if tail else "")
+                                    chosen.append(b)
+                                    est += len(b.text) / 14.0 + 0.4
+                            if est >= secs:
+                                break
+                        buf = io.StringIO()
+                        with contextlib.redirect_stdout(buf):
+                            clips = VO.synth_items([b.key for b in chosen], "ffmpeg", os.path.join(OUT, "_cache_scene"))
+                        for ln in buf.getvalue().splitlines():
+                            log("   " + ln)
+                        parts = []
+                        for b in chosen:
+                            y = VL.resample(clips[b.key], 44100, KSR)
+                            parts += [level(y), np.zeros(int((0.6 if (b.who or "nar") == "nar" else 0.4) * KSR))]
+                        nm = "scene-%s-%s" % (key, tag) if classic else "scene-%s-%s-%s" % (key, lang, tag)
+                        VL.save(nm, np.concatenate(parts), KSR)
+                        log("SCENE %s %s %s: %d lines, %.0f s, speakers %s" % (key, lang, tag, len(chosen), sum(len(x) for x in parts) / KSR, sorted({b.who or "nar" for b in chosen})))
+                    except Exception:
+                        log("SCENE %s %s %s FAILED %s" % (key, lang, tag, traceback.format_exc()[-900:]))
     finally:
         for k in names:
             if saved[k] is None:
@@ -1775,6 +1790,129 @@ ENGINES = [                                                   # (language, key, 
 # (the Italian-voice try, e_kokoro_tr("own") / e_kokoro_tr("esp"), is not an engine any more: 34 % / 74 % of its words were wrong in the first run)
 
 
+# ------------------------------------------------------------------------------------------------------------------------ Google's Chirp 3 HD voices (--only google, --only gpalette)
+# bibi_buzz/cloudtts.py: the thirty voices of Google speak English and Turkish.  The key is the secret GOOGLE_TTS_KEY (never printed); BIBI_GOOGLE_MAX_CHARS limits what a run may send
+# (this job raises it: it sends about 80 thousand characters, a twelfth of the free million of a month).
+GPAL_F = [1.0, 1.2, 1.4, 0.8]                                     # (the sizes of the lively line: the voice as it is, two smaller people, a bigger one)
+GNARR_TEXT = {"en": "Once upon a time, in a little green valley, there lived a family of friendly animals. Every morning they woke up with the sun, and every evening they sat together and told stories.",
+              "tr": "Evvel zaman içinde, küçük yeşil bir vadide, dostane bir hayvan ailesi yaşarmış. Her sabah güneşle birlikte uyanırlarmış, her akşam da bir araya gelip hikâyeler anlatırlarmış."}
+GLESSON_LINE = {"en": "Hello, my friends! Today we are going to learn the colors. Can you say red? Red! Wonderful!",
+                "tr": "Merhaba arkadaşlar! Bugün birlikte renkleri öğreneceğiz. Kırmızı diyebilir misin? Kırmızı! Harika!"}
+
+
+def google_lab(a):
+    """--only google: the Chirp 3 HD voices of Google (the key is the secret GOOGLE_TTS_KEY).  In this order, so that the first things to listen to come first:
+    GOOGLE lines (what the service offers: the voices it lists for tr-TR, en-US, en-GB; is the first clip made), GNARR lines + gnarr-<language>.mp3 (the candidates for the narrator
+    read the same paragraph and the same lesson line), the casting of the tales (GAL / SIM lines, gallery-<language>-google.mp3, scene-<tale>-<language>-google.mp3: the way the daily
+    videos would speak with bibi_buzz/cloudtts.py GTYPES)."""
+    from bibi_buzz import cloudtts as CT
+    if not os.environ.get("GOOGLE_TTS_KEY"):
+        log("GOOGLE: the secret GOOGLE_TTS_KEY is not set: nothing to do")
+        return
+    os.environ.setdefault("BIBI_GOOGLE_MAX_CHARS", "400000")
+    for loc in ("tr-TR", "en-US", "en-GB"):
+        try:
+            vs = CT.list_voices(loc)
+            log("GOOGLE voices %s: %d Chirp3-HD: %s" % (loc, len(vs), " ".join(v.split("-")[-1] for v in vs)))
+        except Exception as e:
+            log("GOOGLE voices %s: the list failed: %s" % (loc, CT._scrub(repr(e))[:240]))
+    try:
+        y = CT.speak("Merhaba çocuklar, bugün size güzel bir masal anlatacağım.", "g:tr:Sulafat", "+0%", "+0Hz")
+        log("GOOGLE first clip made: %.1f s" % (len(y) / float(KSR)))
+    except Exception as e:
+        log("GOOGLE FIRST CLIP FAILED (nothing else is tried): %s" % CT._scrub(repr(e))[:400])
+        return
+    try:
+        google_narrators(CT)
+    except Exception:
+        log("GNARR FAILED %s" % traceback.format_exc()[-1200:])
+    saved = os.environ.get("GALLERY_SET")
+    os.environ["GALLERY_SET"] = "google"
+    try:
+        gallery(a)
+    finally:
+        if saved is None:
+            os.environ.pop("GALLERY_SET", None)
+        else:
+            os.environ["GALLERY_SET"] = saved
+    log("GOOGLE characters sent in this job: %d, requests: %d" % (CT._S["chars"], CT._S["calls"]))
+
+
+def google_narrators(CT):
+    """The candidates for the narrator: all 14 women and a few men read the paragraph of a tale and a line of a lesson at the narrator's pace (-6%); GNARR lines (F0, UTMOS,
+    words wrong); gnarr-<language>.mp3 = the voices one after the other, a number says which one (GALLERY lines: number = voice)."""
+    gap = np.zeros(int(0.35 * KSR))
+    cands = list(CT.WOMEN) + ["Achird", "Charon", "Sadaltager", "Rasalgethi"]
+    for lang in ("en", "tr"):
+        log("---- google narrators %s: GNARR language voice kind F0 UTMOS WER seconds" % lang)
+        parts = []
+        for n, name in enumerate(cands, 1):
+            spec = "g:%s:%s" % (lang, name)
+            ys = []
+            for kind, text in (("tale", GNARR_TEXT[lang]), ("lesson", GLESSON_LINE[lang])):
+                try:
+                    y = CT.speak(text, spec, "-6%", "+0Hz")
+                except Exception as e:
+                    log("GNARR %s %-14s %-6s FAILED %s" % (lang, name, kind, CT._scrub(repr(e))[:200]))
+                    continue
+                sc = score(y, text, lang)
+                f0 = f0_of(y)
+                log("GNARR %s %-14s %-6s F0 %5s UTMOS %.2f WER %3.0f%% SEC %.1f" % (lang, name, kind, ("%.0f" % f0) if f0 else "-", sc.get("mos", 0.0), 100 * sc.get("wer", 1.0), len(y) / float(KSR)))
+                ys.append(y)
+            log("GALLERY %s %d = %s" % (lang, n, name))
+            if len(ys) == 2:
+                try:
+                    ann = CT.speak(number_words(n, lang), "g:%s:Sulafat" % lang, "-6%", "+0Hz")
+                except Exception:
+                    ann = np.zeros(int(0.4 * KSR))
+                parts += [ann, gap, ys[0], gap, ys[1], np.zeros(int(0.9 * KSR))]
+        VL.save("gnarr-" + lang, np.concatenate(parts) if parts else np.zeros(KSR), KSR)
+
+
+def google_palette(a):
+    """--only gpalette: EVERY one of the 30 voices speaks a calm line (as it is) and a lively line at several sizes (GPAL_F: a factor above 1 = a smaller person, shift_voice) in
+    both languages: GPAL lines (F0, UTMOS, words wrong), gpal-emb-<language>.txt (one JSON line per clip with its ECAPA voice print: the casting of the characters is searched from
+    it), gpalette-<language>.mp3 = the calm line of the voices one after the other (a number says which one; GALLERY lines: number = voice)."""
+    from bibi_buzz import cloudtts as CT
+    if not os.environ.get("GOOGLE_TTS_KEY"):
+        log("GPAL: the secret GOOGLE_TTS_KEY is not set: nothing to do")
+        return
+    os.environ.setdefault("BIBI_GOOGLE_MAX_CHARS", "400000")
+    gap = np.zeros(int(0.30 * KSR))
+    for lang in ("en", "tr"):
+        log("---- google palette %s: GPAL language voice factor line F0 UTMOS WER seconds" % lang)
+        parts, dump = [], []
+        for n, name in enumerate(CT.VOICES, 1):
+            spec = "g:%s:%s" % (lang, name)
+            log("GALLERY %s %d = %s" % (lang, n, name))
+            for kind, line, f in [("calm", PAL_CALM[lang], 1.0)] + [("lively", PAL_LIVELY[lang], f) for f in GPAL_F]:
+                try:
+                    y = CT.speak(line, spec, "+0%", "%+.1fHz" % ((f - 1.0) * 150))
+                except Exception as e:
+                    log("GPAL %s %-14s x%.2f %-6s FAILED %s" % (lang, name, f, kind, CT._scrub(repr(e))[:200]))
+                    if CT.dead():
+                        log("GPAL the service was given up: %s" % CT.dead())
+                        return
+                    continue
+                sc = score(y, line, lang)
+                f0 = f0_of(y)
+                e_ = try_embed(y)
+                log("GPAL %s %-14s x%.2f %-6s F0 %5s UTMOS %.2f WER %3.0f%% SEC %.1f" % (lang, name, f, kind, ("%.0f" % f0) if f0 else "-", sc.get("mos", 0.0), 100 * sc.get("wer", 1.0), len(y) / float(KSR)))
+                dump.append({"voice": name, "factor": f, "kind": kind, "f0": round(f0, 1) if f0 else None, "mos": round(sc.get("mos", 0.0), 3), "wer": round(sc.get("wer", 1.0), 3),
+                             "sec": round(len(y) / float(KSR), 2), "emb": [round(float(x), 4) for x in e_] if e_ is not None else None})
+                if kind == "calm":
+                    try:
+                        ann = CT.speak(number_words(n, lang), "g:%s:Sulafat" % lang, "-6%", "+0Hz")
+                    except Exception:
+                        ann = np.zeros(int(0.4 * KSR))
+                    parts += [ann, gap, y, np.zeros(int(0.8 * KSR))]
+        with open(os.path.join(OUT, "gpal-emb-%s.txt" % lang), "w", encoding="utf-8") as f:
+            for r_ in dump:
+                f.write(json.dumps(r_) + "\n")
+        VL.save("gpalette-" + lang, np.concatenate(parts) if parts else np.zeros(KSR), KSR)
+    log("GPAL characters sent in this job: %d, requests: %d" % (CT._S["chars"], CT._S["calls"]))
+
+
 def job_main(a):
     import platform
     log("python", sys.version.split()[0], platform.platform(), "cpus", os.cpu_count())
@@ -1786,7 +1924,8 @@ def job_main(a):
             log("  ", m, "MISSING", repr(e)[:120])
     list_edge_voices()
     only = [x for x in (a.only or "").split(",") if x]
-    special = [("cast", cast_sweep), ("palette", palette), ("studio", studio_ab), ("gallery", gallery), ("world", world_test), ("grid", voice_grid)]            # (jobs of their own: not an engine of the ten lines)
+    special = [("cast", cast_sweep), ("palette", palette), ("studio", studio_ab), ("gallery", gallery), ("world", world_test), ("grid", voice_grid),
+               ("google", google_lab), ("gpalette", google_palette)]            # (jobs of their own: not an engine of the ten lines)
     for key, fn in special:
         if key in only:
             try:

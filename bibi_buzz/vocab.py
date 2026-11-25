@@ -75,7 +75,6 @@ CATS = {
         tags=["farm animals", "animal sounds"], sound_mode=True,
         items=[
             ("cow", "1f42e", "Cows give us milk.", "moo"),
-            ("pig", "1f437", "Pigs love to roll in the mud.", "oink oink"),
             ("sheep", "1f411", "Sheep have soft, fluffy wool.", "baa baa"),
             ("duck", "1f986", "Ducks love to swim.", "quack quack"),
             ("chicken", "1f414", "Chickens lay eggs.", "cluck cluck"),
@@ -333,7 +332,7 @@ COLORS = {
     "green": ("#3DB54A", [("frog", "1f438"), ("broccoli", "1f966"), ("leaf", "1f343"), ("turtle", "1f422")]),
     "orange": ("#FF8A1F", [("orange", "1f34a"), ("carrot", "1f955"), ("fox", "1f98a"), ("pumpkin", "1f383")]),
     "purple": ("#9B59D0", [("grapes", "1f347"), ("eggplant", "1f346"), ("purple heart", "1f49c"), ("octopus", "1f419")]),
-    "pink": ("#FF6FAE", [("pig", "1f437"), ("flamingo", "1f9a9"), ("flower", "1f338"), ("ice cream", "1f368")]),
+    "pink": ("#FF6FAE", [("ribbon", "1f380"), ("flamingo", "1f9a9"), ("flower", "1f338"), ("ice cream", "1f368")]),
     "brown": ("#9A6A3A", [("bear", "1f43b"), ("monkey", "1f435"), ("cookie", "1f36a"), ("tree", "1f333")]),
     "white": ("#BFC9D6", [("cloud", "2601"), ("snowman", "26c4"), ("egg", "1f95a"), ("sheep", "1f411")]),
     "gray": ("#8892A0", [("elephant", "1f418"), ("mouse", "1f42d"), ("wolf", "1f43a"), ("rhino", "1f98f")]),

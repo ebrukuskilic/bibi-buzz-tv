@@ -65,6 +65,11 @@ def song_key(day):
 
 
 DAILY_UPLOADS = 10
+# From day MIX_DAY on, the four lessons of a day are not uploaded one by one: they and the English tale become ONE 10-20 minute
+# compilation (dNNN-C1, compilation.py), and the day has only MIX_SHORTS Shorts: about 6 uploads a day instead of 10 (long videos
+# bring the watch hours and the money of a channel made for kids; many look-alike uploads a day keep a channel from earning).
+MIX_DAY = 7
+MIX_SHORTS = 2
 SUBSCRIBE_URL = "https://www.youtube.com/channel/UCfiz1ZdIyjFtTYkzFOUqqWQ?sub_confirmation=1"      # opens the channel with the "Subscribe?" question
 
 
@@ -183,7 +188,8 @@ def _raw_plan(day):
             out.append(m)
         except Exception as e:                                  # a song that cannot be built must never stop the day's other videos
             print(f"[song] {sk}: {e!r}", flush=True)
-    for slot in range(DAILY_UPLOADS - len(out)):                # the rest of the day's 10 uploads are Shorts (5, or fewer with a Turkish tale and a song)
+    n_shorts = DAILY_UPLOADS - len(out) if day < MIX_DAY else MIX_SHORTS
+    for slot in range(n_shorts):                # the rest of the day's 10 uploads are Shorts (5, or fewer with a Turkish tale and a song)
         out.append(build_short(slot, f"d{day:03d}-S{slot + 1}", day, day * 100 + 50 + slot))
     return out
 

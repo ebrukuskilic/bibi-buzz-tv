@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       only:
-        description: "Engines to run: keys separated by commas (e.g. palette,studio,gallery,cast,prod-kokoro,kokoro-tr) or all (palette = every voice at several sizes, gallery = the casting of some tales, studio = EQ chains, cast = the casting sweep)"
+        description: "Engines to run: keys separated by commas (e.g. palette,studio,gallery,cast,prod-kokoro,kokoro-tr) or all (palette = every voice at several sizes, gallery = the casting of some tales, studio = EQ chains, cast = the casting sweep; google = the Google voices: narrators, casting, scenes; gpalette = every Google voice at several sizes; both need the secret GOOGLE_TTS_KEY)"
         default: "all"
       cbx:
         description: "Also try Chatterbox (a big neural voice in its own python 3.11 environment, slow on the CPU): yes or no"
@@ -94,7 +94,9 @@ jobs:
           pip install pyworld --no-build-isolation || pip install pyworld || echo "pyworld install failed"
           pip list 2>/dev/null | grep -i -E "^(speechbrain|pyworld|torch|torchaudio|numpy|scipy|hyperpyyaml|kokoro) " || true
 
-      - name: Speech lab (the voices of the videos, Edge, Kokoro, Kokoro-Turkish)
+      - name: Speech lab (the voices of the videos, Edge, Kokoro, Kokoro-Turkish, Google)
+        env:
+          GOOGLE_TTS_KEY: ${{ secrets.GOOGLE_TTS_KEY }}              # (only this step sees the key; the jobs google and gpalette use it, nothing else does)
         run: |
           ARGS=""
           if [ "$ONLY" != "all" ]; then ARGS="--only $ONLY"; fi

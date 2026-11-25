@@ -1,6 +1,7 @@
 """The fairy tales (public-domain classics) as story scripts, told in short, simple sentences for ages 2-6."""
 import math
 
+from . import cloudtts as CT
 from . import ktts as KT
 from . import voice as VO
 from .story import Tale, ease, HEAD
@@ -3116,15 +3117,21 @@ CASTING = {    # tale: {character id of the tale: type, or (type, pitch offset i
 def cast_voices(key, lang="en"):
     """{character id: (voice, rate, pitch, effect)} of a tale, from its CASTING and the TYPES (the narrator included)."""
     i = 0 if lang == "en" else 1
-    kokoro = KT.enabled(lang)                                                          # the Kokoro voices (ktts.py) speak first when BIBI_KOKORO asks for them and they are installed
+    google = CT.enabled(lang)                                                          # the Google voices (cloudtts.py) speak first when BIBI_GOOGLE asks for them and the key is there
+    kokoro = KT.enabled(lang)                                                          # the Kokoro voices (ktts.py) speak when BIBI_KOKORO asks for them and they are installed (and take over a line Google cannot make)
     out = {}
     for who, spec in dict(CASTING[key], nar="nar").items():
         typ, off = (spec, 0) if isinstance(spec, str) else spec
         v, r, p, fx = TYPES[typ][i]
         if off:
             p = "%+dHz" % (int(p[:-2]) + off)                                          # the same type, a little higher or lower
-        k = KT.cast(typ, lang, (v, r, p, fx), off) if kokoro else None                 # (the Edge voice above stands in for it whenever Kokoro cannot make a line)
-        if k:
+        g = CT.cast(typ, lang, (v, r, p, fx), off) if google else None                 # (the Edge voice above stands in for it whenever neither can make a line)
+        k = KT.cast(typ, lang, (v, r, p, fx), off) if kokoro else None
+        if g:
+            if k:
+                CT.link(g, k)
+            v, r, p, fx = g
+        elif k:
             v, r, p, fx = k
         VO.fx_parse(fx)                                                                # a typo in an effect name fails here, when the tale is built
         out[who] = (v, r, p, fx)

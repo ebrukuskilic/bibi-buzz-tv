@@ -846,7 +846,7 @@ def three_billy_goats(lang="en"):
     s.nar("Once upon a time, three billy goats lived on a dry, brown hill.",
           ("walk", "lit", LIT_X, DECK, {"fit": True}), ("walk", "mid", MID_X, DECK, {"fit": True}), ("walk", "big", BIG_X, DECK, {"fit": True}))
     s.nar("There was a little goat, a middle goat, and a big goat.", ("pose", "lit", "happy"), ("pose", "mid", "happy"), ("pose", "big", "happy"),
-          ("hop", "lit", {"at": "30%"}), ("hop", "mid", {"at": "58%"}), ("hop", "big", {"at": "88%"}))
+          ("hop", "lit", {"at": "@little|küçük"}), ("hop", "mid", {"at": "@middle|ortanca"}), ("hop", "big", {"at": "@big goat|büyük"}))
     s.nar("They were brothers, and they loved to eat green grass.", ("pose", "lit", "eat"), ("pose", "mid", "eat"), ("pose", "big", "eat"),
           ("sfx", "munch", {"at": "55%"}), ("sfx", "munch", {"at": "85%"}))
     s.say("lit", "Oh no! All the grass on our hill is gone!", ("pose", "lit", "sad"), ("pose", "mid", "sad"), ("pose", "big", "idle"))

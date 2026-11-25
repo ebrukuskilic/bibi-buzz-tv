@@ -1,0 +1,95 @@
+sync problems: none
+duration 260.5s, voice 217.0s
+
+   0.2s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Bibi Buzz masal saatine hoş geldiniz!
+   3.4s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Bugünün masalı... Üç Keçi Kardeş!
+   7.0s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Bir varmış, bir yokmuş. Kuru, kahverengi bir tepede üç keçi kardeş yaşarmış.
+  14.3s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Biri küçük, biri ortanca, biri de büyük keçiymiş.
+  18.7s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Üçü de kardeşmiş ve yeşil çimenleri yemeyi çok severlermiş.
+  23.6s  lit   g:tr:Sadachbia|tr-TR-EmelNeural|+4%|+60Hz Eyvah! Tepemizdeki bütün çimenler bitmiş!
+  27.6s  mid   g:tr:Iapetus|tr-TR-AhmetNeural|+2%|+30Hz Karnım guruldıyor. Çok acıktım!
+  30.3s  big   g:tr:Alnilam|tr-TR-AhmetNeural|-10%|-36Hz Merak etmeyin kardeşler. Köprünün karşısına bakın!
+  34.7s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Köprünün karşısında, tatlı, yemyeşil çimenlerle dolu bir tepe varmış.
+  40.3s  lit   g:tr:Sadachbia|tr-TR-EmelNeural|+4%|+60Hz Mmm! Hadi gidip yiyelim!
+  43.5s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Ama köprünün altında kocaman, huysuz bir trol yaşarmış. Kimsenin köprüsünden geçmesini sevmezmiş!
+  50.8s  big   g:tr:Alnilam|tr-TR-AhmetNeural|-10%|-36Hz Korkmayın. Bir planım var!
+  54.0s  big   g:tr:Alnilam|tr-TR-AhmetNeural|-10%|-36Hz Küçük kardeşim, sen önce git.
+  56.6s  big   g:tr:Alnilam|tr-TR-AhmetNeural|-10%|-36Hz Sonra ortanca kardeşim. Sonra ben!
+  59.5s  lit   g:tr:Sadachbia|tr-TR-EmelNeural|+4%|+60Hz Tamam! İşte gidiyorum!
+  62.2s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Köprünün altında huysuz trol bekliyormuş. Onun da karnı guruldıyormuş!
+  67.5s  troll g:tr:Algenib|tr-TR-AhmetNeural|-16%|-42Hz Hırr... Çok acıktım! Umarım lezzetli bir şey gelir!
+  73.0s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Tam o sırada bir ses duymuş. Tıkır, tıkır! Tıkır, tıkır!
+  78.6s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Küçük Keçi köprüye çıkmış. Tıkır, tıkır! Tıkır, tıkır!
+  83.3s  troll g:tr:Algenib|tr-TR-AhmetNeural|-16%|-42Hz Köprümün üstünde tıkırdayan kim o?
+  86.2s  lit   g:tr:Sadachbia|tr-TR-EmelNeural|+4%|+60Hz Sadece benim, Küçük Keçi.
+  88.5s  lit   g:tr:Sadachbia|tr-TR-EmelNeural|+4%|+60Hz Yeşil tepeye gidiyorum, biraz çimen yiyeceğim.
+  91.3s  troll g:tr:Algenib|tr-TR-AhmetNeural|-16%|-42Hz Hırr! Şimdi seni bir lokmada yutacağım!
+  95.1s  lit   g:tr:Sadachbia|tr-TR-EmelNeural|+4%|+60Hz Lütfen beni yeme! Ben sadece küçük bir keçiyim.
+  98.7s  lit   g:tr:Sadachbia|tr-TR-EmelNeural|+4%|+60Hz Ağabeyim geliyor. O daha büyük!
+ 102.1s  troll g:tr:Algenib|tr-TR-AhmetNeural|-16%|-42Hz Hmm... Daha büyük mü? Peki, git bakalım!
+ 108.8s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Küçük Keçi köprüden zıplaya zıplaya geçmiş, yeşil tepeye çıkmış. Ham, ham, ham!
+ 116.8s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Sonra Ortanca Keçi gelmiş. Tıkır, tıkır! Tıkır, tıkır! Tıkır, tıkır!
+ 121.6s  troll g:tr:Algenib|tr-TR-AhmetNeural|-16%|-42Hz Köprümün üstünde tıkırdayan kim o?
+ 124.4s  mid   g:tr:Iapetus|tr-TR-AhmetNeural|+2%|+30Hz Sadece benim, Ortanca Keçi.
+ 126.8s  mid   g:tr:Iapetus|tr-TR-AhmetNeural|+2%|+30Hz Yeşil tepeye gidiyorum, biraz çimen yiyeceğim.
+ 129.7s  troll g:tr:Algenib|tr-TR-AhmetNeural|-16%|-42Hz Hırr! Şimdi seni bir lokmada yutacağım!
+ 133.5s  mid   g:tr:Iapetus|tr-TR-AhmetNeural|+2%|+30Hz Beni yeme lütfen! Ben ortanca keçiyim.
+ 136.4s  mid   g:tr:Iapetus|tr-TR-AhmetNeural|+2%|+30Hz Büyük ağabeyim geliyor. O çok büyük!
+ 140.5s  troll g:tr:Algenib|tr-TR-AhmetNeural|-16%|-42Hz Daha da büyük mü? Onu bekleyeceğim. Git!
+ 144.3s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Ortanca Keçi köprüden geçmiş, küçük kardeşinin yanına gitmiş. Ham, ham, ham!
+ 150.9s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz En sonunda Büyük Keçi gelmiş. GÜM, GÜM! GÜM, GÜM! Eski köprü sallanmış, sallanmış!
+ 159.1s  troll g:tr:Algenib|tr-TR-AhmetNeural|-16%|-42Hz BENİM köprümde gümbür gümbür yürüyen kim?
+ 162.5s  big   g:tr:Alnilam|tr-TR-AhmetNeural|-10%|-36Hz Benim, Büyük Keçi!
+ 164.3s  big   g:tr:Alnilam|tr-TR-AhmetNeural|-10%|-36Hz Köprüden geçeceğim!
+ 166.3s  troll g:tr:Algenib|tr-TR-AhmetNeural|-16%|-42Hz Hırr! Şimdi seni bir lokmada yutacağım!
+ 170.1s  big   g:tr:Alnilam|tr-TR-AhmetNeural|-10%|-36Hz Yutamazsın! Boynuzlarım büyük, ben cesurum!
+ 174.0s  lit   g:tr:Sadachbia|tr-TR-EmelNeural|+4%|+60Hz Haydi büyük ağabey, haydi!
+ 176.1s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Büyük Keçi boynuzlarını eğmiş ve trolün üstüne koşmuş!
+ 180.4s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz BONK! Trol yukarı, yukarı, yukarı uçmuş, gökyüzüne kadar!
+ 186.0s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Sonra aşağı, aşağı, aşağı düşmüş, ŞAPLAK, suyun içine!
+ 192.4s  troll g:tr:Algenib|tr-TR-AhmetNeural|-16%|-42Hz Ay! Çok kötü davrandığım için özür dilerim!
+ 196.3s  big   g:tr:Alnilam|tr-TR-AhmetNeural|-10%|-36Hz Nazik ol, başkaları da sana nazik olur!
+ 200.0s  troll g:tr:Algenib|tr-TR-AhmetNeural|-16%|-42Hz Olurum! Söz veriyorum! Teşekkürler!
+ 203.2s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Üç kardeş yeniden bir araya gelmiş!
+ 206.5s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Tatlı, yemyeşil tepede üç keçi kardeş yemişler, yemişler, yemişler, karınları doyana kadar.
+ 214.4s  lit   g:tr:Sadachbia|tr-TR-EmelNeural|+4%|+60Hz Mmm, mmm! Bu çimenler çok lezzetli!
+ 219.4s  mid   g:tr:Iapetus|tr-TR-AhmetNeural|+2%|+30Hz Teşekkürler büyük ağabey, çok cesursun!
+ 222.5s  big   g:tr:Alnilam|tr-TR-AhmetNeural|-10%|-36Hz Hep birlikte başardık kardeşler!
+ 225.3s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Peki ya trol? O bir daha asla kötü olmamış. Şimdi köprüsünden geçen herkese merhaba diyormuş.
+ 232.7s  troll g:tr:Algenib|tr-TR-AhmetNeural|-16%|-42Hz Merhaba dostlar! İyi günler!
+ 235.7s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Gökten üç elma düşmüş: biri anlatana, biri dinleyene, biri de bütün çocuklara!
+ 242.9s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Unutmayın küçükler: başkalarına nazik olun, gerektiğinde de cesur olun.
+ 248.5s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Son. İzlediğiniz için teşekkürler!
+ 253.0s  nar   g:tr:Sulafat|tr-TR-EmelNeural|-6%|+0Hz Masalı sevdiysen, beğen ve abone ol! Bir sonraki masalda görüşürüz. Hoşça kalın!
+
+0:00 Giriş
+1:01 Huysuz trol
+1:18 Küçük Keçi
+1:56 Ortanca Keçi
+2:30 Büyük Keçi
+3:26 Yemyeşil tepe
+4:02 Son
+
+{
+ "title": "Üç Keçi Kardeş ve Trol Masalı | Çocuklar İçin Türkçe Masal | Bibi Buzz TV",
+ "description": "Tıkır, tıkır! Üç Keçi Kardeş'in klasik masalını izleyin: karnı aç üç keçi kardeş, yeşil tepedeki tatlı çimenleri yemek için eski köprüden geçmek ister, ama köprünün altında kocaman, huysuz bir trol yaşar. Küçük keçi, ortanca keçi ve büyük keçi ne yapacak? Türkçe seslendirmeli, renkli ve sevimli bir çizgi film masal. 2-6 yaş çocuklar için sade ve kısa cümlelerle anlatılır.\n\nAbone ol: https://www.youtube.com/channel/UCfiz1ZdIyjFtTYkzFOUqqWQ?sub_confirmation=1\n\nBölümler\n0:00 Giriş\n1:01 Huysuz trol\n1:18 Küçük Keçi\n1:56 Ortanca Keçi\n2:30 Büyük Keçi\n3:26 Yemyeşil tepe\n4:02 Son\n\nBibi Buzz TV'de her gün yeni masallar ve öğretici videolar!\nSeslendirme için metin okuma (TTS) sesleri kullanılmıştır. Tüm çizimler ve müzikler Bibi Buzz TV için hazırlanmıştır.\n\n#masal #çocukmasalları #uykumasalları #türkçemasal #BibiBuzzTV",
+ "tags": [
+  "masal",
+  "çocuk masalları",
+  "uyku masalları",
+  "türkçe masal",
+  "çizgi film masal",
+  "masal dinle",
+  "çocuklar için masal",
+  "Bibi Buzz TV",
+  "çocuk hikayeleri",
+  "bebek masalları",
+  "animasyon masal",
+  "masal saati",
+  "üç keçi kardeş",
+  "üç keçi",
+  "keçi kardeşler",
+  "köprünün altındaki trol",
+  "keçiler ve trol"
+ ]
+}

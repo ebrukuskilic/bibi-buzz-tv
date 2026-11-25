@@ -1,0 +1,100 @@
+==================== main 06:22:31
+python 3.12.16 Linux-7.0.0-1020-azure-x86_64-with-glibc2.43 cpus 4
+   numpy 2.5.5
+   scipy 1.18.1
+   torch 2.15.0+cpu
+   torchaudio 2.11.1+cpu
+   kokoro 0.9.4
+   misaki 0.9.4
+   faster_whisper 1.2.1
+   edge_tts 7.3.1
+edge-tts: 318 voices; Turkish: ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural']
+   en-AU-WilliamMultilingualNeural              en-AU  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   en-US-AndrewMultilingualNeural               en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Warm', 'Confident', 'Authentic', 'Honest']}
+   en-US-AvaMultilingualNeural                  en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Expressive', 'Caring', 'Pleasant', 'Friendly']}
+   en-US-BrianMultilingualNeural                en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Approachable', 'Casual', 'Sincere']}
+   en-US-EmmaMultilingualNeural                 en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Cheerful', 'Clear', 'Conversational']}
+   fr-FR-VivienneMultilingualNeural             fr-FR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   fr-FR-RemyMultilingualNeural                 fr-FR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   it-IT-GiuseppeMultilingualNeural             it-IT  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   ko-KR-HyunsuMultilingualNeural               ko-KR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   pt-BR-ThalitaMultilingualNeural              pt-BR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+==================== SUMMARY (UTMOS higher is better; words wrong lower is better; RTF = seconds of work per second of speech)
+==================== ext-prepare 06:24:58
+ext-prepare: the VoxCPM2 foundry, 43 clips to make
+==================== ext-collect 06:54:20
+ext: 13 clips made, 0 failed
+FDL tr: no line was made
+---- en  9-vox-foundry
+  nar    5.6 s  utmos 4.12  words wrong   0%   heard: Once upon a time, a mama pig lived in a cozy little house with her three little pigs.
+  mama   4.6 s  utmos 4.49  words wrong   0%   heard: My dear little pigs, it is time to build your own houses.
+  pig1   3.5 s  utmos 2.93  words wrong   0%   heard: Do not worry, mama. I will build my house very fast!
+  nar   no audio
+  wolf  no audio
+  pig1  no audio
+  wolf  no audio
+  nar   no audio
+  pig3  no audio
+  nar   no audio
+wrote en-9-vox-foundry 15.1 s
+FDREF en nar   cos of its lines to the designed reference: mean 0.72 min 0.72
+FDREF en mama  cos of its lines to the designed reference: mean 0.65 min 0.65
+FDREF en pig1  cos of its lines to the designed reference: mean 0.68 min 0.68
+SIM vox-foundry-en ten-lines            nar      (nar) ~ mama     (mama) cos 0.14
+SIM vox-foundry-en ten-lines            nar      (nar) ~ pig1     (pig1) cos 0.02
+SIM vox-foundry-en ten-lines            mama     (mama) ~ pig1     (pig1) cos 0.25
+SIMSUM vox-foundry-en pairs at or above 0.55: 0
+---- foundry speed test: FDSPEED language steps cfg UTMOS WER seconds-of-audio seconds-of-work real-time-factor
+---- foundry children: FDPROBE name F0 UTMOS WER seconds-of-audio seconds-of-work [description]
+---- gallery tr-pocket: GAL language tale character type F0 UTMOS WER voice
+==================== myvox-prepare 06:55:01
+myvoice tr: reference clip 8.0 s, F0 213 Hz, UTMOS 2.50; Whisper hears 20 words
+myvoice en: reference clip 8.8 s, F0 234 Hz, UTMOS 2.49; Whisper hears 23 words
+myvox-prepare: 20 lines to clone
+==================== myvox-collect 07:20:37
+MYVOX tr line 0 nar   cos to her reference 0.70
+MYVOX tr line 1 mama  cos to her reference 0.60
+MYVOX tr line 2 pig1  cos to her reference 0.62
+MYVOX tr line 3 nar   cos to her reference 0.65
+MYVOX tr line 4 wolf  cos to her reference 0.50
+MYVOX tr line 5 pig1  cos to her reference 0.58
+MYVOX tr line 6 wolf  cos to her reference 0.56
+MYVOXSUM tr: cos of the clones to her reference mean 0.60 min 0.50 (the same person: 0.7 and more; two people: usually below 0.5)
+---- tr  8-myvoice-vox
+  nar    7.8 s  utmos 2.75  words wrong   6%   heard: Bir varmış bir yokmuş. Küçük ve sıcacık bir evde 3 yavru domuzuyla yaşayan bir anne domuz varmış.
+  mama   3.4 s  utmos 2.89  words wrong  12%   heard: benim tatlı yavrularım kendi evlerimizi yapma zamanı geldi
+  pig1   2.7 s  utmos 3.41  words wrong  38%   heard: merak etmeyin, ben evim çok çabuk yapacağım
+  nar    5.1 s  utmos 2.98  words wrong   0%   heard: küçük domuzlar annelerine sarıldılar ve güneşli yolda yürümeye başladılar
+  wolf   3.8 s  utmos 2.08  words wrong   0%   heard: küçük domuz küçük domuz kapıyı aç içeri gireyim
+  pig1   4.5 s  utmos 2.59  words wrong   0%   heard: Olmaz olmaz sakalımın teline yemin olsun açmam
+  wolf   3.0 s  utmos 3.02  words wrong   0%   heard: O zaman üfleyeceğim, püfleyeceğim ve evini yıkacağım.
+  nar   no audio
+  pig3  no audio
+  nar   no audio
+wrote tr-8-myvoice-vox 33.5 s
+MYVOX en line 0 nar   cos to her reference 0.80
+MYVOX en line 1 mama  cos to her reference 0.80
+MYVOX en line 2 pig1  cos to her reference 0.73
+MYVOX en line 3 nar   cos to her reference 0.76
+MYVOX en line 4 wolf  cos to her reference 0.53
+MYVOX en line 5 pig1  cos to her reference 0.68
+MYVOX en line 6 wolf  cos to her reference 0.59
+MYVOX en line 7 nar   cos to her reference 0.76
+MYVOX en line 8 pig3  cos to her reference 0.61
+MYVOX en line 9 nar   cos to her reference 0.50
+MYVOXSUM en: cos of the clones to her reference mean 0.68 min 0.50 (the same person: 0.7 and more; two people: usually below 0.5)
+---- en  8-myvoice-vox
+  nar    5.6 s  utmos 3.45  words wrong   0%   heard: Once upon a time a mama pig lived in a cozy little house with her three little pigs.
+  mama   4.2 s  utmos 3.64  words wrong   0%   heard: My dear little pigs, it is time to build your own houses.
+  pig1   3.5 s  utmos 3.37  words wrong   0%   heard: Do not worry, mama. I will build my house very fast.
+  nar    5.8 s  utmos 3.60  words wrong   0%   heard: So the little pigs hugged their mama and off they went down the sunny road.
+  wolf   2.6 s  utmos 2.90  words wrong   0%   heard: Little pig, little pig, let me come in.
+  pig1   3.5 s  utmos 2.29  words wrong   0%   heard: No, no, not by the hair of my chinny chin chin.
+  wolf   4.8 s  utmos 2.05  words wrong   0%   heard: Then I will huff and I will puff and I will blow your house in.
+  nar    6.9 s  utmos 3.14  words wrong   0%   heard: So the wolf took a big deep breath. He huffed and he puffed and he blew the house down.
+  pig3   4.2 s  utmos 3.54  words wrong  15%   heard: Quick, he is coming down the chimney. Keep the pot of water above link.
+  nar    2.7 s  utmos 2.15  words wrong   0%   heard: And they all lived happily ever after.
+wrote en-8-myvoice-vox 48.2 s
+==================== SUMMARY (UTMOS higher is better; words wrong lower is better; RTF = seconds of work per second of speech)
+  en  8-myvoice-vox  UTMOS 3.01   words wrong   2%   RTF 20.65   (10 lines)
+  tr  8-myvoice-vox  UTMOS 2.82   words wrong   8%   RTF 20.42   (7 lines)

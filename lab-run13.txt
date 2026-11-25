@@ -1,0 +1,159 @@
+==================== main 19:58:07
+python 3.12.16 Linux-7.0.0-1020-azure-x86_64-with-glibc2.43 cpus 4
+   numpy 2.5.5
+   scipy 1.18.1
+   torch 2.15.0+cpu
+   torchaudio 2.11.1+cpu
+   kokoro 0.9.4
+   misaki 0.9.4
+   faster_whisper 1.2.1
+   edge_tts 7.3.1
+edge-tts: 318 voices; Turkish: ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural']
+   en-AU-WilliamMultilingualNeural              en-AU  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   en-US-AndrewMultilingualNeural               en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Warm', 'Confident', 'Authentic', 'Honest']}
+   en-US-AvaMultilingualNeural                  en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Expressive', 'Caring', 'Pleasant', 'Friendly']}
+   en-US-BrianMultilingualNeural                en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Approachable', 'Casual', 'Sincere']}
+   en-US-EmmaMultilingualNeural                 en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Cheerful', 'Clear', 'Conversational']}
+   fr-FR-VivienneMultilingualNeural             fr-FR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   fr-FR-RemyMultilingualNeural                 fr-FR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   it-IT-GiuseppeMultilingualNeural             it-IT  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   ko-KR-HyunsuMultilingualNeural               ko-KR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   pt-BR-ThalitaMultilingualNeural              pt-BR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   [ktts] 56 of 56 clips made (142 s of speech in 212 s of work)
+   [ktts] 56 of 56 clips made in 213 s; 0 item(s) will use the Edge voice
+---- gallery en: GAL language tale character type F0 UTMOS WER voice
+GAL en three-little-pigs    mama     woman       F0   171 UTMOS 4.41 WER   0%  k:af_sky|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en three-little-pigs    pig1     pig         F0   148 UTMOS 4.16 WER   0%  k:bm_george|en-US-RogerNeural|+2%|+27Hz
+GAL en three-little-pigs    pig2     pig         F0   167 UTMOS 4.09 WER   0%  k:am_puck|en-US-RogerNeural|+2%|+15Hz
+GAL en three-little-pigs    pig3     pig         F0   223 UTMOS 4.38 WER   0%  k:am_eric|en-US-RogerNeural|+2%|+3Hz
+GAL en three-little-pigs    wolf     wolf        F0   105 UTMOS 4.38 WER   0%  k:am_echo|en-US-ChristopherNeural|-10%|-28Hz
+GAL en goldilocks           gold     girl        F0   254 UTMOS 3.48 WER   0%  k:af_jessica|en-US-AnaNeural|-2%|+10Hz
+GAL en goldilocks           papa     bear        F0   103 UTMOS 4.39 WER   0%  k:am_onyx|en-US-EricNeural|-12%|-15Hz
+GAL en goldilocks           mama     mamabear    F0   157 UTMOS 4.47 WER   0%  k:af_kore|en-GB-SoniaNeural|-8%|-22Hz
+GAL en goldilocks           baby     baby        F0   289 UTMOS 3.57 WER   0%  k:bf_isabella|en-GB-MaisieNeural|+0%|+20Hz
+GAL en red-riding-hood      red      girl        F0   254 UTMOS 3.48 WER   0%  k:af_jessica|en-US-AnaNeural|-2%|+10Hz
+GAL en red-riding-hood      mama     woman       F0   171 UTMOS 4.41 WER   0%  k:af_sky|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en red-riding-hood      granny   granny      F0   147 UTMOS 4.45 WER   0%  k:af_kore|en-IE-EmilyNeural|-14%|-18Hz
+GAL en red-riding-hood      wolf     wolf        F0   105 UTMOS 4.38 WER   0%  k:am_echo|en-US-ChristopherNeural|-10%|-28Hz
+GAL en red-riding-hood      wolfg    fakegranny  F0   166 UTMOS 4.39 WER   0%  k:am_eric|en-US-AndrewNeural|-8%|+45Hz
+GAL en red-riding-hood      wood     man         F0   126 UTMOS 4.37 WER   0%  k:am_adam|en-US-BrianMultilingualNeural|-6%|+0Hz
+GAL en cinderella           cin      teen        F0   193 UTMOS 4.26 WER   0%  k:af_river|en-GB-LibbyNeural|-2%|+22Hz
+GAL en cinderella           cing     teen        F0   193 UTMOS 4.26 WER   0%  k:af_river|en-GB-LibbyNeural|-2%|+22Hz
+GAL en cinderella           sm       stepmother  F0   155 UTMOS 4.47 WER   0%  k:af_kore|en-US-AvaMultilingualNeural|-12%|-20Hz
+GAL en cinderella           s1       stepsister  F0   205 UTMOS 4.23 WER   0%  k:af_bella|en-CA-ClaraNeural|+6%|+28Hz
+GAL en cinderella           s2       stepsister  F0   257 UTMOS 3.82 WER   0%  k:bf_isabella|en-CA-ClaraNeural|+6%|+20Hz
+GAL en cinderella           fg       fairy       F0   242 UTMOS 3.89 WER   0%  k:af_sarah|en-NZ-MollyNeural|-8%|+30Hz
+GAL en cinderella           pr       prince      F0   154 UTMOS 4.39 WER   0%  k:bm_george|en-GB-ThomasNeural|+0%|+10Hz
+GAL en magic-porridge-pot   kid      girl        F0   254 UTMOS 3.48 WER   0%  k:af_jessica|en-US-AnaNeural|-2%|+10Hz
+GAL en magic-porridge-pot   mama     woman       F0   171 UTMOS 4.41 WER   0%  k:af_sky|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en magic-porridge-pot   old      granny      F0   147 UTMOS 4.45 WER   0%  k:af_kore|en-IE-EmilyNeural|-14%|-18Hz
+GAL en magic-porridge-pot   gpa      grandpa     F0   105 UTMOS 4.42 WER   0%  k:am_echo|en-US-AndrewMultilingualNeural|-14%|-12Hz
+GAL en magic-porridge-pot   gma      granny      F0   181 UTMOS 4.42 WER   0%  k:af_river|en-IE-EmilyNeural|-14%|-26Hz
+GAL en magic-porridge-pot   nei      girl        F0   222 UTMOS 4.12 WER   0%  k:af_aoede|en-US-AnaNeural|-2%|+19Hz
+GAL en gingerbread-man      gm       boy         F0   197 UTMOS 4.36 WER   0%  k:am_eric|en-GB-MaisieNeural|+4%|-26Hz
+GAL en gingerbread-man      woman    granny      F0   147 UTMOS 4.45 WER   0%  k:af_kore|en-IE-EmilyNeural|-14%|-18Hz
+GAL en gingerbread-man      man      grandpa     F0   105 UTMOS 4.42 WER   0%  k:am_echo|en-US-AndrewMultilingualNeural|-14%|-12Hz
+GAL en gingerbread-man      pig      pig         F0   167 UTMOS 4.09 WER   0%  k:am_puck|en-US-RogerNeural|+2%|+15Hz
+GAL en gingerbread-man      bear     bear        F0   103 UTMOS 4.39 WER   0%  k:am_onyx|en-US-EricNeural|-12%|-15Hz
+GAL en gingerbread-man      fox      fox         F0   129 UTMOS 4.36 WER   0%  k:am_adam|en-GB-RyanNeural|-4%|-30Hz
+GALWARN en three-little-pigs: mama (woman) and pig2 (pig) may sound alike: F0 171 and 167 Hz (x1.02)
+GALWARN en red-riding-hood: mama (woman) and wolfg (fakegranny) may sound alike: F0 171 and 166 Hz (x1.03)
+GALWARN en cinderella: cin (teen) and cing (teen) may sound alike: F0 193 and 193 Hz (x1.00), the same voice
+GALWARN en cinderella: cin (teen) and s1 (stepsister) may sound alike: F0 193 and 205 Hz (x1.06)
+GALWARN en cinderella: cing (teen) and s1 (stepsister) may sound alike: F0 193 and 205 Hz (x1.06)
+GALWARN en cinderella: sm (stepmother) and pr (prince) may sound alike: F0 155 and 154 Hz (x1.01)
+GALWARN en cinderella: s2 (stepsister) and fg (fairy) may sound alike: F0 257 and 242 Hz (x1.06)
+GALWARN en magic-porridge-pot: mama (woman) and gma (granny) may sound alike: F0 171 and 181 Hz (x1.06)
+GALWARN en gingerbread-man: man (grandpa) and bear (bear) may sound alike: F0 105 and 103 Hz (x1.02)
+wrote gallery-en 172.3 s
+   [ktts] 52 of 52 clips made (132 s of speech in 74 s of work)
+   [ktts] 52 of 52 clips made in 75 s; 0 item(s) will use the Edge voice
+---- gallery en-kidsedge: GAL language tale character type F0 UTMOS WER voice
+GAL en-kidsedge three-little-pigs    mama     woman       F0   171 UTMOS 4.42 WER   0%  k:af_sky|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en-kidsedge three-little-pigs    pig1     pig         F0   148 UTMOS 4.15 WER   0%  k:bm_george|en-US-RogerNeural|+2%|+27Hz
+GAL en-kidsedge three-little-pigs    pig2     pig         F0   167 UTMOS 4.10 WER   0%  k:am_puck|en-US-RogerNeural|+2%|+15Hz
+GAL en-kidsedge three-little-pigs    pig3     pig         F0   223 UTMOS 4.38 WER   0%  k:am_eric|en-US-RogerNeural|+2%|+3Hz
+GAL en-kidsedge three-little-pigs    wolf     wolf        F0   105 UTMOS 4.37 WER   0%  k:am_echo|en-US-ChristopherNeural|-10%|-28Hz
+GAL en-kidsedge goldilocks           gold     girl        F0   331 UTMOS 3.49 WER   0%  en-US-AnaNeural
+GAL en-kidsedge goldilocks           papa     bear        F0   102 UTMOS 4.37 WER   0%  k:am_onyx|en-US-EricNeural|-12%|-15Hz
+GAL en-kidsedge goldilocks           mama     mamabear    F0   157 UTMOS 4.46 WER   0%  k:af_kore|en-GB-SoniaNeural|-8%|-22Hz
+GAL en-kidsedge goldilocks           baby     baby        F0   382 UTMOS 2.94 WER   0%  en-GB-MaisieNeural
+GAL en-kidsedge red-riding-hood      red      girl        F0   331 UTMOS 3.49 WER   0%  en-US-AnaNeural
+GAL en-kidsedge red-riding-hood      mama     woman       F0   171 UTMOS 4.42 WER   0%  k:af_sky|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en-kidsedge red-riding-hood      granny   granny      F0   146 UTMOS 4.44 WER   0%  k:af_kore|en-IE-EmilyNeural|-14%|-18Hz
+GAL en-kidsedge red-riding-hood      wolf     wolf        F0   105 UTMOS 4.37 WER   0%  k:am_echo|en-US-ChristopherNeural|-10%|-28Hz
+GAL en-kidsedge red-riding-hood      wolfg    fakegranny  F0   166 UTMOS 4.40 WER   0%  k:am_eric|en-US-AndrewNeural|-8%|+45Hz
+GAL en-kidsedge red-riding-hood      wood     man         F0   126 UTMOS 4.35 WER   0%  k:am_adam|en-US-BrianMultilingualNeural|-6%|+0Hz
+GAL en-kidsedge cinderella           cin      teen        F0   192 UTMOS 4.27 WER   0%  k:af_river|en-GB-LibbyNeural|-2%|+22Hz
+GAL en-kidsedge cinderella           cing     teen        F0   192 UTMOS 4.27 WER   0%  k:af_river|en-GB-LibbyNeural|-2%|+22Hz
+GAL en-kidsedge cinderella           sm       stepmother  F0   155 UTMOS 4.47 WER   0%  k:af_kore|en-US-AvaMultilingualNeural|-12%|-20Hz
+GAL en-kidsedge cinderella           s1       stepsister  F0   206 UTMOS 4.26 WER   0%  k:af_bella|en-CA-ClaraNeural|+6%|+28Hz
+GAL en-kidsedge cinderella           s2       stepsister  F0   257 UTMOS 3.83 WER   0%  k:bf_isabella|en-CA-ClaraNeural|+6%|+20Hz
+GAL en-kidsedge cinderella           fg       fairy       F0   242 UTMOS 3.86 WER   0%  k:af_sarah|en-NZ-MollyNeural|-8%|+30Hz
+GAL en-kidsedge cinderella           pr       prince      F0   153 UTMOS 4.37 WER   0%  k:bm_george|en-GB-ThomasNeural|+0%|+10Hz
+GAL en-kidsedge magic-porridge-pot   kid      girl        F0   331 UTMOS 3.49 WER   0%  en-US-AnaNeural
+GAL en-kidsedge magic-porridge-pot   mama     woman       F0   171 UTMOS 4.42 WER   0%  k:af_sky|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en-kidsedge magic-porridge-pot   old      granny      F0   146 UTMOS 4.44 WER   0%  k:af_kore|en-IE-EmilyNeural|-14%|-18Hz
+GAL en-kidsedge magic-porridge-pot   gpa      grandpa     F0   104 UTMOS 4.42 WER   0%  k:am_echo|en-US-AndrewMultilingualNeural|-14%|-12Hz
+GAL en-kidsedge magic-porridge-pot   gma      granny      F0   181 UTMOS 4.43 WER   0%  k:af_river|en-IE-EmilyNeural|-14%|-26Hz
+GAL en-kidsedge magic-porridge-pot   nei      girl        F0   346 UTMOS 3.02 WER   0%  en-US-AnaNeural
+GAL en-kidsedge gingerbread-man      gm       boy         F0   277 UTMOS 3.81 WER   0%  en-GB-MaisieNeural
+GAL en-kidsedge gingerbread-man      woman    granny      F0   146 UTMOS 4.44 WER   0%  k:af_kore|en-IE-EmilyNeural|-14%|-18Hz
+GAL en-kidsedge gingerbread-man      man      grandpa     F0   104 UTMOS 4.42 WER   0%  k:am_echo|en-US-AndrewMultilingualNeural|-14%|-12Hz
+GAL en-kidsedge gingerbread-man      pig      pig         F0   167 UTMOS 4.10 WER   0%  k:am_puck|en-US-RogerNeural|+2%|+15Hz
+GAL en-kidsedge gingerbread-man      bear     bear        F0   102 UTMOS 4.37 WER   0%  k:am_onyx|en-US-EricNeural|-12%|-15Hz
+GAL en-kidsedge gingerbread-man      fox      fox         F0   130 UTMOS 4.36 WER   0%  k:am_adam|en-GB-RyanNeural|-4%|-30Hz
+GALWARN en-kidsedge three-little-pigs: mama (woman) and pig2 (pig) may sound alike: F0 171 and 167 Hz (x1.02)
+GALWARN en-kidsedge red-riding-hood: mama (woman) and wolfg (fakegranny) may sound alike: F0 171 and 166 Hz (x1.03)
+GALWARN en-kidsedge cinderella: cin (teen) and cing (teen) may sound alike: F0 192 and 192 Hz (x1.00), the same voice
+GALWARN en-kidsedge cinderella: cin (teen) and s1 (stepsister) may sound alike: F0 192 and 206 Hz (x1.07)
+GALWARN en-kidsedge cinderella: cing (teen) and s1 (stepsister) may sound alike: F0 192 and 206 Hz (x1.07)
+GALWARN en-kidsedge cinderella: sm (stepmother) and pr (prince) may sound alike: F0 155 and 153 Hz (x1.01)
+GALWARN en-kidsedge cinderella: s2 (stepsister) and fg (fairy) may sound alike: F0 257 and 242 Hz (x1.06)
+GALWARN en-kidsedge magic-porridge-pot: kid (girl) and nei (girl) may sound alike: F0 331 and 346 Hz (x1.05), the same voice
+GALWARN en-kidsedge magic-porridge-pot: mama (woman) and gma (granny) may sound alike: F0 171 and 181 Hz (x1.06)
+GALWARN en-kidsedge gingerbread-man: man (grandpa) and bear (bear) may sound alike: F0 104 and 102 Hz (x1.02)
+wrote gallery-en-kidsedge 183.3 s
+   [ktts] 56 of 56 clips made (175 s of speech in 99 s of work)
+   [ktts] 56 of 56 clips made in 100 s; 0 item(s) will use the Edge voice
+---- gallery tr: GAL language tale character type F0 UTMOS WER voice
+GAL tr three-little-pigs    mama     woman       F0   211 UTMOS 4.08 WER  20%  kt:elif=0.6,emre=0.4|tr-TR-EmelNeural|-8%|-18Hz
+GAL tr three-little-pigs    pig1     pig         F0   164 UTMOS 3.98 WER  20%  kt:elif=0.2,emre=0.8|tr-TR-AhmetNeural|+4%|+37Hz
+GAL tr three-little-pigs    pig2     pig         F0   146 UTMOS 3.71 WER   0%  kt:emre|tr-TR-AhmetNeural|+4%|+25Hz
+GAL tr three-little-pigs    pig3     pig         F0   188 UTMOS 3.92 WER   0%  kt:elif=0.4,emre=0.6|tr-TR-AhmetNeural|+4%|+13Hz
+GAL tr three-little-pigs    wolf     wolf        F0    98 UTMOS 3.68 WER   0%  kt:elif=-0.25,emre=1.25|tr-TR-AhmetNeural|-10%|-36Hz
+GAL tr goldilocks           gold     girl        F0   271 UTMOS 3.57 WER  12%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-2%|+55Hz
+GAL tr goldilocks           papa     bear        F0   118 UTMOS 3.72 WER   0%  kt:emre|tr-TR-AhmetNeural|-12%|-38Hz
+GAL tr goldilocks           mama     mamabear    F0   200 UTMOS 4.23 WER   0%  kt:elif=0.6,emre=0.4|tr-TR-EmelNeural|-10%|-26Hz
+GAL tr goldilocks           baby     baby        F0   296 UTMOS 3.48 WER  20%  kt:elif=1.25,emre=-0.25|tr-TR-EmelNeural|+0%|+75Hz
+GAL tr red-riding-hood      red      girl        F0   271 UTMOS 3.57 WER  12%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-2%|+55Hz
+GAL tr red-riding-hood      mama     woman       F0   211 UTMOS 4.08 WER  20%  kt:elif=0.6,emre=0.4|tr-TR-EmelNeural|-8%|-18Hz
+GAL tr red-riding-hood      granny   granny      F0   191 UTMOS 4.20 WER   0%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr red-riding-hood      wolf     wolf        F0    98 UTMOS 3.68 WER   0%  kt:elif=-0.25,emre=1.25|tr-TR-AhmetNeural|-10%|-36Hz
+GAL tr red-riding-hood      wolfg    fakegranny  F0   161 UTMOS 4.36 WER   0%  kt:elif=0.4,emre=0.6|tr-TR-AhmetNeural|-8%|+60Hz
+GAL tr red-riding-hood      wood     man         F0   116 UTMOS 4.15 WER   0%  kt:emre|tr-TR-AhmetNeural|-6%|-8Hz
+GAL tr cinderella           cin      teen        F0   264 UTMOS 3.67 WER  20%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-2%|+15Hz
+GAL tr cinderella           cing     teen        F0   264 UTMOS 3.67 WER  20%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-2%|+15Hz
+GAL tr cinderella           sm       stepmother  F0   164 UTMOS 3.83 WER  14%  kt:elif=0.4,emre=0.6|tr-TR-EmelNeural|-10%|-20Hz
+GAL tr cinderella           s1       stepsister  F0   296 UTMOS 2.89 WER   0%  kt:elif=1.25,emre=-0.25|tr-TR-EmelNeural|+6%|+38Hz
+GAL tr cinderella           s2       stepsister  F0   195 UTMOS 3.80 WER   0%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|+6%|+30Hz
+GAL tr cinderella           fg       fairy       F0   218 UTMOS 3.38 WER  40%  kt:elif=0.6,emre=0.4|tr-TR-EmelNeural|-14%|+0Hz
+GAL tr cinderella           pr       prince      F0   135 UTMOS 4.15 WER   0%  kt:emre|tr-TR-AhmetNeural|-2%|+8Hz
+GAL tr magic-porridge-pot   kid      girl        F0   271 UTMOS 3.57 WER  12%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-2%|+55Hz
+GAL tr magic-porridge-pot   mama     woman       F0   211 UTMOS 4.08 WER  20%  kt:elif=0.6,emre=0.4|tr-TR-EmelNeural|-8%|-18Hz
+GAL tr magic-porridge-pot   old      granny      F0   191 UTMOS 4.20 WER   0%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr magic-porridge-pot   gpa      grandpa     F0   100 UTMOS 4.02 WER   0%  kt:elif=-0.25,emre=1.25|tr-TR-AhmetNeural|-12%|-14Hz
+GAL tr magic-porridge-pot   gma      granny      F0   163 UTMOS 4.27 WER   0%  kt:elif=0.4,emre=0.6|tr-TR-EmelNeural|-14%|-36Hz
+GAL tr magic-porridge-pot   nei      girl        F0   300 UTMOS 3.37 WER  12%  kt:elif=1.25,emre=-0.25|tr-TR-EmelNeural|-2%|+64Hz
+GAL tr gingerbread-man      gm       boy         F0   205 UTMOS 3.98 WER   0%  kt:elif=0.6,emre=0.4|tr-TR-EmelNeural|+4%|+45Hz
+GAL tr gingerbread-man      woman    granny      F0   191 UTMOS 4.20 WER   0%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr gingerbread-man      man      grandpa     F0   100 UTMOS 4.02 WER   0%  kt:elif=-0.25,emre=1.25|tr-TR-AhmetNeural|-12%|-14Hz
+GAL tr gingerbread-man      pig      pig         F0   146 UTMOS 3.71 WER   0%  kt:emre|tr-TR-AhmetNeural|+4%|+25Hz
+GAL tr gingerbread-man      bear     bear        F0   118 UTMOS 3.72 WER   0%  kt:emre|tr-TR-AhmetNeural|-12%|-38Hz
+GAL tr gingerbread-man      fox      fox         F0   129 UTMOS 3.86 WER   0%  kt:elif=-0.25,emre=1.25|tr-TR-AhmetNeural|-4%|+12Hz
+GALWARN tr goldilocks: gold (girl) and baby (baby) may sound alike: F0 271 and 296 Hz (x1.09)
+GALWARN tr cinderella: cin (teen) and cing (teen) may sound alike: F0 264 and 264 Hz (x1.00), the same voice
+GALWARN tr gingerbread-man: gm (boy) and woman (granny) may sound alike: F0 205 and 191 Hz (x1.07)
+GALWARN tr gingerbread-man: pig (pig) and bear (bear) may sound alike: F0 146 and 118 Hz (x1.23), the same voice
+GALWARN tr gingerbread-man: bear (bear) and fox (fox) may sound alike: F0 118 and 129 Hz (x1.09)
+wrote gallery-tr 250.2 s

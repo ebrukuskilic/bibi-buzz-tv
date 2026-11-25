@@ -1,0 +1,172 @@
+==================== main 16:59:16
+python 3.12.16 Linux-7.0.0-1020-azure-x86_64-with-glibc2.43 cpus 4
+   numpy 2.5.5
+   scipy 1.18.1
+   torch 2.15.0+cpu
+   torchaudio 2.11.1+cpu
+   kokoro 0.9.4
+   misaki 0.9.4
+   faster_whisper 1.2.1
+   edge_tts 7.3.1
+edge-tts: 318 voices; Turkish: ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural']
+   en-AU-WilliamMultilingualNeural              en-AU  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   en-US-AndrewMultilingualNeural               en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Warm', 'Confident', 'Authentic', 'Honest']}
+   en-US-AvaMultilingualNeural                  en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Expressive', 'Caring', 'Pleasant', 'Friendly']}
+   en-US-BrianMultilingualNeural                en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Approachable', 'Casual', 'Sincere']}
+   en-US-EmmaMultilingualNeural                 en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Cheerful', 'Clear', 'Conversational']}
+   fr-FR-VivienneMultilingualNeural             fr-FR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   fr-FR-RemyMultilingualNeural                 fr-FR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   it-IT-GiuseppeMultilingualNeural             it-IT  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   ko-KR-HyunsuMultilingualNeural               ko-KR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   pt-BR-ThalitaMultilingualNeural              pt-BR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   production casting: {'mama': 'k:af_bella|en-US-AvaMultilingualNeural|-4%|+12Hz', 'nar': 'k:af_heart|en-US-JennyNeural|-6%|+0Hz', 'pig1': 'k:am_puck|en-US-RogerNeural|+2%|+27Hz', 'pig2': 'k:am_puck|en-US-RogerNeural|+2%|+15Hz', 'pig3': 'k:am_puck|en-US-RogerNeural|+2%|+3Hz', 'wolf': 'k:am_fenrir|en-US-ChristopherNeural|-10%|-28Hz'}
+   [38;5;2m✔ Download and installation successful[0m
+   You can now load the package via spacy.load('en_core_web_sm')
+   [ktts] 63 of 63 clips made (247 s of speech in 73 s of work); 0 will use the Edge voice
+   66 lines, 205 s of speech, 76 s of work (RTF 0.37, Kokoro model loading included)
+wrote en-full-prod 235.2 s
+   ATTENTION nar    utmos 4.47 words wrong 67%   'Welcome to Bibi Buzz story time!'   heard: 'Welcome to BibiBuzz Storytime.'
+   ATTENTION pig1   utmos 3.02 words wrong 0%   'Do not worry, Mama! I will build my house very fast!'   heard: 'Do not worry, mama. I will build my house very fast.'
+   ATTENTION pig1   utmos 2.92 words wrong 0%   'Straw is light and easy. I can build my house in no time!'   heard: 'Straw is light and easy. I can build my house in no time.'
+   ATTENTION pig1   utmos 2.07 words wrong 0%   'Now I can play all day!'   heard: 'Now I can play all day.'
+   ATTENTION pig2   utmos 2.79 words wrong 0%   'My house is done! Time to sing and dance!'   heard: 'My house is done, time to sing and dance.'
+   ATTENTION pig1   utmos 2.89 words wrong 0%   'Why are you working so hard? Come and play with us!'   heard: 'Why are you working so hard? Come and play with us.'
+   ATTENTION pig1   utmos 2.53 words wrong 0%   'No, no, not by the hair of my chinny chin chin!'   heard: 'No, no, not by the hair of my chinny chin chin.'
+   ATTENTION wolf   utmos 2.94 words wrong 0%   'Then I will huff, and I will puff, and I will blow your hous'   heard: 'Then I will huff and I will puff and I will blow your house '
+   ATTENTION pig2   utmos 2.91 words wrong 18%   'No, no, not by the hair of our chinny chin chins!'   heard: 'No, no, not by the hair of our chinny chinchins.'
+   ATTENTION wolf   utmos 2.94 words wrong 0%   'Then I will huff, and I will puff, and I will blow your hous'   heard: 'Then I will huff and I will puff and I will blow your house '
+   ATTENTION pig3   utmos 2.78 words wrong 40%   'Come in, come in! Hurry!'   heard: 'Come and come and hurry.'
+   ATTENTION wolf   utmos 2.94 words wrong 0%   'Then I will huff, and I will puff, and I will blow your hous'   heard: 'Then I will huff and I will puff and I will blow your house '
+   ATTENTION wolf   utmos 2.92 words wrong 0%   'Oh my! I am so tired. But I have a new plan. I will climb do'   heard: 'Oh my, I am so tired, but I have a new plan. I will climb do'
+   ATTENTION pig2   utmos 2.39 words wrong 17%   'The water is hot, hot, hot!'   heard: "The water's hot, hot, hot."
+   ATTENTION wolf   utmos 2.72 words wrong 50%   'Yowwww! That is hot!'   heard: 'Yowl with that is hot.'
+   ATTENTION pig1   utmos 2.57 words wrong 0%   'I am sorry I did not work hard, brother!'   heard: 'I am sorry I did not work hard brother.'
+   ATTENTION pig2   utmos 3.11 words wrong 0%   'Hooray for the brick house! Let us all have some pie!'   heard: 'Hooray for the Brick House, let us all have some pie.'
+   per character (en):  lines  seconds  UTMOS  words wrong
+      mama     2     7.0   4.38     0%   voice k:af_bella|en-US-AvaMultilingualNeural|-4%|+12Hz
+      nar     35   129.4   4.48     2%   voice k:af_heart|en-US-JennyNeural|-6%|+0Hz
+      pig1     8    17.4   2.83     0%   voice k:am_puck|en-US-RogerNeural|+2%|+27Hz
+      pig2     7    15.2   3.12     5%   voice k:am_puck|en-US-RogerNeural|+2%|+15Hz
+      pig3     6    15.2   3.57     7%   voice k:am_puck|en-US-RogerNeural|+2%|+3Hz
+      wolf     8    21.2   3.12     6%   voice k:am_fenrir|en-US-ChristopherNeural|-10%|-28Hz
+---- en  4-prod-kokoro
+  nar    5.3 s  utmos 4.53  words wrong   0%   heard: Once upon a time, a mama pig lived in a cozy little house with her three little pigs.
+  mama   3.2 s  utmos 4.39  words wrong   0%   heard: My dear little pigs, it is time to build your own houses.
+  pig1   2.6 s  utmos 3.02  words wrong   0%   heard: Do not worry, mama. I will build my house very fast.
+  nar    4.2 s  utmos 4.49  words wrong   0%   heard: So the little pigs hugged their mama and off they went down the sunny road.
+  wolf   1.8 s  utmos 3.47  words wrong   0%   heard: Little pig, little pig, let me come in.
+  pig1   2.1 s  utmos 2.53  words wrong   0%   heard: No, no, not by the hair of my chinny chin chin.
+  wolf   3.3 s  utmos 2.94  words wrong   0%   heard: Then I will huff and I will puff and I will blow your house in.
+  nar    4.9 s  utmos 4.48  words wrong   0%   heard: So the wolf took a big, deep breath. He huffed and he puffed and he blew the house down.
+  pig3   3.1 s  utmos 4.09  words wrong   0%   heard: Quick, he is coming down the chimney. Keep the pot of water bubbling.
+  nar    2.0 s  utmos 4.41  words wrong   0%   heard: and they all lived happily ever after.
+wrote en-4-prod-kokoro 36.9 s
+kokoro-turkish files: ['.gitattributes', 'LICENSE', 'NOTICE', 'README.md', 'config.json', 'g2p_tr.py', 'kokoro-turkish.pth', 'onnx/model.onnx', 'onnx/model_fp16.onnx', 'onnx/model_quantized.onnx', 'samples/elif_01.wav', 'samples/elif_02.wav', 'samples/elif_03.wav', 'samples/elif_04.wav', 'samples/elif_05.wav', 'samples/elif_06.wav', 'samples/elif_07.wav', 'samples/elif_08.wav', 'samples/elif_09.wav', 'samples/elif_10.wav', 'samples/emre_01.wav', 'samples/emre_02.wav', 'samples/emre_03.wav', 'samples/emre_04.wav', 'samples/emre_05.wav', 'samples/emre_06.wav', 'samples/emre_07.wav', 'samples/emre_08.wav', 'samples/emre_09.wav', 'samples/emre_10.wav', 'tokenizer.json', 'tokenizer_config.json', 'voices/elif.bin', 'voices/elif.pt', 'voices/emre.bin', 'voices/emre.pt']
+   nar elif: bɪr varmˈɯʃ, bɪr jɔkmˈʊʃ. kyʧˈøk vɛ sɯʤaʤˈɯk bɪr ɛvdˈɛ, ˈøʧ javrˈʊ domuzˈʊjla jaʃajˈan bɪr annˈɛ dˈomʊz varmˈɯʃ.
+   mama elif+emre: benˈɪm tatlˈɯ javrulˈaɾɯm, kændˈɪ ɛvlˈeɾinizɪ jˈapma zamanˈɯ ɟældˈɪ!
+   pig1 elif+emre: meɾˈak ˈɛtmɛ annˈɛ! bæn ˈevimɪ ʧˈɔk ʧabˈʊk japaʤˈaːɯm!
+   nar elif: kyʧˈøk dˈomʊzlar anneleɾinˈɛ saɾɯldɯlˈar vɛ ɟynɛʃlˈɪ jɔldˈa jyɾˈymejɛ bˈaʃladɯlar.
+   wolf emre: kyʧˈøk dˈomʊz, kyʧˈøk dˈomʊz, kapɯjˈɯ ˈaʧ, iʧeɾˈɪ ɟiɾejˈɪm!
+   pig1 elif+emre: ɔlmˈaz, ɔlmˈaz! sakalɯmˈɯn telinˈɛ jemˈɪn ɔlsˈʊn, aʧmˈam!
+   wolf emre: ɔ zamˈan øflejeʤˈejɪm, pøflejeʤˈejɪm vɛ evinˈɪ jɯkaʤˈaːɯm!
+   nar elif: kˈʊrt byjˈøk, deɾˈɪn bɪr nefˈɛs aldˈɯ. ˈøfledɪ, pˈøfledɪ vɛ evˈɪ jɯktˈɯ!
+   pig3 emre: ʧabˈʊk! baʤadˈan inˈijɔr! tænʤˈeɾenɪn sujunˈʊ kajnatˈɯn!
+   nar elif: vɛ hɛpsˈɪ mʊtlˈʊ mʊtlˈʊ jaʃadɯlˈar.
+---- tr  4-kokoro-tr
+  nar    8.7 s  utmos 4.27  words wrong   0%   heard: Bir varmış bir yokmuş, küçük ve sıcacık bir evde üç yavru domuzuyla yaşayan bir anne domuz varmış.
+  mama   5.1 s  utmos 4.34  words wrong   0%   heard: Benim tatlı yavrularım kendi evlerinizi yapma zamanı geldi.
+  pig1   4.0 s  utmos 4.37  words wrong   0%   heard: Merak etme anne, ben evimi çok çabuk yapacağım.
+  nar    6.7 s  utmos 4.31  words wrong   0%   heard: Küçük domuzlar annelerine sarıldılar ve güneşli yolda yürümeye başladılar.
+  wolf   4.1 s  utmos 4.14  words wrong  12%   heard: Küçük domuz, küçük domuz kapıya aç içeri gireyim.
+  pig1   4.7 s  utmos 4.37  words wrong  14%   heard: Olmaz, olmaz. Sakalımın terine yemin olsun, açmam.
+  wolf   4.5 s  utmos 4.13  words wrong   0%   heard: O zaman üfleyeceğim, püfleyeceğim ve evini yıkacağım.
+  nar    5.9 s  utmos 4.28  words wrong  27%   heard: Kort büyük derin bir nefe saldı, üfledi, püfledi ve evi yıktı.
+  pig3   4.2 s  utmos 4.23  words wrong  33%   heard: Çabuk baca dan iniyor, tencerenin suyunu kaynatın.
+  nar    3.3 s  utmos 4.30  words wrong   0%   heard: ve hepsi mutlu mutlu yaşadılar.
+wrote tr-4-kokoro-tr 55.9 s
+   nar elif: bɪr varmˈɯʃ, bɪr jɔkmˈʊʃ. kyʧˈøk vɛ sɯʤaʤˈɯk bɪr ɛvdˈɛ, ˈøʧ javrˈʊ domuzˈʊjla jaʃajˈan bɪr annˈɛ dˈomʊz varmˈɯʃ.
+   mama elif+emre: benˈɪm tatlˈɯ javrulˈaɾɯm, kændˈɪ ɛvlˈeɾinizɪ jˈapma zamanˈɯ ɟældˈɪ!
+   pig1 elif+emre: meɾˈak ˈɛtmɛ annˈɛ! bæn ˈevimɪ ʧˈɔk ʧabˈʊk japaʤˈaːɯm!
+   nar elif: kyʧˈøk dˈomʊzlar anneleɾinˈɛ saɾɯldɯlˈar vɛ ɟynɛʃlˈɪ jɔldˈa jyɾˈymejɛ bˈaʃladɯlar.
+   wolf emre: kyʧˈøk dˈomʊz, kyʧˈøk dˈomʊz, kapɯjˈɯ ˈaʧ, iʧeɾˈɪ ɟiɾejˈɪm!
+   pig1 elif+emre: ɔlmˈaz, ɔlmˈaz! sakalɯmˈɯn telinˈɛ jemˈɪn ɔlsˈʊn, aʧmˈam!
+   wolf emre: ɔ zamˈan øflejeʤˈejɪm, pøflejeʤˈejɪm vɛ evinˈɪ jɯkaʤˈaːɯm!
+   nar elif: kˈʊrt byjˈøk, deɾˈɪn bɪr nefˈɛs aldˈɯ. ˈøfledɪ, pˈøfledɪ vɛ evˈɪ jɯktˈɯ!
+   pig3 emre: ʧabˈʊk! baʤadˈan inˈijɔr! tænʤˈeɾenɪn sujunˈʊ kajnatˈɯn!
+   nar elif: vɛ hɛpsˈɪ mʊtlˈʊ mʊtlˈʊ jaʃadɯlˈar.
+---- tr  5-kokoro-tr-shift
+  nar    8.7 s  utmos 4.25  words wrong   0%   heard: Bir varmış bir yokmuş, küçük ve sıcacık bir evde, üç yavru domuzuyla yaşayan bir anne domuz varmış.
+  mama   5.1 s  utmos 3.09  words wrong   0%   heard: Benim tatlı yavrularım kendi evlerinizi yapma zamanı geldi.
+  pig1   4.0 s  utmos 2.10  words wrong   0%   heard: Merak etme anne, ben evimi çok çabuk yapacağım.
+  nar    6.7 s  utmos 4.31  words wrong   0%   heard: Küçük domuzlar annelerine sarıldılar ve güneşli yolda yürümeye başladılar.
+  wolf   4.1 s  utmos 2.81  words wrong  12%   heard: Küçük domuz, küçük domuz kapıya aç içeri gireyim.
+  pig1   4.7 s  utmos 2.29  words wrong  14%   heard: Olmaz, olmaz. Sakalımın terine yemin olsun açmam.
+  wolf   4.5 s  utmos 2.28  words wrong  14%   heard: O zaman üfleyeceğim, küfleyeceğim ve evini yıkacağım.
+  nar    5.9 s  utmos 4.28  words wrong  27%   heard: Kort büyük derin bir nefe saldı, üfledi, püfledi ve evi yıktı.
+  pig3   4.2 s  utmos 4.22  words wrong  33%   heard: Çabuk baca dan iniyor, tencerenin suyunu kaynatın.
+  nar    3.3 s  utmos 4.30  words wrong   0%   heard: ve hepsi mutlu mutlu yaşadılar.
+wrote tr-5-kokoro-tr-shift 55.9 s
+   production casting: {'mama': 'kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-8%|-18Hz', 'nar': 'kt:elif|tr-TR-EmelNeural|-6%|+0Hz', 'pig1': 'kt:emre|tr-TR-AhmetNeural|+4%|+37Hz', 'pig2': 'kt:emre|tr-TR-AhmetNeural|+4%|+25Hz', 'pig3': 'kt:emre|tr-TR-AhmetNeural|+4%|+13Hz', 'wolf': 'kt:emre|tr-TR-AhmetNeural|-10%|-36Hz'}
+   [ktts] 63 of 63 clips made (342 s of speech in 93 s of work); 0 will use the Edge voice
+   66 lines, 318 s of speech, 96 s of work (RTF 0.30, Kokoro model loading included)
+wrote tr-full-prod 347.2 s
+   ATTENTION nar    utmos 3.83 words wrong 60%   'Bugünün masalı... Üç Küçük Domuz!'   heard: 'Bugün masalı 3 küçük domuzsa.'
+   ATTENTION mama   utmos 2.78 words wrong 0%   'Çok çalışın ve kendinizi koruyun. Koca kötü kurda da dikkat '   heard: 'Çok çalışın ve kendinizi koruyun. Koca kötü kurda da dikkat '
+   ATTENTION pig1   utmos 2.16 words wrong 0%   'Merak etme anne! Ben evimi çok çabuk yapacağım!'   heard: 'Merak etme anne, ben evimi çok çabuk yapacağım.'
+   ATTENTION pig1   utmos 2.28 words wrong 0%   'Saman hafif ve kolay. Evimi hemen yapabilirim!'   heard: 'Saman hafif ve kolay. Evimi hemen yapabilirim.'
+   ATTENTION nar    utmos 3.57 words wrong 75%   'Pat! Saman ev hazırdı.'   heard: 'Pati, Samanif hazırdı.'
+   ATTENTION pig1   utmos 2.03 words wrong 0%   'Şimdi bütün gün oynayabilirim!'   heard: 'Şimdi bütün gün oynayabilirim.'
+   ATTENTION pig2   utmos 2.27 words wrong 18%   'Çubuklar sağlam, ev de çabuk biter. Ben çubuklardan bir ev y'   heard: 'Çubuklar sağlam evde çabuk biter. Ben çubuklardan bir ev yap'
+   ATTENTION pig2   utmos 1.83 words wrong 14%   'Evim bitti! Şarkı söyleyip dans etme zamanı!'   heard: 'Evin bitti. Şarkı söyleyip dans etme zamanı.'
+   ATTENTION pig3   utmos 2.05 words wrong 8%   'Tuğlalar ağır ve bu uzun sürecek. Ama tuğla ev çok sağlam ol'   heard: 'Tuhlalar ağır ve bu uzun sürecek. Ama tuğla ev çok sağlam ol'
+   ATTENTION pig1   utmos 1.93 words wrong 0%   'Neden bu kadar çok çalışıyorsun? Gel bizimle oyna!'   heard: 'Neden bu kadar çok çalışıyorsun? Gel bizimle oyna.'
+   ATTENTION pig3   utmos 2.52 words wrong 12%   'Sağlam bir ev beni korur. İşim bitince oynarım!'   heard: 'Sağlam bir ev beni korur. Eşim bitince oynarım.'
+   ATTENTION nar    utmos 3.41 words wrong 100%   'Tak, tak, tak!'   heard: 'Takı takı takı'
+   ATTENTION wolf   utmos 2.20 words wrong 0%   'Küçük domuz, küçük domuz, kapıyı aç, içeri gireyim!'   heard: 'Küçük domuz, küçük domuz kapıyı aç içeri gireyim.'
+   ATTENTION pig1   utmos 2.39 words wrong 14%   'Olmaz, olmaz! Sakalımın teline yemin olsun, açmam!'   heard: 'Olmaz, olmaz. Sakalımın terine yemin olsun açmam.'
+   ATTENTION wolf   utmos 1.90 words wrong 14%   'O zaman üfleyeceğim, püfleyeceğim ve evini yıkacağım!'   heard: 'O zaman üfleyeceğim, küfleyeceğim ve evini yıkacağım.'
+   ATTENTION nar    utmos 4.32 words wrong 36%   'Kurt büyük, derin bir nefes aldı. Üfledi, püfledi ve evi yık'   heard: 'Kort büyük derin bir nefe saldı. Üfledi, püflediye ve evi yı'
+   ATTENTION pig1   utmos 1.75 words wrong 0%   'İmdat! Koş, koş, koş! Kardeşimin çubuk evine!'   heard: 'İmdat koş koş koş Kardeşimin çubuk evine'
+   ATTENTION pig1   utmos 1.63 words wrong 0%   'Kardeşim, kardeşim! Koca kötü kurt geliyor!'   heard: 'Kardeşim, kardeşim. Koca kötü kurt geliyor.'
+   ATTENTION pig2   utmos 2.22 words wrong 0%   'Korkma. Evim sağlam. Benimle kal!'   heard: 'Korkma evim sağlam benimle kal'
+   ATTENTION wolf   utmos 1.59 words wrong 12%   'Küçük domuzlar, küçük domuzlar, kapıyı açın, içeri gireyim!'   heard: 'Küçük domuzlar, küçük domuzlar kapıya açın içeri gireyim.'
+   ATTENTION pig2   utmos 2.36 words wrong 0%   'Olmaz, olmaz! Sakallarımızın teline yemin olsun, açmayız!'   heard: 'Olmaz, olmaz. Sakallarımızın teline yemin olsun açmayız.'
+   ATTENTION wolf   utmos 1.90 words wrong 14%   'O zaman üfleyeceğim, püfleyeceğim ve evini yıkacağım!'   heard: 'O zaman üfleyeceğim, küfleyeceğim ve evini yıkacağım.'
+   ATTENTION pig2   utmos 2.20 words wrong 0%   'Çabuk! Kardeşimizin tuğla evine koşalım!'   heard: 'Çabuk kardeşimizin tuğla evine koşalım.'
+   ATTENTION pig3   utmos 2.95 words wrong 25%   'Girin, girin! Çabuk olun!'   heard: 'A girin girin, çabuk olun.'
+   ATTENTION wolf   utmos 1.59 words wrong 12%   'Küçük domuzlar, küçük domuzlar, kapıyı açın, içeri gireyim!'   heard: 'Küçük domuzlar, küçük domuzlar kapıya açın içeri gireyim.'
+   ATTENTION pig3   utmos 2.56 words wrong 0%   'Olmaz, olmaz! Sakallarımızın teline yemin olsun, açmayız!'   heard: 'Olmaz, olmaz. Sakallarımızın teline yemin olsun, açmayız.'
+   ATTENTION wolf   utmos 1.90 words wrong 14%   'O zaman üfleyeceğim, püfleyeceğim ve evini yıkacağım!'   heard: 'O zaman üfleyeceğim, küfleyeceğim ve evini yıkacağım.'
+   ATTENTION nar    utmos 4.19 words wrong 50%   'Kurt üfledi, püfledi. Biraz daha üfledi, püfledi. Ama tuğla '   heard: 'Kurt üfledi püfle de. Biraz daha üfledi püfle de. Ama Tula e'
+   ATTENTION wolf   utmos 1.81 words wrong 18%   'Ah! Çok yoruldum. Ama yeni bir planım var. Bacadan aşağı ine'   heard: 'Çok yoruldum ama yeni bir planım var. Bacağdan aşağı ineceği'
+   ATTENTION pig3   utmos 2.38 words wrong 17%   'Çabuk! Bacadan iniyor! Tencerenin suyunu kaynatın!'   heard: 'Eh çabuk, bacadan iniyor, tencerenin suyunu kaynatın.'
+   ATTENTION pig2   utmos 1.83 words wrong 50%   'Su sıcak, sıcak, sıcak!'   heard: "Asıl Sıcak Sıcak Sıcak'ı"
+   ATTENTION nar    utmos 4.22 words wrong 33%   'Aşağı, aşağı, aşağı... Kurt bacadan kaydı ve şlap! Tam tence'   heard: 'aşalı aşalı aşalı. Kurt bacadan kaydı ve şrap. Tam tencereni'
+   ATTENTION wolf   utmos 1.57 words wrong 33%   'Ayyy! Çok sıcak!'   heard: 'Ay çok sıcak.'
+   ATTENTION pig1   utmos 2.37 words wrong 0%   'Çok çalışmadığım için özür dilerim kardeşim!'   heard: 'Çok çalışmadığım için özür dilerim kardeşim'
+   ATTENTION pig3   utmos 2.62 words wrong 0%   'Önemli değil. Artık hepimizin sağlam, güvenli bir evi var!'   heard: 'önemli değil. Artık hepimizin sağlam güvenli bir evi var.'
+   ATTENTION pig2   utmos 2.18 words wrong 25%   'Yaşasın tuğla ev! Hadi hep birlikte turta yiyelim!'   heard: 'Yaşasın Tula evi. Hadi hep birlikte turta yiyelim.'
+   per character (tr):  lines  seconds  UTMOS  words wrong
+      mama     2    10.9   3.18     0%   voice kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-8%|-18Hz
+      nar     35   186.0   4.16    15%   voice kt:elif|tr-TR-EmelNeural|-6%|+0Hz
+      pig1     8    31.5   2.07     2%   voice kt:emre|tr-TR-AhmetNeural|+4%|+37Hz
+      pig2     7    28.9   2.13    15%   voice kt:emre|tr-TR-AhmetNeural|+4%|+25Hz
+      pig3     6    27.2   2.52    10%   voice kt:emre|tr-TR-AhmetNeural|+4%|+13Hz
+      wolf     8    33.0   1.81    15%   voice kt:emre|tr-TR-AhmetNeural|-10%|-36Hz
+---- tr  6-prod-kokoro
+  nar    9.1 s  utmos 3.89  words wrong   0%   heard: Bir varmış bir yokmuş. Küçük ve sıcacık bir evde üç yavru domuzuyla yaşayan bir anne domuz varmış.
+  mama   4.6 s  utmos 3.58  words wrong   0%   heard: Benim tatlı yavrularım kendi evlerinizi yapma zamanı geldi.
+  pig1   4.2 s  utmos 2.16  words wrong   0%   heard: Merak etme anne, ben evimi çok çabuk yapacağım.
+  nar    6.0 s  utmos 4.24  words wrong   0%   heard: Küçük domuzlar annelerine sarıldılar ve güneşli yolda yürümeye başladılar.
+  wolf   3.4 s  utmos 2.20  words wrong   0%   heard: Küçük domuz, küçük domuz kapıyı aç içeri gireyim.
+  pig1   4.9 s  utmos 2.39  words wrong  14%   heard: Olmaz, olmaz. Sakalımın terine yemin olsun açmam.
+  wolf   3.8 s  utmos 1.90  words wrong  14%   heard: O zaman üfleyeceğim, küfleyeceğim ve evini yıkacağım.
+  nar    6.1 s  utmos 4.32  words wrong  36%   heard: Kort büyük derin bir nefe saldı. Üfledi, püflediye ve evi yıktı.
+  pig3   5.2 s  utmos 2.38  words wrong  17%   heard: Eh çabuk, bacadan iniyor, tencerenin suyunu kaynatın.
+  nar    2.7 s  utmos 4.09  words wrong   0%   heard: ve hepsi mutlu mutlu yaşadılar.
+wrote tr-6-prod-kokoro 54.5 s
+==================== SUMMARY (UTMOS higher is better; words wrong lower is better; RTF = seconds of work per second of speech)
+  en  4-prod-kokoro  UTMOS 3.84   words wrong   0%   RTF 0.37   (10 lines)
+  tr  4-kokoro-tr    UTMOS 4.27   words wrong   9%   RTF 0.36   (10 lines)
+  tr  5-kokoro-tr-shift UTMOS 3.39   words wrong  10%   RTF 0.25   (10 lines)
+  tr  6-prod-kokoro  UTMOS 3.12   words wrong   8%   RTF 0.30   (10 lines)

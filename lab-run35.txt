@@ -1,0 +1,1176 @@
+==================== main 19:23:56
+python 3.12.16 Linux-7.0.0-1020-azure-x86_64-with-glibc2.43 cpus 4
+   numpy 2.5.5
+   scipy 1.18.1
+   torch 2.15.0+cpu
+   torchaudio 2.11.1+cpu
+   kokoro 0.9.4
+   misaki 0.9.4
+   faster_whisper 1.2.1
+   edge_tts 7.3.1
+edge-tts: 318 voices; Turkish: ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural']
+   en-AU-WilliamMultilingualNeural              en-AU  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   en-US-AndrewMultilingualNeural               en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Warm', 'Confident', 'Authentic', 'Honest']}
+   en-US-AvaMultilingualNeural                  en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Expressive', 'Caring', 'Pleasant', 'Friendly']}
+   en-US-BrianMultilingualNeural                en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Approachable', 'Casual', 'Sincere']}
+   en-US-EmmaMultilingualNeural                 en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Cheerful', 'Clear', 'Conversational']}
+   fr-FR-VivienneMultilingualNeural             fr-FR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   fr-FR-RemyMultilingualNeural                 fr-FR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   it-IT-GiuseppeMultilingualNeural             it-IT  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   ko-KR-HyunsuMultilingualNeural               ko-KR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   pt-BR-ThalitaMultilingualNeural              pt-BR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+GOOGLE voices tr-TR: 30 Chirp3-HD: Achernar Achird Algenib Algieba Alnilam Aoede Autonoe Callirrhoe Charon Despina Enceladus Erinome Fenrir Gacrux Iapetus Kore Laomedeia Leda Orus Puck Pulcherrima Rasalgethi Sadachbia Sadaltager Schedar Sulafat Umbriel Vindemiatrix Zephyr Zubenelgenubi
+GOOGLE voices en-US: 30 Chirp3-HD: Achernar Achird Algenib Algieba Alnilam Aoede Autonoe Callirrhoe Charon Despina Enceladus Erinome Fenrir Gacrux Iapetus Kore Laomedeia Leda Orus Puck Pulcherrima Rasalgethi Sadachbia Sadaltager Schedar Sulafat Umbriel Vindemiatrix Zephyr Zubenelgenubi
+GOOGLE voices en-GB: 30 Chirp3-HD: Achernar Achird Algenib Algieba Alnilam Aoede Autonoe Callirrhoe Charon Despina Enceladus Erinome Fenrir Gacrux Iapetus Kore Laomedeia Leda Orus Puck Pulcherrima Rasalgethi Sadachbia Sadaltager Schedar Sulafat Umbriel Vindemiatrix Zephyr Zubenelgenubi
+GOOGLE first clip made: 3.3 s
+---- google narrators en: GNARR language voice kind F0 UTMOS WER seconds
+GNARR en Achernar       tale   F0   214 UTMOS 4.49 WER   0% SEC 11.0
+GNARR en Achernar       lesson F0   270 UTMOS 4.32 WER   0% SEC 7.3
+GALLERY en 1 = Achernar
+GNARR en Aoede          tale   F0   177 UTMOS 4.51 WER   0% SEC 11.2
+GNARR en Aoede          lesson F0   226 UTMOS 4.50 WER   0% SEC 8.1
+GALLERY en 2 = Aoede
+GNARR en Autonoe        tale   F0   187 UTMOS 4.42 WER   0% SEC 10.0
+GNARR en Autonoe        lesson F0   293 UTMOS 4.25 WER   0% SEC 10.8
+GALLERY en 3 = Autonoe
+GNARR en Callirrhoe     tale   F0   181 UTMOS 4.40 WER   0% SEC 11.1
+GNARR en Callirrhoe     lesson F0   220 UTMOS 4.39 WER   0% SEC 8.9
+GALLERY en 4 = Callirrhoe
+GNARR en Despina        tale   F0   227 UTMOS 4.45 WER   0% SEC 11.2
+GNARR en Despina        lesson F0   245 UTMOS 4.09 WER   0% SEC 8.9
+GALLERY en 5 = Despina
+GNARR en Erinome        tale   F0   230 UTMOS 4.49 WER   0% SEC 11.4
+GNARR en Erinome        lesson F0   294 UTMOS 3.93 WER   0% SEC 9.1
+GALLERY en 6 = Erinome
+GNARR en Gacrux         tale   F0   151 UTMOS 4.47 WER   0% SEC 13.4
+GNARR en Gacrux         lesson F0   192 UTMOS 4.47 WER   0% SEC 7.9
+GALLERY en 7 = Gacrux
+GNARR en Kore           tale   F0   219 UTMOS 4.50 WER   0% SEC 12.3
+GNARR en Kore           lesson F0   259 UTMOS 4.46 WER   0% SEC 8.2
+GALLERY en 8 = Kore
+GNARR en Laomedeia      tale   F0   173 UTMOS 4.49 WER   0% SEC 11.0
+GNARR en Laomedeia      lesson F0   255 UTMOS 4.33 WER   0% SEC 10.4
+GALLERY en 9 = Laomedeia
+GNARR en Leda           tale   F0   220 UTMOS 4.52 WER   0% SEC 13.8
+GNARR en Leda           lesson F0   218 UTMOS 4.42 WER   0% SEC 8.6
+GALLERY en 10 = Leda
+GNARR en Pulcherrima    tale   F0   149 UTMOS 4.47 WER   0% SEC 12.1
+GNARR en Pulcherrima    lesson F0   154 UTMOS 4.46 WER   0% SEC 8.3
+GALLERY en 11 = Pulcherrima
+GNARR en Sulafat        tale   F0   253 UTMOS 4.51 WER   0% SEC 15.0
+GNARR en Sulafat        lesson F0   278 UTMOS 4.31 WER   0% SEC 11.4
+GALLERY en 12 = Sulafat
+GNARR en Vindemiatrix   tale   F0   181 UTMOS 4.48 WER   0% SEC 11.6
+GNARR en Vindemiatrix   lesson F0   230 UTMOS 4.44 WER   0% SEC 9.8
+GALLERY en 13 = Vindemiatrix
+GNARR en Zephyr         tale   F0   180 UTMOS 4.44 WER   0% SEC 10.2
+GNARR en Zephyr         lesson F0   303 UTMOS 4.40 WER   0% SEC 8.4
+GALLERY en 14 = Zephyr
+GNARR en Achird         tale   F0   132 UTMOS 4.41 WER   0% SEC 11.2
+GNARR en Achird         lesson F0   160 UTMOS 4.41 WER   0% SEC 7.4
+GALLERY en 15 = Achird
+GNARR en Charon         tale   F0   123 UTMOS 4.28 WER   0% SEC 11.0
+GNARR en Charon         lesson F0   163 UTMOS 4.32 WER   0% SEC 6.7
+GALLERY en 16 = Charon
+GNARR en Sadaltager     tale   F0   120 UTMOS 4.53 WER   0% SEC 11.9
+GNARR en Sadaltager     lesson F0   193 UTMOS 4.41 WER   0% SEC 10.1
+GALLERY en 17 = Sadaltager
+GNARR en Rasalgethi     tale   F0   143 UTMOS 4.50 WER   0% SEC 11.5
+GNARR en Rasalgethi     lesson F0   160 UTMOS 4.46 WER   0% SEC 6.8
+GALLERY en 18 = Rasalgethi
+wrote gnarr-en 413.9 s
+---- google narrators tr: GNARR language voice kind F0 UTMOS WER seconds
+GNARR tr Achernar       tale   F0   227 UTMOS 4.31 WER   4% SEC 12.1
+GNARR tr Achernar       lesson F0   298 UTMOS 3.36 WER   0% SEC 8.1
+GALLERY tr 1 = Achernar
+GNARR tr Aoede          tale   F0   189 UTMOS 3.86 WER  16% SEC 12.9
+GNARR tr Aoede          lesson F0   270 UTMOS 3.15 WER   0% SEC 9.6
+GALLERY tr 2 = Aoede
+GNARR tr Autonoe        tale   F0   211 UTMOS 4.23 WER   8% SEC 12.5
+GNARR tr Autonoe        lesson F0   269 UTMOS 3.34 WER   0% SEC 10.1
+GALLERY tr 3 = Autonoe
+GNARR tr Callirrhoe     tale   F0   188 UTMOS 4.18 WER   4% SEC 11.8
+GNARR tr Callirrhoe     lesson F0   241 UTMOS 4.15 WER   0% SEC 8.1
+GALLERY tr 4 = Callirrhoe
+GNARR tr Despina        tale   F0   222 UTMOS 3.88 WER   8% SEC 13.2
+GNARR tr Despina        lesson F0   284 UTMOS 3.54 WER   0% SEC 8.6
+GALLERY tr 5 = Despina
+GNARR tr Erinome        tale   F0   221 UTMOS 4.25 WER  16% SEC 12.7
+GNARR tr Erinome        lesson F0   302 UTMOS 3.80 WER   0% SEC 9.2
+GALLERY tr 6 = Erinome
+GNARR tr Gacrux         tale   F0   139 UTMOS 4.10 WER   4% SEC 12.1
+GNARR tr Gacrux         lesson F0   183 UTMOS 3.83 WER   0% SEC 8.5
+GALLERY tr 7 = Gacrux
+GNARR tr Kore           tale   F0   185 UTMOS 4.21 WER   4% SEC 11.9
+GNARR tr Kore           lesson F0   253 UTMOS 4.06 WER   0% SEC 8.0
+GALLERY tr 8 = Kore
+GNARR tr Laomedeia      tale   F0   183 UTMOS 4.22 WER   4% SEC 12.5
+GNARR tr Laomedeia      lesson F0   328 UTMOS 3.79 WER   0% SEC 8.5
+GALLERY tr 9 = Laomedeia
+GNARR tr Leda           tale   F0   255 UTMOS 4.24 WER  12% SEC 11.8
+GNARR tr Leda           lesson F0   280 UTMOS 4.01 WER   0% SEC 7.9
+GALLERY tr 10 = Leda
+GNARR tr Pulcherrima    tale   F0   117 UTMOS 3.87 WER  12% SEC 12.2
+GNARR tr Pulcherrima    lesson F0   142 UTMOS 3.66 WER   0% SEC 8.1
+GALLERY tr 11 = Pulcherrima
+GNARR tr Sulafat        tale   F0   209 UTMOS 4.32 WER  12% SEC 12.8
+GNARR tr Sulafat        lesson F0   290 UTMOS 3.21 WER   0% SEC 8.1
+GALLERY tr 12 = Sulafat
+GNARR tr Vindemiatrix   tale   F0   201 UTMOS 3.91 WER  16% SEC 12.6
+GNARR tr Vindemiatrix   lesson F0   267 UTMOS 3.33 WER   0% SEC 8.5
+GALLERY tr 13 = Vindemiatrix
+GNARR tr Zephyr         tale   F0   172 UTMOS 4.17 WER   4% SEC 12.5
+GNARR tr Zephyr         lesson F0   240 UTMOS 3.55 WER   0% SEC 9.7
+GALLERY tr 14 = Zephyr
+GNARR tr Achird         tale   F0   131 UTMOS 4.08 WER  12% SEC 12.0
+GNARR tr Achird         lesson F0   166 UTMOS 3.96 WER   0% SEC 8.0
+GALLERY tr 15 = Achird
+GNARR tr Charon         tale   F0   131 UTMOS 3.66 WER  16% SEC 11.9
+GNARR tr Charon         lesson F0   141 UTMOS 3.59 WER   0% SEC 8.3
+GALLERY tr 16 = Charon
+GNARR tr Sadaltager     tale   F0   135 UTMOS 4.07 WER  20% SEC 12.3
+GNARR tr Sadaltager     lesson F0   156 UTMOS 3.94 WER   0% SEC 8.3
+GALLERY tr 17 = Sadaltager
+GNARR tr Rasalgethi     tale   F0   129 UTMOS 4.18 WER  12% SEC 12.3
+GNARR tr Rasalgethi     lesson F0   154 UTMOS 3.53 WER   0% SEC 7.6
+GALLERY tr 18 = Rasalgethi
+wrote gnarr-tr 423.5 s
+   [gtts] 56 of 56 clips made (134 s of speech, 11525 characters sent so far in this run) in 23 s; 0 item(s) go to the other voices
+---- gallery en-google: GAL language tale character type F0 UTMOS WER voice
+GAL en-google three-little-pigs    mama     woman       F0   204 UTMOS 4.52 WER   0%  g:en:Erinome|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en-google three-little-pigs    pig1     pig         F0   179 UTMOS 4.08 WER   0%  g:en:Zubenelgenubi|en-US-RogerNeural|+2%|+27Hz
+GAL en-google three-little-pigs    pig2     pig         F0   189 UTMOS 4.24 WER   0%  g:en:Fenrir|en-US-RogerNeural|+2%|+15Hz
+GAL en-google three-little-pigs    pig3     pig         F0   184 UTMOS 4.26 WER   0%  g:en:Schedar|en-US-RogerNeural|+2%|+3Hz
+GAL en-google three-little-pigs    wolf     wolf        F0    97 UTMOS 3.91 WER   0%  g:en:Algieba|en-US-ChristopherNeural|-10%|-28Hz
+GAL en-google goldilocks           gold     girl        F0   284 UTMOS 4.02 WER   0%  g:en:Leda|en-US-AnaNeural|-2%|+10Hz
+GAL en-google goldilocks           papa     bear        F0   115 UTMOS 4.33 WER   0%  g:en:Charon|en-US-EricNeural|-12%|-15Hz
+GAL en-google goldilocks           mama     mamabear    F0   190 UTMOS 4.40 WER   0%  g:en:Kore|en-GB-SoniaNeural|-8%|-22Hz
+GAL en-google goldilocks           baby     baby        F0   205 UTMOS 3.23 WER   0%  g:en:Laomedeia|en-GB-MaisieNeural|+0%|+20Hz
+GAL en-google red-riding-hood      red      girl        F0   284 UTMOS 4.02 WER   0%  g:en:Leda|en-US-AnaNeural|-2%|+10Hz
+GAL en-google red-riding-hood      mama     woman       F0   204 UTMOS 4.52 WER   0%  g:en:Erinome|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en-google red-riding-hood      granny   granny      F0   157 UTMOS 4.37 WER   0%  g:en:Gacrux|en-IE-EmilyNeural|-14%|-18Hz
+GAL en-google red-riding-hood      wolf     wolf        F0    97 UTMOS 3.91 WER   0%  g:en:Algieba|en-US-ChristopherNeural|-10%|-28Hz
+GAL en-google red-riding-hood      wolfg    fakegranny  F0   135 UTMOS 4.46 WER   0%  g:en:Algenib|en-US-AndrewNeural|-8%|+45Hz
+GAL en-google red-riding-hood      wood     man         F0   147 UTMOS 4.36 WER   0%  g:en:Orus|en-US-BrianMultilingualNeural|-6%|+0Hz
+GAL en-google cinderella           cin      teen        F0   190 UTMOS 3.65 WER   0%  g:en:Autonoe|en-GB-LibbyNeural|-2%|+22Hz
+GAL en-google cinderella           cing     teen        F0   190 UTMOS 3.65 WER   0%  g:en:Autonoe|en-GB-LibbyNeural|-2%|+22Hz
+GAL en-google cinderella           sm       stepmother  F0   248 UTMOS 4.07 WER   0%  g:en:Kore|en-US-AvaMultilingualNeural|-12%|-20Hz
+GAL en-google cinderella           s1       stepsister  F0   232 UTMOS 4.47 WER   0%  g:en:Despina|en-CA-ClaraNeural|+6%|+28Hz
+GAL en-google cinderella           s2       stepsister  F0   284 UTMOS 4.44 WER   0%  g:en:Callirrhoe|en-CA-ClaraNeural|+6%|+20Hz
+GAL en-google cinderella           fg       fairy       F0   196 UTMOS 4.36 WER   0%  g:en:Aoede|en-NZ-MollyNeural|-8%|+30Hz
+GAL en-google cinderella           pr       prince      F0   205 UTMOS 4.40 WER   0%  g:en-GB:Achird|en-GB-ThomasNeural|+0%|+10Hz
+GAL en-google magic-porridge-pot   kid      girl        F0   284 UTMOS 4.02 WER   0%  g:en:Leda|en-US-AnaNeural|-2%|+10Hz
+GAL en-google magic-porridge-pot   mama     woman       F0   204 UTMOS 4.52 WER   0%  g:en:Erinome|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en-google magic-porridge-pot   old      granny      F0   157 UTMOS 4.37 WER   0%  g:en:Gacrux|en-IE-EmilyNeural|-14%|-18Hz
+GAL en-google magic-porridge-pot   gpa      grandpa     F0   144 UTMOS 4.24 WER   0%  g:en:Umbriel|en-US-AndrewMultilingualNeural|-14%|-12Hz
+GAL en-google magic-porridge-pot   gma      granny      F0   169 UTMOS 4.33 WER   0%  g:en:Vindemiatrix|en-IE-EmilyNeural|-14%|-26Hz
+GAL en-google magic-porridge-pot   nei      girl        F0   290 UTMOS 3.23 WER   0%  g:en:Zephyr|en-US-AnaNeural|-2%|+19Hz
+GAL en-google gingerbread-man      gm       boy         F0   201 UTMOS 4.03 WER   0%  g:en:Sadachbia|en-GB-MaisieNeural|+4%|-26Hz
+GAL en-google gingerbread-man      woman    granny      F0   157 UTMOS 4.37 WER   0%  g:en:Gacrux|en-IE-EmilyNeural|-14%|-18Hz
+GAL en-google gingerbread-man      man      grandpa     F0   144 UTMOS 4.24 WER   0%  g:en:Umbriel|en-US-AndrewMultilingualNeural|-14%|-12Hz
+GAL en-google gingerbread-man      pig      pig         F0   189 UTMOS 4.24 WER   0%  g:en:Fenrir|en-US-RogerNeural|+2%|+15Hz
+GAL en-google gingerbread-man      bear     bear        F0   115 UTMOS 4.33 WER   0%  g:en:Charon|en-US-EricNeural|-12%|-15Hz
+GAL en-google gingerbread-man      fox      fox         F0   127 UTMOS 4.22 WER   0%  g:en:Zubenelgenubi|en-GB-RyanNeural|-4%|-30Hz
+SIM en-google three-little-pigs    mama     (woman) ~ pig1     (pig) cos 0.21
+SIM en-google three-little-pigs    mama     (woman) ~ pig2     (pig) cos 0.07
+SIM en-google three-little-pigs    mama     (woman) ~ pig3     (pig) cos 0.13
+SIM en-google three-little-pigs    mama     (woman) ~ wolf     (wolf) cos 0.09
+SIM en-google three-little-pigs    pig1     (pig) ~ pig2     (pig) cos 0.06
+SIM en-google three-little-pigs    pig1     (pig) ~ pig3     (pig) cos 0.19
+SIM en-google three-little-pigs    pig1     (pig) ~ wolf     (wolf) cos 0.12
+SIM en-google three-little-pigs    pig2     (pig) ~ pig3     (pig) cos 0.37
+SIM en-google three-little-pigs    pig2     (pig) ~ wolf     (wolf) cos 0.14
+SIM en-google three-little-pigs    pig3     (pig) ~ wolf     (wolf) cos 0.15
+SIM en-google goldilocks           gold     (girl) ~ papa     (bear) cos 0.09
+SIM en-google goldilocks           gold     (girl) ~ mama     (mamabear) cos 0.09
+SIM en-google goldilocks           gold     (girl) ~ baby     (baby) cos 0.49
+SIM en-google goldilocks           papa     (bear) ~ mama     (mamabear) cos 0.01
+SIM en-google goldilocks           papa     (bear) ~ baby     (baby) cos -0.06
+SIM en-google goldilocks           mama     (mamabear) ~ baby     (baby) cos 0.07
+SIM en-google red-riding-hood      red      (girl) ~ mama     (woman) cos 0.12
+SIM en-google red-riding-hood      red      (girl) ~ granny   (granny) cos -0.05
+SIM en-google red-riding-hood      red      (girl) ~ wolf     (wolf) cos -0.04
+SIM en-google red-riding-hood      red      (girl) ~ wolfg    (fakegranny) cos 0.08
+SIM en-google red-riding-hood      red      (girl) ~ wood     (man) cos 0.00
+SIM en-google red-riding-hood      mama     (woman) ~ granny   (granny) cos -0.09
+SIM en-google red-riding-hood      mama     (woman) ~ wolf     (wolf) cos 0.09
+SIM en-google red-riding-hood      mama     (woman) ~ wolfg    (fakegranny) cos 0.10
+SIM en-google red-riding-hood      mama     (woman) ~ wood     (man) cos 0.01
+SIM en-google red-riding-hood      granny   (granny) ~ wolf     (wolf) cos 0.06
+SIM en-google red-riding-hood      granny   (granny) ~ wolfg    (fakegranny) cos 0.24
+SIM en-google red-riding-hood      granny   (granny) ~ wood     (man) cos 0.05
+SIM en-google red-riding-hood      wolf     (wolf) ~ wolfg    (fakegranny) cos 0.22
+SIM en-google red-riding-hood      wolf     (wolf) ~ wood     (man) cos 0.17
+SIM en-google red-riding-hood      wolfg    (fakegranny) ~ wood     (man) cos 0.11
+SIM en-google cinderella           cin      (teen) ~ cing     (teen) cos 1.00   <-- alike
+SIM en-google cinderella           cin      (teen) ~ sm       (stepmother) cos 0.15
+SIM en-google cinderella           cin      (teen) ~ s1       (stepsister) cos 0.08
+SIM en-google cinderella           cin      (teen) ~ s2       (stepsister) cos 0.12
+SIM en-google cinderella           cin      (teen) ~ fg       (fairy) cos 0.06
+SIM en-google cinderella           cin      (teen) ~ pr       (prince) cos 0.07
+SIM en-google cinderella           cing     (teen) ~ sm       (stepmother) cos 0.15
+SIM en-google cinderella           cing     (teen) ~ s1       (stepsister) cos 0.08
+SIM en-google cinderella           cing     (teen) ~ s2       (stepsister) cos 0.12
+SIM en-google cinderella           cing     (teen) ~ fg       (fairy) cos 0.06
+SIM en-google cinderella           cing     (teen) ~ pr       (prince) cos 0.07
+SIM en-google cinderella           sm       (stepmother) ~ s1       (stepsister) cos 0.11
+SIM en-google cinderella           sm       (stepmother) ~ s2       (stepsister) cos 0.10
+SIM en-google cinderella           sm       (stepmother) ~ fg       (fairy) cos 0.16
+SIM en-google cinderella           sm       (stepmother) ~ pr       (prince) cos -0.04
+SIM en-google cinderella           s1       (stepsister) ~ s2       (stepsister) cos 0.45
+SIM en-google cinderella           s1       (stepsister) ~ fg       (fairy) cos 0.01
+SIM en-google cinderella           s1       (stepsister) ~ pr       (prince) cos 0.10
+SIM en-google cinderella           s2       (stepsister) ~ fg       (fairy) cos 0.12
+SIM en-google cinderella           s2       (stepsister) ~ pr       (prince) cos 0.09
+SIM en-google cinderella           fg       (fairy) ~ pr       (prince) cos 0.00
+SIM en-google magic-porridge-pot   kid      (girl) ~ mama     (woman) cos 0.12
+SIM en-google magic-porridge-pot   kid      (girl) ~ old      (granny) cos -0.05
+SIM en-google magic-porridge-pot   kid      (girl) ~ gpa      (grandpa) cos 0.04
+SIM en-google magic-porridge-pot   kid      (girl) ~ gma      (granny) cos 0.01
+SIM en-google magic-porridge-pot   kid      (girl) ~ nei      (girl) cos 0.60   <-- alike
+SIM en-google magic-porridge-pot   mama     (woman) ~ old      (granny) cos -0.09
+SIM en-google magic-porridge-pot   mama     (woman) ~ gpa      (grandpa) cos -0.04
+SIM en-google magic-porridge-pot   mama     (woman) ~ gma      (granny) cos 0.04
+SIM en-google magic-porridge-pot   mama     (woman) ~ nei      (girl) cos 0.11
+SIM en-google magic-porridge-pot   old      (granny) ~ gpa      (grandpa) cos 0.10
+SIM en-google magic-porridge-pot   old      (granny) ~ gma      (granny) cos 0.31
+SIM en-google magic-porridge-pot   old      (granny) ~ nei      (girl) cos 0.05
+SIM en-google magic-porridge-pot   gpa      (grandpa) ~ gma      (granny) cos 0.12
+SIM en-google magic-porridge-pot   gpa      (grandpa) ~ nei      (girl) cos 0.01
+SIM en-google magic-porridge-pot   gma      (granny) ~ nei      (girl) cos 0.03
+SIM en-google gingerbread-man      gm       (boy) ~ woman    (granny) cos 0.00
+SIM en-google gingerbread-man      gm       (boy) ~ man      (grandpa) cos -0.05
+SIM en-google gingerbread-man      gm       (boy) ~ pig      (pig) cos 0.09
+SIM en-google gingerbread-man      gm       (boy) ~ bear     (bear) cos 0.03
+SIM en-google gingerbread-man      gm       (boy) ~ fox      (fox) cos 0.12
+SIM en-google gingerbread-man      woman    (granny) ~ man      (grandpa) cos 0.10
+SIM en-google gingerbread-man      woman    (granny) ~ pig      (pig) cos 0.00
+SIM en-google gingerbread-man      woman    (granny) ~ bear     (bear) cos 0.07
+SIM en-google gingerbread-man      woman    (granny) ~ fox      (fox) cos 0.08
+SIM en-google gingerbread-man      man      (grandpa) ~ pig      (pig) cos 0.06
+SIM en-google gingerbread-man      man      (grandpa) ~ bear     (bear) cos 0.18
+SIM en-google gingerbread-man      man      (grandpa) ~ fox      (fox) cos -0.16
+SIM en-google gingerbread-man      pig      (pig) ~ bear     (bear) cos 0.10
+SIM en-google gingerbread-man      pig      (pig) ~ fox      (fox) cos 0.15
+SIM en-google gingerbread-man      bear     (bear) ~ fox      (fox) cos 0.06
+SIMSUM en-google pairs at or above 0.55: 2
+GALWARN en-google three-little-pigs: mama (woman) and pig2 (pig) may sound alike: F0 204 and 189 Hz (x1.08)
+GALWARN en-google three-little-pigs: pig1 (pig) and pig2 (pig) may sound alike: F0 179 and 189 Hz (x1.05)
+GALWARN en-google three-little-pigs: pig1 (pig) and pig3 (pig) may sound alike: F0 179 and 184 Hz (x1.03)
+GALWARN en-google three-little-pigs: pig2 (pig) and pig3 (pig) may sound alike: F0 189 and 184 Hz (x1.02)
+GALWARN en-google goldilocks: mama (mamabear) and baby (baby) may sound alike: F0 190 and 205 Hz (x1.08)
+GALWARN en-google red-riding-hood: granny (granny) and wood (man) may sound alike: F0 157 and 147 Hz (x1.07)
+GALWARN en-google red-riding-hood: wolfg (fakegranny) and wood (man) may sound alike: F0 135 and 147 Hz (x1.09)
+GALWARN en-google cinderella: cin (teen) and cing (teen) may sound alike: F0 190 and 190 Hz (x1.00), the same voice
+GALWARN en-google cinderella: cin (teen) and fg (fairy) may sound alike: F0 190 and 196 Hz (x1.03)
+GALWARN en-google cinderella: cin (teen) and pr (prince) may sound alike: F0 190 and 205 Hz (x1.08)
+GALWARN en-google cinderella: cing (teen) and fg (fairy) may sound alike: F0 190 and 196 Hz (x1.03)
+GALWARN en-google cinderella: cing (teen) and pr (prince) may sound alike: F0 190 and 205 Hz (x1.08)
+GALWARN en-google cinderella: sm (stepmother) and s1 (stepsister) may sound alike: F0 248 and 232 Hz (x1.07)
+GALWARN en-google cinderella: fg (fairy) and pr (prince) may sound alike: F0 196 and 205 Hz (x1.05)
+GALWARN en-google magic-porridge-pot: kid (girl) and nei (girl) may sound alike: F0 284 and 290 Hz (x1.02)
+GALWARN en-google magic-porridge-pot: old (granny) and gpa (grandpa) may sound alike: F0 157 and 144 Hz (x1.09)
+GALWARN en-google magic-porridge-pot: old (granny) and gma (granny) may sound alike: F0 157 and 169 Hz (x1.08)
+GALWARN en-google gingerbread-man: gm (boy) and pig (pig) may sound alike: F0 201 and 189 Hz (x1.06)
+GALWARN en-google gingerbread-man: woman (granny) and man (grandpa) may sound alike: F0 157 and 144 Hz (x1.09)
+wrote gallery-en-google 205.8 s
+   [gtts] 56 of 56 clips made (139 s of speech, 13041 characters sent so far in this run) in 23 s; 0 item(s) go to the other voices
+---- gallery tr-google: GAL language tale character type F0 UTMOS WER voice
+GAL tr-google three-little-pigs    mama     woman       F0   230 UTMOS 4.39 WER   0%  g:tr:Erinome|tr-TR-EmelNeural|-8%|-18Hz
+GAL tr-google three-little-pigs    pig1     pig         F0   203 UTMOS 4.30 WER   0%  g:tr:Zubenelgenubi|tr-TR-AhmetNeural|+4%|+37Hz
+GAL tr-google three-little-pigs    pig2     pig         F0   153 UTMOS 4.02 WER   0%  g:tr:Fenrir|tr-TR-AhmetNeural|+4%|+25Hz
+GAL tr-google three-little-pigs    pig3     pig         F0   180 UTMOS 3.79 WER  20%  g:tr:Schedar|tr-TR-AhmetNeural|+4%|+13Hz
+GAL tr-google three-little-pigs    wolf     wolf        F0   125 UTMOS 3.34 WER   0%  g:tr:Algieba|tr-TR-AhmetNeural|-10%|-36Hz
+GAL tr-google goldilocks           gold     girl        F0   327 UTMOS 3.97 WER   0%  g:tr:Leda|tr-TR-EmelNeural|-2%|+55Hz
+GAL tr-google goldilocks           papa     bear        F0   137 UTMOS 3.84 WER   0%  g:tr:Charon|tr-TR-AhmetNeural|-12%|-38Hz
+GAL tr-google goldilocks           mama     mamabear    F0   223 UTMOS 4.08 WER   0%  g:tr:Kore|tr-TR-EmelNeural|-10%|-26Hz
+GAL tr-google goldilocks           baby     baby        F0   304 UTMOS 3.09 WER  20%  g:tr:Laomedeia|tr-TR-EmelNeural|+0%|+75Hz
+GAL tr-google red-riding-hood      red      girl        F0   327 UTMOS 3.97 WER   0%  g:tr:Leda|tr-TR-EmelNeural|-2%|+55Hz
+GAL tr-google red-riding-hood      mama     woman       F0   230 UTMOS 4.39 WER   0%  g:tr:Erinome|tr-TR-EmelNeural|-8%|-18Hz
+GAL tr-google red-riding-hood      granny   granny      F0   141 UTMOS 3.78 WER   0%  g:tr:Gacrux|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr-google red-riding-hood      wolf     wolf        F0   125 UTMOS 3.34 WER   0%  g:tr:Algieba|tr-TR-AhmetNeural|-10%|-36Hz
+GAL tr-google red-riding-hood      wolfg    fakegranny  F0   113 UTMOS 4.08 WER   0%  g:tr:Algenib|tr-TR-AhmetNeural|-8%|+60Hz
+GAL tr-google red-riding-hood      wood     man         F0   167 UTMOS 4.10 WER   0%  g:tr:Orus|tr-TR-AhmetNeural|-6%|-8Hz
+GAL tr-google cinderella           cin      teen        F0   200 UTMOS 4.18 WER  20%  g:tr:Autonoe|tr-TR-EmelNeural|-2%|+15Hz
+GAL tr-google cinderella           cing     teen        F0   200 UTMOS 4.18 WER  20%  g:tr:Autonoe|tr-TR-EmelNeural|-2%|+15Hz
+GAL tr-google cinderella           sm       stepmother  F0   234 UTMOS 3.99 WER   0%  g:tr:Kore|tr-TR-EmelNeural|-10%|-20Hz
+GAL tr-google cinderella           s1       stepsister  F0   321 UTMOS 2.99 WER  25%  g:tr:Despina|tr-TR-EmelNeural|+6%|+38Hz
+GAL tr-google cinderella           s2       stepsister  F0   268 UTMOS 3.79 WER   0%  g:tr:Callirrhoe|tr-TR-EmelNeural|+6%|+30Hz
+GAL tr-google cinderella           fg       fairy       F0   211 UTMOS 4.19 WER  40%  g:tr:Aoede|tr-TR-EmelNeural|-14%|+0Hz
+GAL tr-google cinderella           pr       prince      F0   154 UTMOS 3.96 WER   0%  g:tr:Achird|tr-TR-AhmetNeural|-2%|+8Hz
+GAL tr-google magic-porridge-pot   kid      girl        F0   327 UTMOS 3.97 WER   0%  g:tr:Leda|tr-TR-EmelNeural|-2%|+55Hz
+GAL tr-google magic-porridge-pot   mama     woman       F0   230 UTMOS 4.39 WER   0%  g:tr:Erinome|tr-TR-EmelNeural|-8%|-18Hz
+GAL tr-google magic-porridge-pot   old      granny      F0   141 UTMOS 3.78 WER   0%  g:tr:Gacrux|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr-google magic-porridge-pot   gpa      grandpa     F0   127 UTMOS 4.10 WER   0%  g:tr:Umbriel|tr-TR-AhmetNeural|-12%|-14Hz
+GAL tr-google magic-porridge-pot   gma      granny      F0   231 UTMOS 4.10 WER   0%  g:tr:Vindemiatrix|tr-TR-EmelNeural|-14%|-36Hz
+GAL tr-google magic-porridge-pot   nei      girl        F0   261 UTMOS 3.99 WER   0%  g:tr:Zephyr|tr-TR-EmelNeural|-2%|+64Hz
+GAL tr-google gingerbread-man      gm       boy         F0   186 UTMOS 3.70 WER   0%  g:tr:Sadachbia|tr-TR-EmelNeural|+4%|+45Hz
+GAL tr-google gingerbread-man      woman    granny      F0   141 UTMOS 3.78 WER   0%  g:tr:Gacrux|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr-google gingerbread-man      man      grandpa     F0   127 UTMOS 4.10 WER   0%  g:tr:Umbriel|tr-TR-AhmetNeural|-12%|-14Hz
+GAL tr-google gingerbread-man      pig      pig         F0   153 UTMOS 4.02 WER   0%  g:tr:Fenrir|tr-TR-AhmetNeural|+4%|+25Hz
+GAL tr-google gingerbread-man      bear     bear        F0   137 UTMOS 3.84 WER   0%  g:tr:Charon|tr-TR-AhmetNeural|-12%|-38Hz
+GAL tr-google gingerbread-man      fox      fox         F0   186 UTMOS 3.94 WER   0%  g:tr:Zubenelgenubi|tr-TR-AhmetNeural|-4%|+12Hz
+SIM tr-google three-little-pigs    mama     (woman) ~ pig1     (pig) cos 0.25
+SIM tr-google three-little-pigs    mama     (woman) ~ pig2     (pig) cos 0.06
+SIM tr-google three-little-pigs    mama     (woman) ~ pig3     (pig) cos 0.06
+SIM tr-google three-little-pigs    mama     (woman) ~ wolf     (wolf) cos 0.18
+SIM tr-google three-little-pigs    pig1     (pig) ~ pig2     (pig) cos 0.11
+SIM tr-google three-little-pigs    pig1     (pig) ~ pig3     (pig) cos 0.31
+SIM tr-google three-little-pigs    pig1     (pig) ~ wolf     (wolf) cos 0.11
+SIM tr-google three-little-pigs    pig2     (pig) ~ pig3     (pig) cos 0.46
+SIM tr-google three-little-pigs    pig2     (pig) ~ wolf     (wolf) cos 0.02
+SIM tr-google three-little-pigs    pig3     (pig) ~ wolf     (wolf) cos 0.18
+SIM tr-google goldilocks           gold     (girl) ~ papa     (bear) cos 0.08
+SIM tr-google goldilocks           gold     (girl) ~ mama     (mamabear) cos 0.15
+SIM tr-google goldilocks           gold     (girl) ~ baby     (baby) cos 0.40
+SIM tr-google goldilocks           papa     (bear) ~ mama     (mamabear) cos 0.11
+SIM tr-google goldilocks           papa     (bear) ~ baby     (baby) cos -0.00
+SIM tr-google goldilocks           mama     (mamabear) ~ baby     (baby) cos 0.04
+SIM tr-google red-riding-hood      red      (girl) ~ mama     (woman) cos 0.12
+SIM tr-google red-riding-hood      red      (girl) ~ granny   (granny) cos 0.10
+SIM tr-google red-riding-hood      red      (girl) ~ wolf     (wolf) cos 0.02
+SIM tr-google red-riding-hood      red      (girl) ~ wolfg    (fakegranny) cos 0.25
+SIM tr-google red-riding-hood      red      (girl) ~ wood     (man) cos 0.25
+SIM tr-google red-riding-hood      mama     (woman) ~ granny   (granny) cos 0.25
+SIM tr-google red-riding-hood      mama     (woman) ~ wolf     (wolf) cos 0.18
+SIM tr-google red-riding-hood      mama     (woman) ~ wolfg    (fakegranny) cos 0.25
+SIM tr-google red-riding-hood      mama     (woman) ~ wood     (man) cos 0.10
+SIM tr-google red-riding-hood      granny   (granny) ~ wolf     (wolf) cos 0.13
+SIM tr-google red-riding-hood      granny   (granny) ~ wolfg    (fakegranny) cos 0.41
+SIM tr-google red-riding-hood      granny   (granny) ~ wood     (man) cos 0.21
+SIM tr-google red-riding-hood      wolf     (wolf) ~ wolfg    (fakegranny) cos 0.09
+SIM tr-google red-riding-hood      wolf     (wolf) ~ wood     (man) cos 0.23
+SIM tr-google red-riding-hood      wolfg    (fakegranny) ~ wood     (man) cos 0.16
+SIM tr-google cinderella           cin      (teen) ~ cing     (teen) cos 1.00   <-- alike
+SIM tr-google cinderella           cin      (teen) ~ sm       (stepmother) cos 0.40
+SIM tr-google cinderella           cin      (teen) ~ s1       (stepsister) cos 0.17
+SIM tr-google cinderella           cin      (teen) ~ s2       (stepsister) cos 0.29
+SIM tr-google cinderella           cin      (teen) ~ fg       (fairy) cos 0.21
+SIM tr-google cinderella           cin      (teen) ~ pr       (prince) cos 0.25
+SIM tr-google cinderella           cing     (teen) ~ sm       (stepmother) cos 0.40
+SIM tr-google cinderella           cing     (teen) ~ s1       (stepsister) cos 0.17
+SIM tr-google cinderella           cing     (teen) ~ s2       (stepsister) cos 0.29
+SIM tr-google cinderella           cing     (teen) ~ fg       (fairy) cos 0.21
+SIM tr-google cinderella           cing     (teen) ~ pr       (prince) cos 0.25
+SIM tr-google cinderella           sm       (stepmother) ~ s1       (stepsister) cos 0.00
+SIM tr-google cinderella           sm       (stepmother) ~ s2       (stepsister) cos 0.08
+SIM tr-google cinderella           sm       (stepmother) ~ fg       (fairy) cos 0.21
+SIM tr-google cinderella           sm       (stepmother) ~ pr       (prince) cos 0.20
+SIM tr-google cinderella           s1       (stepsister) ~ s2       (stepsister) cos 0.52
+SIM tr-google cinderella           s1       (stepsister) ~ fg       (fairy) cos 0.22
+SIM tr-google cinderella           s1       (stepsister) ~ pr       (prince) cos 0.14
+SIM tr-google cinderella           s2       (stepsister) ~ fg       (fairy) cos 0.30
+SIM tr-google cinderella           s2       (stepsister) ~ pr       (prince) cos 0.17
+SIM tr-google cinderella           fg       (fairy) ~ pr       (prince) cos 0.10
+SIM tr-google magic-porridge-pot   kid      (girl) ~ mama     (woman) cos 0.12
+SIM tr-google magic-porridge-pot   kid      (girl) ~ old      (granny) cos 0.10
+SIM tr-google magic-porridge-pot   kid      (girl) ~ gpa      (grandpa) cos 0.15
+SIM tr-google magic-porridge-pot   kid      (girl) ~ gma      (granny) cos 0.17
+SIM tr-google magic-porridge-pot   kid      (girl) ~ nei      (girl) cos 0.71   <-- alike
+SIM tr-google magic-porridge-pot   mama     (woman) ~ old      (granny) cos 0.25
+SIM tr-google magic-porridge-pot   mama     (woman) ~ gpa      (grandpa) cos 0.12
+SIM tr-google magic-porridge-pot   mama     (woman) ~ gma      (granny) cos 0.15
+SIM tr-google magic-porridge-pot   mama     (woman) ~ nei      (girl) cos 0.16
+SIM tr-google magic-porridge-pot   old      (granny) ~ gpa      (grandpa) cos 0.25
+SIM tr-google magic-porridge-pot   old      (granny) ~ gma      (granny) cos 0.38
+SIM tr-google magic-porridge-pot   old      (granny) ~ nei      (girl) cos 0.12
+SIM tr-google magic-porridge-pot   gpa      (grandpa) ~ gma      (granny) cos 0.16
+SIM tr-google magic-porridge-pot   gpa      (grandpa) ~ nei      (girl) cos 0.19
+SIM tr-google magic-porridge-pot   gma      (granny) ~ nei      (girl) cos 0.12
+SIM tr-google gingerbread-man      gm       (boy) ~ woman    (granny) cos 0.24
+SIM tr-google gingerbread-man      gm       (boy) ~ man      (grandpa) cos 0.10
+SIM tr-google gingerbread-man      gm       (boy) ~ pig      (pig) cos 0.18
+SIM tr-google gingerbread-man      gm       (boy) ~ bear     (bear) cos 0.03
+SIM tr-google gingerbread-man      gm       (boy) ~ fox      (fox) cos 0.20
+SIM tr-google gingerbread-man      woman    (granny) ~ man      (grandpa) cos 0.25
+SIM tr-google gingerbread-man      woman    (granny) ~ pig      (pig) cos 0.00
+SIM tr-google gingerbread-man      woman    (granny) ~ bear     (bear) cos 0.08
+SIM tr-google gingerbread-man      woman    (granny) ~ fox      (fox) cos 0.33
+SIM tr-google gingerbread-man      man      (grandpa) ~ pig      (pig) cos 0.10
+SIM tr-google gingerbread-man      man      (grandpa) ~ bear     (bear) cos 0.16
+SIM tr-google gingerbread-man      man      (grandpa) ~ fox      (fox) cos 0.24
+SIM tr-google gingerbread-man      pig      (pig) ~ bear     (bear) cos 0.06
+SIM tr-google gingerbread-man      pig      (pig) ~ fox      (fox) cos 0.20
+SIM tr-google gingerbread-man      bear     (bear) ~ fox      (fox) cos 0.06
+SIMSUM tr-google pairs at or above 0.55: 2
+GALWARN tr-google goldilocks: gold (girl) and baby (baby) may sound alike: F0 327 and 304 Hz (x1.07)
+GALWARN tr-google cinderella: cin (teen) and cing (teen) may sound alike: F0 200 and 200 Hz (x1.00), the same voice
+GALWARN tr-google cinderella: cin (teen) and fg (fairy) may sound alike: F0 200 and 211 Hz (x1.05)
+GALWARN tr-google cinderella: cing (teen) and fg (fairy) may sound alike: F0 200 and 211 Hz (x1.05)
+GALWARN tr-google magic-porridge-pot: mama (woman) and gma (granny) may sound alike: F0 230 and 231 Hz (x1.00)
+GALWARN tr-google gingerbread-man: gm (boy) and fox (fox) may sound alike: F0 186 and 186 Hz (x1.00)
+GALWARN tr-google gingerbread-man: woman (granny) and pig (pig) may sound alike: F0 141 and 153 Hz (x1.08)
+GALWARN tr-google gingerbread-man: woman (granny) and bear (bear) may sound alike: F0 141 and 137 Hz (x1.03)
+GALWARN tr-google gingerbread-man: man (grandpa) and bear (bear) may sound alike: F0 127 and 137 Hz (x1.08)
+wrote gallery-tr-google 197.9 s
+   [gtts] 46 of 46 clips made (130 s of speech, 14500 characters sent so far in this run) in 19 s; 0 item(s) go to the other voices
+---- gallery en-google-rest: GAL language tale character type F0 UTMOS WER voice
+GAL en-google-rest tortoise-and-hare    hare     hare        F0   165 UTMOS 4.30 WER   0%  g:en:Achird|en-NZ-MitchellNeural|+8%|+25Hz
+GAL en-google-rest tortoise-and-hare    tort     tortoise    F0   141 UTMOS 3.77 WER   0%  g:en:Umbriel|en-US-SteffanNeural|-20%|-10Hz
+GAL en-google-rest tortoise-and-hare    bear     bear        F0   115 UTMOS 4.33 WER   0%  g:en:Charon|en-US-EricNeural|-12%|-15Hz
+GAL en-google-rest tortoise-and-hare    pig1     pig         F0   179 UTMOS 4.08 WER   0%  g:en:Zubenelgenubi|en-US-RogerNeural|+2%|+27Hz
+GAL en-google-rest tortoise-and-hare    pig2     pig         F0   189 UTMOS 4.24 WER   0%  g:en:Fenrir|en-US-RogerNeural|+2%|+15Hz
+GAL en-google-rest tortoise-and-hare    pig3     pig         F0   184 UTMOS 4.26 WER   0%  g:en:Schedar|en-US-RogerNeural|+2%|+3Hz
+GAL en-google-rest three-billy-goats    lit      goat_little F0   249 UTMOS 3.64 WER  22%  g:en:Sadachbia|en-GB-MaisieNeural|+4%|+5Hz
+GAL en-google-rest three-billy-goats    mid      goat_mid    F0   172 UTMOS 4.34 WER   0%  g:en:Iapetus|en-CA-LiamNeural|+0%|+10Hz
+GAL en-google-rest three-billy-goats    big      goat_big    F0   157 UTMOS 4.39 WER   0%  g:en:Alnilam|en-US-ChristopherNeural|-14%|-20Hz
+GAL en-google-rest three-billy-goats    troll    troll       F0   188 UTMOS 3.67 WER  12%  g:en:Algenib|en-ZA-LukeNeural|-16%|-35Hz
+GAL en-google-rest enormous-turnip      gpa      grandpa     F0   144 UTMOS 4.24 WER   0%  g:en:Umbriel|en-US-AndrewMultilingualNeural|-14%|-12Hz
+GAL en-google-rest enormous-turnip      gma      granny      F0   157 UTMOS 4.37 WER   0%  g:en:Gacrux|en-IE-EmilyNeural|-14%|-18Hz
+GAL en-google-rest enormous-turnip      kid      girl        F0   284 UTMOS 4.02 WER   0%  g:en:Leda|en-US-AnaNeural|-2%|+10Hz
+GAL en-google-rest enormous-turnip      pig      pig         F0   189 UTMOS 4.24 WER   0%  g:en:Fenrir|en-US-RogerNeural|+2%|+15Hz
+GAL en-google-rest enormous-turnip      hare     hare        F0   165 UTMOS 4.30 WER   0%  g:en:Achird|en-NZ-MitchellNeural|+8%|+25Hz
+GAL en-google-rest enormous-turnip      bear     bear        F0   115 UTMOS 4.33 WER   0%  g:en:Charon|en-US-EricNeural|-12%|-15Hz
+GAL en-google-rest enormous-turnip      pip      tiny        F0   284 UTMOS 3.07 WER   0%  g:en:Zephyr|en-US-AnaNeural|+8%|+40Hz
+GAL en-google-rest stone-soup           fox      fox         F0   127 UTMOS 4.22 WER   0%  g:en:Zubenelgenubi|en-GB-RyanNeural|-4%|-30Hz
+GAL en-google-rest stone-soup           hare     hare        F0   165 UTMOS 4.30 WER   0%  g:en:Achird|en-NZ-MitchellNeural|+8%|+25Hz
+GAL en-google-rest stone-soup           pig      pig         F0   189 UTMOS 4.24 WER   0%  g:en:Fenrir|en-US-RogerNeural|+2%|+15Hz
+GAL en-google-rest stone-soup           goat     goat_mid    F0   172 UTMOS 4.34 WER   0%  g:en:Iapetus|en-CA-LiamNeural|+0%|+10Hz
+GAL en-google-rest stone-soup           gma      granny      F0   157 UTMOS 4.37 WER   0%  g:en:Gacrux|en-IE-EmilyNeural|-14%|-18Hz
+GAL en-google-rest stone-soup           kid      girl        F0   284 UTMOS 4.02 WER   0%  g:en:Leda|en-US-AnaNeural|-2%|+10Hz
+GAL en-google-rest snow-white           snow     teen        F0   190 UTMOS 3.65 WER   0%  g:en:Autonoe|en-GB-LibbyNeural|-2%|+22Hz
+GAL en-google-rest snow-white           queen    queen       F0   143 UTMOS 4.45 WER   0%  g:en-GB:Pulcherrima|en-GB-SoniaNeural|-10%|-15Hz
+GAL en-google-rest snow-white           mir      mirror      F0   141 UTMOS 4.18 WER   0%  g:en:Charon|en-AU-WilliamMultilingualNeural|-18%|-8Hz
+GAL en-google-rest snow-white           dw       dwarf       F0   171 UTMOS 4.27 WER   0%  g:en:Sadaltager|en-US-RogerNeural|+6%|-8Hz
+GAL en-google-rest snow-white           old      witch       F0   157 UTMOS 4.15 WER   0%  g:en:Gacrux|en-IE-EmilyNeural|-14%|-30Hz
+GAL en-google-rest snow-white           pr       prince      F0   205 UTMOS 4.40 WER   0%  g:en-GB:Achird|en-GB-ThomasNeural|+0%|+10Hz
+GAL en-google-rest elves-and-shoemaker  shoe     man         F0   147 UTMOS 4.36 WER   0%  g:en:Orus|en-US-BrianMultilingualNeural|-6%|+0Hz
+GAL en-google-rest elves-and-shoemaker  wife     woman       F0   204 UTMOS 4.52 WER   0%  g:en:Erinome|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en-google-rest elves-and-shoemaker  lady     teen        F0   190 UTMOS 3.65 WER   0%  g:en:Autonoe|en-GB-LibbyNeural|-2%|+22Hz
+GAL en-google-rest elves-and-shoemaker  lord     lord        F0   177 UTMOS 4.38 WER   0%  g:en-GB:Rasalgethi|en-US-EricNeural|-8%|-6Hz
+GAL en-google-rest elves-and-shoemaker  e1       elf         F0   185 UTMOS 3.99 WER   0%  g:en:Puck|en-NZ-MitchellNeural|+10%|+25Hz
+GAL en-google-rest elves-and-shoemaker  e2       elfgirl     F0   234 UTMOS 3.34 WER  14%  g:en:Leda|en-GB-MaisieNeural|+10%|+18Hz
+GAL en-google-rest princess-and-pea     prince   prince      F0   205 UTMOS 4.40 WER   0%  g:en-GB:Achird|en-GB-ThomasNeural|+0%|+10Hz
+GAL en-google-rest princess-and-pea     king     king        F0   223 UTMOS 4.43 WER   0%  g:en-GB:Alnilam|en-US-ChristopherNeural|-14%|-25Hz
+GAL en-google-rest princess-and-pea     queen    woman       F0   204 UTMOS 4.52 WER   0%  g:en:Erinome|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en-google-rest princess-and-pea     prn      teen        F0   190 UTMOS 3.65 WER   0%  g:en:Autonoe|en-GB-LibbyNeural|-2%|+22Hz
+GAL en-google-rest little-red-hen       hen      hen         F0   270 UTMOS 3.61 WER   0%  g:en:Callirrhoe|en-AU-NatashaNeural|+4%|+15Hz
+GAL en-google-rest little-red-hen       pig      pig         F0   189 UTMOS 4.24 WER   0%  g:en:Fenrir|en-US-RogerNeural|+2%|+15Hz
+GAL en-google-rest little-red-hen       goat     goat_mid    F0   172 UTMOS 4.34 WER   0%  g:en:Iapetus|en-CA-LiamNeural|+0%|+10Hz
+GAL en-google-rest little-red-hen       hare     hare        F0   165 UTMOS 4.30 WER   0%  g:en:Achird|en-NZ-MitchellNeural|+8%|+25Hz
+GAL en-google-rest lion-and-mouse       lion     lion        F0   144 UTMOS 4.38 WER   0%  g:en:Orus|en-US-ChristopherNeural|-12%|-38Hz
+GAL en-google-rest lion-and-mouse       mouse    tiny        F0   284 UTMOS 3.07 WER   0%  g:en:Zephyr|en-US-AnaNeural|+8%|+40Hz
+GAL en-google-rest lion-and-mouse       fox      fox         F0   127 UTMOS 4.22 WER   0%  g:en:Zubenelgenubi|en-GB-RyanNeural|-4%|-30Hz
+GAL en-google-rest lion-and-mouse       hare     hare        F0   165 UTMOS 4.30 WER   0%  g:en:Achird|en-NZ-MitchellNeural|+8%|+25Hz
+GAL en-google-rest lion-and-mouse       bear     bear        F0   115 UTMOS 4.33 WER   0%  g:en:Charon|en-US-EricNeural|-12%|-15Hz
+GAL en-google-rest boy-who-cried-wolf   boy      boy         F0   194 UTMOS 3.89 WER   0%  g:en:Puck|en-GB-MaisieNeural|+4%|-35Hz
+GAL en-google-rest boy-who-cried-wolf   farmer   grandpa     F0   144 UTMOS 4.24 WER   0%  g:en:Umbriel|en-US-AndrewMultilingualNeural|-14%|-12Hz
+GAL en-google-rest boy-who-cried-wolf   granny   granny      F0   157 UTMOS 4.37 WER   0%  g:en:Gacrux|en-IE-EmilyNeural|-14%|-18Hz
+GAL en-google-rest boy-who-cried-wolf   mum      woman       F0   204 UTMOS 4.52 WER   0%  g:en:Erinome|en-US-AvaMultilingualNeural|-4%|+12Hz
+SIM en-google-rest tortoise-and-hare    hare     (hare) ~ tort     (tortoise) cos -0.05
+SIM en-google-rest tortoise-and-hare    hare     (hare) ~ bear     (bear) cos -0.03
+SIM en-google-rest tortoise-and-hare    hare     (hare) ~ pig1     (pig) cos 0.20
+SIM en-google-rest tortoise-and-hare    hare     (hare) ~ pig2     (pig) cos 0.34
+SIM en-google-rest tortoise-and-hare    hare     (hare) ~ pig3     (pig) cos 0.38
+SIM en-google-rest tortoise-and-hare    tort     (tortoise) ~ bear     (bear) cos 0.08
+SIM en-google-rest tortoise-and-hare    tort     (tortoise) ~ pig1     (pig) cos 0.09
+SIM en-google-rest tortoise-and-hare    tort     (tortoise) ~ pig2     (pig) cos 0.19
+SIM en-google-rest tortoise-and-hare    tort     (tortoise) ~ pig3     (pig) cos 0.09
+SIM en-google-rest tortoise-and-hare    bear     (bear) ~ pig1     (pig) cos 0.14
+SIM en-google-rest tortoise-and-hare    bear     (bear) ~ pig2     (pig) cos 0.10
+SIM en-google-rest tortoise-and-hare    bear     (bear) ~ pig3     (pig) cos -0.03
+SIM en-google-rest tortoise-and-hare    pig1     (pig) ~ pig2     (pig) cos 0.06
+SIM en-google-rest tortoise-and-hare    pig1     (pig) ~ pig3     (pig) cos 0.19
+SIM en-google-rest tortoise-and-hare    pig2     (pig) ~ pig3     (pig) cos 0.37
+SIM en-google-rest three-billy-goats    lit      (goat_little) ~ mid      (goat_mid) cos 0.11
+SIM en-google-rest three-billy-goats    lit      (goat_little) ~ big      (goat_big) cos 0.03
+SIM en-google-rest three-billy-goats    lit      (goat_little) ~ troll    (troll) cos 0.11
+SIM en-google-rest three-billy-goats    mid      (goat_mid) ~ big      (goat_big) cos 0.10
+SIM en-google-rest three-billy-goats    mid      (goat_mid) ~ troll    (troll) cos 0.04
+SIM en-google-rest three-billy-goats    big      (goat_big) ~ troll    (troll) cos 0.20
+SIM en-google-rest enormous-turnip      gpa      (grandpa) ~ gma      (granny) cos 0.10
+SIM en-google-rest enormous-turnip      gpa      (grandpa) ~ kid      (girl) cos 0.04
+SIM en-google-rest enormous-turnip      gpa      (grandpa) ~ pig      (pig) cos 0.06
+SIM en-google-rest enormous-turnip      gpa      (grandpa) ~ hare     (hare) cos -0.10
+SIM en-google-rest enormous-turnip      gpa      (grandpa) ~ bear     (bear) cos 0.18
+SIM en-google-rest enormous-turnip      gpa      (grandpa) ~ pip      (tiny) cos 0.06
+SIM en-google-rest enormous-turnip      gma      (granny) ~ kid      (girl) cos -0.05
+SIM en-google-rest enormous-turnip      gma      (granny) ~ pig      (pig) cos 0.00
+SIM en-google-rest enormous-turnip      gma      (granny) ~ hare     (hare) cos 0.02
+SIM en-google-rest enormous-turnip      gma      (granny) ~ bear     (bear) cos 0.07
+SIM en-google-rest enormous-turnip      gma      (granny) ~ pip      (tiny) cos -0.03
+SIM en-google-rest enormous-turnip      kid      (girl) ~ pig      (pig) cos 0.23
+SIM en-google-rest enormous-turnip      kid      (girl) ~ hare     (hare) cos 0.31
+SIM en-google-rest enormous-turnip      kid      (girl) ~ bear     (bear) cos 0.09
+SIM en-google-rest enormous-turnip      kid      (girl) ~ pip      (tiny) cos 0.52
+SIM en-google-rest enormous-turnip      pig      (pig) ~ hare     (hare) cos 0.34
+SIM en-google-rest enormous-turnip      pig      (pig) ~ bear     (bear) cos 0.10
+SIM en-google-rest enormous-turnip      pig      (pig) ~ pip      (tiny) cos 0.19
+SIM en-google-rest enormous-turnip      hare     (hare) ~ bear     (bear) cos -0.03
+SIM en-google-rest enormous-turnip      hare     (hare) ~ pip      (tiny) cos 0.09
+SIM en-google-rest enormous-turnip      bear     (bear) ~ pip      (tiny) cos 0.08
+SIM en-google-rest stone-soup           fox      (fox) ~ hare     (hare) cos 0.16
+SIM en-google-rest stone-soup           fox      (fox) ~ pig      (pig) cos 0.15
+SIM en-google-rest stone-soup           fox      (fox) ~ goat     (goat_mid) cos 0.06
+SIM en-google-rest stone-soup           fox      (fox) ~ gma      (granny) cos 0.08
+SIM en-google-rest stone-soup           fox      (fox) ~ kid      (girl) cos -0.02
+SIM en-google-rest stone-soup           hare     (hare) ~ pig      (pig) cos 0.34
+SIM en-google-rest stone-soup           hare     (hare) ~ goat     (goat_mid) cos 0.02
+SIM en-google-rest stone-soup           hare     (hare) ~ gma      (granny) cos 0.02
+SIM en-google-rest stone-soup           hare     (hare) ~ kid      (girl) cos 0.31
+SIM en-google-rest stone-soup           pig      (pig) ~ goat     (goat_mid) cos 0.10
+SIM en-google-rest stone-soup           pig      (pig) ~ gma      (granny) cos 0.00
+SIM en-google-rest stone-soup           pig      (pig) ~ kid      (girl) cos 0.23
+SIM en-google-rest stone-soup           goat     (goat_mid) ~ gma      (granny) cos 0.12
+SIM en-google-rest stone-soup           goat     (goat_mid) ~ kid      (girl) cos -0.10
+SIM en-google-rest stone-soup           gma      (granny) ~ kid      (girl) cos -0.05
+SIM en-google-rest snow-white           snow     (teen) ~ queen    (queen) cos 0.04
+SIM en-google-rest snow-white           snow     (teen) ~ mir      (mirror) cos -0.04
+SIM en-google-rest snow-white           snow     (teen) ~ dw       (dwarf) cos 0.11
+SIM en-google-rest snow-white           snow     (teen) ~ old      (witch) cos 0.03
+SIM en-google-rest snow-white           snow     (teen) ~ pr       (prince) cos 0.07
+SIM en-google-rest snow-white           queen    (queen) ~ mir      (mirror) cos 0.13
+SIM en-google-rest snow-white           queen    (queen) ~ dw       (dwarf) cos 0.02
+SIM en-google-rest snow-white           queen    (queen) ~ old      (witch) cos 0.19
+SIM en-google-rest snow-white           queen    (queen) ~ pr       (prince) cos 0.35
+SIM en-google-rest snow-white           mir      (mirror) ~ dw       (dwarf) cos 0.08
+SIM en-google-rest snow-white           mir      (mirror) ~ old      (witch) cos 0.01
+SIM en-google-rest snow-white           mir      (mirror) ~ pr       (prince) cos 0.05
+SIM en-google-rest snow-white           dw       (dwarf) ~ old      (witch) cos 0.03
+SIM en-google-rest snow-white           dw       (dwarf) ~ pr       (prince) cos 0.18
+SIM en-google-rest snow-white           old      (witch) ~ pr       (prince) cos 0.09
+SIM en-google-rest elves-and-shoemaker  shoe     (man) ~ wife     (woman) cos 0.01
+SIM en-google-rest elves-and-shoemaker  shoe     (man) ~ lady     (teen) cos 0.04
+SIM en-google-rest elves-and-shoemaker  shoe     (man) ~ lord     (lord) cos 0.11
+SIM en-google-rest elves-and-shoemaker  shoe     (man) ~ e1       (elf) cos 0.17
+SIM en-google-rest elves-and-shoemaker  shoe     (man) ~ e2       (elfgirl) cos 0.06
+SIM en-google-rest elves-and-shoemaker  wife     (woman) ~ lady     (teen) cos 0.17
+SIM en-google-rest elves-and-shoemaker  wife     (woman) ~ lord     (lord) cos 0.11
+SIM en-google-rest elves-and-shoemaker  wife     (woman) ~ e1       (elf) cos 0.09
+SIM en-google-rest elves-and-shoemaker  wife     (woman) ~ e2       (elfgirl) cos 0.11
+SIM en-google-rest elves-and-shoemaker  lady     (teen) ~ lord     (lord) cos 0.15
+SIM en-google-rest elves-and-shoemaker  lady     (teen) ~ e1       (elf) cos 0.08
+SIM en-google-rest elves-and-shoemaker  lady     (teen) ~ e2       (elfgirl) cos 0.02
+SIM en-google-rest elves-and-shoemaker  lord     (lord) ~ e1       (elf) cos 0.14
+SIM en-google-rest elves-and-shoemaker  lord     (lord) ~ e2       (elfgirl) cos 0.12
+SIM en-google-rest elves-and-shoemaker  e1       (elf) ~ e2       (elfgirl) cos 0.47
+SIM en-google-rest princess-and-pea     prince   (prince) ~ king     (king) cos 0.34
+SIM en-google-rest princess-and-pea     prince   (prince) ~ queen    (woman) cos 0.04
+SIM en-google-rest princess-and-pea     prince   (prince) ~ prn      (teen) cos 0.07
+SIM en-google-rest princess-and-pea     king     (king) ~ queen    (woman) cos -0.01
+SIM en-google-rest princess-and-pea     king     (king) ~ prn      (teen) cos 0.06
+SIM en-google-rest princess-and-pea     queen    (woman) ~ prn      (teen) cos 0.17
+SIM en-google-rest little-red-hen       hen      (hen) ~ pig      (pig) cos 0.33
+SIM en-google-rest little-red-hen       hen      (hen) ~ goat     (goat_mid) cos -0.01
+SIM en-google-rest little-red-hen       hen      (hen) ~ hare     (hare) cos 0.21
+SIM en-google-rest little-red-hen       pig      (pig) ~ goat     (goat_mid) cos 0.10
+SIM en-google-rest little-red-hen       pig      (pig) ~ hare     (hare) cos 0.34
+SIM en-google-rest little-red-hen       goat     (goat_mid) ~ hare     (hare) cos 0.02
+SIM en-google-rest lion-and-mouse       lion     (lion) ~ mouse    (tiny) cos -0.05
+SIM en-google-rest lion-and-mouse       lion     (lion) ~ fox      (fox) cos 0.14
+SIM en-google-rest lion-and-mouse       lion     (lion) ~ hare     (hare) cos 0.06
+SIM en-google-rest lion-and-mouse       lion     (lion) ~ bear     (bear) cos 0.19
+SIM en-google-rest lion-and-mouse       mouse    (tiny) ~ fox      (fox) cos -0.10
+SIM en-google-rest lion-and-mouse       mouse    (tiny) ~ hare     (hare) cos 0.09
+SIM en-google-rest lion-and-mouse       mouse    (tiny) ~ bear     (bear) cos 0.08
+SIM en-google-rest lion-and-mouse       fox      (fox) ~ hare     (hare) cos 0.16
+SIM en-google-rest lion-and-mouse       fox      (fox) ~ bear     (bear) cos 0.06
+SIM en-google-rest lion-and-mouse       hare     (hare) ~ bear     (bear) cos -0.03
+SIM en-google-rest boy-who-cried-wolf   boy      (boy) ~ farmer   (grandpa) cos 0.02
+SIM en-google-rest boy-who-cried-wolf   boy      (boy) ~ granny   (granny) cos -0.02
+SIM en-google-rest boy-who-cried-wolf   boy      (boy) ~ mum      (woman) cos -0.08
+SIM en-google-rest boy-who-cried-wolf   farmer   (grandpa) ~ granny   (granny) cos 0.10
+SIM en-google-rest boy-who-cried-wolf   farmer   (grandpa) ~ mum      (woman) cos -0.04
+SIM en-google-rest boy-who-cried-wolf   granny   (granny) ~ mum      (woman) cos -0.09
+SIMSUM en-google-rest pairs at or above 0.55: 0
+GALWARN en-google-rest tortoise-and-hare: hare (hare) and pig1 (pig) may sound alike: F0 165 and 179 Hz (x1.08)
+GALWARN en-google-rest tortoise-and-hare: pig1 (pig) and pig2 (pig) may sound alike: F0 179 and 189 Hz (x1.05)
+GALWARN en-google-rest tortoise-and-hare: pig1 (pig) and pig3 (pig) may sound alike: F0 179 and 184 Hz (x1.03)
+GALWARN en-google-rest tortoise-and-hare: pig2 (pig) and pig3 (pig) may sound alike: F0 189 and 184 Hz (x1.02)
+GALWARN en-google-rest three-billy-goats: mid (goat_mid) and big (goat_big) may sound alike: F0 172 and 157 Hz (x1.09)
+GALWARN en-google-rest three-billy-goats: mid (goat_mid) and troll (troll) may sound alike: F0 172 and 188 Hz (x1.10)
+GALWARN en-google-rest enormous-turnip: gpa (grandpa) and gma (granny) may sound alike: F0 144 and 157 Hz (x1.09)
+GALWARN en-google-rest enormous-turnip: gma (granny) and hare (hare) may sound alike: F0 157 and 165 Hz (x1.06)
+GALWARN en-google-rest enormous-turnip: kid (girl) and pip (tiny) may sound alike: F0 284 and 284 Hz (x1.00)
+GALWARN en-google-rest stone-soup: hare (hare) and goat (goat_mid) may sound alike: F0 165 and 172 Hz (x1.04)
+GALWARN en-google-rest stone-soup: hare (hare) and gma (granny) may sound alike: F0 165 and 157 Hz (x1.06)
+GALWARN en-google-rest stone-soup: pig (pig) and goat (goat_mid) may sound alike: F0 189 and 172 Hz (x1.10)
+GALWARN en-google-rest stone-soup: goat (goat_mid) and gma (granny) may sound alike: F0 172 and 157 Hz (x1.09)
+GALWARN en-google-rest snow-white: snow (teen) and pr (prince) may sound alike: F0 190 and 205 Hz (x1.08)
+GALWARN en-google-rest snow-white: queen (queen) and mir (mirror) may sound alike: F0 143 and 141 Hz (x1.01)
+GALWARN en-google-rest snow-white: queen (queen) and old (witch) may sound alike: F0 143 and 157 Hz (x1.10)
+GALWARN en-google-rest snow-white: dw (dwarf) and old (witch) may sound alike: F0 171 and 157 Hz (x1.09)
+GALWARN en-google-rest elves-and-shoemaker: wife (woman) and lady (teen) may sound alike: F0 204 and 190 Hz (x1.08)
+GALWARN en-google-rest elves-and-shoemaker: lady (teen) and lord (lord) may sound alike: F0 190 and 177 Hz (x1.07)
+GALWARN en-google-rest elves-and-shoemaker: lady (teen) and e1 (elf) may sound alike: F0 190 and 185 Hz (x1.03)
+GALWARN en-google-rest elves-and-shoemaker: lord (lord) and e1 (elf) may sound alike: F0 177 and 185 Hz (x1.04)
+GALWARN en-google-rest princess-and-pea: prince (prince) and king (king) may sound alike: F0 205 and 223 Hz (x1.09)
+GALWARN en-google-rest princess-and-pea: prince (prince) and queen (woman) may sound alike: F0 205 and 204 Hz (x1.01)
+GALWARN en-google-rest princess-and-pea: prince (prince) and prn (teen) may sound alike: F0 205 and 190 Hz (x1.08)
+GALWARN en-google-rest princess-and-pea: king (king) and queen (woman) may sound alike: F0 223 and 204 Hz (x1.09)
+GALWARN en-google-rest princess-and-pea: queen (woman) and prn (teen) may sound alike: F0 204 and 190 Hz (x1.08)
+GALWARN en-google-rest little-red-hen: pig (pig) and goat (goat_mid) may sound alike: F0 189 and 172 Hz (x1.10)
+GALWARN en-google-rest little-red-hen: goat (goat_mid) and hare (hare) may sound alike: F0 172 and 165 Hz (x1.04)
+GALWARN en-google-rest boy-who-cried-wolf: boy (boy) and mum (woman) may sound alike: F0 194 and 204 Hz (x1.05)
+GALWARN en-google-rest boy-who-cried-wolf: farmer (grandpa) and granny (granny) may sound alike: F0 144 and 157 Hz (x1.09)
+   [gtts] 46 of 46 clips made (128 s of speech, 15968 characters sent so far in this run) in 19 s; 0 item(s) go to the other voices
+---- gallery tr-google-rest: GAL language tale character type F0 UTMOS WER voice
+GAL tr-google-rest tortoise-and-hare    hare     hare        F0   208 UTMOS 4.03 WER   0%  g:tr:Achird|tr-TR-AhmetNeural|+8%|+55Hz
+GAL tr-google-rest tortoise-and-hare    tort     tortoise    F0   129 UTMOS 4.18 WER   0%  g:tr:Umbriel|tr-TR-AhmetNeural|-20%|-14Hz
+GAL tr-google-rest tortoise-and-hare    bear     bear        F0   137 UTMOS 3.84 WER   0%  g:tr:Charon|tr-TR-AhmetNeural|-12%|-38Hz
+GAL tr-google-rest tortoise-and-hare    pig1     pig         F0   203 UTMOS 4.30 WER   0%  g:tr:Zubenelgenubi|tr-TR-AhmetNeural|+4%|+37Hz
+GAL tr-google-rest tortoise-and-hare    pig2     pig         F0   153 UTMOS 4.02 WER   0%  g:tr:Fenrir|tr-TR-AhmetNeural|+4%|+25Hz
+GAL tr-google-rest tortoise-and-hare    pig3     pig         F0   180 UTMOS 3.79 WER  20%  g:tr:Schedar|tr-TR-AhmetNeural|+4%|+13Hz
+GAL tr-google-rest three-billy-goats    lit      goat_little F0   148 UTMOS 3.44 WER  57%  g:tr:Sadachbia|tr-TR-EmelNeural|+4%|+60Hz
+GAL tr-google-rest three-billy-goats    mid      goat_mid    F0   129 UTMOS 3.99 WER   0%  g:tr:Iapetus|tr-TR-AhmetNeural|+2%|+30Hz
+GAL tr-google-rest three-billy-goats    big      goat_big    F0   149 UTMOS 4.33 WER  20%  g:tr:Alnilam|tr-TR-AhmetNeural|-10%|-36Hz
+GAL tr-google-rest three-billy-goats    troll    troll       F0   129 UTMOS 3.14 WER   0%  g:tr:Algenib|tr-TR-AhmetNeural|-16%|-42Hz
+GAL tr-google-rest enormous-turnip      gpa      grandpa     F0   127 UTMOS 4.10 WER   0%  g:tr:Umbriel|tr-TR-AhmetNeural|-12%|-14Hz
+GAL tr-google-rest enormous-turnip      gma      granny      F0   141 UTMOS 3.78 WER   0%  g:tr:Gacrux|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr-google-rest enormous-turnip      kid      girl        F0   327 UTMOS 3.97 WER   0%  g:tr:Leda|tr-TR-EmelNeural|-2%|+55Hz
+GAL tr-google-rest enormous-turnip      pig      pig         F0   153 UTMOS 4.02 WER   0%  g:tr:Fenrir|tr-TR-AhmetNeural|+4%|+25Hz
+GAL tr-google-rest enormous-turnip      hare     hare        F0   208 UTMOS 4.03 WER   0%  g:tr:Achird|tr-TR-AhmetNeural|+8%|+55Hz
+GAL tr-google-rest enormous-turnip      bear     bear        F0   137 UTMOS 3.84 WER   0%  g:tr:Charon|tr-TR-AhmetNeural|-12%|-38Hz
+GAL tr-google-rest enormous-turnip      pip      tiny        F0   282 UTMOS 3.00 WER   0%  g:tr:Zephyr|tr-TR-EmelNeural|+8%|+75Hz
+GAL tr-google-rest stone-soup           fox      fox         F0   186 UTMOS 3.94 WER   0%  g:tr:Zubenelgenubi|tr-TR-AhmetNeural|-4%|+12Hz
+GAL tr-google-rest stone-soup           hare     hare        F0   208 UTMOS 4.03 WER   0%  g:tr:Achird|tr-TR-AhmetNeural|+8%|+55Hz
+GAL tr-google-rest stone-soup           pig      pig         F0   153 UTMOS 4.02 WER   0%  g:tr:Fenrir|tr-TR-AhmetNeural|+4%|+25Hz
+GAL tr-google-rest stone-soup           goat     goat_mid    F0   129 UTMOS 3.99 WER   0%  g:tr:Iapetus|tr-TR-AhmetNeural|+2%|+30Hz
+GAL tr-google-rest stone-soup           gma      granny      F0   141 UTMOS 3.78 WER   0%  g:tr:Gacrux|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr-google-rest stone-soup           kid      girl        F0   327 UTMOS 3.97 WER   0%  g:tr:Leda|tr-TR-EmelNeural|-2%|+55Hz
+GAL tr-google-rest snow-white           snow     teen        F0   200 UTMOS 4.18 WER  20%  g:tr:Autonoe|tr-TR-EmelNeural|-2%|+15Hz
+GAL tr-google-rest snow-white           queen    queen       F0   146 UTMOS 4.15 WER  14%  g:tr:Pulcherrima|tr-TR-EmelNeural|-12%|-22Hz
+GAL tr-google-rest snow-white           mir      mirror      F0   151 UTMOS 3.57 WER   0%  g:tr:Charon|tr-TR-AhmetNeural|-16%|-10Hz
+GAL tr-google-rest snow-white           dw       dwarf       F0   172 UTMOS 3.68 WER   0%  g:tr:Sadaltager|tr-TR-AhmetNeural|+8%|+22Hz
+GAL tr-google-rest snow-white           old      witch       F0   189 UTMOS 3.49 WER  12%  g:tr:Gacrux|tr-TR-EmelNeural|-14%|-40Hz
+GAL tr-google-rest snow-white           pr       prince      F0   154 UTMOS 3.96 WER   0%  g:tr:Achird|tr-TR-AhmetNeural|-2%|+8Hz
+GAL tr-google-rest elves-and-shoemaker  shoe     man         F0   167 UTMOS 4.10 WER   0%  g:tr:Orus|tr-TR-AhmetNeural|-6%|-8Hz
+GAL tr-google-rest elves-and-shoemaker  wife     woman       F0   230 UTMOS 4.39 WER   0%  g:tr:Erinome|tr-TR-EmelNeural|-8%|-18Hz
+GAL tr-google-rest elves-and-shoemaker  lady     teen        F0   200 UTMOS 4.18 WER  20%  g:tr:Autonoe|tr-TR-EmelNeural|-2%|+15Hz
+GAL tr-google-rest elves-and-shoemaker  lord     lord        F0   159 UTMOS 3.93 WER   0%  g:tr:Rasalgethi|tr-TR-AhmetNeural|-10%|-20Hz
+GAL tr-google-rest elves-and-shoemaker  e1       elf         F0   254 UTMOS 3.72 WER   0%  g:tr:Puck|tr-TR-AhmetNeural|+10%|+50Hz
+GAL tr-google-rest elves-and-shoemaker  e2       elfgirl     F0   346 UTMOS 3.25 WER   0%  g:tr:Leda|tr-TR-EmelNeural|+10%|+55Hz
+GAL tr-google-rest princess-and-pea     prince   prince      F0   154 UTMOS 3.96 WER   0%  g:tr:Achird|tr-TR-AhmetNeural|-2%|+8Hz
+GAL tr-google-rest princess-and-pea     king     king        F0   155 UTMOS 4.30 WER   0%  g:tr:Alnilam|tr-TR-AhmetNeural|-14%|-28Hz
+GAL tr-google-rest princess-and-pea     queen    woman       F0   230 UTMOS 4.39 WER   0%  g:tr:Erinome|tr-TR-EmelNeural|-8%|-18Hz
+GAL tr-google-rest princess-and-pea     prn      teen        F0   200 UTMOS 4.18 WER  20%  g:tr:Autonoe|tr-TR-EmelNeural|-2%|+15Hz
+GAL tr-google-rest little-red-hen       hen      hen         F0   255 UTMOS 3.99 WER  40%  g:tr:Callirrhoe|tr-TR-EmelNeural|+2%|+40Hz
+GAL tr-google-rest little-red-hen       pig      pig         F0   153 UTMOS 4.02 WER   0%  g:tr:Fenrir|tr-TR-AhmetNeural|+4%|+25Hz
+GAL tr-google-rest little-red-hen       goat     goat_mid    F0   129 UTMOS 3.99 WER   0%  g:tr:Iapetus|tr-TR-AhmetNeural|+2%|+30Hz
+GAL tr-google-rest little-red-hen       hare     hare        F0   208 UTMOS 4.03 WER   0%  g:tr:Achird|tr-TR-AhmetNeural|+8%|+55Hz
+GAL tr-google-rest lion-and-mouse       lion     lion        F0   133 UTMOS 3.24 WER  71%  g:tr:Orus|tr-TR-AhmetNeural|-12%|-44Hz
+GAL tr-google-rest lion-and-mouse       mouse    tiny        F0   282 UTMOS 3.00 WER   0%  g:tr:Zephyr|tr-TR-EmelNeural|+8%|+75Hz
+GAL tr-google-rest lion-and-mouse       fox      fox         F0   186 UTMOS 3.94 WER   0%  g:tr:Zubenelgenubi|tr-TR-AhmetNeural|-4%|+12Hz
+GAL tr-google-rest lion-and-mouse       hare     hare        F0   208 UTMOS 4.03 WER   0%  g:tr:Achird|tr-TR-AhmetNeural|+8%|+55Hz
+GAL tr-google-rest lion-and-mouse       bear     bear        F0   137 UTMOS 3.84 WER   0%  g:tr:Charon|tr-TR-AhmetNeural|-12%|-38Hz
+GAL tr-google-rest boy-who-cried-wolf   boy      boy         F0   242 UTMOS 4.26 WER   0%  g:tr:Puck|tr-TR-EmelNeural|+4%|+36Hz
+GAL tr-google-rest boy-who-cried-wolf   farmer   grandpa     F0   127 UTMOS 4.10 WER   0%  g:tr:Umbriel|tr-TR-AhmetNeural|-12%|-14Hz
+GAL tr-google-rest boy-who-cried-wolf   granny   granny      F0   141 UTMOS 3.78 WER   0%  g:tr:Gacrux|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr-google-rest boy-who-cried-wolf   mum      woman       F0   230 UTMOS 4.39 WER   0%  g:tr:Erinome|tr-TR-EmelNeural|-8%|-18Hz
+SIM tr-google-rest tortoise-and-hare    hare     (hare) ~ tort     (tortoise) cos 0.12
+SIM tr-google-rest tortoise-and-hare    hare     (hare) ~ bear     (bear) cos 0.12
+SIM tr-google-rest tortoise-and-hare    hare     (hare) ~ pig1     (pig) cos 0.16
+SIM tr-google-rest tortoise-and-hare    hare     (hare) ~ pig2     (pig) cos 0.42
+SIM tr-google-rest tortoise-and-hare    hare     (hare) ~ pig3     (pig) cos 0.51
+SIM tr-google-rest tortoise-and-hare    tort     (tortoise) ~ bear     (bear) cos 0.14
+SIM tr-google-rest tortoise-and-hare    tort     (tortoise) ~ pig1     (pig) cos 0.19
+SIM tr-google-rest tortoise-and-hare    tort     (tortoise) ~ pig2     (pig) cos 0.15
+SIM tr-google-rest tortoise-and-hare    tort     (tortoise) ~ pig3     (pig) cos 0.17
+SIM tr-google-rest tortoise-and-hare    bear     (bear) ~ pig1     (pig) cos 0.10
+SIM tr-google-rest tortoise-and-hare    bear     (bear) ~ pig2     (pig) cos 0.06
+SIM tr-google-rest tortoise-and-hare    bear     (bear) ~ pig3     (pig) cos 0.06
+SIM tr-google-rest tortoise-and-hare    pig1     (pig) ~ pig2     (pig) cos 0.11
+SIM tr-google-rest tortoise-and-hare    pig1     (pig) ~ pig3     (pig) cos 0.31
+SIM tr-google-rest tortoise-and-hare    pig2     (pig) ~ pig3     (pig) cos 0.46
+SIM tr-google-rest three-billy-goats    lit      (goat_little) ~ mid      (goat_mid) cos 0.18
+SIM tr-google-rest three-billy-goats    lit      (goat_little) ~ big      (goat_big) cos 0.09
+SIM tr-google-rest three-billy-goats    lit      (goat_little) ~ troll    (troll) cos 0.03
+SIM tr-google-rest three-billy-goats    mid      (goat_mid) ~ big      (goat_big) cos 0.27
+SIM tr-google-rest three-billy-goats    mid      (goat_mid) ~ troll    (troll) cos 0.24
+SIM tr-google-rest three-billy-goats    big      (goat_big) ~ troll    (troll) cos 0.46
+SIM tr-google-rest enormous-turnip      gpa      (grandpa) ~ gma      (granny) cos 0.25
+SIM tr-google-rest enormous-turnip      gpa      (grandpa) ~ kid      (girl) cos 0.15
+SIM tr-google-rest enormous-turnip      gpa      (grandpa) ~ pig      (pig) cos 0.10
+SIM tr-google-rest enormous-turnip      gpa      (grandpa) ~ hare     (hare) cos 0.07
+SIM tr-google-rest enormous-turnip      gpa      (grandpa) ~ bear     (bear) cos 0.16
+SIM tr-google-rest enormous-turnip      gpa      (grandpa) ~ pip      (tiny) cos 0.10
+SIM tr-google-rest enormous-turnip      gma      (granny) ~ kid      (girl) cos 0.10
+SIM tr-google-rest enormous-turnip      gma      (granny) ~ pig      (pig) cos 0.00
+SIM tr-google-rest enormous-turnip      gma      (granny) ~ hare     (hare) cos 0.08
+SIM tr-google-rest enormous-turnip      gma      (granny) ~ bear     (bear) cos 0.08
+SIM tr-google-rest enormous-turnip      gma      (granny) ~ pip      (tiny) cos 0.01
+SIM tr-google-rest enormous-turnip      kid      (girl) ~ pig      (pig) cos 0.40
+SIM tr-google-rest enormous-turnip      kid      (girl) ~ hare     (hare) cos 0.37
+SIM tr-google-rest enormous-turnip      kid      (girl) ~ bear     (bear) cos 0.08
+SIM tr-google-rest enormous-turnip      kid      (girl) ~ pip      (tiny) cos 0.67   <-- alike
+SIM tr-google-rest enormous-turnip      pig      (pig) ~ hare     (hare) cos 0.42
+SIM tr-google-rest enormous-turnip      pig      (pig) ~ bear     (bear) cos 0.06
+SIM tr-google-rest enormous-turnip      pig      (pig) ~ pip      (tiny) cos 0.34
+SIM tr-google-rest enormous-turnip      hare     (hare) ~ bear     (bear) cos 0.12
+SIM tr-google-rest enormous-turnip      hare     (hare) ~ pip      (tiny) cos 0.29
+SIM tr-google-rest enormous-turnip      bear     (bear) ~ pip      (tiny) cos 0.06
+SIM tr-google-rest stone-soup           fox      (fox) ~ hare     (hare) cos 0.23
+SIM tr-google-rest stone-soup           fox      (fox) ~ pig      (pig) cos 0.20
+SIM tr-google-rest stone-soup           fox      (fox) ~ goat     (goat_mid) cos 0.28
+SIM tr-google-rest stone-soup           fox      (fox) ~ gma      (granny) cos 0.33
+SIM tr-google-rest stone-soup           fox      (fox) ~ kid      (girl) cos 0.05
+SIM tr-google-rest stone-soup           hare     (hare) ~ pig      (pig) cos 0.42
+SIM tr-google-rest stone-soup           hare     (hare) ~ goat     (goat_mid) cos 0.20
+SIM tr-google-rest stone-soup           hare     (hare) ~ gma      (granny) cos 0.08
+SIM tr-google-rest stone-soup           hare     (hare) ~ kid      (girl) cos 0.37
+SIM tr-google-rest stone-soup           pig      (pig) ~ goat     (goat_mid) cos 0.13
+SIM tr-google-rest stone-soup           pig      (pig) ~ gma      (granny) cos 0.00
+SIM tr-google-rest stone-soup           pig      (pig) ~ kid      (girl) cos 0.40
+SIM tr-google-rest stone-soup           goat     (goat_mid) ~ gma      (granny) cos 0.31
+SIM tr-google-rest stone-soup           goat     (goat_mid) ~ kid      (girl) cos 0.17
+SIM tr-google-rest stone-soup           gma      (granny) ~ kid      (girl) cos 0.10
+SIM tr-google-rest snow-white           snow     (teen) ~ queen    (queen) cos 0.26
+SIM tr-google-rest snow-white           snow     (teen) ~ mir      (mirror) cos 0.06
+SIM tr-google-rest snow-white           snow     (teen) ~ dw       (dwarf) cos 0.21
+SIM tr-google-rest snow-white           snow     (teen) ~ old      (witch) cos 0.08
+SIM tr-google-rest snow-white           snow     (teen) ~ pr       (prince) cos 0.25
+SIM tr-google-rest snow-white           queen    (queen) ~ mir      (mirror) cos 0.25
+SIM tr-google-rest snow-white           queen    (queen) ~ dw       (dwarf) cos 0.12
+SIM tr-google-rest snow-white           queen    (queen) ~ old      (witch) cos 0.16
+SIM tr-google-rest snow-white           queen    (queen) ~ pr       (prince) cos 0.45
+SIM tr-google-rest snow-white           mir      (mirror) ~ dw       (dwarf) cos 0.12
+SIM tr-google-rest snow-white           mir      (mirror) ~ old      (witch) cos 0.19
+SIM tr-google-rest snow-white           mir      (mirror) ~ pr       (prince) cos 0.14
+SIM tr-google-rest snow-white           dw       (dwarf) ~ old      (witch) cos 0.21
+SIM tr-google-rest snow-white           dw       (dwarf) ~ pr       (prince) cos 0.15
+SIM tr-google-rest snow-white           old      (witch) ~ pr       (prince) cos 0.19
+SIM tr-google-rest elves-and-shoemaker  shoe     (man) ~ wife     (woman) cos 0.10
+SIM tr-google-rest elves-and-shoemaker  shoe     (man) ~ lady     (teen) cos 0.14
+SIM tr-google-rest elves-and-shoemaker  shoe     (man) ~ lord     (lord) cos 0.46
+SIM tr-google-rest elves-and-shoemaker  shoe     (man) ~ e1       (elf) cos 0.13
+SIM tr-google-rest elves-and-shoemaker  shoe     (man) ~ e2       (elfgirl) cos 0.14
+SIM tr-google-rest elves-and-shoemaker  wife     (woman) ~ lady     (teen) cos 0.27
+SIM tr-google-rest elves-and-shoemaker  wife     (woman) ~ lord     (lord) cos 0.14
+SIM tr-google-rest elves-and-shoemaker  wife     (woman) ~ e1       (elf) cos 0.08
+SIM tr-google-rest elves-and-shoemaker  wife     (woman) ~ e2       (elfgirl) cos 0.20
+SIM tr-google-rest elves-and-shoemaker  lady     (teen) ~ lord     (lord) cos 0.12
+SIM tr-google-rest elves-and-shoemaker  lady     (teen) ~ e1       (elf) cos 0.16
+SIM tr-google-rest elves-and-shoemaker  lady     (teen) ~ e2       (elfgirl) cos 0.09
+SIM tr-google-rest elves-and-shoemaker  lord     (lord) ~ e1       (elf) cos 0.10
+SIM tr-google-rest elves-and-shoemaker  lord     (lord) ~ e2       (elfgirl) cos 0.10
+SIM tr-google-rest elves-and-shoemaker  e1       (elf) ~ e2       (elfgirl) cos 0.54
+SIM tr-google-rest princess-and-pea     prince   (prince) ~ king     (king) cos 0.27
+SIM tr-google-rest princess-and-pea     prince   (prince) ~ queen    (woman) cos 0.15
+SIM tr-google-rest princess-and-pea     prince   (prince) ~ prn      (teen) cos 0.25
+SIM tr-google-rest princess-and-pea     king     (king) ~ queen    (woman) cos 0.28
+SIM tr-google-rest princess-and-pea     king     (king) ~ prn      (teen) cos 0.16
+SIM tr-google-rest princess-and-pea     queen    (woman) ~ prn      (teen) cos 0.27
+SIM tr-google-rest little-red-hen       hen      (hen) ~ pig      (pig) cos 0.34
+SIM tr-google-rest little-red-hen       hen      (hen) ~ goat     (goat_mid) cos 0.15
+SIM tr-google-rest little-red-hen       hen      (hen) ~ hare     (hare) cos 0.29
+SIM tr-google-rest little-red-hen       pig      (pig) ~ goat     (goat_mid) cos 0.13
+SIM tr-google-rest little-red-hen       pig      (pig) ~ hare     (hare) cos 0.42
+SIM tr-google-rest little-red-hen       goat     (goat_mid) ~ hare     (hare) cos 0.20
+SIM tr-google-rest lion-and-mouse       lion     (lion) ~ mouse    (tiny) cos 0.00
+SIM tr-google-rest lion-and-mouse       lion     (lion) ~ fox      (fox) cos 0.20
+SIM tr-google-rest lion-and-mouse       lion     (lion) ~ hare     (hare) cos 0.18
+SIM tr-google-rest lion-and-mouse       lion     (lion) ~ bear     (bear) cos 0.30
+SIM tr-google-rest lion-and-mouse       mouse    (tiny) ~ fox      (fox) cos 0.01
+SIM tr-google-rest lion-and-mouse       mouse    (tiny) ~ hare     (hare) cos 0.29
+SIM tr-google-rest lion-and-mouse       mouse    (tiny) ~ bear     (bear) cos 0.06
+SIM tr-google-rest lion-and-mouse       fox      (fox) ~ hare     (hare) cos 0.23
+SIM tr-google-rest lion-and-mouse       fox      (fox) ~ bear     (bear) cos 0.06
+SIM tr-google-rest lion-and-mouse       hare     (hare) ~ bear     (bear) cos 0.12
+SIM tr-google-rest boy-who-cried-wolf   boy      (boy) ~ farmer   (grandpa) cos 0.19
+SIM tr-google-rest boy-who-cried-wolf   boy      (boy) ~ granny   (granny) cos 0.07
+SIM tr-google-rest boy-who-cried-wolf   boy      (boy) ~ mum      (woman) cos 0.18
+SIM tr-google-rest boy-who-cried-wolf   farmer   (grandpa) ~ granny   (granny) cos 0.25
+SIM tr-google-rest boy-who-cried-wolf   farmer   (grandpa) ~ mum      (woman) cos 0.12
+SIM tr-google-rest boy-who-cried-wolf   granny   (granny) ~ mum      (woman) cos 0.25
+SIMSUM tr-google-rest pairs at or above 0.55: 1
+GALWARN tr-google-rest tortoise-and-hare: hare (hare) and pig1 (pig) may sound alike: F0 208 and 203 Hz (x1.02)
+GALWARN tr-google-rest tortoise-and-hare: tort (tortoise) and bear (bear) may sound alike: F0 129 and 137 Hz (x1.06)
+GALWARN tr-google-rest three-billy-goats: lit (goat_little) and big (goat_big) may sound alike: F0 148 and 149 Hz (x1.01)
+GALWARN tr-google-rest three-billy-goats: mid (goat_mid) and troll (troll) may sound alike: F0 129 and 129 Hz (x1.00)
+GALWARN tr-google-rest enormous-turnip: gpa (grandpa) and bear (bear) may sound alike: F0 127 and 137 Hz (x1.08)
+GALWARN tr-google-rest enormous-turnip: gma (granny) and pig (pig) may sound alike: F0 141 and 153 Hz (x1.08)
+GALWARN tr-google-rest enormous-turnip: gma (granny) and bear (bear) may sound alike: F0 141 and 137 Hz (x1.03)
+GALWARN tr-google-rest stone-soup: pig (pig) and gma (granny) may sound alike: F0 153 and 141 Hz (x1.08)
+GALWARN tr-google-rest stone-soup: goat (goat_mid) and gma (granny) may sound alike: F0 129 and 141 Hz (x1.10)
+GALWARN tr-google-rest snow-white: snow (teen) and old (witch) may sound alike: F0 200 and 189 Hz (x1.06)
+GALWARN tr-google-rest snow-white: queen (queen) and mir (mirror) may sound alike: F0 146 and 151 Hz (x1.04)
+GALWARN tr-google-rest snow-white: queen (queen) and pr (prince) may sound alike: F0 146 and 154 Hz (x1.05)
+GALWARN tr-google-rest snow-white: mir (mirror) and pr (prince) may sound alike: F0 151 and 154 Hz (x1.02)
+GALWARN tr-google-rest elves-and-shoemaker: shoe (man) and lord (lord) may sound alike: F0 167 and 159 Hz (x1.05)
+GALWARN tr-google-rest princess-and-pea: prince (prince) and king (king) may sound alike: F0 154 and 155 Hz (x1.00)
+GALWARN tr-google-rest lion-and-mouse: lion (lion) and bear (bear) may sound alike: F0 133 and 137 Hz (x1.03)
+GALWARN tr-google-rest boy-who-cried-wolf: boy (boy) and mum (woman) may sound alike: F0 242 and 230 Hz (x1.05)
+   [gtts] 47 of 47 clips made (195 s of speech, 18395 characters sent so far in this run) in 19 s; 0 item(s) go to the other voices
+wrote scene-red-riding-hood-en-google 204.4 s
+SCENE red-riding-hood en google: 47 lines, 204 s, speakers ['granny', 'mama', 'nar', 'red', 'wolf', 'wolfb']
+   [gtts] 23 of 23 clips made (110 s of speech, 19817 characters sent so far in this run) in 10 s; 0 item(s) go to the other voices
+wrote scene-three-little-pigs-en-google 119.5 s
+SCENE three-little-pigs en google: 24 lines, 120 s, speakers ['mama', 'nar', 'pig1', 'pig2', 'pig3']
+   [gtts] 35 of 35 clips made (125 s of speech, 21425 characters sent so far in this run) in 15 s; 0 item(s) go to the other voices
+wrote scene-cinderella-en-google 138.9 s
+SCENE cinderella en google: 36 lines, 139 s, speakers ['cin', 'cing', 'fg', 'nar', 's1', 's2', 'sm']
+   [gtts] 47 of 47 clips made (177 s of speech, 23735 characters sent so far in this run) in 20 s; 0 item(s) go to the other voices
+wrote scene-red-riding-hood-tr-google 184.9 s
+SCENE red-riding-hood tr google: 47 lines, 185 s, speakers ['granny', 'mama', 'nar', 'red', 'wolf', 'wolfb']
+   [gtts] 23 of 23 clips made (98 s of speech, 25008 characters sent so far in this run) in 10 s; 0 item(s) go to the other voices
+wrote scene-three-little-pigs-tr-google 102.8 s
+SCENE three-little-pigs tr google: 24 lines, 103 s, speakers ['mama', 'nar', 'pig1', 'pig2', 'pig3']
+   [gtts] 35 of 35 clips made (126 s of speech, 26564 characters sent so far in this run) in 14 s; 0 item(s) go to the other voices
+wrote scene-cinderella-tr-google 133.7 s
+SCENE cinderella tr google: 36 lines, 134 s, speakers ['cin', 'cing', 'fg', 'nar', 's1', 's2', 'sm']
+GOOGLE characters sent in this job: 26564, requests: 523
+---- google palette en: GPAL language voice factor line F0 UTMOS WER seconds
+GALLERY en 1 = Achernar
+GPAL en Achernar       x1.00 calm   F0   237 UTMOS 4.48 WER   0% SEC 4.4
+GPAL en Achernar       x1.00 lively F0   381 UTMOS 3.57 WER   0% SEC 3.0
+GPAL en Achernar       x1.20 lively F0   436 UTMOS 2.85 WER   0% SEC 3.2
+GPAL en Achernar       x1.40 lively F0   353 UTMOS 2.73 WER   0% SEC 2.8
+GPAL en Achernar       x0.80 lively F0   199 UTMOS 3.74 WER   0% SEC 2.8
+GALLERY en 2 = Aoede
+GPAL en Aoede          x1.00 calm   F0   177 UTMOS 4.49 WER   0% SEC 4.3
+GPAL en Aoede          x1.00 lively F0   245 UTMOS 4.40 WER   0% SEC 3.5
+GPAL en Aoede          x1.20 lively F0   294 UTMOS 4.12 WER   0% SEC 3.5
+GPAL en Aoede          x1.40 lively F0   265 UTMOS 3.44 WER   0% SEC 3.3
+GPAL en Aoede          x0.80 lively F0   170 UTMOS 4.16 WER   0% SEC 3.3
+GALLERY en 3 = Autonoe
+GPAL en Autonoe        x1.00 calm   F0   192 UTMOS 4.52 WER   0% SEC 4.7
+GPAL en Autonoe        x1.00 lively F0   350 UTMOS 3.96 WER   0% SEC 3.1
+GPAL en Autonoe        x1.20 lively F0   387 UTMOS 2.68 WER   0% SEC 3.1
+GPAL en Autonoe        x1.40 lively F0   417 UTMOS 2.46 WER   0% SEC 3.5
+GPAL en Autonoe        x0.80 lively F0   212 UTMOS 3.47 WER   0% SEC 3.0
+GALLERY en 4 = Callirrhoe
+GPAL en Callirrhoe     x1.00 calm   F0   204 UTMOS 4.45 WER   0% SEC 4.0
+GPAL en Callirrhoe     x1.00 lively F0   274 UTMOS 4.36 WER   0% SEC 3.3
+GPAL en Callirrhoe     x1.20 lively F0   317 UTMOS 4.14 WER   0% SEC 3.3
+GPAL en Callirrhoe     x1.40 lively F0   361 UTMOS 2.69 WER   0% SEC 3.3
+GPAL en Callirrhoe     x0.80 lively F0   234 UTMOS 3.87 WER   0% SEC 3.4
+GALLERY en 5 = Despina
+GPAL en Despina        x1.00 calm   F0   227 UTMOS 4.41 WER   0% SEC 4.4
+GPAL en Despina        x1.00 lively F0   378 UTMOS 3.65 WER   0% SEC 3.6
+GPAL en Despina        x1.20 lively F0   341 UTMOS 3.70 WER   0% SEC 3.6
+GPAL en Despina        x1.40 lively F0   369 UTMOS 2.31 WER   0% SEC 3.4
+GPAL en Despina        x0.80 lively F0   218 UTMOS 3.58 WER   0% SEC 2.8
+GALLERY en 6 = Erinome
+GPAL en Erinome        x1.00 calm   F0   203 UTMOS 4.49 WER   0% SEC 4.1
+GPAL en Erinome        x1.00 lively F0   281 UTMOS 4.32 WER   0% SEC 2.8
+GPAL en Erinome        x1.20 lively F0   378 UTMOS 4.32 WER   0% SEC 4.0
+GPAL en Erinome        x1.40 lively F0   375 UTMOS 2.54 WER   0% SEC 3.3
+GPAL en Erinome        x0.80 lively F0   238 UTMOS 4.00 WER   0% SEC 2.8
+GALLERY en 7 = Gacrux
+GPAL en Gacrux         x1.00 calm   F0   156 UTMOS 4.47 WER   0% SEC 5.1
+GPAL en Gacrux         x1.00 lively F0   210 UTMOS 4.42 WER   0% SEC 3.4
+GPAL en Gacrux         x1.20 lively F0   263 UTMOS 3.69 WER   0% SEC 3.2
+GPAL en Gacrux         x1.40 lively F0   255 UTMOS 3.45 WER   0% SEC 3.9
+GPAL en Gacrux         x0.80 lively F0   147 UTMOS 4.26 WER   0% SEC 3.8
+GALLERY en 8 = Kore
+GPAL en Kore           x1.00 calm   F0   191 UTMOS 4.56 WER   0% SEC 5.6
+GPAL en Kore           x1.00 lively F0   349 UTMOS 4.03 WER   0% SEC 2.6
+GPAL en Kore           x1.20 lively F0   311 UTMOS 4.12 WER   0% SEC 3.2
+GPAL en Kore           x1.40 lively F0   333 UTMOS 2.73 WER   0% SEC 3.2
+GPAL en Kore           x0.80 lively F0   261 UTMOS 3.16 WER   0% SEC 3.2
+GALLERY en 9 = Laomedeia
+GPAL en Laomedeia      x1.00 calm   F0   193 UTMOS 4.47 WER   0% SEC 3.9
+GPAL en Laomedeia      x1.00 lively F0   193 UTMOS 4.46 WER   0% SEC 3.2
+GPAL en Laomedeia      x1.20 lively F0   261 UTMOS 3.68 WER   0% SEC 3.5
+GPAL en Laomedeia      x1.40 lively F0   306 UTMOS 2.32 WER   0% SEC 4.1
+GPAL en Laomedeia      x0.80 lively F0   187 UTMOS 3.70 WER   0% SEC 4.1
+GALLERY en 10 = Leda
+GPAL en Leda           x1.00 calm   F0   200 UTMOS 4.42 WER   0% SEC 4.2
+GPAL en Leda           x1.00 lively F0   272 UTMOS 4.42 WER   0% SEC 3.9
+GPAL en Leda           x1.20 lively F0   280 UTMOS 3.75 WER   0% SEC 2.8
+GPAL en Leda           x1.40 lively F0   313 UTMOS 3.27 WER   0% SEC 3.3
+GPAL en Leda           x0.80 lively F0   185 UTMOS 4.16 WER   0% SEC 2.8
+GALLERY en 11 = Pulcherrima
+GPAL en Pulcherrima    x1.00 calm   F0   135 UTMOS 4.43 WER   0% SEC 4.4
+GPAL en Pulcherrima    x1.00 lively F0   182 UTMOS 4.27 WER   0% SEC 2.9
+GPAL en Pulcherrima    x1.20 lively F0   253 UTMOS 4.31 WER   0% SEC 3.2
+GPAL en Pulcherrima    x1.40 lively F0   248 UTMOS 3.71 WER   0% SEC 2.8
+GPAL en Pulcherrima    x0.80 lively F0   137 UTMOS 4.15 WER   0% SEC 3.6
+GALLERY en 12 = Sulafat
+GPAL en Sulafat        x1.00 calm   F0   206 UTMOS 4.51 WER   0% SEC 5.0
+GPAL en Sulafat        x1.00 lively F0   301 UTMOS 4.11 WER   0% SEC 3.3
+GPAL en Sulafat        x1.20 lively F0   306 UTMOS 3.95 WER   0% SEC 3.8
+GPAL en Sulafat        x1.40 lively F0   373 UTMOS 2.73 WER   0% SEC 3.8
+GPAL en Sulafat        x0.80 lively F0   208 UTMOS 4.23 WER   0% SEC 3.8
+GALLERY en 13 = Vindemiatrix
+GPAL en Vindemiatrix   x1.00 calm   F0   169 UTMOS 4.44 WER   0% SEC 4.9
+GPAL en Vindemiatrix   x1.00 lively F0   242 UTMOS 4.32 WER   0% SEC 3.0
+GPAL en Vindemiatrix   x1.20 lively F0   249 UTMOS 4.19 WER   0% SEC 3.4
+GPAL en Vindemiatrix   x1.40 lively F0   289 UTMOS 3.59 WER   0% SEC 3.4
+GPAL en Vindemiatrix   x0.80 lively F0   198 UTMOS 3.72 WER   0% SEC 2.9
+GALLERY en 14 = Zephyr
+GPAL en Zephyr         x1.00 calm   F0   203 UTMOS 4.46 WER   0% SEC 4.5
+GPAL en Zephyr         x1.00 lively F0   257 UTMOS 4.26 WER   0% SEC 3.0
+GPAL en Zephyr         x1.20 lively F0   335 UTMOS 3.75 WER   0% SEC 3.7
+GPAL en Zephyr         x1.40 lively F0   411 UTMOS 1.59 WER   0% SEC 3.8
+GPAL en Zephyr         x0.80 lively F0   246 UTMOS 3.69 WER   0% SEC 2.8
+GALLERY en 15 = Achird
+GPAL en Achird         x1.00 calm   F0   144 UTMOS 4.41 WER   0% SEC 4.1
+GPAL en Achird         x1.00 lively F0   190 UTMOS 4.29 WER   0% SEC 3.3
+GPAL en Achird         x1.20 lively F0   212 UTMOS 3.97 WER   0% SEC 3.0
+GPAL en Achird         x1.40 lively F0   265 UTMOS 4.00 WER   0% SEC 3.3
+GPAL en Achird         x0.80 lively F0   153 UTMOS 3.64 WER   0% SEC 3.3
+GALLERY en 16 = Algenib
+GPAL en Algenib        x1.00 calm   F0   150 UTMOS 4.47 WER   0% SEC 4.3
+GPAL en Algenib        x1.00 lively F0   217 UTMOS 4.08 WER   0% SEC 3.2
+GPAL en Algenib        x1.20 lively F0   227 UTMOS 3.85 WER   0% SEC 2.8
+GPAL en Algenib        x1.40 lively F0   278 UTMOS 4.04 WER   0% SEC 3.2
+GPAL en Algenib        x0.80 lively F0   145 UTMOS 3.65 WER   0% SEC 3.3
+GALLERY en 17 = Algieba
+GPAL en Algieba        x1.00 calm   F0   146 UTMOS 4.42 WER   0% SEC 4.5
+GPAL en Algieba        x1.00 lively F0   199 UTMOS 4.19 WER   0% SEC 3.9
+GPAL en Algieba        x1.20 lively F0   237 UTMOS 4.18 WER   0% SEC 3.8
+GPAL en Algieba        x1.40 lively F0   179 UTMOS 4.12 WER   0% SEC 3.5
+GPAL en Algieba        x0.80 lively F0   120 UTMOS 3.65 WER   0% SEC 3.5
+GALLERY en 18 = Alnilam
+GPAL en Alnilam        x1.00 calm   F0   130 UTMOS 4.45 WER   0% SEC 4.0
+GPAL en Alnilam        x1.00 lively F0   134 UTMOS 4.43 WER   0% SEC 3.0
+GPAL en Alnilam        x1.20 lively F0   141 UTMOS 4.39 WER   0% SEC 2.9
+GPAL en Alnilam        x1.40 lively F0   262 UTMOS 3.97 WER   0% SEC 3.1
+GPAL en Alnilam        x0.80 lively F0   161 UTMOS 3.98 WER   0% SEC 3.1
+GALLERY en 19 = Charon
+GPAL en Charon         x1.00 calm   F0   134 UTMOS 4.39 WER   0% SEC 4.4
+GPAL en Charon         x1.00 lively F0   143 UTMOS 4.13 WER   0% SEC 3.8
+GPAL en Charon         x1.20 lively F0   150 UTMOS 4.18 WER   0% SEC 3.5
+GPAL en Charon         x1.40 lively F0   172 UTMOS 4.08 WER   0% SEC 3.5
+GPAL en Charon         x0.80 lively F0   131 UTMOS 3.20 WER   0% SEC 3.8
+GALLERY en 20 = Enceladus
+GPAL en Enceladus      x1.00 calm   F0   126 UTMOS 4.44 WER   0% SEC 5.4
+GPAL en Enceladus      x1.00 lively F0   175 UTMOS 4.35 WER   0% SEC 3.5
+GPAL en Enceladus      x1.20 lively F0   202 UTMOS 4.28 WER   0% SEC 3.5
+GPAL en Enceladus      x1.40 lively F0   289 UTMOS 4.25 WER   0% SEC 3.3
+GPAL en Enceladus      x0.80 lively F0   174 UTMOS 3.71 WER   0% SEC 3.3
+GALLERY en 21 = Fenrir
+GPAL en Fenrir         x1.00 calm   F0   137 UTMOS 4.49 WER   0% SEC 5.4
+GPAL en Fenrir         x1.00 lively F0   216 UTMOS 3.92 WER   0% SEC 3.3
+GPAL en Fenrir         x1.20 lively F0   281 UTMOS 3.90 WER   0% SEC 3.4
+GPAL en Fenrir         x1.40 lively F0   298 UTMOS 3.51 WER   0% SEC 3.3
+GPAL en Fenrir         x0.80 lively F0   174 UTMOS 3.36 WER   0% SEC 3.3
+GALLERY en 22 = Iapetus
+GPAL en Iapetus        x1.00 calm   F0   144 UTMOS 4.51 WER   0% SEC 5.2
+GPAL en Iapetus        x1.00 lively F0   155 UTMOS 4.41 WER   0% SEC 3.3
+GPAL en Iapetus        x1.20 lively F0   212 UTMOS 4.33 WER   0% SEC 3.3
+GPAL en Iapetus        x1.40 lively F0   371 UTMOS 3.31 WER   0% SEC 3.5
+GPAL en Iapetus        x0.80 lively F0   141 UTMOS 3.92 WER   0% SEC 4.2
+GALLERY en 23 = Orus
+GPAL en Orus           x1.00 calm   F0   134 UTMOS 4.45 WER   0% SEC 5.0
+GPAL en Orus           x1.00 lively F0   152 UTMOS 4.37 WER   0% SEC 3.0
+GPAL en Orus           x1.20 lively F0   217 UTMOS 4.30 WER   0% SEC 2.8
+GPAL en Orus           x1.40 lively F0   276 UTMOS 4.17 WER   0% SEC 3.2
+GPAL en Orus           x0.80 lively F0   141 UTMOS 3.59 WER   0% SEC 2.3
+GALLERY en 24 = Puck
+GPAL en Puck           x1.00 calm   F0   110 UTMOS 4.48 WER   0% SEC 5.0
+GPAL en Puck           x1.00 lively F0   200 UTMOS 3.94 WER   0% SEC 3.6
+GPAL en Puck           x1.20 lively F0   212 UTMOS 4.39 WER   0% SEC 2.9
+GPAL en Puck           x1.40 lively F0   277 UTMOS 3.18 WER   0% SEC 3.6
+GPAL en Puck           x0.80 lively F0   133 UTMOS 4.24 WER   0% SEC 3.5
+GALLERY en 25 = Rasalgethi
+GPAL en Rasalgethi     x1.00 calm   F0   132 UTMOS 4.48 WER   0% SEC 4.1
+GPAL en Rasalgethi     x1.00 lively F0   188 UTMOS 4.42 WER   0% SEC 3.2
+GPAL en Rasalgethi     x1.20 lively F0   251 UTMOS 4.07 WER   0% SEC 2.8
+GPAL en Rasalgethi     x1.40 lively F0   263 UTMOS 4.14 WER   0% SEC 3.1
+GPAL en Rasalgethi     x0.80 lively F0   165 UTMOS 3.85 WER   0% SEC 2.9
+GALLERY en 26 = Sadachbia
+GPAL en Sadachbia      x1.00 calm   F0   147 UTMOS 4.39 WER   0% SEC 4.7
+GPAL en Sadachbia      x1.00 lively F0   202 UTMOS 3.46 WER   0% SEC 3.0
+GPAL en Sadachbia      x1.20 lively F0   306 UTMOS 3.38 WER   0% SEC 3.1
+GPAL en Sadachbia      x1.40 lively F0   252 UTMOS 3.71 WER   0% SEC 3.2
+GPAL en Sadachbia      x0.80 lively F0   176 UTMOS 2.67 WER   0% SEC 3.1
+GALLERY en 27 = Sadaltager
+GPAL en Sadaltager     x1.00 calm   F0   130 UTMOS 4.51 WER   0% SEC 4.8
+GPAL en Sadaltager     x1.00 lively F0   215 UTMOS 4.32 WER   0% SEC 3.5
+GPAL en Sadaltager     x1.20 lively F0   230 UTMOS 3.60 WER   0% SEC 3.2
+GPAL en Sadaltager     x1.40 lively F0   377 UTMOS 3.36 WER   0% SEC 2.5
+GPAL en Sadaltager     x0.80 lively F0   137 UTMOS 3.40 WER   0% SEC 2.8
+GALLERY en 28 = Schedar
+GPAL en Schedar        x1.00 calm   F0   116 UTMOS 4.40 WER   0% SEC 4.8
+GPAL en Schedar        x1.00 lively F0   164 UTMOS 4.19 WER   0% SEC 3.1
+GPAL en Schedar        x1.20 lively F0   303 UTMOS 3.54 WER   0% SEC 2.6
+GPAL en Schedar        x1.40 lively F0   349 UTMOS 2.90 WER   0% SEC 2.7
+GPAL en Schedar        x0.80 lively F0   161 UTMOS 3.23 WER   9% SEC 2.4
+GALLERY en 29 = Umbriel
+GPAL en Umbriel        x1.00 calm   F0   118 UTMOS 4.45 WER   0% SEC 4.5
+GPAL en Umbriel        x1.00 lively F0   187 UTMOS 4.11 WER   0% SEC 3.3
+GPAL en Umbriel        x1.20 lively F0   314 UTMOS 3.98 WER   0% SEC 3.2
+GPAL en Umbriel        x1.40 lively F0   338 UTMOS 3.20 WER   0% SEC 3.2
+GPAL en Umbriel        x0.80 lively F0   162 UTMOS 3.52 WER   0% SEC 2.9
+GALLERY en 30 = Zubenelgenubi
+GPAL en Zubenelgenubi  x1.00 calm   F0   135 UTMOS 4.47 WER   0% SEC 5.4
+GPAL en Zubenelgenubi  x1.00 lively F0   161 UTMOS 4.30 WER   0% SEC 3.1
+GPAL en Zubenelgenubi  x1.20 lively F0   295 UTMOS 4.21 WER   0% SEC 4.1
+GPAL en Zubenelgenubi  x1.40 lively F0   278 UTMOS 4.25 WER   0% SEC 3.3
+GPAL en Zubenelgenubi  x0.80 lively F0   161 UTMOS 3.04 WER   0% SEC 3.2
+wrote gpalette-en 203.2 s
+---- google palette tr: GPAL language voice factor line F0 UTMOS WER seconds
+GALLERY tr 1 = Achernar
+GPAL tr Achernar       x1.00 calm   F0   251 UTMOS 3.66 WER  15% SEC 4.8
+GPAL tr Achernar       x1.00 lively F0   268 UTMOS 3.87 WER  12% SEC 4.1
+GPAL tr Achernar       x1.20 lively F0   349 UTMOS 2.69 WER  12% SEC 5.0
+GPAL tr Achernar       x1.40 lively F0   383 UTMOS 1.51 WER  12% SEC 4.3
+GPAL tr Achernar       x0.80 lively F0   251 UTMOS 2.37 WER   0% SEC 4.9
+GALLERY tr 2 = Aoede
+GPAL tr Aoede          x1.00 calm   F0   186 UTMOS 4.33 WER   0% SEC 6.1
+GPAL tr Aoede          x1.00 lively F0   227 UTMOS 4.30 WER  12% SEC 4.6
+GPAL tr Aoede          x1.20 lively F0   272 UTMOS 4.03 WER  12% SEC 4.6
+GPAL tr Aoede          x1.40 lively F0   337 UTMOS 2.51 WER  38% SEC 4.7
+GPAL tr Aoede          x0.80 lively F0   182 UTMOS 3.57 WER  12% SEC 4.6
+GALLERY tr 3 = Autonoe
+GPAL tr Autonoe        x1.00 calm   F0   210 UTMOS 3.99 WER  15% SEC 5.6
+GPAL tr Autonoe        x1.00 lively F0   237 UTMOS 3.68 WER  12% SEC 5.4
+GPAL tr Autonoe        x1.20 lively F0   295 UTMOS 3.12 WER  25% SEC 4.9
+GPAL tr Autonoe        x1.40 lively F0   330 UTMOS 2.43 WER  12% SEC 5.4
+GPAL tr Autonoe        x0.80 lively F0   189 UTMOS 3.09 WER  12% SEC 5.3
+GALLERY tr 4 = Callirrhoe
+GPAL tr Callirrhoe     x1.00 calm   F0   199 UTMOS 4.11 WER   0% SEC 5.1
+GPAL tr Callirrhoe     x1.00 lively F0   279 UTMOS 3.63 WER   0% SEC 4.7
+GPAL tr Callirrhoe     x1.20 lively F0   288 UTMOS 3.85 WER  12% SEC 4.4
+GPAL tr Callirrhoe     x1.40 lively F0   431 UTMOS 1.85 WER   0% SEC 3.8
+GPAL tr Callirrhoe     x0.80 lively F0   197 UTMOS 3.11 WER   0% SEC 4.1
+GALLERY tr 5 = Despina
+GPAL tr Despina        x1.00 calm   F0   229 UTMOS 4.19 WER   0% SEC 5.4
+GPAL tr Despina        x1.00 lively F0   278 UTMOS 3.85 WER  12% SEC 4.2
+GPAL tr Despina        x1.20 lively F0   264 UTMOS 3.50 WER   0% SEC 4.8
+GPAL tr Despina        x1.40 lively F0   299 UTMOS 2.42 WER   0% SEC 4.8
+GPAL tr Despina        x0.80 lively F0   178 UTMOS 3.70 WER   0% SEC 4.8
+GALLERY tr 6 = Erinome
+GPAL tr Erinome        x1.00 calm   F0   221 UTMOS 4.18 WER   0% SEC 5.4
+GPAL tr Erinome        x1.00 lively F0   310 UTMOS 3.53 WER  12% SEC 4.3
+GPAL tr Erinome        x1.20 lively F0   375 UTMOS 2.79 WER  12% SEC 4.2
+GPAL tr Erinome        x1.40 lively F0   371 UTMOS 2.41 WER   0% SEC 5.0
+GPAL tr Erinome        x0.80 lively F0   230 UTMOS 2.97 WER  12% SEC 4.8
+GALLERY tr 7 = Gacrux
+GPAL tr Gacrux         x1.00 calm   F0   202 UTMOS 4.05 WER   0% SEC 5.6
+GPAL tr Gacrux         x1.00 lively F0   216 UTMOS 3.86 WER   0% SEC 3.7
+GPAL tr Gacrux         x1.20 lively F0   279 UTMOS 3.89 WER   0% SEC 4.5
+GPAL tr Gacrux         x1.40 lively F0   325 UTMOS 2.82 WER   0% SEC 4.5
+GPAL tr Gacrux         x0.80 lively F0   187 UTMOS 2.90 WER  12% SEC 4.5
+GALLERY tr 8 = Kore
+GPAL tr Kore           x1.00 calm   F0   181 UTMOS 4.13 WER   0% SEC 4.9
+GPAL tr Kore           x1.00 lively F0   246 UTMOS 3.98 WER  12% SEC 3.8
+GPAL tr Kore           x1.20 lively F0   332 UTMOS 3.92 WER  25% SEC 4.3
+GPAL tr Kore           x1.40 lively F0   332 UTMOS 2.58 WER   0% SEC 4.0
+GPAL tr Kore           x0.80 lively F0   237 UTMOS 2.68 WER   0% SEC 4.4
+GALLERY tr 9 = Laomedeia
+GPAL tr Laomedeia      x1.00 calm   F0   207 UTMOS 4.19 WER   0% SEC 5.6
+GPAL tr Laomedeia      x1.00 lively F0   253 UTMOS 3.77 WER   0% SEC 3.8
+GPAL tr Laomedeia      x1.20 lively F0   358 UTMOS 2.64 WER   0% SEC 5.5
+GPAL tr Laomedeia      x1.40 lively F0   373 UTMOS 2.29 WER   0% SEC 5.1
+GPAL tr Laomedeia      x0.80 lively F0   202 UTMOS 2.71 WER   0% SEC 3.8
+GALLERY tr 10 = Leda
+GPAL tr Leda           x1.00 calm   F0   212 UTMOS 4.11 WER   8% SEC 5.2
+GPAL tr Leda           x1.00 lively F0   266 UTMOS 4.09 WER   0% SEC 4.1
+GPAL tr Leda           x1.20 lively F0   321 UTMOS 3.06 WER   0% SEC 4.1
+GPAL tr Leda           x1.40 lively F0   445 UTMOS 1.70 WER  12% SEC 4.1
+GPAL tr Leda           x0.80 lively F0   274 UTMOS 2.46 WER  12% SEC 4.1
+GALLERY tr 11 = Pulcherrima
+GPAL tr Pulcherrima    x1.00 calm   F0   123 UTMOS 4.02 WER   0% SEC 5.1
+GPAL tr Pulcherrima    x1.00 lively F0   201 UTMOS 3.55 WER   0% SEC 3.8
+GPAL tr Pulcherrima    x1.20 lively F0   183 UTMOS 3.87 WER  12% SEC 4.0
+GPAL tr Pulcherrima    x1.40 lively F0   240 UTMOS 3.36 WER   0% SEC 4.2
+GPAL tr Pulcherrima    x0.80 lively F0   138 UTMOS 3.03 WER  12% SEC 4.2
+GALLERY tr 12 = Sulafat
+GPAL tr Sulafat        x1.00 calm   F0   232 UTMOS 4.12 WER   0% SEC 5.1
+GPAL tr Sulafat        x1.00 lively F0   299 UTMOS 3.93 WER  12% SEC 4.2
+GPAL tr Sulafat        x1.20 lively F0   306 UTMOS 3.48 WER   0% SEC 5.1
+GPAL tr Sulafat        x1.40 lively F0   419 UTMOS 1.81 WER   0% SEC 3.7
+GPAL tr Sulafat        x0.80 lively F0   205 UTMOS 3.22 WER   0% SEC 5.1
+GALLERY tr 13 = Vindemiatrix
+GPAL tr Vindemiatrix   x1.00 calm   F0   203 UTMOS 3.97 WER   0% SEC 5.7
+GPAL tr Vindemiatrix   x1.00 lively F0   221 UTMOS 3.95 WER  12% SEC 4.0
+GPAL tr Vindemiatrix   x1.20 lively F0   263 UTMOS 4.05 WER  12% SEC 4.0
+GPAL tr Vindemiatrix   x1.40 lively F0   430 UTMOS 2.03 WER   0% SEC 4.6
+GPAL tr Vindemiatrix   x0.80 lively F0   247 UTMOS 2.10 WER   0% SEC 4.6
+GALLERY tr 14 = Zephyr
+GPAL tr Zephyr         x1.00 calm   F0   216 UTMOS 4.07 WER   0% SEC 5.8
+GPAL tr Zephyr         x1.00 lively F0   249 UTMOS 4.05 WER  25% SEC 3.8
+GPAL tr Zephyr         x1.20 lively F0   381 UTMOS 2.30 WER  25% SEC 4.6
+GPAL tr Zephyr         x1.40 lively F0   363 UTMOS 2.47 WER   0% SEC 5.1
+GPAL tr Zephyr         x0.80 lively F0   210 UTMOS 2.86 WER  12% SEC 3.9
+GALLERY tr 15 = Achird
+GPAL tr Achird         x1.00 calm   F0   135 UTMOS 4.00 WER   0% SEC 5.3
+GPAL tr Achird         x1.00 lively F0   216 UTMOS 3.27 WER   0% SEC 4.5
+GPAL tr Achird         x1.20 lively F0   259 UTMOS 3.38 WER   0% SEC 4.5
+GPAL tr Achird         x1.40 lively F0   295 UTMOS 3.80 WER  12% SEC 4.6
+GPAL tr Achird         x0.80 lively F0   175 UTMOS 2.57 WER   0% SEC 4.5
+GALLERY tr 16 = Algenib
+GPAL tr Algenib        x1.00 calm   F0   147 UTMOS 4.08 WER   0% SEC 5.7
+GPAL tr Algenib        x1.00 lively F0   143 UTMOS 4.04 WER  12% SEC 3.9
+GPAL tr Algenib        x1.20 lively F0   137 UTMOS 4.06 WER   0% SEC 4.5
+GPAL tr Algenib        x1.40 lively F0   189 UTMOS 3.98 WER   0% SEC 3.9
+GPAL tr Algenib        x0.80 lively F0   158 UTMOS 2.71 WER   0% SEC 4.1
+GALLERY tr 17 = Algieba
+GPAL tr Algieba        x1.00 calm   F0   109 UTMOS 3.82 WER   0% SEC 5.2
+GPAL tr Algieba        x1.00 lively F0   171 UTMOS 2.99 WER  12% SEC 4.1
+GPAL tr Algieba        x1.20 lively F0   150 UTMOS 3.81 WER   0% SEC 4.0
+GPAL tr Algieba        x1.40 lively F0   173 UTMOS 3.78 WER  12% SEC 4.1
+GPAL tr Algieba        x0.80 lively F0   129 UTMOS 2.78 WER   0% SEC 4.1
+GALLERY tr 18 = Alnilam
+GPAL tr Alnilam        x1.00 calm   F0   140 UTMOS 4.15 WER   0% SEC 5.6
+GPAL tr Alnilam        x1.00 lively F0   186 UTMOS 4.01 WER  12% SEC 4.1
+GPAL tr Alnilam        x1.20 lively F0   220 UTMOS 4.12 WER  12% SEC 4.1
+GPAL tr Alnilam        x1.40 lively F0   184 UTMOS 3.62 WER   0% SEC 4.3
+GPAL tr Alnilam        x0.80 lively F0   127 UTMOS 3.27 WER   0% SEC 3.9
+GALLERY tr 19 = Charon
+GPAL tr Charon         x1.00 calm   F0   135 UTMOS 3.85 WER   0% SEC 5.8
+GPAL tr Charon         x1.00 lively F0   175 UTMOS 3.54 WER   0% SEC 4.7
+GPAL tr Charon         x1.20 lively F0   191 UTMOS 3.75 WER  25% SEC 4.4
+GPAL tr Charon         x1.40 lively F0   223 UTMOS 3.93 WER  12% SEC 3.6
+GPAL tr Charon         x0.80 lively F0   134 UTMOS 2.61 WER   0% SEC 4.3
+GALLERY tr 20 = Enceladus
+GPAL tr Enceladus      x1.00 calm   F0   126 UTMOS 4.02 WER   0% SEC 5.4
+GPAL tr Enceladus      x1.00 lively F0   134 UTMOS 4.02 WER   0% SEC 4.6
+GPAL tr Enceladus      x1.20 lively F0   160 UTMOS 3.92 WER   0% SEC 4.6
+GPAL tr Enceladus      x1.40 lively F0   181 UTMOS 3.99 WER   0% SEC 4.5
+GPAL tr Enceladus      x0.80 lively F0   115 UTMOS 2.89 WER  25% SEC 4.4
+GALLERY tr 21 = Fenrir
+GPAL tr Fenrir         x1.00 calm   F0   141 UTMOS 4.13 WER   0% SEC 5.8
+GPAL tr Fenrir         x1.00 lively F0   183 UTMOS 4.06 WER   0% SEC 4.6
+GPAL tr Fenrir         x1.20 lively F0   241 UTMOS 3.55 WER  25% SEC 5.0
+GPAL tr Fenrir         x1.40 lively F0   261 UTMOS 3.34 WER  12% SEC 4.2
+GPAL tr Fenrir         x0.80 lively F0   217 UTMOS 3.14 WER  12% SEC 4.3
+GALLERY tr 22 = Iapetus
+GPAL tr Iapetus        x1.00 calm   F0   137 UTMOS 4.27 WER   0% SEC 5.7
+GPAL tr Iapetus        x1.00 lively F0   133 UTMOS 4.05 WER   0% SEC 3.4
+GPAL tr Iapetus        x1.20 lively F0   152 UTMOS 4.05 WER  12% SEC 3.9
+GPAL tr Iapetus        x1.40 lively F0   174 UTMOS 4.11 WER  12% SEC 3.9
+GPAL tr Iapetus        x0.80 lively F0   132 UTMOS 3.47 WER   0% SEC 5.0
+GALLERY tr 23 = Orus
+GPAL tr Orus           x1.00 calm   F0   134 UTMOS 4.14 WER   8% SEC 5.6
+GPAL tr Orus           x1.00 lively F0   187 UTMOS 3.74 WER   0% SEC 4.1
+GPAL tr Orus           x1.20 lively F0   195 UTMOS 3.86 WER  12% SEC 4.1
+GPAL tr Orus           x1.40 lively F0   216 UTMOS 4.05 WER   0% SEC 5.0
+GPAL tr Orus           x0.80 lively F0   160 UTMOS 3.07 WER   0% SEC 4.6
+GALLERY tr 24 = Puck
+GPAL tr Puck           x1.00 calm   F0   128 UTMOS 4.21 WER   0% SEC 5.8
+GPAL tr Puck           x1.00 lively F0   194 UTMOS 4.02 WER   0% SEC 4.9
+GPAL tr Puck           x1.20 lively F0   314 UTMOS 3.11 WER  12% SEC 4.6
+GPAL tr Puck           x1.40 lively F0   271 UTMOS 3.40 WER   0% SEC 4.9
+GPAL tr Puck           x0.80 lively F0   141 UTMOS 3.55 WER   0% SEC 5.1
+GALLERY tr 25 = Rasalgethi
+GPAL tr Rasalgethi     x1.00 calm   F0   133 UTMOS 3.94 WER   0% SEC 5.6
+GPAL tr Rasalgethi     x1.00 lively F0   198 UTMOS 3.78 WER  12% SEC 4.4
+GPAL tr Rasalgethi     x1.20 lively F0   245 UTMOS 3.74 WER  12% SEC 4.7
+GPAL tr Rasalgethi     x1.40 lively F0   282 UTMOS 3.74 WER  12% SEC 4.7
+GPAL tr Rasalgethi     x0.80 lively F0   146 UTMOS 3.10 WER   0% SEC 4.0
+GALLERY tr 26 = Sadachbia
+GPAL tr Sadachbia      x1.00 calm   F0   118 UTMOS 4.04 WER   0% SEC 5.1
+GPAL tr Sadachbia      x1.00 lively F0   145 UTMOS 4.02 WER   0% SEC 3.5
+GPAL tr Sadachbia      x1.20 lively F0   224 UTMOS 3.63 WER   0% SEC 4.3
+GPAL tr Sadachbia      x1.40 lively F0   262 UTMOS 3.91 WER   0% SEC 4.3
+GPAL tr Sadachbia      x0.80 lively F0   165 UTMOS 2.48 WER   0% SEC 4.3
+GALLERY tr 27 = Sadaltager
+GPAL tr Sadaltager     x1.00 calm   F0   143 UTMOS 4.10 WER   0% SEC 5.8
+GPAL tr Sadaltager     x1.00 lively F0   155 UTMOS 4.03 WER   0% SEC 4.1
+GPAL tr Sadaltager     x1.20 lively F0   233 UTMOS 3.87 WER   0% SEC 4.3
+GPAL tr Sadaltager     x1.40 lively F0   265 UTMOS 3.69 WER  12% SEC 4.4
+GPAL tr Sadaltager     x0.80 lively F0   155 UTMOS 2.60 WER   0% SEC 4.2
+GALLERY tr 28 = Schedar
+GPAL tr Schedar        x1.00 calm   F0   138 UTMOS 3.99 WER   0% SEC 4.5
+GPAL tr Schedar        x1.00 lively F0   190 UTMOS 3.35 WER  12% SEC 4.0
+GPAL tr Schedar        x1.20 lively F0   277 UTMOS 3.03 WER  25% SEC 3.4
+GPAL tr Schedar        x1.40 lively F0   207 UTMOS 2.78 WER   0% SEC 3.2
+GPAL tr Schedar        x0.80 lively F0   140 UTMOS 2.95 WER  12% SEC 4.4
+GALLERY tr 29 = Umbriel
+GPAL tr Umbriel        x1.00 calm   F0   114 UTMOS 3.89 WER   0% SEC 5.3
+GPAL tr Umbriel        x1.00 lively F0   186 UTMOS 3.09 WER   0% SEC 4.1
+GPAL tr Umbriel        x1.20 lively F0   172 UTMOS 3.93 WER   0% SEC 3.4
+GPAL tr Umbriel        x1.40 lively F0   218 UTMOS 2.93 WER  12% SEC 3.4
+GPAL tr Umbriel        x0.80 lively F0   151 UTMOS 2.40 WER   0% SEC 4.1
+GALLERY tr 30 = Zubenelgenubi
+GPAL tr Zubenelgenubi  x1.00 calm   F0   149 UTMOS 4.00 WER   0% SEC 5.8
+GPAL tr Zubenelgenubi  x1.00 lively F0   203 UTMOS 3.55 WER   0% SEC 4.0
+GPAL tr Zubenelgenubi  x1.20 lively F0   218 UTMOS 4.26 WER  12% SEC 4.3
+GPAL tr Zubenelgenubi  x1.40 lively F0   228 UTMOS 3.74 WER  12% SEC 4.2
+GPAL tr Zubenelgenubi  x0.80 lively F0   164 UTMOS 2.41 WER   0% SEC 3.6
+wrote gpalette-tr 230.0 s
+GPAL characters sent in this job: 44162, requests: 883

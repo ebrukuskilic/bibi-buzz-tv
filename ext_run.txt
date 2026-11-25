@@ -1,0 +1,196 @@
+ptts --list-voices: returncode 0 stdout lines 102
+Zoey	en	NbpkqMVS3CJeq2j8	Playful, upbeat and Gen Z energy voice with a standard American accent. Perfect for engaging conversations!
+Juniper	en	NIWIOv5vTi5eRMj8	Cheerful presence with real resonance under it, personable when the copy turns intimate and decisive on the final line.
+Everly	en	vjFyp2BcCyTlUmYb	Rounded, soft-edged tone with gentle lift at the end of phrases and an easy, relaxed delivery.
+Harper	en	4SZHfMpw-p46Ywgs	Modern, confident and friendly voice with a standard American accent.
+Hadley	en	bXwrkHhURL1VFJdG	Settled, even-toned and genuinely kind, with crisp consonants that hold up over a handset.
+Delia	en	nGzMHMPAWGaJFHOo	Low, grounded and quick to the point, with a sincerity that keeps an apology honest.
+Easton	en	LMDIYE0Oa377Qh6Z	Punchy and close in, with crisp consonant attack that cuts through a music bed and pitch that lifts across each line.
+Micah	en	40QrMVgAxFiUnP9f	Buoyant and high in energy, with a playful lift at the ends of phrases and clean attack that survives a loud mix.
+Trevor	en	0zLApsZfVLLNaEGl	Buoyant energy over a resonant mid-low core, phrases landing softly and consonants cutting through a handset.
+Russell	en	_6Aslh2DxfmnRLmP	A high-energy American adult voice that pushes and encourages with the intensity of someone who genuinely believes in you.
+Preston	en	qIxlZ7Ei8KvWlyQH	Trim, focused delivery with clean edges on every consonant and a steady, low-set core that carries through phone bandwidth.
+Miles	en	d9XCyhjo4JhkHF1d	Resonant and decisive, with genuine dynamic range, dropping right down for one clause then driving back up.
+Maeve	en	6PWnV0Nq4wu7RVBT	A sparky, attentive British English adult voice that gets to the point with a smile. Ideal for fast, efficient customer support and helpful voice assistants.
+Freya	en	GgfEkEJtxZR7gnpy	A young British voice, glossy and confident with fast, girly chatter and bubbly sparkle, perfect for a friendly receptionist or assistant.
+Pippa	en	uem82D50GRv2Dwma	A confident, upbeat British English adult voice with infectious energy. Perfect for proactive assistants and motivating customer success calls.
+Elodie-Rose	en	y9bQqIDnyxwqK01t	A young British voice with sharp, enthusiastic energy and crisp articulation, sparky and to the point for customer support and care.
+Imogen	en	gDT1nz7Ie36ZhL-C	A bubbly, friendly British English adult voice that puts callers instantly at ease. Great for onboarding assistants and warm concierge interactions.
+Lottie	en	m9MxpY6IUGXtWp76	Sparky and to the point, high forward energy with clean edges on the consonants and the range to drop low for one line then climb back.
+Alfie	en	X6NceqF285Gr04gb	Punchy and forward, with crisp consonant attack and a pitch that lifts across a line, sitting high over a music bed.
+Hugh	en	YyKcxPG7iIgS3jsK	Soft and close, airy in texture, with lively pitch movement and an attentive, sincere delivery.
+Edwin	en	zUCxzrOrugTSis03	Efficient and firm, sincere in attention, with tidy articulation that holds up at phone bandwidth.
+Spencer	en	JOW0vchyswkQUMDS	Light and airy, sitting a touch higher, with crisp consonants and a slow, patient delivery.
+Toby	en	dME3IWyZBvmh1n1q	A sparky, attentive British English adult voice that gets to the point with a smile. Ideal for fast, efficient customer support and helpful voice assistants.
+Teddy	en	Zn7g6NxLqXlJb7Qi	Sparky and close in, quick off the mark, with firm consonants and the range to drop right down for a clause then come back up.
+Noa	es	b6FvJAiokjdqIti4	A glossy, confident young Castilian Spanish voice with fast, girly charm and warmth, a bubbly assistant that makes every chat sparkle.
+Lucía-Sol	es	3p0eIGbkmny71GlA	A bouncy, chipper young Castilian Spanish voice with a cute upward lilt, bringing playful energy to friendly reception and support.
+Candela	es	c9wqBDmQiBie5q6Y	An enthusiastic, bubbly young Castilian Spanish voice, animated like a beauty guru mid-tutorial, adding fun energy to customer care.
+Celia	es	rmLBOdHrfkFym9MM	Sparky and forward, light on the air but firm on every consonant, landing the final line without pushing.
+Alba	es	u2UscyAnHilpiwmf	A sweet, expressive young Castilian Spanish voice, soft and girly with lively emphasis, sparky and to the point for efficient support.
+Alicia	es	4701YgRXjkBcg6sL	Rounded and softly resonant, settling low in the range, with phrases that land gently and an apology that sounds genuinely meant.
+Marcos	es	jvPx8j8zLGQ3utZz	A confident, upbeat Peninsular Spanish adult voice with infectious energy. Perfect for proactive assistants and motivating customer success calls.
+Borja	es	tIjCgP8v3RY8UpgM	Resonant and punchy, driving a rhythmic read that cuts over a loud music bed and lands squarely on the brand name.
+Iker	es	t-_TS1e-0GzDAX02	An easy-going, friendly Peninsular Spanish adult voice that puts callers instantly at ease. Great for onboarding assistants and warm concierge interactions.
+Nuno	es	fghJGlv90qu8OJ36	Resonant and easy-going, with a relaxed mid-range delivery and a hint of playful lift at the end of phrases.
+Izan	es	Ejb29qHnSOK0cIHY	Crisp consonant attack, forward energy and a punchy delivery that sits on top of a music bed.
+Guillermo	es	FaLVVqpFQcDOtq45	Low and resonant, settled in tone, with phrases that land softly and an apology that sounds genuinely meant.
+Rebeca	es	Sx8m6WdXBG06zwZT	Fuller and grounded in the low end, with hard consonant edges and a decisive punch saved for the brand name.
+Regina	es	s58clrg2fe0MO7Y-	A confident, upbeat Mexican Spanish adult voice with the natural assurance of a closer. Ideal for proactive assistants and sales-led customer interactions.
+Danae	es	evfxKSxpDIhmsNoq	Sparky and punchy, with a light, airy top end, clean attack on every word and a brisk rhythm that lands the brand name.
+Azucena	es	KJpIQlbYrZPA4aLq	Weighted lower register with steady authority that comes from calm rather than volume, and diction that survives raised playback speed.
+Jimena	es	qG5BXOJYrKEnXLIX	Crisp consonant attack and a forward, sparky delivery that sits over
+Phonon: 37 English voices: Zoey, Juniper, Everly, Harper, Hadley, Delia, Easton, Micah, Trevor, Russell, Preston, Miles, Maeve, Freya, Pippa, Elodie-Rose, Imogen, Lottie, Alfie, Hugh, Edwin, Spencer, Toby, Teddy, Bryony, Captain Silas Blackwater, Morwenna of the Deep, Old Mortlake, Azgorath, Fennick the Young Elf, The Thing Under the Stairs, Vyrmathrax the Ancient, Grub the Ogre, Master Aldric, The Snow Queen, Sir Bramwell, Fairy Godmother
+Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]Fetching 9 files:  22%|██▏       | 2/9 [00:00<00:02,  2.82it/s]Fetching 9 files: 100%|██████████| 9/9 [00:07<00:00,  1.13it/s]Fetching 9 files: 100%|██████████| 9/9 [00:07<00:00,  1.18it/s]
+Pocket TTS Turkish loaded in 10.4 s, sample rate 24000
+pg-three-little-pigs-mama          pocket   female_2   sakin      2.9 s of audio in  11.8 s
+pg-three-little-pigs-pig1          pocket   male_2     -          3.5 s of audio in   1.4 s
+pg-three-little-pigs-pig2          pocket   male_3     -          3.2 s of audio in   1.4 s
+pg-three-little-pigs-pig3          pocket   male_1     -          3.2 s of audio in   1.4 s
+pg-three-little-pigs-wolf          pocket   male_1     kızgın     2.7 s of audio in   0.8 s
+pg-goldilocks-gold                 pocket   female_1   mutlu      4.7 s of audio in   1.7 s
+pg-goldilocks-papa                 pocket   male_1     kızgın     1.8 s of audio in   0.5 s
+pg-goldilocks-mama                 pocket   female_3   kızgın     2.3 s of audio in   1.1 s
+pg-goldilocks-baby                 pocket   female_1   mutlu      2.2 s of audio in   0.6 s
+pg-red-riding-hood-red             pocket   female_1   mutlu      4.7 s of audio in   1.3 s
+pg-red-riding-hood-mama            pocket   female_2   sakin      2.9 s of audio in   0.8 s
+pg-red-riding-hood-granny          pocket   female_3   sakin      3.7 s of audio in   1.0 s
+pg-red-riding-hood-wolf            pocket   male_1     kızgın     2.7 s of audio in   0.8 s
+pg-red-riding-hood-wolfg           pocket   male_3     -          2.2 s of audio in   0.6 s
+pg-red-riding-hood-wood            pocket   male_3     -          3.0 s of audio in   0.9 s
+pg-cinderella-cin                  pocket   female_1   -          2.4 s of audio in   0.7 s
+pg-cinderella-cing                 pocket   female_1   -          2.4 s of audio in   0.7 s
+pg-cinderella-sm                   pocket   female_3   kızgın     4.1 s of audio in   1.1 s
+pg-cinderella-s1                   pocket   female_1   kızgın     2.7 s of audio in   0.8 s
+pg-cinderella-s2                   pocket   female_3   kızgın     2.9 s of audio in   0.8 s
+pg-cinderella-fg                   pocket   female_2   mutlu      2.6 s of audio in   0.7 s
+pg-cinderella-pr                   pocket   male_2     -          3.0 s of audio in   0.8 s
+pg-magic-porridge-pot-kid          pocket   female_1   mutlu      4.6 s of audio in   1.3 s
+pg-magic-porridge-pot-mama         pocket   female_2   sakin      2.9 s of audio in   0.8 s
+pg-magic-porridge-pot-old          pocket   female_3   sakin      3.8 s of audio in   1.0 s
+pg-magic-porridge-pot-gpa          pocket   male_1     sakin      3.1 s of audio in   0.9 s
+pg-magic-porridge-pot-gma          pocket   female_2   sakin      3.1 s of audio in   0.9 s
+pg-magic-porridge-pot-nei          pocket   female_3   mutlu      4.9 s of audio in   1.4 s
+pg-gingerbread-man-gm              pocket   male_2     mutlu      3.3 s of audio in   0.9 s
+pg-gingerbread-man-woman           pocket   female_3   sakin      3.7 s of audio in   1.0 s
+pg-gingerbread-man-man             pocket   male_1     sakin      3.2 s of audio in   0.9 s
+pg-gingerbread-man-pig             pocket   male_2     -          3.5 s of audio in   1.0 s
+pg-gingerbread-man-bear            pocket   male_1     kızgın     1.8 s of audio in   0.5 s
+pg-gingerbread-man-fox             pocket   male_3     şaşkın     3.4 s of audio in   1.0 s
+pk-female_1-calm                   pocket   female_1   -          4.6 s of audio in   1.2 s
+pk-female_1-lively                 pocket   female_1   mutlu      4.7 s of audio in   1.3 s
+pk-female_2-calm                   pocket   female_2   -          4.3 s of audio in   1.2 s
+pk-female_2-lively                 pocket   female_2   mutlu      4.2 s of audio in   1.1 s
+pk-female_3-calm                   pocket   female_3   -          5.0 s of audio in   1.4 s
+pk-female_3-lively                 pocket   female_3   mutlu      4.9 s of audio in   1.3 s
+pk-male_1-calm                     pocket   male_1     -          4.4 s of audio in   1.2 s
+pk-male_1-lively                   pocket   male_1     mutlu      4.0 s of audio in   1.1 s
+pk-male_2-calm                     pocket   male_2     -          4.7 s of audio in   1.3 s
+pk-male_2-lively                   pocket   male_2     mutlu      4.7 s of audio in   1.3 s
+pk-male_3-calm                     pocket   male_3     -          4.3 s of audio in   1.2 s
+pk-male_3-lively                   pocket   male_3     mutlu      3.9 s of audio in   1.1 s
+pk-female_2-emo-mutlu              pocket   female_2   mutlu      4.1 s of audio in   1.1 s
+pk-female_2-emo-uzgun              pocket   female_2   üzgün      4.2 s of audio in   1.2 s
+pk-female_2-emo-kizgin             pocket   female_2   kızgın     4.2 s of audio in   1.2 s
+pk-female_2-emo-sasgin             pocket   female_2   şaşkın     4.2 s of audio in   1.2 s
+pk-female_2-emo-sakin              pocket   female_2   sakin      4.2 s of audio in   1.2 s
+pk-male_1-emo-mutlu                pocket   male_1     mutlu      4.2 s of audio in   1.2 s
+pk-male_1-emo-uzgun                pocket   male_1     üzgün      3.9 s of audio in   1.1 s
+pk-male_1-emo-kizgin               pocket   male_1     kızgın     4.0 s of audio in   1.1 s
+pk-male_1-emo-sasgin               pocket   male_1     şaşkın     4.0 s of audio in   1.1 s
+pk-male_1-emo-sakin                pocket   male_1     sakin      4.0 s of audio in   1.1 s
+pk-female_1-world-1.25-1.10        pocket   female_1   mutlu      4.6 s of audio in   1.3 s
+pk-female_1-world-1.50-1.20        pocket   female_1   mutlu      4.7 s of audio in   1.3 s
+pk-male_2-world-1.30-1.12          pocket   male_2     mutlu      4.9 s of audio in   1.3 s
+Phonon 31m loaded in 2.4 s
+ph-calm-Zoey                       phonon   Zoey       -          4.4 s of audio in   3.8 s
+ph-calm-Juniper                    phonon   Juniper    -          4.4 s of audio in   1.2 s
+ph-calm-Everly                     phonon   Everly     -          4.5 s of audio in   1.2 s
+ph-calm-Harper                     phonon   Harper     -          4.2 s of audio in   1.4 s
+ph-calm-Hadley                     phonon   Hadley     -          4.6 s of audio in   1.2 s
+ph-calm-Delia                      phonon   Delia      -          4.6 s of audio in   1.2 s
+ph-calm-Easton                     phonon   Easton     -          4.1 s of audio in   1.2 s
+ph-calm-Micah                      phonon   Micah      -          4.4 s of audio in   1.1 s
+ph-calm-Trevor                     phonon   Trevor     -          4.6 s of audio in   1.2 s
+ph-calm-Russell                    phonon   Russell    -          4.2 s of audio in   1.2 s
+ph-calm-Preston                    phonon   Preston    -          4.6 s of audio in   1.1 s
+ph-calm-Miles                      phonon   Miles      -          4.3 s of audio in   1.2 s
+ph-calm-Maeve                      phonon   Maeve      -          4.4 s of audio in   1.3 s
+ph-calm-Freya                      phonon   Freya      -          4.4 s of audio in   1.2 s
+ph-calm-Pippa                      phonon   Pippa      -          4.6 s of audio in   1.2 s
+ph-calm-Elodie-Rose                phonon   Elodie-Rose -          4.5 s of audio in   1.3 s
+ph-calm-Imogen                     phonon   Imogen     -          4.4 s of audio in   1.3 s
+ph-calm-Lottie                     phonon   Lottie     -          4.4 s of audio in   1.4 s
+ph-calm-Alfie                      phonon   Alfie      -          4.3 s of audio in   1.3 s
+ph-calm-Hugh                       phonon   Hugh       -          4.6 s of audio in   1.2 s
+ph-calm-Edwin                      phonon   Edwin      -          4.4 s of audio in   1.3 s
+ph-calm-Spencer                    phonon   Spencer    -          4.6 s of audio in   1.2 s
+ph-calm-Toby                       phonon   Toby       -          4.4 s of audio in   1.2 s
+ph-calm-Teddy                      phonon   Teddy      -          4.5 s of audio in   1.2 s
+ph-calm-Bryony                     phonon   Bryony     -          4.4 s of audio in   1.2 s
+ph-calm-Captain Silas Blackwater   phonon   Captain Silas Blackwater -          5.0 s of audio in   1.2 s
+ph-calm-Morwenna of the Deep       phonon   Morwenna of the Deep -          5.4 s of audio in   1.4 s
+ph-calm-Old Mortlake               phonon   Old Mortlake -          4.9 s of audio in   1.3 s
+ph-calm-Azgorath                   phonon   Azgorath   -          5.4 s of audio in   1.4 s
+ph-calm-Fennick the Young Elf      phonon   Fennick the Young Elf -          4.4 s of audio in   1.1 s
+ph-calm-The Thing Under the Stairs phonon   The Thing Under the Stairs -          5.2 s of audio in   1.2 s
+ph-calm-Vyrmathrax the Ancient     phonon   Vyrmathrax the Ancient -          5.4 s of audio in   1.3 s
+ph-calm-Grub the Ogre              phonon   Grub the Ogre -          5.3 s of audio in   1.2 s
+ph-calm-Master Aldric              phonon   Master Aldric -          5.3 s of audio in   1.3 s
+ph-calm-The Snow Queen             phonon   The Snow Queen -          4.6 s of audio in   1.2 s
+ph-calm-Sir Bramwell               phonon   Sir Bramwell -          4.9 s of audio in   1.3 s
+ph-calm-Fairy Godmother            phonon   Fairy Godmother -          5.5 s of audio in   1.3 s
+ph-lively-Zoey                     phonon   Zoey       -          4.1 s of audio in   0.5 s
+ph-lively-Juniper                  phonon   Juniper    -          4.0 s of audio in   0.5 s
+ph-lively-Everly                   phonon   Everly     -          4.2 s of audio in   0.5 s
+ph-lively-Harper                   phonon   Harper     -          4.1 s of audio in   0.5 s
+ph-lively-Hadley                   phonon   Hadley     -          4.2 s of audio in   0.5 s
+ph-lively-Delia                    phonon   Delia      -          4.2 s of audio in   0.5 s
+ph-lively-Easton                   phonon   Easton     -          3.8 s of audio in   0.5 s
+ph-lively-Micah                    phonon   Micah      -          4.1 s of audio in   0.5 s
+ph-lively-Trevor                   phonon   Trevor     -          4.5 s of audio in   0.6 s
+ph-lively-Russell                  phonon   Russell    -          3.9 s of audio in   0.5 s
+ph-lively-Preston                  phonon   Preston    -          4.2 s of audio in   0.5 s
+ph-lively-Miles                    phonon   Miles      -          3.9 s of audio in   0.5 s
+ph-lively-Maeve                    phonon   Maeve      -          4.2 s of audio in   0.5 s
+ph-lively-Freya                    phonon   Freya      -          4.1 s of audio in   0.5 s
+ph-lively-Pippa                    phonon   Pippa      -          4.1 s of audio in   0.5 s
+ph-lively-Elodie-Rose              phonon   Elodie-Rose -          4.1 s of audio in   0.5 s
+ph-lively-Imogen                   phonon   Imogen     -          4.0 s of audio in   0.5 s
+ph-lively-Lottie                   phonon   Lottie     -          3.9 s of audio in   0.5 s
+ph-lively-Alfie                    phonon   Alfie      -          3.8 s of audio in   0.5 s
+ph-lively-Hugh                     phonon   Hugh       -          4.2 s of audio in   0.5 s
+ph-lively-Edwin                    phonon   Edwin      -          4.1 s of audio in   0.5 s
+ph-lively-Spencer                  phonon   Spencer    -          4.2 s of audio in   0.5 s
+ph-lively-Toby                     phonon   Toby       -          4.0 s of audio in   0.5 s
+ph-lively-Teddy                    phonon   Teddy      -          4.1 s of audio in   0.5 s
+ph-lively-Bryony                   phonon   Bryony     -          4.0 s of audio in   0.5 s
+ph-lively-Captain Silas Blackwater phonon   Captain Silas Blackwater -          4.9 s of audio in   0.6 s
+ph-lively-Morwenna of the Deep     phonon   Morwenna of the Deep -          5.0 s of audio in   0.6 s
+ph-lively-Old Mortlake             phonon   Old Mortlake -          5.1 s of audio in   0.6 s
+ph-lively-Azgorath                 phonon   Azgorath   -          5.4 s of audio in   0.6 s
+ph-lively-Fennick the Young Elf    phonon   Fennick the Young Elf -          4.1 s of audio in   0.5 s
+ph-lively-The Thing Under the Stairs phonon   The Thing Under the Stairs -          5.2 s of audio in   0.6 s
+ph-lively-Vyrmathrax the Ancient   phonon   Vyrmathrax the Ancient -          5.1 s of audio in   0.6 s
+ph-lively-Grub the Ogre            phonon   Grub the Ogre -          5.0 s of audio in   0.6 s
+ph-lively-Master Aldric            phonon   Master Aldric -          5.0 s of audio in   0.6 s
+ph-lively-The Snow Queen           phonon   The Snow Queen -          5.0 s of audio in   0.6 s
+ph-lively-Sir Bramwell             phonon   Sir Bramwell -          4.6 s of audio in   0.6 s
+ph-lively-Fairy Godmother          phonon   Fairy Godmother -          5.4 s of audio in   0.6 s
+ph-narr-Everly                     phonon   Everly     -         11.9 s of audio in   1.4 s
+ph-narr-Hadley                     phonon   Hadley     -         12.2 s of audio in   1.4 s
+ph-narr-Juniper                    phonon   Juniper    -         11.6 s of audio in   1.4 s
+ph-narr-Delia                      phonon   Delia      -         11.8 s of audio in   1.3 s
+ph-narr-Hugh                       phonon   Hugh       -         12.0 s of audio in   1.4 s
+ph-narr-Imogen                     phonon   Imogen     -         11.4 s of audio in   1.3 s
+ph-narr-Harper                     phonon   Harper     -         11.3 s of audio in   1.4 s
+ph-narr-Maeve                      phonon   Maeve      -         11.8 s of audio in   1.4 s
+pk-narr-female_1                   pocket   female_1   -         12.0 s of audio in   3.1 s
+pk-narr-female_2                   pocket   female_2   -         11.4 s of audio in   3.0 s
+pk-narr-female_3                   pocket   female_3   -         12.7 s of audio in   3.3 s
+ph-kid-Freya-1.15-1.04             phonon   Freya      -          4.1 s of audio in   0.5 s
+ph-kid-Freya-1.30-1.10             phonon   Freya      -          4.1 s of audio in   0.4 s
+ph-kid-Elodie-Rose-1.20-1.06       phonon   Elodie-Rose -          4.1 s of audio in   0.5 s
+ph-kid-Micah-1.25-1.08             phonon   Micah      -          4.1 s of audio in   0.5 s
+ph-kid-Alfie-1.30-1.10             phonon   Alfie      -          3.8 s of audio in   0.5 s
+done: 149 of 149 clips in 182 s

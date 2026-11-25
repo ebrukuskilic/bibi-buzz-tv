@@ -1,0 +1,236 @@
+==================== main 05:07:59
+python 3.12.16 Linux-7.0.0-1020-azure-x86_64-with-glibc2.43 cpus 4
+   numpy 2.5.5
+   scipy 1.18.1
+   torch 2.15.0+cpu
+   torchaudio 2.11.1+cpu
+   kokoro 0.9.4
+   misaki 0.9.4
+   faster_whisper 1.2.1
+   edge_tts 7.3.1
+edge-tts: 318 voices; Turkish: ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural']
+   en-AU-WilliamMultilingualNeural              en-AU  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   en-US-AndrewMultilingualNeural               en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Warm', 'Confident', 'Authentic', 'Honest']}
+   en-US-AvaMultilingualNeural                  en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Expressive', 'Caring', 'Pleasant', 'Friendly']}
+   en-US-BrianMultilingualNeural                en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Approachable', 'Casual', 'Sincere']}
+   en-US-EmmaMultilingualNeural                 en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Cheerful', 'Clear', 'Conversational']}
+   fr-FR-VivienneMultilingualNeural             fr-FR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   fr-FR-RemyMultilingualNeural                 fr-FR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   it-IT-GiuseppeMultilingualNeural             it-IT  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   ko-KR-HyunsuMultilingualNeural               ko-KR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   pt-BR-ThalitaMultilingualNeural              pt-BR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+---- world en: WORLD language voice method pitch-factor formant-factor F0 UTMOS WER seconds   (resample: pitch and formants move by the pitch factor)
+WORLD en af_sarah               plain    f0x1.00 envx1.00 F0   192 UTMOS 4.49 WER   0% SEC 3.6
+WORLD en af_sarah               resample f0x1.20 envx1.00 F0   235 UTMOS 4.39 WER   0% SEC 3.4
+WORLD en af_sarah               resample f0x1.35 envx1.00 F0   261 UTMOS 4.06 WER   0% SEC 3.6
+WORLD en af_sarah               resample f0x1.50 envx1.00 F0   291 UTMOS 2.97 WER   0% SEC 3.6
+   WORLD analysis + synthesis of 3.6 s of speech took 0.6 s
+WORLD en af_sarah               world    f0x1.20 envx1.06 F0   229 UTMOS 3.99 WER   0% SEC 3.6
+WORLD en af_sarah               world    f0x1.35 envx1.10 F0   258 UTMOS 3.96 WER   0% SEC 3.6
+WORLD en af_sarah               world    f0x1.35 envx1.18 F0   257 UTMOS 3.97 WER   0% SEC 3.6
+WORLD en af_sarah               world    f0x1.50 envx1.12 F0   290 UTMOS 3.91 WER   0% SEC 3.6
+WORLD en af_sarah               world    f0x1.50 envx1.22 F0   286 UTMOS 3.81 WER   0% SEC 3.6
+WORLD en bf_isabella            plain    f0x1.00 envx1.00 F0   217 UTMOS 4.39 WER   0% SEC 3.5
+WORLD en bf_isabella            resample f0x1.20 envx1.00 F0   259 UTMOS 3.92 WER   0% SEC 3.3
+WORLD en bf_isabella            resample f0x1.35 envx1.00 F0   294 UTMOS 3.50 WER   0% SEC 3.6
+WORLD en bf_isabella            resample f0x1.50 envx1.00 F0   325 UTMOS 2.45 WER   0% SEC 3.6
+WORLD en bf_isabella            world    f0x1.20 envx1.06 F0   258 UTMOS 3.85 WER   0% SEC 3.5
+WORLD en bf_isabella            world    f0x1.35 envx1.10 F0   289 UTMOS 3.75 WER   0% SEC 3.5
+WORLD en bf_isabella            world    f0x1.35 envx1.18 F0   290 UTMOS 3.37 WER   0% SEC 3.5
+WORLD en bf_isabella            world    f0x1.50 envx1.12 F0   320 UTMOS 3.56 WER   0% SEC 3.5
+WORLD en bf_isabella            world    f0x1.50 envx1.22 F0   320 UTMOS 3.28 WER   0% SEC 3.5
+WORLD en af_river               plain    f0x1.00 envx1.00 F0   185 UTMOS 4.46 WER   0% SEC 3.1
+WORLD en af_river               resample f0x1.20 envx1.00 F0   217 UTMOS 4.40 WER   0% SEC 3.0
+WORLD en af_river               resample f0x1.35 envx1.00 F0   244 UTMOS 4.15 WER   0% SEC 3.1
+WORLD en af_river               resample f0x1.50 envx1.00 F0   273 UTMOS 3.15 WER   0% SEC 3.1
+WORLD en af_river               world    f0x1.20 envx1.06 F0   221 UTMOS 3.30 WER   0% SEC 3.1
+WORLD en af_river               world    f0x1.35 envx1.10 F0   251 UTMOS 3.22 WER   0% SEC 3.1
+WORLD en af_river               world    f0x1.35 envx1.18 F0   249 UTMOS 3.20 WER   0% SEC 3.1
+WORLD en af_river               world    f0x1.50 envx1.12 F0   279 UTMOS 3.12 WER   0% SEC 3.1
+WORLD en af_river               world    f0x1.50 envx1.22 F0   280 UTMOS 3.03 WER   0% SEC 3.1
+wrote world-en 103.0 s
+---- world tr: WORLD language voice method pitch-factor formant-factor F0 UTMOS WER seconds   (resample: pitch and formants move by the pitch factor)
+WORLD tr elif=0.8,emre=0.2      plain    f0x1.00 envx1.00 F0   217 UTMOS 4.26 WER   0% SEC 5.8
+WORLD tr elif=0.8,emre=0.2      resample f0x1.20 envx1.00 F0   264 UTMOS 3.75 WER   0% SEC 6.0
+WORLD tr elif=0.8,emre=0.2      resample f0x1.35 envx1.00 F0   297 UTMOS 2.60 WER   0% SEC 5.9
+WORLD tr elif=0.8,emre=0.2      resample f0x1.50 envx1.00 F0   330 UTMOS 2.05 WER   0% SEC 6.0
+   WORLD analysis + synthesis of 5.8 s of speech took 1.1 s
+WORLD tr elif=0.8,emre=0.2      world    f0x1.20 envx1.06 F0   259 UTMOS 3.10 WER   0% SEC 5.8
+WORLD tr elif=0.8,emre=0.2      world    f0x1.35 envx1.10 F0   292 UTMOS 3.08 WER   0% SEC 5.8
+WORLD tr elif=0.8,emre=0.2      world    f0x1.35 envx1.18 F0   292 UTMOS 2.59 WER   0% SEC 5.8
+WORLD tr elif=0.8,emre=0.2      world    f0x1.50 envx1.12 F0   324 UTMOS 3.03 WER   0% SEC 5.8
+WORLD tr elif=0.8,emre=0.2      world    f0x1.50 envx1.22 F0   324 UTMOS 2.51 WER   0% SEC 5.8
+WORLD tr elif                   plain    f0x1.00 envx1.00 F0   234 UTMOS 4.27 WER   0% SEC 5.9
+WORLD tr elif                   resample f0x1.20 envx1.00 F0   284 UTMOS 3.58 WER   0% SEC 6.1
+WORLD tr elif                   resample f0x1.35 envx1.00 F0   320 UTMOS 2.52 WER   0% SEC 6.0
+WORLD tr elif                   resample f0x1.50 envx1.00 F0   357 UTMOS 1.82 WER   0% SEC 6.1
+WORLD tr elif                   world    f0x1.20 envx1.06 F0   281 UTMOS 2.91 WER   0% SEC 5.9
+WORLD tr elif                   world    f0x1.35 envx1.10 F0   316 UTMOS 2.89 WER   0% SEC 5.9
+WORLD tr elif                   world    f0x1.35 envx1.18 F0   316 UTMOS 2.57 WER  12% SEC 5.9
+WORLD tr elif                   world    f0x1.50 envx1.12 F0   351 UTMOS 2.79 WER   0% SEC 5.9
+WORLD tr elif                   world    f0x1.50 envx1.22 F0   351 UTMOS 2.43 WER   0% SEC 5.9
+wrote world-tr 113.0 s
+==================== ext-prepare 05:11:35
+ext-prepare: 61 clips to make (34 lines of the tales)
+==================== ext-collect 05:13:26
+ext: 63 clips made, 0 failed
+---- ext pocket: EXT engine group voice emotion pitch-factor formant-factor F0 UTMOS WER seconds-of-audio seconds-of-work
+EXTPAL pocket 1 = female_1
+EXT pocket  palette    female_1     -        f0x1.00 envx1.00 F0   216 UTMOS 3.62 WER   0% SEC 4.6 WORK 1.6
+EXT pocket  palette    female_1     mutlu    f0x1.00 envx1.00 F0   247 UTMOS 3.62 WER   0% SEC 4.7 WORK 1.6
+EXT pocket  world      female_1     mutlu    f0x1.25 envx1.10 F0   295 UTMOS 2.35 WER   0% SEC 4.6 WORK 1.6
+EXT pocket  world      female_1     mutlu    f0x1.50 envx1.20 F0   359 UTMOS 2.44 WER  25% SEC 4.5 WORK 1.5
+EXTPAL pocket 2 = female_2
+EXT pocket  palette    female_2     -        f0x1.00 envx1.00 F0   217 UTMOS 2.77 WER  15% SEC 4.3 WORK 1.5
+EXT pocket  palette    female_2     mutlu    f0x1.00 envx1.00 F0   220 UTMOS 3.19 WER  12% SEC 4.1 WORK 1.4
+EXT pocket  emotion    female_2     mutlu    f0x1.00 envx1.00 F0   219 UTMOS 2.83 WER  12% SEC 4.2 WORK 1.4
+EXT pocket  emotion    female_2     üzgün    f0x1.00 envx1.00 F0   229 UTMOS 3.53 WER  12% SEC 4.2 WORK 1.4
+EXT pocket  emotion    female_2     kızgın   f0x1.00 envx1.00 F0   227 UTMOS 3.18 WER  12% SEC 4.2 WORK 1.4
+EXT pocket  emotion    female_2     şaşkın   f0x1.00 envx1.00 F0   225 UTMOS 3.39 WER  12% SEC 4.1 WORK 1.4
+EXT pocket  emotion    female_2     sakin    f0x1.00 envx1.00 F0   211 UTMOS 3.39 WER  12% SEC 4.2 WORK 1.4
+EXTPAL pocket 3 = female_3
+EXT pocket  palette    female_3     -        f0x1.00 envx1.00 F0   172 UTMOS 3.47 WER  15% SEC 4.8 WORK 1.6
+EXT pocket  palette    female_3     mutlu    f0x1.00 envx1.00 F0   194 UTMOS 3.61 WER   0% SEC 4.8 WORK 1.7
+EXTPAL pocket 4 = male_1
+EXT pocket  palette    male_1       -        f0x1.00 envx1.00 F0   112 UTMOS 2.99 WER  15% SEC 4.3 WORK 1.5
+EXT pocket  palette    male_1       mutlu    f0x1.00 envx1.00 F0   138 UTMOS 2.53 WER   0% SEC 3.9 WORK 1.4
+EXT pocket  emotion    male_1       mutlu    f0x1.00 envx1.00 F0   140 UTMOS 2.52 WER  12% SEC 4.0 WORK 1.4
+EXT pocket  emotion    male_1       üzgün    f0x1.00 envx1.00 F0   148 UTMOS 1.93 WER  25% SEC 4.1 WORK 1.4
+EXT pocket  emotion    male_1       kızgın   f0x1.00 envx1.00 F0   144 UTMOS 2.71 WER   0% SEC 4.0 WORK 1.4
+EXT pocket  emotion    male_1       şaşkın   f0x1.00 envx1.00 F0   128 UTMOS 2.74 WER  25% SEC 4.0 WORK 1.4
+EXT pocket  emotion    male_1       sakin    f0x1.00 envx1.00 F0   112 UTMOS 2.58 WER  38% SEC 4.2 WORK 1.4
+EXTPAL pocket 5 = male_2
+EXT pocket  palette    male_2       -        f0x1.00 envx1.00 F0   135 UTMOS 2.77 WER   0% SEC 4.8 WORK 1.6
+EXT pocket  palette    male_2       mutlu    f0x1.00 envx1.00 F0   145 UTMOS 2.38 WER  12% SEC 4.6 WORK 1.6
+EXT pocket  world      male_2       mutlu    f0x1.30 envx1.12 F0   190 UTMOS 2.89 WER   0% SEC 5.0 WORK 1.7
+EXTPAL pocket 6 = male_3
+EXT pocket  palette    male_3       -        f0x1.00 envx1.00 F0   140 UTMOS 3.08 WER   0% SEC 4.3 WORK 1.5
+EXT pocket  palette    male_3       mutlu    f0x1.00 envx1.00 F0   146 UTMOS 3.22 WER   0% SEC 4.0 WORK 1.4
+wrote palette-pocket 128.6 s
+---- ext phonon: EXT engine group voice emotion pitch-factor formant-factor F0 UTMOS WER seconds-of-audio seconds-of-work
+EXTPAL phonon 1 = Easton
+EXT phonon  palette-en Easton       -        f0x1.00 envx1.00 F0   131 UTMOS 4.48 WER   0% SEC 4.1 WORK 2.6  [fallback]
+EXT phonon  palette-en Easton       -        f0x1.00 envx1.00 F0   168 UTMOS 4.19 WER   0% SEC 3.8 WORK 0.6  [fallback]
+EXTPAL phonon 2 = Zoey
+EXT phonon  palette-en Zoey         -        f0x1.00 envx1.00 F0   194 UTMOS 4.53 WER   0% SEC 4.4 WORK 1.0  [fallback]
+EXT phonon  palette-en Zoey         -        f0x1.00 envx1.00 F0   271 UTMOS 4.46 WER   0% SEC 4.1 WORK 0.6  [fallback]
+wrote palette-phonon 22.5 s
+---- gallery tr-pocket: GAL language tale character type F0 UTMOS WER voice
+GAL tr-pocket three-little-pigs    mama     woman       F0   200 UTMOS 3.50 WER   0%  pocket:female_2/sakin/f0x1.00/envx1.00
+GAL tr-pocket three-little-pigs    pig1     pig         F0   138 UTMOS 3.22 WER  20%  pocket:male_2/-/f0x1.10/envx1.04
+GAL tr-pocket three-little-pigs    pig2     pig         F0   144 UTMOS 3.11 WER  20%  pocket:male_3/-/f0x1.05/envx1.02
+GAL tr-pocket three-little-pigs    pig3     pig         F0   135 UTMOS 3.00 WER  20%  pocket:male_1/-/f0x1.15/envx1.06
+GAL tr-pocket three-little-pigs    wolf     wolf        F0    97 UTMOS 2.35 WER  50%  pocket:male_1/kızgın/f0x0.80/envx0.92
+GAL tr-pocket goldilocks           gold     girl        F0   319 UTMOS 3.25 WER   0%  pocket:female_1/mutlu/f0x1.25/envx1.10
+GAL tr-pocket goldilocks           papa     bear        F0   114 UTMOS 2.30 WER 100%  pocket:male_1/kızgın/f0x0.75/envx0.90
+GAL tr-pocket goldilocks           mama     mamabear    F0   147 UTMOS 3.48 WER  25%  pocket:female_3/kızgın/f0x0.80/envx0.94
+GAL tr-pocket goldilocks           baby     baby        F0   401 UTMOS 2.30 WER  40%  pocket:female_1/mutlu/f0x1.55/envx1.22
+GAL tr-pocket red-riding-hood      red      girl        F0   331 UTMOS 2.85 WER   0%  pocket:female_1/mutlu/f0x1.25/envx1.10
+GAL tr-pocket red-riding-hood      mama     woman       F0   204 UTMOS 3.48 WER  20%  pocket:female_2/sakin/f0x1.00/envx1.00
+GAL tr-pocket red-riding-hood      granny   granny      F0   154 UTMOS 3.30 WER   0%  pocket:female_3/sakin/f0x0.88/envx0.97
+GAL tr-pocket red-riding-hood      wolf     wolf        F0   104 UTMOS 2.06 WER  25%  pocket:male_1/kızgın/f0x0.80/envx0.92
+GAL tr-pocket red-riding-hood      wolfg    fakegranny  F0   144 UTMOS 3.11 WER   0%  pocket:male_3/-/f0x1.10/envx1.05
+GAL tr-pocket red-riding-hood      wood     man         F0   153 UTMOS 3.32 WER   0%  pocket:male_3/-/f0x1.00/envx1.00
+GAL tr-pocket cinderella           cin      teen        F0   253 UTMOS 3.55 WER  20%  pocket:female_1/-/f0x1.00/envx1.00
+GAL tr-pocket cinderella           cing     teen        F0   245 UTMOS 3.78 WER  20%  pocket:female_1/-/f0x1.00/envx1.00
+GAL tr-pocket cinderella           sm       stepmother  F0   183 UTMOS 3.53 WER  14%  pocket:female_3/kızgın/f0x0.92/envx0.98
+GAL tr-pocket cinderella           s1       stepsister  F0   237 UTMOS 1.91 WER   0%  pocket:female_1/kızgın/f0x1.05/envx1.03
+GAL tr-pocket cinderella           s2       stepsister  F0   194 UTMOS 2.66 WER  25%  pocket:female_3/kızgın/f0x1.12/envx1.05
+GAL tr-pocket cinderella           fg       fairy       F0   212 UTMOS 3.11 WER   0%  pocket:female_2/mutlu/f0x1.12/envx1.05
+GAL tr-pocket cinderella           pr       prince      F0   153 UTMOS 3.12 WER   0%  pocket:male_2/-/f0x1.00/envx1.00
+GAL tr-pocket magic-porridge-pot   kid      girl        F0   337 UTMOS 3.11 WER   0%  pocket:female_1/mutlu/f0x1.25/envx1.10
+GAL tr-pocket magic-porridge-pot   mama     woman       F0   204 UTMOS 3.43 WER  40%  pocket:female_2/sakin/f0x1.00/envx1.00
+GAL tr-pocket magic-porridge-pot   old      granny      F0   149 UTMOS 3.66 WER   0%  pocket:female_3/sakin/f0x0.88/envx0.97
+GAL tr-pocket magic-porridge-pot   gpa      grandpa     F0   122 UTMOS 2.71 WER  25%  pocket:male_1/sakin/f0x0.90/envx0.96
+GAL tr-pocket magic-porridge-pot   gma      granny      F0   168 UTMOS 3.48 WER   0%  pocket:female_2/sakin/f0x0.90/envx0.97
+GAL tr-pocket magic-porridge-pot   nei      girl        F0   203 UTMOS 3.70 WER   0%  pocket:female_3/mutlu/f0x1.18/envx1.08
+GAL tr-pocket gingerbread-man      gm       boy         F0   183 UTMOS 3.40 WER   0%  pocket:male_2/mutlu/f0x1.30/envx1.12
+GAL tr-pocket gingerbread-man      woman    granny      F0   154 UTMOS 3.50 WER   0%  pocket:female_3/sakin/f0x0.88/envx0.97
+GAL tr-pocket gingerbread-man      man      grandpa     F0   149 UTMOS 2.92 WER  12%  pocket:male_1/sakin/f0x0.90/envx0.96
+GAL tr-pocket gingerbread-man      pig      pig         F0   137 UTMOS 3.36 WER  60%  pocket:male_2/-/f0x1.10/envx1.04
+GAL tr-pocket gingerbread-man      bear     bear        F0   105 UTMOS 2.39 WER 100%  pocket:male_1/kızgın/f0x0.75/envx0.90
+GAL tr-pocket gingerbread-man      fox      fox         F0   131 UTMOS 3.00 WER   0%  pocket:male_3/şaşkın/f0x1.00/envx1.00
+SIM tr-pocket three-little-pigs    mama     (woman) ~ pig1     (pig) cos 0.10
+SIM tr-pocket three-little-pigs    mama     (woman) ~ pig2     (pig) cos 0.11
+SIM tr-pocket three-little-pigs    mama     (woman) ~ pig3     (pig) cos 0.10
+SIM tr-pocket three-little-pigs    mama     (woman) ~ wolf     (wolf) cos 0.15
+SIM tr-pocket three-little-pigs    pig1     (pig) ~ pig2     (pig) cos 0.67   <-- alike
+SIM tr-pocket three-little-pigs    pig1     (pig) ~ pig3     (pig) cos 0.48
+SIM tr-pocket three-little-pigs    pig1     (pig) ~ wolf     (wolf) cos 0.11
+SIM tr-pocket three-little-pigs    pig2     (pig) ~ pig3     (pig) cos 0.34
+SIM tr-pocket three-little-pigs    pig2     (pig) ~ wolf     (wolf) cos 0.12
+SIM tr-pocket three-little-pigs    pig3     (pig) ~ wolf     (wolf) cos 0.23
+SIM tr-pocket goldilocks           gold     (girl) ~ papa     (bear) cos 0.08
+SIM tr-pocket goldilocks           gold     (girl) ~ mama     (mamabear) cos 0.23
+SIM tr-pocket goldilocks           gold     (girl) ~ baby     (baby) cos 0.35
+SIM tr-pocket goldilocks           papa     (bear) ~ mama     (mamabear) cos 0.09
+SIM tr-pocket goldilocks           papa     (bear) ~ baby     (baby) cos 0.03
+SIM tr-pocket goldilocks           mama     (mamabear) ~ baby     (baby) cos 0.15
+SIM tr-pocket red-riding-hood      red      (girl) ~ mama     (woman) cos 0.29
+SIM tr-pocket red-riding-hood      red      (girl) ~ granny   (granny) cos 0.24
+SIM tr-pocket red-riding-hood      red      (girl) ~ wolf     (wolf) cos 0.03
+SIM tr-pocket red-riding-hood      red      (girl) ~ wolfg    (fakegranny) cos 0.17
+SIM tr-pocket red-riding-hood      red      (girl) ~ wood     (man) cos 0.16
+SIM tr-pocket red-riding-hood      mama     (woman) ~ granny   (granny) cos 0.43
+SIM tr-pocket red-riding-hood      mama     (woman) ~ wolf     (wolf) cos 0.17
+SIM tr-pocket red-riding-hood      mama     (woman) ~ wolfg    (fakegranny) cos 0.29
+SIM tr-pocket red-riding-hood      mama     (woman) ~ wood     (man) cos 0.16
+SIM tr-pocket red-riding-hood      granny   (granny) ~ wolf     (wolf) cos 0.22
+SIM tr-pocket red-riding-hood      granny   (granny) ~ wolfg    (fakegranny) cos 0.48
+SIM tr-pocket red-riding-hood      granny   (granny) ~ wood     (man) cos 0.18
+SIM tr-pocket red-riding-hood      wolf     (wolf) ~ wolfg    (fakegranny) cos 0.15
+SIM tr-pocket red-riding-hood      wolf     (wolf) ~ wood     (man) cos 0.13
+SIM tr-pocket red-riding-hood      wolfg    (fakegranny) ~ wood     (man) cos 0.50
+SIM tr-pocket cinderella           cin      (teen) ~ cing     (teen) cos 0.90   <-- alike
+SIM tr-pocket cinderella           cin      (teen) ~ sm       (stepmother) cos 0.30
+SIM tr-pocket cinderella           cin      (teen) ~ s1       (stepsister) cos 0.50
+SIM tr-pocket cinderella           cin      (teen) ~ s2       (stepsister) cos 0.41
+SIM tr-pocket cinderella           cin      (teen) ~ fg       (fairy) cos 0.31
+SIM tr-pocket cinderella           cin      (teen) ~ pr       (prince) cos 0.10
+SIM tr-pocket cinderella           cing     (teen) ~ sm       (stepmother) cos 0.26
+SIM tr-pocket cinderella           cing     (teen) ~ s1       (stepsister) cos 0.48
+SIM tr-pocket cinderella           cing     (teen) ~ s2       (stepsister) cos 0.39
+SIM tr-pocket cinderella           cing     (teen) ~ fg       (fairy) cos 0.29
+SIM tr-pocket cinderella           cing     (teen) ~ pr       (prince) cos 0.12
+SIM tr-pocket cinderella           sm       (stepmother) ~ s1       (stepsister) cos 0.29
+SIM tr-pocket cinderella           sm       (stepmother) ~ s2       (stepsister) cos 0.40
+SIM tr-pocket cinderella           sm       (stepmother) ~ fg       (fairy) cos 0.37
+SIM tr-pocket cinderella           sm       (stepmother) ~ pr       (prince) cos -0.03
+SIM tr-pocket cinderella           s1       (stepsister) ~ s2       (stepsister) cos 0.59   <-- alike
+SIM tr-pocket cinderella           s1       (stepsister) ~ fg       (fairy) cos 0.35
+SIM tr-pocket cinderella           s1       (stepsister) ~ pr       (prince) cos 0.18
+SIM tr-pocket cinderella           s2       (stepsister) ~ fg       (fairy) cos 0.60   <-- alike
+SIM tr-pocket cinderella           s2       (stepsister) ~ pr       (prince) cos 0.11
+SIM tr-pocket cinderella           fg       (fairy) ~ pr       (prince) cos 0.14
+SIM tr-pocket magic-porridge-pot   kid      (girl) ~ mama     (woman) cos 0.38
+SIM tr-pocket magic-porridge-pot   kid      (girl) ~ old      (granny) cos 0.31
+SIM tr-pocket magic-porridge-pot   kid      (girl) ~ gpa      (grandpa) cos 0.04
+SIM tr-pocket magic-porridge-pot   kid      (girl) ~ gma      (granny) cos 0.32
+SIM tr-pocket magic-porridge-pot   kid      (girl) ~ nei      (girl) cos 0.53
+SIM tr-pocket magic-porridge-pot   mama     (woman) ~ old      (granny) cos 0.44
+SIM tr-pocket magic-porridge-pot   mama     (woman) ~ gpa      (grandpa) cos 0.10
+SIM tr-pocket magic-porridge-pot   mama     (woman) ~ gma      (granny) cos 0.65   <-- alike
+SIM tr-pocket magic-porridge-pot   mama     (woman) ~ nei      (girl) cos 0.40
+SIM tr-pocket magic-porridge-pot   old      (granny) ~ gpa      (grandpa) cos 0.07
+SIM tr-pocket magic-porridge-pot   old      (granny) ~ gma      (granny) cos 0.74   <-- alike
+SIM tr-pocket magic-porridge-pot   old      (granny) ~ nei      (girl) cos 0.37
+SIM tr-pocket magic-porridge-pot   gpa      (grandpa) ~ gma      (granny) cos 0.04
+SIM tr-pocket magic-porridge-pot   gpa      (grandpa) ~ nei      (girl) cos 0.09
+SIM tr-pocket magic-porridge-pot   gma      (granny) ~ nei      (girl) cos 0.42
+SIM tr-pocket gingerbread-man      gm       (boy) ~ woman    (granny) cos 0.51
+SIM tr-pocket gingerbread-man      gm       (boy) ~ man      (grandpa) cos 0.17
+SIM tr-pocket gingerbread-man      gm       (boy) ~ pig      (pig) cos 0.42
+SIM tr-pocket gingerbread-man      gm       (boy) ~ bear     (bear) cos 0.14
+SIM tr-pocket gingerbread-man      gm       (boy) ~ fox      (fox) cos 0.14
+SIM tr-pocket gingerbread-man      woman    (granny) ~ man      (grandpa) cos 0.17
+SIM tr-pocket gingerbread-man      woman    (granny) ~ pig      (pig) cos 0.23
+SIM tr-pocket gingerbread-man      woman    (granny) ~ bear     (bear) cos 0.12
+SIM tr-pocket gingerbread-man      woman    (granny) ~ fox      (fox) cos 0.15
+SIM tr-pocket gingerbread-man      man      (grandpa) ~ pig      (pig) cos 0.18
+SIM tr-pocket gingerbread-man      man      (grandpa) ~ bear     (bear) cos 0.66   <-- alike
+SIM tr-pocket gingerbread-man      man      (grandpa) ~ fox      (fox) cos 0.10
+SIM tr-pocket gingerbread-man      pig      (pig) ~ bear     (bear) cos 0.09
+SIM tr-pocket gingerbread-man      pig      (pig) ~ fox      (fox) cos 0.40
+SIM tr-pocket gingerbread-man      bear     (bear) ~ fox      (fox) cos 0.03
+SIMSUM tr-pocket pairs at or above 0.55: 7
+wrote gallery-tr-pocket 240.6 s

@@ -1,0 +1,501 @@
+==================== main 06:31:53
+python 3.12.16 Linux-7.0.0-1020-azure-x86_64-with-glibc2.43 cpus 4
+   numpy 2.5.5
+   scipy 1.18.1
+   torch 2.15.0+cpu
+   torchaudio 2.11.1+cpu
+   kokoro 0.9.4
+   misaki 0.9.4
+   faster_whisper 1.2.1
+   edge_tts 7.3.1
+edge-tts: 318 voices; Turkish: ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural']
+   en-AU-WilliamMultilingualNeural              en-AU  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   en-US-AndrewMultilingualNeural               en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Warm', 'Confident', 'Authentic', 'Honest']}
+   en-US-AvaMultilingualNeural                  en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Expressive', 'Caring', 'Pleasant', 'Friendly']}
+   en-US-BrianMultilingualNeural                en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Approachable', 'Casual', 'Sincere']}
+   en-US-EmmaMultilingualNeural                 en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Cheerful', 'Clear', 'Conversational']}
+   fr-FR-VivienneMultilingualNeural             fr-FR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   fr-FR-RemyMultilingualNeural                 fr-FR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   it-IT-GiuseppeMultilingualNeural             it-IT  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   ko-KR-HyunsuMultilingualNeural               ko-KR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   pt-BR-ThalitaMultilingualNeural              pt-BR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+---- voice grid tr: GRID language spec pitch(Hz) line F0 UTMOS WER seconds   (line 1 is the harder one: only at the pitch 0)
+GRID tr elif                                -45 L0 F0   167 UTMOS 3.54 WER  15% SEC 6.0  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr elif                                -23 L0 F0   203 UTMOS 4.12 WER   0% SEC 6.9
+GRID tr elif                                 -8 L0 F0   228 UTMOS 4.28 WER   0% SEC 6.5
+GRID tr elif                                 +0 L0 F0   242 UTMOS 4.11 WER   0% SEC 6.4
+GRID tr elif                                +15 L0 F0   267 UTMOS 4.08 WER   0% SEC 6.2
+GRID tr elif                                +30 L0 F0   292 UTMOS 3.38 WER   0% SEC 6.4
+GRID tr elif                                +45 L0 F0   315 UTMOS 2.95 WER   0% SEC 6.7
+GRID tr elif=0.8,emre=0.2                   -45 L0 F0   155 UTMOS 3.50 WER  15% SEC 5.8  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr elif=0.8,emre=0.2                   -23 L0 F0   188 UTMOS 4.17 WER   0% SEC 6.8
+GRID tr elif=0.8,emre=0.2                    -8 L0 F0   213 UTMOS 4.28 WER   0% SEC 6.4
+GRID tr elif=0.8,emre=0.2                    +0 L0 F0   225 UTMOS 4.28 WER   0% SEC 6.2
+GRID tr elif=0.8,emre=0.2                   +15 L0 F0   247 UTMOS 4.09 WER   0% SEC 6.0
+GRID tr elif=0.8,emre=0.2                   +30 L0 F0   272 UTMOS 3.50 WER   0% SEC 6.2
+GRID tr elif=0.8,emre=0.2                   +45 L0 F0   292 UTMOS 3.03 WER   0% SEC 6.5
+GRID tr elif=0.6,emre=0.4                   -45 L0 F0   141 UTMOS 3.49 WER  15% SEC 5.6  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr elif=0.6,emre=0.4                   -23 L0 F0   172 UTMOS 4.15 WER   0% SEC 6.6
+GRID tr elif=0.6,emre=0.4                    -8 L0 F0   193 UTMOS 4.27 WER   0% SEC 6.3
+GRID tr elif=0.6,emre=0.4                    +0 L0 F0   205 UTMOS 4.27 WER   0% SEC 6.1
+GRID tr elif=0.6,emre=0.4                   +15 L0 F0   228 UTMOS 4.20 WER   0% SEC 5.8
+GRID tr elif=0.6,emre=0.4                   +30 L0 F0   245 UTMOS 3.71 WER  15% SEC 6.0  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr elif=0.6,emre=0.4                   +45 L0 F0   265 UTMOS 3.04 WER   0% SEC 6.4
+GRID tr elif=0.4,emre=0.6                   -45 L0 F0   127 UTMOS 3.27 WER  15% SEC 5.5  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir hopulmuş.
+GRID tr elif=0.4,emre=0.6                   -23 L0 F0   154 UTMOS 4.02 WER   0% SEC 6.4
+GRID tr elif=0.4,emre=0.6                    -8 L0 F0   173 UTMOS 4.18 WER   0% SEC 6.1
+GRID tr elif=0.4,emre=0.6                    +0 L0 F0   183 UTMOS 4.25 WER   0% SEC 5.9
+GRID tr elif=0.4,emre=0.6                   +15 L0 F0   202 UTMOS 4.17 WER   0% SEC 5.7
+GRID tr elif=0.4,emre=0.6                   +30 L0 F0   219 UTMOS 3.85 WER  15% SEC 5.9  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr elif=0.4,emre=0.6                   +45 L0 F0   238 UTMOS 3.40 WER   0% SEC 6.3
+GRID tr elif=0.2,emre=0.8                   -45 L0 F0   111 UTMOS 3.02 WER   0% SEC 5.3
+GRID tr elif=0.2,emre=0.8                   -23 L0 F0   133 UTMOS 4.03 WER   0% SEC 6.3
+GRID tr elif=0.2,emre=0.8                    -8 L0 F0   149 UTMOS 3.91 WER   0% SEC 6.0
+GRID tr elif=0.2,emre=0.8                    +0 L0 F0   160 UTMOS 4.06 WER   0% SEC 5.8
+GRID tr elif=0.2,emre=0.8                   +15 L0 F0   176 UTMOS 4.00 WER   0% SEC 5.5
+GRID tr elif=0.2,emre=0.8                   +30 L0 F0   190 UTMOS 3.96 WER  15% SEC 5.6  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr elif=0.2,emre=0.8                   +45 L0 F0   204 UTMOS 3.56 WER   0% SEC 6.2
+GRID tr emre                                -45 L0 F0    98 UTMOS 2.82 WER   8% SEC 5.1
+GRID tr emre                                -23 L0 F0   118 UTMOS 4.03 WER   0% SEC 6.2
+GRID tr emre                                 -8 L0 F0   130 UTMOS 4.15 WER   0% SEC 5.9
+GRID tr emre                                 +0 L0 F0   136 UTMOS 4.04 WER   0% SEC 5.7
+GRID tr emre                                +15 L0 F0   151 UTMOS 4.03 WER   0% SEC 5.4
+GRID tr emre                                +30 L0 F0   163 UTMOS 4.06 WER  15% SEC 5.5  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr emre                                +45 L0 F0   176 UTMOS 3.72 WER   0% SEC 6.0
+GRID tr elif=1.25,emre=-0.25                -45 L0 F0   184 UTMOS 3.38 WER  15% SEC 6.3  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr elif=1.25,emre=-0.25                -23 L0 F0   222 UTMOS 3.92 WER   0% SEC 7.0
+GRID tr elif=1.25,emre=-0.25                 -8 L0 F0   247 UTMOS 4.19 WER   0% SEC 6.7
+GRID tr elif=1.25,emre=-0.25                 +0 L0 F0   264 UTMOS 4.14 WER   0% SEC 6.6
+GRID tr elif=1.25,emre=-0.25                +15 L0 F0   290 UTMOS 3.89 WER   0% SEC 6.4
+GRID tr elif=1.25,emre=-0.25                +30 L0 F0   317 UTMOS 3.06 WER   0% SEC 6.6
+GRID tr elif=1.25,emre=-0.25                +45 L0 F0   340 UTMOS 2.59 WER   0% SEC 6.8
+GRID tr elif=-0.25,emre=1.25                -45 L0 F0   315 UTMOS 2.34 WER  46% SEC 4.9  heard: Bir ağırmış bir yokmuş küçük bir tavja maçede parla kırmızı bir topumuş.
+GRID tr elif=-0.25,emre=1.25                -23 L0 F0   103 UTMOS 3.87 WER   0% SEC 6.0
+GRID tr elif=-0.25,emre=1.25                 -8 L0 F0   111 UTMOS 4.03 WER   0% SEC 5.7
+GRID tr elif=-0.25,emre=1.25                 +0 L0 F0   115 UTMOS 4.02 WER   0% SEC 5.6
+GRID tr elif=-0.25,emre=1.25                +15 L0 F0   125 UTMOS 3.97 WER   0% SEC 5.2
+GRID tr elif=-0.25,emre=1.25                +30 L0 F0   133 UTMOS 3.98 WER  15% SEC 5.3  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr elif=-0.25,emre=1.25                +45 L0 F0   145 UTMOS 3.69 WER   0% SEC 5.7
+GRID tr elif:p=1,af_alloy:t=1               -45 L0 F0   167 UTMOS 2.99 WER   0% SEC 6.0
+GRID tr elif:p=1,af_alloy:t=1               -23 L0 F0   202 UTMOS 3.57 WER   0% SEC 6.9
+GRID tr elif:p=1,af_alloy:t=1                -8 L0 F0   227 UTMOS 3.90 WER   0% SEC 6.5
+GRID tr elif:p=1,af_alloy:t=1                +0 L0 F0   241 UTMOS 4.12 WER   0% SEC 6.4
+GRID tr elif:p=1,af_alloy:t=1                +0 L1 F0   236 UTMOS 4.05 WER   0% SEC 8.1
+GRID tr elif:p=1,af_alloy:t=1               +15 L0 F0   266 UTMOS 4.17 WER   0% SEC 6.2
+GRID tr elif:p=1,af_alloy:t=1               +30 L0 F0   291 UTMOS 3.97 WER   0% SEC 6.4
+GRID tr elif:p=1,af_alloy:t=1               +45 L0 F0   314 UTMOS 3.69 WER   0% SEC 6.7
+GRID tr elif:p=1,af_aoede:t=1               -45 L0 F0   168 UTMOS 2.97 WER   0% SEC 6.0
+GRID tr elif:p=1,af_aoede:t=1               -23 L0 F0   204 UTMOS 3.71 WER   0% SEC 6.9
+GRID tr elif:p=1,af_aoede:t=1                -8 L0 F0   229 UTMOS 4.20 WER   0% SEC 6.5
+GRID tr elif:p=1,af_aoede:t=1                +0 L0 F0   241 UTMOS 3.99 WER   0% SEC 6.4
+GRID tr elif:p=1,af_aoede:t=1                +0 L1 F0   236 UTMOS 3.86 WER   0% SEC 8.1
+GRID tr elif:p=1,af_aoede:t=1               +15 L0 F0   268 UTMOS 3.87 WER   0% SEC 6.2
+GRID tr elif:p=1,af_aoede:t=1               +30 L0 F0   292 UTMOS 3.82 WER   0% SEC 6.4
+GRID tr elif:p=1,af_aoede:t=1               +45 L0 F0   314 UTMOS 3.43 WER   0% SEC 6.7
+GRID tr elif:p=1,af_bella:t=1               -45 L0 F0   168 UTMOS 3.35 WER   0% SEC 6.0
+GRID tr elif:p=1,af_bella:t=1               -23 L0 F0   204 UTMOS 4.02 WER   0% SEC 6.9
+GRID tr elif:p=1,af_bella:t=1                -8 L0 F0   228 UTMOS 4.24 WER   0% SEC 6.5
+GRID tr elif:p=1,af_bella:t=1                +0 L0 F0   242 UTMOS 4.17 WER   0% SEC 6.4
+GRID tr elif:p=1,af_bella:t=1                +0 L1 F0   236 UTMOS 4.05 WER   0% SEC 8.1
+GRID tr elif:p=1,af_bella:t=1               +15 L0 F0   267 UTMOS 4.04 WER   0% SEC 6.2
+GRID tr elif:p=1,af_bella:t=1               +30 L0 F0   291 UTMOS 3.40 WER   0% SEC 6.4
+GRID tr elif:p=1,af_bella:t=1               +45 L0 F0   313 UTMOS 2.73 WER   0% SEC 6.7
+GRID tr elif:p=1,af_heart:t=1               -45 L0 F0   168 UTMOS 3.83 WER   0% SEC 6.0
+GRID tr elif:p=1,af_heart:t=1               -23 L0 F0   205 UTMOS 4.27 WER   0% SEC 6.9
+GRID tr elif:p=1,af_heart:t=1                -8 L0 F0   229 UTMOS 4.40 WER   0% SEC 6.5
+GRID tr elif:p=1,af_heart:t=1                +0 L0 F0   242 UTMOS 4.18 WER   0% SEC 6.4
+GRID tr elif:p=1,af_heart:t=1                +0 L1 F0   238 UTMOS 4.33 WER   0% SEC 8.1
+GRID tr elif:p=1,af_heart:t=1               +15 L0 F0   268 UTMOS 4.34 WER   0% SEC 6.2
+GRID tr elif:p=1,af_heart:t=1               +30 L0 F0   292 UTMOS 3.87 WER   0% SEC 6.4
+GRID tr elif:p=1,af_heart:t=1               +45 L0 F0   314 UTMOS 3.11 WER   0% SEC 6.7
+GRID tr elif:p=1,af_jessica:t=1             -45 L0 F0   168 UTMOS 3.46 WER  15% SEC 6.0  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr elif:p=1,af_jessica:t=1             -23 L0 F0   205 UTMOS 4.06 WER   0% SEC 6.9
+GRID tr elif:p=1,af_jessica:t=1              -8 L0 F0   229 UTMOS 4.30 WER   0% SEC 6.5
+GRID tr elif:p=1,af_jessica:t=1              +0 L0 F0   243 UTMOS 4.23 WER   0% SEC 6.4
+GRID tr elif:p=1,af_jessica:t=1              +0 L1 F0   238 UTMOS 4.25 WER   0% SEC 8.1
+GRID tr elif:p=1,af_jessica:t=1             +15 L0 F0   269 UTMOS 3.75 WER   0% SEC 6.2
+GRID tr elif:p=1,af_jessica:t=1             +30 L0 F0   294 UTMOS 2.91 WER   0% SEC 6.4
+GRID tr elif:p=1,af_jessica:t=1             +45 L0 F0   314 UTMOS 2.63 WER   0% SEC 6.7
+GRID tr elif:p=1,af_kore:t=1                -45 L0 F0   167 UTMOS 3.17 WER   0% SEC 6.0
+GRID tr elif:p=1,af_kore:t=1                -23 L0 F0   203 UTMOS 3.88 WER   0% SEC 6.9
+GRID tr elif:p=1,af_kore:t=1                 -8 L0 F0   228 UTMOS 4.24 WER   0% SEC 6.5
+GRID tr elif:p=1,af_kore:t=1                 +0 L0 F0   241 UTMOS 3.95 WER   0% SEC 6.4
+GRID tr elif:p=1,af_kore:t=1                 +0 L1 F0   236 UTMOS 4.00 WER   0% SEC 8.1
+GRID tr elif:p=1,af_kore:t=1                +15 L0 F0   267 UTMOS 4.18 WER   0% SEC 6.2
+GRID tr elif:p=1,af_kore:t=1                +30 L0 F0   291 UTMOS 3.78 WER   0% SEC 6.4
+GRID tr elif:p=1,af_kore:t=1                +45 L0 F0   312 UTMOS 3.25 WER   0% SEC 6.7
+GRID tr elif:p=1,af_nicole:t=1              -45 L0 F0   168 UTMOS 2.33 WER  23% SEC 6.0  heard: Bir varmış bir yokmuş, küçük bir taflan bahçede parlak, kırmızı bir toplumuş.
+GRID tr elif:p=1,af_nicole:t=1              -23 L0 F0   205 UTMOS 2.59 WER   0% SEC 6.9
+GRID tr elif:p=1,af_nicole:t=1               -8 L0 F0   232 UTMOS 2.72 WER   0% SEC 6.5
+GRID tr elif:p=1,af_nicole:t=1               +0 L0 F0   243 UTMOS 2.68 WER   0% SEC 6.4
+GRID tr elif:p=1,af_nicole:t=1               +0 L1 F0   236 UTMOS 2.38 WER   8% SEC 8.1
+GRID tr elif:p=1,af_nicole:t=1              +15 L0 F0   269 UTMOS 2.57 WER   0% SEC 6.2
+GRID tr elif:p=1,af_nicole:t=1              +30 L0 F0   291 UTMOS 2.24 WER   0% SEC 6.4
+GRID tr elif:p=1,af_nicole:t=1              +45 L0 F0   312 UTMOS 1.53 WER   0% SEC 6.7
+GRID tr elif:p=1,af_nova:t=1                -45 L0 F0   167 UTMOS 3.61 WER   0% SEC 6.0
+GRID tr elif:p=1,af_nova:t=1                -23 L0 F0   204 UTMOS 4.11 WER   0% SEC 6.9
+GRID tr elif:p=1,af_nova:t=1                 -8 L0 F0   228 UTMOS 4.26 WER   0% SEC 6.5
+GRID tr elif:p=1,af_nova:t=1                 +0 L0 F0   241 UTMOS 4.30 WER   0% SEC 6.4
+GRID tr elif:p=1,af_nova:t=1                 +0 L1 F0   236 UTMOS 4.34 WER   8% SEC 8.1
+GRID tr elif:p=1,af_nova:t=1                +15 L0 F0   268 UTMOS 4.27 WER   0% SEC 6.2
+GRID tr elif:p=1,af_nova:t=1                +30 L0 F0   292 UTMOS 3.87 WER   0% SEC 6.4
+GRID tr elif:p=1,af_nova:t=1                +45 L0 F0   313 UTMOS 3.17 WER   0% SEC 6.7
+GRID tr elif:p=1,af_river:t=1               -45 L0 F0   168 UTMOS 2.85 WER   8% SEC 6.0
+GRID tr elif:p=1,af_river:t=1               -23 L0 F0   204 UTMOS 3.76 WER   0% SEC 6.9
+GRID tr elif:p=1,af_river:t=1                -8 L0 F0   229 UTMOS 4.21 WER   0% SEC 6.5
+GRID tr elif:p=1,af_river:t=1                +0 L0 F0   241 UTMOS 4.24 WER   0% SEC 6.4
+GRID tr elif:p=1,af_river:t=1                +0 L1 F0   237 UTMOS 4.13 WER   0% SEC 8.1
+GRID tr elif:p=1,af_river:t=1               +15 L0 F0   268 UTMOS 4.29 WER   0% SEC 6.2
+GRID tr elif:p=1,af_river:t=1               +30 L0 F0   292 UTMOS 3.99 WER   0% SEC 6.4
+GRID tr elif:p=1,af_river:t=1               +45 L0 F0   314 UTMOS 3.69 WER   0% SEC 6.7
+GRID tr elif:p=1,af_sarah:t=1               -45 L0 F0   167 UTMOS 3.68 WER  15% SEC 6.0  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr elif:p=1,af_sarah:t=1               -23 L0 F0   204 UTMOS 4.14 WER   0% SEC 6.9
+GRID tr elif:p=1,af_sarah:t=1                -8 L0 F0   229 UTMOS 4.20 WER   0% SEC 6.5
+GRID tr elif:p=1,af_sarah:t=1                +0 L0 F0   241 UTMOS 4.32 WER   0% SEC 6.4
+GRID tr elif:p=1,af_sarah:t=1                +0 L1 F0   237 UTMOS 4.17 WER   0% SEC 8.1
+GRID tr elif:p=1,af_sarah:t=1               +15 L0 F0   268 UTMOS 4.15 WER   0% SEC 6.2
+GRID tr elif:p=1,af_sarah:t=1               +30 L0 F0   292 UTMOS 3.70 WER   0% SEC 6.4
+GRID tr elif:p=1,af_sarah:t=1               +45 L0 F0   314 UTMOS 3.35 WER   0% SEC 6.7
+GRID tr elif:p=1,af_sky:t=1                 -45 L0 F0   168 UTMOS 3.32 WER   0% SEC 6.0
+GRID tr elif:p=1,af_sky:t=1                 -23 L0 F0   205 UTMOS 3.77 WER   0% SEC 6.9
+GRID tr elif:p=1,af_sky:t=1                  -8 L0 F0   229 UTMOS 3.90 WER   0% SEC 6.5
+GRID tr elif:p=1,af_sky:t=1                  +0 L0 F0   242 UTMOS 4.17 WER   0% SEC 6.4
+GRID tr elif:p=1,af_sky:t=1                  +0 L1 F0   237 UTMOS 4.12 WER   0% SEC 8.1
+GRID tr elif:p=1,af_sky:t=1                 +15 L0 F0   267 UTMOS 3.89 WER   0% SEC 6.2
+GRID tr elif:p=1,af_sky:t=1                 +30 L0 F0   292 UTMOS 3.74 WER   0% SEC 6.4
+GRID tr elif:p=1,af_sky:t=1                 +45 L0 F0   314 UTMOS 3.01 WER   0% SEC 6.7
+GRID tr emre:p=1,am_adam:t=1                -45 L0 F0    99 UTMOS 2.15 WER   0% SEC 5.1
+GRID tr emre:p=1,am_adam:t=1                -23 L0 F0   120 UTMOS 3.99 WER   0% SEC 6.2
+GRID tr emre:p=1,am_adam:t=1                 -8 L0 F0   133 UTMOS 4.15 WER   0% SEC 5.9
+GRID tr emre:p=1,am_adam:t=1                 +0 L0 F0   141 UTMOS 4.09 WER   0% SEC 5.7
+GRID tr emre:p=1,am_adam:t=1                 +0 L1 F0   139 UTMOS 3.86 WER   0% SEC 6.5
+GRID tr emre:p=1,am_adam:t=1                +15 L0 F0   154 UTMOS 4.15 WER   0% SEC 5.4
+GRID tr emre:p=1,am_adam:t=1                +30 L0 F0   166 UTMOS 4.16 WER   0% SEC 5.5
+GRID tr emre:p=1,am_adam:t=1                +45 L0 F0   179 UTMOS 3.87 WER   0% SEC 6.0
+GRID tr emre:p=1,am_echo:t=1                -45 L0 F0    97 UTMOS 3.17 WER  15% SEC 5.1  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak, kırmızı bir toplumuş.
+GRID tr emre:p=1,am_echo:t=1                -23 L0 F0   116 UTMOS 4.04 WER   0% SEC 6.2
+GRID tr emre:p=1,am_echo:t=1                 -8 L0 F0   130 UTMOS 4.06 WER   0% SEC 5.9
+GRID tr emre:p=1,am_echo:t=1                 +0 L0 F0   137 UTMOS 3.87 WER   0% SEC 5.7
+GRID tr emre:p=1,am_echo:t=1                 +0 L1 F0   137 UTMOS 3.87 WER   0% SEC 6.5
+GRID tr emre:p=1,am_echo:t=1                +15 L0 F0   152 UTMOS 4.12 WER   0% SEC 5.4
+GRID tr emre:p=1,am_echo:t=1                +30 L0 F0   165 UTMOS 4.08 WER   0% SEC 5.5
+GRID tr emre:p=1,am_echo:t=1                +45 L0 F0   177 UTMOS 3.80 WER   0% SEC 6.0
+GRID tr emre:p=1,am_eric:t=1                -45 L0 F0    98 UTMOS 2.15 WER  38% SEC 5.1  heard: Bir varmış bir yokmuş, küçük bir tavzın maçıda parlak, kınıcı bir topulmuş.
+GRID tr emre:p=1,am_eric:t=1                -23 L0 F0   116 UTMOS 3.78 WER   0% SEC 6.2
+GRID tr emre:p=1,am_eric:t=1                 -8 L0 F0   128 UTMOS 4.00 WER   0% SEC 5.9
+GRID tr emre:p=1,am_eric:t=1                 +0 L0 F0   135 UTMOS 3.96 WER   0% SEC 5.7
+GRID tr emre:p=1,am_eric:t=1                 +0 L1 F0   135 UTMOS 3.62 WER   0% SEC 6.5
+GRID tr emre:p=1,am_eric:t=1                +15 L0 F0   150 UTMOS 3.87 WER  15% SEC 5.4  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr emre:p=1,am_eric:t=1                +30 L0 F0   162 UTMOS 3.90 WER  15% SEC 5.5  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr emre:p=1,am_eric:t=1                +45 L0 F0   177 UTMOS 3.74 WER   0% SEC 6.0
+GRID tr emre:p=1,am_fenrir:t=1              -45 L0 F0    98 UTMOS 3.18 WER  15% SEC 5.1  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir hop olmuş.
+GRID tr emre:p=1,am_fenrir:t=1              -23 L0 F0   118 UTMOS 4.15 WER   0% SEC 6.2
+GRID tr emre:p=1,am_fenrir:t=1               -8 L0 F0   129 UTMOS 4.11 WER   0% SEC 5.9
+GRID tr emre:p=1,am_fenrir:t=1               +0 L0 F0   136 UTMOS 4.16 WER   0% SEC 5.7
+GRID tr emre:p=1,am_fenrir:t=1               +0 L1 F0   136 UTMOS 3.94 WER   0% SEC 6.5
+GRID tr emre:p=1,am_fenrir:t=1              +15 L0 F0   150 UTMOS 4.14 WER   0% SEC 5.4
+GRID tr emre:p=1,am_fenrir:t=1              +30 L0 F0   162 UTMOS 4.09 WER   0% SEC 5.5
+GRID tr emre:p=1,am_fenrir:t=1              +45 L0 F0   177 UTMOS 3.81 WER   0% SEC 6.0
+GRID tr emre:p=1,am_liam:t=1                -45 L0 F0    99 UTMOS 2.13 WER   8% SEC 5.1
+GRID tr emre:p=1,am_liam:t=1                -23 L0 F0   118 UTMOS 3.60 WER   0% SEC 6.2
+GRID tr emre:p=1,am_liam:t=1                 -8 L0 F0   130 UTMOS 3.92 WER   0% SEC 5.9
+GRID tr emre:p=1,am_liam:t=1                 +0 L0 F0   136 UTMOS 3.97 WER   0% SEC 5.7
+GRID tr emre:p=1,am_liam:t=1                 +0 L1 F0   135 UTMOS 3.76 WER   0% SEC 6.5
+GRID tr emre:p=1,am_liam:t=1                +15 L0 F0   150 UTMOS 3.99 WER   0% SEC 5.4
+GRID tr emre:p=1,am_liam:t=1                +30 L0 F0   163 UTMOS 3.95 WER   0% SEC 5.5
+GRID tr emre:p=1,am_liam:t=1                +45 L0 F0   176 UTMOS 3.83 WER   0% SEC 6.0
+GRID tr emre:p=1,am_michael:t=1             -45 L0 F0    99 UTMOS 2.15 WER  31% SEC 5.1  heard: Bir varmış bir yokmuş, küçük bir tavzın bahçede pahala kırmızı bir hop olmuş.
+GRID tr emre:p=1,am_michael:t=1             -23 L0 F0   117 UTMOS 3.74 WER   0% SEC 6.2
+GRID tr emre:p=1,am_michael:t=1              -8 L0 F0   129 UTMOS 3.84 WER   0% SEC 5.9
+GRID tr emre:p=1,am_michael:t=1              +0 L0 F0   135 UTMOS 3.92 WER   0% SEC 5.7
+GRID tr emre:p=1,am_michael:t=1              +0 L1 F0   136 UTMOS 3.76 WER   8% SEC 6.5
+GRID tr emre:p=1,am_michael:t=1             +15 L0 F0   150 UTMOS 3.91 WER   0% SEC 5.4
+GRID tr emre:p=1,am_michael:t=1             +30 L0 F0   163 UTMOS 4.00 WER   0% SEC 5.5
+GRID tr emre:p=1,am_michael:t=1             +45 L0 F0   178 UTMOS 3.79 WER   0% SEC 6.0
+GRID tr emre:p=1,am_onyx:t=1                -45 L0 F0    97 UTMOS 1.89 WER  38% SEC 5.1  heard: Bir varmış bir yokmuş, küçük bir tavzın maçıda pahala kırmızı bir dokunmuş.
+GRID tr emre:p=1,am_onyx:t=1                -23 L0 F0   119 UTMOS 3.48 WER   0% SEC 6.2
+GRID tr emre:p=1,am_onyx:t=1                 -8 L0 F0   131 UTMOS 3.74 WER   0% SEC 5.9
+GRID tr emre:p=1,am_onyx:t=1                 +0 L0 F0   138 UTMOS 3.80 WER   0% SEC 5.7
+GRID tr emre:p=1,am_onyx:t=1                 +0 L1 F0   136 UTMOS 3.65 WER   0% SEC 6.5
+GRID tr emre:p=1,am_onyx:t=1                +15 L0 F0   153 UTMOS 3.79 WER   0% SEC 5.4
+GRID tr emre:p=1,am_onyx:t=1                +30 L0 F0   163 UTMOS 3.83 WER   0% SEC 5.5
+GRID tr emre:p=1,am_onyx:t=1                +45 L0 F0   177 UTMOS 3.69 WER   0% SEC 6.0
+GRID tr emre:p=1,am_puck:t=1                -45 L0 F0    97 UTMOS 3.00 WER   8% SEC 5.1
+GRID tr emre:p=1,am_puck:t=1                -23 L0 F0   117 UTMOS 4.02 WER   0% SEC 6.2
+GRID tr emre:p=1,am_puck:t=1                 -8 L0 F0   129 UTMOS 4.04 WER   0% SEC 5.9
+GRID tr emre:p=1,am_puck:t=1                 +0 L0 F0   136 UTMOS 4.07 WER   0% SEC 5.7
+GRID tr emre:p=1,am_puck:t=1                 +0 L1 F0   135 UTMOS 3.98 WER   0% SEC 6.5
+GRID tr emre:p=1,am_puck:t=1                +15 L0 F0   151 UTMOS 4.12 WER   0% SEC 5.4
+GRID tr emre:p=1,am_puck:t=1                +30 L0 F0   163 UTMOS 4.04 WER  15% SEC 5.5  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr emre:p=1,am_puck:t=1                +45 L0 F0   177 UTMOS 3.93 WER   0% SEC 6.0
+GRID tr emre:p=1,am_santa:t=1               -45 L0 F0   102 UTMOS 1.91 WER  15% SEC 5.1  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak, kımız bir top olmuş.
+GRID tr emre:p=1,am_santa:t=1               -23 L0 F0   122 UTMOS 3.70 WER   0% SEC 6.2
+GRID tr emre:p=1,am_santa:t=1                -8 L0 F0   134 UTMOS 3.93 WER   0% SEC 5.9
+GRID tr emre:p=1,am_santa:t=1                +0 L0 F0   138 UTMOS 3.86 WER   0% SEC 5.7
+GRID tr emre:p=1,am_santa:t=1                +0 L1 F0   138 UTMOS 3.75 WER   0% SEC 6.5
+GRID tr emre:p=1,am_santa:t=1               +15 L0 F0   152 UTMOS 3.83 WER   0% SEC 5.4
+GRID tr emre:p=1,am_santa:t=1               +30 L0 F0   166 UTMOS 3.92 WER   0% SEC 5.5
+GRID tr emre:p=1,am_santa:t=1               +45 L0 F0   177 UTMOS 3.81 WER   0% SEC 6.0
+GRID tr elif:p=1,bf_alice:t=1               -45 L0 F0   168 UTMOS 3.33 WER   0% SEC 6.0
+GRID tr elif:p=1,bf_alice:t=1               -23 L0 F0   205 UTMOS 3.56 WER   0% SEC 6.9
+GRID tr elif:p=1,bf_alice:t=1                -8 L0 F0   230 UTMOS 4.13 WER   0% SEC 6.5
+GRID tr elif:p=1,bf_alice:t=1                +0 L0 F0   244 UTMOS 3.99 WER   0% SEC 6.4
+GRID tr elif:p=1,bf_alice:t=1                +0 L1 F0   237 UTMOS 3.79 WER   0% SEC 8.1
+GRID tr elif:p=1,bf_alice:t=1               +15 L0 F0   268 UTMOS 3.83 WER   0% SEC 6.2
+GRID tr elif:p=1,bf_alice:t=1               +30 L0 F0   294 UTMOS 3.28 WER   0% SEC 6.4
+GRID tr elif:p=1,bf_alice:t=1               +45 L0 F0   315 UTMOS 2.72 WER   0% SEC 6.7
+GRID tr elif:p=1,bf_emma:t=1                -45 L0 F0   167 UTMOS 3.03 WER  23% SEC 6.0  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak, kınıza bir toplulmuş.
+GRID tr elif:p=1,bf_emma:t=1                -23 L0 F0   203 UTMOS 3.48 WER   0% SEC 6.9
+GRID tr elif:p=1,bf_emma:t=1                 -8 L0 F0   228 UTMOS 3.46 WER   0% SEC 6.5
+GRID tr elif:p=1,bf_emma:t=1                 +0 L0 F0   242 UTMOS 3.84 WER   0% SEC 6.4
+GRID tr elif:p=1,bf_emma:t=1                 +0 L1 F0   237 UTMOS 3.65 WER   0% SEC 8.1
+GRID tr elif:p=1,bf_emma:t=1                +15 L0 F0   267 UTMOS 3.76 WER   0% SEC 6.2
+GRID tr elif:p=1,bf_emma:t=1                +30 L0 F0   289 UTMOS 3.13 WER   0% SEC 6.4
+GRID tr elif:p=1,bf_emma:t=1                +45 L0 F0   313 UTMOS 2.79 WER   0% SEC 6.7
+GRID tr elif:p=1,bf_isabella:t=1            -45 L0 F0   168 UTMOS 3.70 WER  15% SEC 6.0  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak, kırmızı bir toplulmuş.
+GRID tr elif:p=1,bf_isabella:t=1            -23 L0 F0   205 UTMOS 4.15 WER   0% SEC 6.9
+GRID tr elif:p=1,bf_isabella:t=1             -8 L0 F0   229 UTMOS 3.93 WER   0% SEC 6.5
+GRID tr elif:p=1,bf_isabella:t=1             +0 L0 F0   242 UTMOS 4.30 WER   0% SEC 6.4
+GRID tr elif:p=1,bf_isabella:t=1             +0 L1 F0   237 UTMOS 4.26 WER   0% SEC 8.1
+GRID tr elif:p=1,bf_isabella:t=1            +15 L0 F0   267 UTMOS 4.16 WER   0% SEC 6.2
+GRID tr elif:p=1,bf_isabella:t=1            +30 L0 F0   292 UTMOS 3.57 WER   0% SEC 6.4
+GRID tr elif:p=1,bf_isabella:t=1            +45 L0 F0   314 UTMOS 2.91 WER   0% SEC 6.7
+GRID tr elif:p=1,bf_lily:t=1                -45 L0 F0   169 UTMOS 3.36 WER  15% SEC 6.0  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr elif:p=1,bf_lily:t=1                -23 L0 F0   204 UTMOS 3.82 WER   0% SEC 6.9
+GRID tr elif:p=1,bf_lily:t=1                 -8 L0 F0   229 UTMOS 4.11 WER   0% SEC 6.5
+GRID tr elif:p=1,bf_lily:t=1                 +0 L0 F0   242 UTMOS 4.14 WER   0% SEC 6.4
+GRID tr elif:p=1,bf_lily:t=1                 +0 L1 F0   239 UTMOS 4.10 WER   0% SEC 8.1
+GRID tr elif:p=1,bf_lily:t=1                +15 L0 F0   268 UTMOS 3.96 WER   0% SEC 6.2
+GRID tr elif:p=1,bf_lily:t=1                +30 L0 F0   292 UTMOS 3.48 WER   0% SEC 6.4
+GRID tr elif:p=1,bf_lily:t=1                +45 L0 F0   314 UTMOS 2.73 WER   0% SEC 6.7
+GRID tr emre:p=1,bm_daniel:t=1              -45 L0 F0    97 UTMOS 2.15 WER  23% SEC 5.1  heard: Bir varmış bir yokmuş, küçük bir tavsım bahçede parlak, kırmızı bir topumuş.
+GRID tr emre:p=1,bm_daniel:t=1              -23 L0 F0   116 UTMOS 3.65 WER   0% SEC 6.2
+GRID tr emre:p=1,bm_daniel:t=1               -8 L0 F0   128 UTMOS 3.79 WER   0% SEC 5.9
+GRID tr emre:p=1,bm_daniel:t=1               +0 L0 F0   135 UTMOS 3.74 WER   0% SEC 5.7
+GRID tr emre:p=1,bm_daniel:t=1               +0 L1 F0   135 UTMOS 3.81 WER   0% SEC 6.5
+GRID tr emre:p=1,bm_daniel:t=1              +15 L0 F0   149 UTMOS 3.77 WER   0% SEC 5.4
+GRID tr emre:p=1,bm_daniel:t=1              +30 L0 F0   162 UTMOS 3.83 WER  15% SEC 5.5  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr emre:p=1,bm_daniel:t=1              +45 L0 F0   177 UTMOS 3.70 WER   0% SEC 6.0
+GRID tr emre:p=1,bm_fable:t=1               -45 L0 F0    97 UTMOS 3.42 WER  23% SEC 5.1  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak, kınızı bir toplumuş.
+GRID tr emre:p=1,bm_fable:t=1               -23 L0 F0   116 UTMOS 3.98 WER   0% SEC 6.2
+GRID tr emre:p=1,bm_fable:t=1                -8 L0 F0   129 UTMOS 4.01 WER   0% SEC 5.9
+GRID tr emre:p=1,bm_fable:t=1                +0 L0 F0   137 UTMOS 4.04 WER   0% SEC 5.7
+GRID tr emre:p=1,bm_fable:t=1                +0 L1 F0   137 UTMOS 4.01 WER   0% SEC 6.5
+GRID tr emre:p=1,bm_fable:t=1               +15 L0 F0   152 UTMOS 4.05 WER   0% SEC 5.4
+GRID tr emre:p=1,bm_fable:t=1               +30 L0 F0   163 UTMOS 4.02 WER   0% SEC 5.5
+GRID tr emre:p=1,bm_fable:t=1               +45 L0 F0   178 UTMOS 3.65 WER   0% SEC 6.0
+GRID tr emre:p=1,bm_george:t=1              -45 L0 F0    97 UTMOS 2.26 WER  38% SEC 5.1  heard: Bir varmış bir yokmuş, küçük bir tavzın maçıda parlak, kınızlı bir toplumuş.
+GRID tr emre:p=1,bm_george:t=1              -23 L0 F0   115 UTMOS 3.47 WER   0% SEC 6.2
+GRID tr emre:p=1,bm_george:t=1               -8 L0 F0   127 UTMOS 3.59 WER   0% SEC 5.9
+GRID tr emre:p=1,bm_george:t=1               +0 L0 F0   135 UTMOS 3.61 WER   0% SEC 5.7
+GRID tr emre:p=1,bm_george:t=1               +0 L1 F0   135 UTMOS 3.41 WER   0% SEC 6.5
+GRID tr emre:p=1,bm_george:t=1              +15 L0 F0   149 UTMOS 3.62 WER   0% SEC 5.4
+GRID tr emre:p=1,bm_george:t=1              +30 L0 F0   162 UTMOS 3.58 WER  15% SEC 5.5  heard: Bir varmış bir yokmuş, küçük bir tavşan bahçede parlak kırmızı bir toplulmuş.
+GRID tr emre:p=1,bm_george:t=1              +45 L0 F0   175 UTMOS 3.30 WER   0% SEC 6.0
+GRID tr emre:p=1,bm_lewis:t=1               -45 L0 F0    98 UTMOS 2.14 WER  31% SEC 5.1  heard: Bir ağmış bir yokmuş, küçük bir tafsın maçede parlak, kırmızı bir top olmuş.
+GRID tr emre:p=1,bm_lewis:t=1               -23 L0 F0   121 UTMOS 3.51 WER   0% SEC 6.2
+GRID tr emre:p=1,bm_lewis:t=1                -8 L0 F0   135 UTMOS 3.51 WER   0% SEC 5.9
+GRID tr emre:p=1,bm_lewis:t=1                +0 L0 F0   143 UTMOS 3.61 WER   0% SEC 5.7
+GRID tr emre:p=1,bm_lewis:t=1                +0 L1 F0   139 UTMOS 3.41 WER   0% SEC 6.5
+GRID tr emre:p=1,bm_lewis:t=1               +15 L0 F0   158 UTMOS 3.53 WER   0% SEC 5.4
+GRID tr emre:p=1,bm_lewis:t=1               +30 L0 F0   171 UTMOS 3.51 WER   0% SEC 5.5
+GRID tr emre:p=1,bm_lewis:t=1               +45 L0 F0   182 UTMOS 3.15 WER   0% SEC 6.0
+GRID tr elif:p=1,elif:t=0.5,af_alloy:t=0.5   +0 L0 F0   241 UTMOS 4.31 WER   0% SEC 6.4
+GRID tr elif:p=1,elif:t=0.5,af_alloy:t=0.5   +0 L1 F0   237 UTMOS 4.32 WER   0% SEC 8.1
+GRID tr elif:p=1,elif:t=0.5,af_aoede:t=0.5   +0 L0 F0   241 UTMOS 4.32 WER   0% SEC 6.4
+GRID tr elif:p=1,elif:t=0.5,af_aoede:t=0.5   +0 L1 F0   237 UTMOS 4.27 WER   0% SEC 8.1
+GRID tr elif:p=1,elif:t=0.5,af_bella:t=0.5   +0 L0 F0   242 UTMOS 4.34 WER   0% SEC 6.4
+GRID tr elif:p=1,elif:t=0.5,af_bella:t=0.5   +0 L1 F0   237 UTMOS 4.34 WER   0% SEC 8.1
+GRID tr elif:p=1,elif:t=0.5,af_heart:t=0.5   +0 L0 F0   241 UTMOS 4.37 WER   0% SEC 6.4
+GRID tr elif:p=1,elif:t=0.5,af_heart:t=0.5   +0 L1 F0   238 UTMOS 4.38 WER   0% SEC 8.1
+GRID tr elif:p=1,elif:t=0.5,af_jessica:t=0.5   +0 L0 F0   241 UTMOS 4.35 WER   0% SEC 6.4
+GRID tr elif:p=1,elif:t=0.5,af_jessica:t=0.5   +0 L1 F0   237 UTMOS 4.29 WER   0% SEC 8.1
+GRID tr elif:p=1,elif:t=0.5,af_kore:t=0.5    +0 L0 F0   241 UTMOS 4.33 WER   0% SEC 6.4
+GRID tr elif:p=1,elif:t=0.5,af_kore:t=0.5    +0 L1 F0   236 UTMOS 4.28 WER   0% SEC 8.1
+GRID tr elif:p=1,elif:t=0.5,af_nicole:t=0.5   +0 L0 F0   240 UTMOS 4.25 WER   0% SEC 6.4
+GRID tr elif:p=1,elif:t=0.5,af_nicole:t=0.5   +0 L1 F0   237 UTMOS 4.17 WER   0% SEC 8.1
+GRID tr elif:p=1,elif:t=0.5,af_nova:t=0.5    +0 L0 F0   241 UTMOS 4.35 WER   0% SEC 6.4
+GRID tr elif:p=1,elif:t=0.5,af_nova:t=0.5    +0 L1 F0   237 UTMOS 4.36 WER   8% SEC 8.1
+GRID tr elif:p=1,elif:t=0.5,af_river:t=0.5   +0 L0 F0   241 UTMOS 4.38 WER   0% SEC 6.4
+GRID tr elif:p=1,elif:t=0.5,af_river:t=0.5   +0 L1 F0   237 UTMOS 4.32 WER   0% SEC 8.1
+GRID tr elif:p=1,elif:t=0.5,af_sarah:t=0.5   +0 L0 F0   241 UTMOS 4.36 WER   0% SEC 6.4
+GRID tr elif:p=1,elif:t=0.5,af_sarah:t=0.5   +0 L1 F0   237 UTMOS 4.36 WER   0% SEC 8.1
+GRID tr elif:p=1,elif:t=0.5,af_sky:t=0.5     +0 L0 F0   241 UTMOS 4.33 WER   0% SEC 6.4
+GRID tr elif:p=1,elif:t=0.5,af_sky:t=0.5     +0 L1 F0   237 UTMOS 4.35 WER   0% SEC 8.1
+GRID tr emre:p=1,emre:t=0.5,am_adam:t=0.5    +0 L0 F0   142 UTMOS 4.16 WER   0% SEC 5.7
+GRID tr emre:p=1,emre:t=0.5,am_adam:t=0.5    +0 L1 F0   137 UTMOS 3.98 WER   0% SEC 6.5
+GRID tr emre:p=1,emre:t=0.5,am_echo:t=0.5    +0 L0 F0   138 UTMOS 4.15 WER   0% SEC 5.7
+GRID tr emre:p=1,emre:t=0.5,am_echo:t=0.5    +0 L1 F0   136 UTMOS 4.06 WER   0% SEC 6.5
+GRID tr emre:p=1,emre:t=0.5,am_eric:t=0.5    +0 L0 F0   137 UTMOS 4.14 WER   0% SEC 5.7
+GRID tr emre:p=1,emre:t=0.5,am_eric:t=0.5    +0 L1 F0   136 UTMOS 4.00 WER   0% SEC 6.5
+GRID tr emre:p=1,emre:t=0.5,am_fenrir:t=0.5   +0 L0 F0   136 UTMOS 4.20 WER   0% SEC 5.7
+GRID tr emre:p=1,emre:t=0.5,am_fenrir:t=0.5   +0 L1 F0   136 UTMOS 4.04 WER   0% SEC 6.5
+GRID tr emre:p=1,emre:t=0.5,am_liam:t=0.5    +0 L0 F0   140 UTMOS 4.14 WER   0% SEC 5.7
+GRID tr emre:p=1,emre:t=0.5,am_liam:t=0.5    +0 L1 F0   136 UTMOS 4.00 WER   0% SEC 6.5
+GRID tr emre:p=1,emre:t=0.5,am_michael:t=0.5   +0 L0 F0   137 UTMOS 4.05 WER   0% SEC 5.7
+GRID tr emre:p=1,emre:t=0.5,am_michael:t=0.5   +0 L1 F0   136 UTMOS 3.92 WER   0% SEC 6.5
+GRID tr emre:p=1,emre:t=0.5,am_onyx:t=0.5    +0 L0 F0   137 UTMOS 4.10 WER   0% SEC 5.7
+GRID tr emre:p=1,emre:t=0.5,am_onyx:t=0.5    +0 L1 F0   136 UTMOS 3.98 WER   0% SEC 6.5
+GRID tr emre:p=1,emre:t=0.5,am_puck:t=0.5    +0 L0 F0   136 UTMOS 4.15 WER   0% SEC 5.7
+GRID tr emre:p=1,emre:t=0.5,am_puck:t=0.5    +0 L1 F0   136 UTMOS 4.03 WER   0% SEC 6.5
+GRID tr emre:p=1,emre:t=0.5,am_santa:t=0.5   +0 L0 F0   139 UTMOS 4.11 WER   0% SEC 5.7
+GRID tr emre:p=1,emre:t=0.5,am_santa:t=0.5   +0 L1 F0   137 UTMOS 3.92 WER   0% SEC 6.5
+GRID tr elif:p=1,elif:t=0.5,bf_alice:t=0.5   +0 L0 F0   243 UTMOS 4.31 WER   0% SEC 6.4
+GRID tr elif:p=1,elif:t=0.5,bf_alice:t=0.5   +0 L1 F0   238 UTMOS 4.32 WER   8% SEC 8.1
+GRID tr elif:p=1,elif:t=0.5,bf_emma:t=0.5    +0 L0 F0   241 UTMOS 4.36 WER   0% SEC 6.4
+GRID tr elif:p=1,elif:t=0.5,bf_emma:t=0.5    +0 L1 F0   237 UTMOS 4.32 WER   0% SEC 8.1
+GRID tr elif:p=1,elif:t=0.5,bf_isabella:t=0.5   +0 L0 F0   242 UTMOS 4.35 WER   0% SEC 6.4
+GRID tr elif:p=1,elif:t=0.5,bf_isabella:t=0.5   +0 L1 F0   238 UTMOS 4.34 WER   0% SEC 8.1
+GRID tr elif:p=1,elif:t=0.5,bf_lily:t=0.5    +0 L0 F0   241 UTMOS 4.32 WER   0% SEC 6.4
+GRID tr elif:p=1,elif:t=0.5,bf_lily:t=0.5    +0 L1 F0   238 UTMOS 4.32 WER   0% SEC 8.1
+GRID tr emre:p=1,emre:t=0.5,bm_daniel:t=0.5   +0 L0 F0   136 UTMOS 4.10 WER   0% SEC 5.7
+GRID tr emre:p=1,emre:t=0.5,bm_daniel:t=0.5   +0 L1 F0   136 UTMOS 3.97 WER   0% SEC 6.5
+GRID tr emre:p=1,emre:t=0.5,bm_fable:t=0.5   +0 L0 F0   137 UTMOS 4.15 WER   0% SEC 5.7
+GRID tr emre:p=1,emre:t=0.5,bm_fable:t=0.5   +0 L1 F0   136 UTMOS 4.10 WER   0% SEC 6.5
+GRID tr emre:p=1,emre:t=0.5,bm_george:t=0.5   +0 L0 F0   136 UTMOS 4.09 WER   0% SEC 5.7
+GRID tr emre:p=1,emre:t=0.5,bm_george:t=0.5   +0 L1 F0   136 UTMOS 3.92 WER   0% SEC 6.5
+GRID tr emre:p=1,emre:t=0.5,bm_lewis:t=0.5   +0 L0 F0   141 UTMOS 4.09 WER   0% SEC 5.7
+GRID tr emre:p=1,emre:t=0.5,bm_lewis:t=0.5   +0 L1 F0   137 UTMOS 3.94 WER   0% SEC 6.5
+GRIDSUM tr: 336 clips, mean UTMOS 3.78, mean words wrong 2%
+---- voice grid en: GRID language spec pitch(Hz) line F0 UTMOS WER seconds   (line 1 is the harder one: only at the pitch 0)
+GRID en af_alloy                            -45 L0 F0   107 UTMOS 3.68 WER   0% SEC 4.9
+GRID en af_alloy                            -23 L0 F0   123 UTMOS 4.37 WER   0% SEC 5.2
+GRID en af_alloy                             +0 L0 F0   145 UTMOS 4.43 WER   0% SEC 5.0
+GRID en af_alloy                            +22 L0 F0   164 UTMOS 4.42 WER   0% SEC 4.9
+GRID en af_alloy                            +45 L0 F0   186 UTMOS 3.86 WER   0% SEC 5.0
+GRID en af_aoede                            -45 L0 F0   129 UTMOS 3.36 WER  20% SEC 4.5  heard: But upon a time, a little rabbit found a shady rib ball in the garden.
+GRID en af_aoede                            -23 L0 F0   158 UTMOS 4.28 WER   0% SEC 5.0
+GRID en af_aoede                             +0 L0 F0   181 UTMOS 4.47 WER   0% SEC 4.8
+GRID en af_aoede                            +22 L0 F0   207 UTMOS 4.46 WER   0% SEC 4.6
+GRID en af_aoede                            +45 L0 F0   232 UTMOS 4.29 WER   0% SEC 4.8
+GRID en af_bella                            -45 L0 F0   141 UTMOS 3.23 WER   0% SEC 5.0
+GRID en af_bella                            -23 L0 F0   171 UTMOS 4.30 WER   0% SEC 5.2
+GRID en af_bella                             +0 L0 F0   204 UTMOS 4.35 WER   0% SEC 5.1
+GRID en af_bella                            +22 L0 F0   234 UTMOS 4.05 WER   0% SEC 5.0
+GRID en af_bella                            +45 L0 F0   264 UTMOS 2.96 WER   0% SEC 5.2
+GRID en af_heart                            -45 L0 F0   138 UTMOS 3.97 WER   0% SEC 4.6
+GRID en af_heart                            -23 L0 F0   167 UTMOS 4.46 WER   0% SEC 5.0
+GRID en af_heart                             +0 L0 F0   195 UTMOS 4.52 WER   0% SEC 4.7
+GRID en af_heart                            +22 L0 F0   226 UTMOS 4.45 WER   0% SEC 4.6
+GRID en af_heart                            +45 L0 F0   257 UTMOS 3.63 WER   0% SEC 4.8
+GRID en af_jessica                          -45 L0 F0   151 UTMOS 3.93 WER   0% SEC 4.3
+GRID en af_jessica                          -23 L0 F0   177 UTMOS 4.43 WER   0% SEC 4.5
+GRID en af_jessica                           +0 L0 F0   209 UTMOS 4.47 WER   0% SEC 4.4
+GRID en af_jessica                          +22 L0 F0   238 UTMOS 4.22 WER   0% SEC 4.2
+GRID en af_jessica                          +45 L0 F0   263 UTMOS 3.31 WER   0% SEC 4.5
+GRID en af_kore                             -45 L0 F0   118 UTMOS 3.93 WER   7% SEC 4.7
+GRID en af_kore                             -23 L0 F0   130 UTMOS 4.43 WER   0% SEC 5.0
+GRID en af_kore                              +0 L0 F0   153 UTMOS 4.50 WER   0% SEC 4.8
+GRID en af_kore                             +22 L0 F0   176 UTMOS 4.51 WER   0% SEC 4.8
+GRID en af_kore                             +45 L0 F0   196 UTMOS 4.47 WER   0% SEC 5.0
+GRID en af_nicole                           -45 L0 F0   116 UTMOS 2.31 WER   0% SEC 6.6
+GRID en af_nicole                           -23 L0 F0   128 UTMOS 2.76 WER   0% SEC 7.1
+GRID en af_nicole                            +0 L0 F0   151 UTMOS 3.08 WER   0% SEC 6.9
+GRID en af_nicole                           +22 L0 F0   174 UTMOS 2.83 WER   0% SEC 6.7
+GRID en af_nicole                           +45 L0 F0   195 UTMOS 1.84 WER   0% SEC 6.9
+GRID en af_nova                             -45 L0 F0   114 UTMOS 4.02 WER   0% SEC 4.7
+GRID en af_nova                             -23 L0 F0   136 UTMOS 4.44 WER   0% SEC 5.0
+GRID en af_nova                              +0 L0 F0   161 UTMOS 4.50 WER   0% SEC 4.9
+GRID en af_nova                             +22 L0 F0   186 UTMOS 4.46 WER   0% SEC 4.7
+GRID en af_nova                             +45 L0 F0   212 UTMOS 4.11 WER   0% SEC 4.9
+GRID en af_river                            -45 L0 F0   129 UTMOS 3.25 WER   0% SEC 4.3
+GRID en af_river                            -23 L0 F0   155 UTMOS 4.41 WER   0% SEC 4.6
+GRID en af_river                             +0 L0 F0   182 UTMOS 4.47 WER   0% SEC 4.4
+GRID en af_river                            +22 L0 F0   206 UTMOS 4.47 WER   0% SEC 4.2
+GRID en af_river                            +45 L0 F0   231 UTMOS 4.35 WER   0% SEC 4.5
+GRID en af_sarah                            -45 L0 F0   135 UTMOS 3.88 WER   0% SEC 5.0
+GRID en af_sarah                            -23 L0 F0   160 UTMOS 4.42 WER   0% SEC 5.2
+GRID en af_sarah                             +0 L0 F0   191 UTMOS 4.49 WER   0% SEC 5.0
+GRID en af_sarah                            +22 L0 F0   225 UTMOS 4.49 WER   0% SEC 4.9
+GRID en af_sarah                            +45 L0 F0   249 UTMOS 4.41 WER   0% SEC 5.2
+GRID en af_sky                              -45 L0 F0   120 UTMOS 3.83 WER   7% SEC 4.7
+GRID en af_sky                              -23 L0 F0   138 UTMOS 4.38 WER   0% SEC 5.2
+GRID en af_sky                               +0 L0 F0   160 UTMOS 4.46 WER   0% SEC 4.8
+GRID en af_sky                              +22 L0 F0   182 UTMOS 4.45 WER   0% SEC 4.8
+GRID en af_sky                              +45 L0 F0   203 UTMOS 4.16 WER   0% SEC 4.9
+GRID en am_adam                             -45 L0 F0    95 UTMOS 2.00 WER   7% SEC 4.8
+GRID en am_adam                             -23 L0 F0   108 UTMOS 4.25 WER   0% SEC 5.0
+GRID en am_adam                              +0 L0 F0   126 UTMOS 4.44 WER   0% SEC 4.8
+GRID en am_adam                             +22 L0 F0   142 UTMOS 4.45 WER   0% SEC 4.7
+GRID en am_adam                             +45 L0 F0   157 UTMOS 4.38 WER   0% SEC 5.0
+GRID en am_echo                             -45 L0 F0   101 UTMOS 3.54 WER   0% SEC 5.0
+GRID en am_echo                             -23 L0 F0   105 UTMOS 4.33 WER   0% SEC 5.1
+GRID en am_echo                              +0 L0 F0   117 UTMOS 4.46 WER   0% SEC 5.0
+GRID en am_echo                             +22 L0 F0   130 UTMOS 4.45 WER   0% SEC 4.9
+GRID en am_echo                             +45 L0 F0   144 UTMOS 4.41 WER   0% SEC 5.0
+GRID en am_eric                             -45 L0 F0   117 UTMOS 2.76 WER   7% SEC 4.3
+GRID en am_eric                             -23 L0 F0   139 UTMOS 4.25 WER   0% SEC 4.6
+GRID en am_eric                              +0 L0 F0   158 UTMOS 4.40 WER   0% SEC 4.4
+GRID en am_eric                             +22 L0 F0   179 UTMOS 4.39 WER   0% SEC 4.2
+GRID en am_eric                             +45 L0 F0   202 UTMOS 4.35 WER   0% SEC 4.4
+GRID en am_fenrir                           -45 L0 F0   114 UTMOS 3.47 WER   7% SEC 4.6
+GRID en am_fenrir                           -23 L0 F0   129 UTMOS 4.35 WER   0% SEC 4.9
+GRID en am_fenrir                            +0 L0 F0   144 UTMOS 4.47 WER   0% SEC 4.7
+GRID en am_fenrir                           +22 L0 F0   164 UTMOS 4.50 WER   0% SEC 4.6
+GRID en am_fenrir                           +45 L0 F0   180 UTMOS 4.41 WER   0% SEC 4.8
+GRID en am_liam                             -45 L0 F0   110 UTMOS 1.87 WER   0% SEC 4.3
+GRID en am_liam                             -23 L0 F0   115 UTMOS 4.04 WER   0% SEC 4.5
+GRID en am_liam                              +0 L0 F0   128 UTMOS 4.43 WER   0% SEC 4.4
+GRID en am_liam                             +22 L0 F0   145 UTMOS 4.41 WER   0% SEC 4.2
+GRID en am_liam                             +45 L0 F0   156 UTMOS 4.34 WER   0% SEC 4.5
+GRID en am_michael                          -45 L0 F0    99 UTMOS 2.47 WER   0% SEC 5.3
+GRID en am_michael                          -23 L0 F0   109 UTMOS 3.81 WER   0% SEC 5.6
+GRID en am_michael                           +0 L0 F0   124 UTMOS 4.39 WER   0% SEC 5.3
+GRID en am_michael                          +22 L0 F0   142 UTMOS 4.38 WER   0% SEC 5.2
+GRID en am_michael                          +45 L0 F0   158 UTMOS 4.35 WER   0% SEC 5.5
+GRID en am_onyx                             -45 L0 F0   337 UTMOS 1.45 WER   0% SEC 4.8
+GRID en am_onyx                             -23 L0 F0   380 UTMOS 3.70 WER   0% SEC 5.0
+GRID en am_onyx                              +0 L0 F0    98 UTMOS 4.32 WER   0% SEC 4.9
+GRID en am_onyx                             +22 L0 F0   102 UTMOS 4.41 WER   0% SEC 4.7
+GRID en am_onyx                             +45 L0 F0   113 UTMOS 4.37 WER   0% SEC 5.0
+GRID en am_puck                             -45 L0 F0   100 UTMOS 3.11 WER  13% SEC 4.4  heard: And upon a time, a little rabbit found a shady red ball in the garden.
+GRID en am_puck                             -23 L0 F0   113 UTMOS 4.37 WER   0% SEC 4.9
+GRID en am_puck                              +0 L0 F0   120 UTMOS 4.45 WER   0% SEC 4.6
+GRID en am_puck                             +22 L0 F0   131 UTMOS 4.47 WER   0% SEC 4.5
+GRID en am_puck                             +45 L0 F0   148 UTMOS 4.46 WER   0% SEC 4.8
+GRID en am_santa                            -45 L0 F0   155 UTMOS 1.35 WER  13% SEC 4.9  heard: And upon a time, a little rabbit found a shiny red ball in the gut.
+GRID en am_santa                            -23 L0 F0   173 UTMOS 3.35 WER   0% SEC 5.2
+GRID en am_santa                             +0 L0 F0   208 UTMOS 3.93 WER   0% SEC 5.0
+GRID en am_santa                            +22 L0 F0   251 UTMOS 3.78 WER   0% SEC 4.8
+GRID en am_santa                            +45 L0 F0   273 UTMOS 3.73 WER   0% SEC 5.1
+GRID en bf_alice                            -45 L0 F0   159 UTMOS 3.58 WER   0% SEC 4.8
+GRID en bf_alice                            -23 L0 F0   187 UTMOS 4.29 WER   0% SEC 5.2
+GRID en bf_alice                             +0 L0 F0   217 UTMOS 4.43 WER   0% SEC 5.0
+GRID en bf_alice                            +22 L0 F0   247 UTMOS 4.33 WER   0% SEC 4.8
+GRID en bf_alice                            +45 L0 F0   284 UTMOS 3.56 WER   7% SEC 5.1
+GRID en bf_emma                             -45 L0 F0   125 UTMOS 3.52 WER   0% SEC 4.5
+GRID en bf_emma                             -23 L0 F0   150 UTMOS 4.36 WER   0% SEC 5.0
+GRID en bf_emma                              +0 L0 F0   179 UTMOS 4.38 WER   0% SEC 4.8
+GRID en bf_emma                             +22 L0 F0   206 UTMOS 4.30 WER   0% SEC 4.6
+GRID en bf_emma                             +45 L0 F0   230 UTMOS 3.52 WER   0% SEC 5.0
+GRID en bf_isabella                         -45 L0 F0   145 UTMOS 3.74 WER   0% SEC 4.7
+GRID en bf_isabella                         -23 L0 F0   172 UTMOS 4.35 WER   0% SEC 5.2
+GRID en bf_isabella                          +0 L0 F0   204 UTMOS 4.46 WER   0% SEC 5.0
+GRID en bf_isabella                         +22 L0 F0   237 UTMOS 3.91 WER   0% SEC 4.8
+GRID en bf_isabella                         +45 L0 F0   273 UTMOS 3.58 WER   0% SEC 5.1
+GRID en bf_lily                             -45 L0 F0   138 UTMOS 3.55 WER   0% SEC 4.6
+GRID en bf_lily                             -23 L0 F0   153 UTMOS 4.31 WER   0% SEC 5.1
+GRID en bf_lily                              +0 L0 F0   178 UTMOS 4.37 WER   0% SEC 4.9
+GRID en bf_lily                             +22 L0 F0   204 UTMOS 4.32 WER   0% SEC 4.7
+GRID en bf_lily                             +45 L0 F0   239 UTMOS 3.45 WER   0% SEC 5.1
+GRID en bm_daniel                           -45 L0 F0    99 UTMOS 2.32 WER   0% SEC 4.5
+GRID en bm_daniel                           -23 L0 F0   110 UTMOS 3.90 WER   0% SEC 4.9
+GRID en bm_daniel                            +0 L0 F0   128 UTMOS 4.31 WER   0% SEC 4.7
+GRID en bm_daniel                           +22 L0 F0   148 UTMOS 4.24 WER   0% SEC 4.5
+GRID en bm_daniel                           +45 L0 F0   167 UTMOS 3.99 WER   0% SEC 4.7
+GRID en bm_fable                            -45 L0 F0   108 UTMOS 3.54 WER   0% SEC 4.8
+GRID en bm_fable                            -23 L0 F0   112 UTMOS 4.26 WER   0% SEC 5.1
+GRID en bm_fable                             +0 L0 F0   128 UTMOS 4.37 WER   0% SEC 5.0
+GRID en bm_fable                            +22 L0 F0   143 UTMOS 4.36 WER   0% SEC 4.8
+GRID en bm_fable                            +45 L0 F0   156 UTMOS 4.07 WER   0% SEC 5.1
+GRID en bm_george                           -45 L0 F0   106 UTMOS 1.94 WER   0% SEC 5.2
+GRID en bm_george                           -23 L0 F0   123 UTMOS 3.79 WER   0% SEC 5.6
+GRID en bm_george                            +0 L0 F0   142 UTMOS 4.41 WER   0% SEC 5.5
+GRID en bm_george                           +22 L0 F0   162 UTMOS 4.37 WER   0% SEC 5.3
+GRID en bm_george                           +45 L0 F0   184 UTMOS 4.34 WER   0% SEC 5.5
+GRID en bm_lewis                            -45 L0 F0     - UTMOS 1.36 WER  33% SEC 5.4  heard: And so, by the time, a little rabbit found a shiny red ball in the gun.
+GRID en bm_lewis                            -23 L0 F0   100 UTMOS 3.53 WER   0% SEC 5.6
+GRID en bm_lewis                             +0 L0 F0   113 UTMOS 4.16 WER   0% SEC 5.5
+GRID en bm_lewis                            +22 L0 F0   120 UTMOS 4.19 WER   0% SEC 5.3
+GRID en bm_lewis                            +45 L0 F0   131 UTMOS 3.79 WER   0% SEC 5.5
+GRIDSUM en: 140 clips, mean UTMOS 3.95, mean words wrong 1%

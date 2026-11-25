@@ -1,0 +1,409 @@
+==================== main 06:11:17
+python 3.12.16 Linux-7.0.0-1020-azure-x86_64-with-glibc2.43 cpus 4
+   numpy 2.5.5
+   scipy 1.18.1
+   torch 2.15.0+cpu
+   torchaudio 2.11.1+cpu
+   kokoro 0.9.4
+   misaki 0.9.4
+   faster_whisper 1.2.1
+   edge_tts 7.3.1
+edge-tts: 318 voices; Turkish: ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural']
+   en-AU-WilliamMultilingualNeural              en-AU  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   en-US-AndrewMultilingualNeural               en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Warm', 'Confident', 'Authentic', 'Honest']}
+   en-US-AvaMultilingualNeural                  en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Expressive', 'Caring', 'Pleasant', 'Friendly']}
+   en-US-BrianMultilingualNeural                en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Approachable', 'Casual', 'Sincere']}
+   en-US-EmmaMultilingualNeural                 en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Cheerful', 'Clear', 'Conversational']}
+   fr-FR-VivienneMultilingualNeural             fr-FR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   fr-FR-RemyMultilingualNeural                 fr-FR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   it-IT-GiuseppeMultilingualNeural             it-IT  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   ko-KR-HyunsuMultilingualNeural               ko-KR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   pt-BR-ThalitaMultilingualNeural              pt-BR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   [ktts] 56 of 56 clips made (143 s of speech in 49 s of work)
+   [ktts] 56 of 56 clips made in 50 s; 0 item(s) will use the Edge voice
+---- gallery en: GAL language tale character type F0 UTMOS WER voice
+GAL en three-little-pigs    mama     woman       F0   171 UTMOS 4.41 WER   0%  k:af_sky|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en three-little-pigs    pig1     pig         F0   148 UTMOS 4.18 WER   0%  k:bm_george|en-US-RogerNeural|+2%|+27Hz
+GAL en three-little-pigs    pig2     pig         F0   168 UTMOS 4.09 WER   0%  k:am_puck|en-US-RogerNeural|+2%|+15Hz
+GAL en three-little-pigs    pig3     pig         F0   223 UTMOS 4.38 WER   0%  k:am_eric|en-US-RogerNeural|+2%|+3Hz
+GAL en three-little-pigs    wolf     wolf        F0   105 UTMOS 4.36 WER   0%  k:am_echo|en-US-ChristopherNeural|-10%|-28Hz
+GAL en goldilocks           gold     girl        F0   234 UTMOS 4.19 WER   9%  k:af_sarah|en-US-AnaNeural|-2%|+10Hz
+GAL en goldilocks           papa     bear        F0   103 UTMOS 4.37 WER   0%  k:am_onyx|en-US-EricNeural|-12%|-15Hz
+GAL en goldilocks           mama     mamabear    F0   157 UTMOS 4.46 WER   0%  k:af_kore|en-GB-SoniaNeural|-8%|-22Hz
+GAL en goldilocks           baby     baby        F0   289 UTMOS 3.61 WER   0%  k:bf_isabella|en-GB-MaisieNeural|+0%|+20Hz
+GAL en red-riding-hood      red      girl        F0   234 UTMOS 4.19 WER   9%  k:af_sarah|en-US-AnaNeural|-2%|+10Hz
+GAL en red-riding-hood      mama     woman       F0   171 UTMOS 4.41 WER   0%  k:af_sky|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en red-riding-hood      granny   granny      F0   147 UTMOS 4.45 WER   0%  k:af_kore|en-IE-EmilyNeural|-14%|-18Hz
+GAL en red-riding-hood      wolf     wolf        F0   105 UTMOS 4.36 WER   0%  k:am_echo|en-US-ChristopherNeural|-10%|-28Hz
+GAL en red-riding-hood      wolfg    fakegranny  F0   166 UTMOS 4.39 WER   0%  k:am_eric|en-US-AndrewNeural|-8%|+45Hz
+GAL en red-riding-hood      wood     man         F0   126 UTMOS 4.39 WER   0%  k:am_adam|en-US-BrianMultilingualNeural|-6%|+0Hz
+GAL en cinderella           cin      teen        F0   192 UTMOS 4.24 WER   0%  k:af_river|en-GB-LibbyNeural|-2%|+22Hz
+GAL en cinderella           cing     teen        F0   192 UTMOS 4.24 WER   0%  k:af_river|en-GB-LibbyNeural|-2%|+22Hz
+GAL en cinderella           sm       stepmother  F0   155 UTMOS 4.46 WER   0%  k:af_kore|en-US-AvaMultilingualNeural|-12%|-20Hz
+GAL en cinderella           s1       stepsister  F0   206 UTMOS 4.28 WER   0%  k:af_bella|en-CA-ClaraNeural|+6%|+28Hz
+GAL en cinderella           s2       stepsister  F0   254 UTMOS 3.87 WER   0%  k:bf_isabella|en-CA-ClaraNeural|+6%|+20Hz
+GAL en cinderella           fg       fairy       F0   242 UTMOS 3.93 WER   0%  k:af_sarah|en-NZ-MollyNeural|-8%|+30Hz
+GAL en cinderella           pr       prince      F0   154 UTMOS 4.39 WER   0%  k:bm_george|en-GB-ThomasNeural|+0%|+10Hz
+GAL en magic-porridge-pot   kid      girl        F0   234 UTMOS 4.19 WER   9%  k:af_sarah|en-US-AnaNeural|-2%|+10Hz
+GAL en magic-porridge-pot   mama     woman       F0   171 UTMOS 4.41 WER   0%  k:af_sky|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en magic-porridge-pot   old      granny      F0   147 UTMOS 4.45 WER   0%  k:af_kore|en-IE-EmilyNeural|-14%|-18Hz
+GAL en magic-porridge-pot   gpa      grandpa     F0   105 UTMOS 4.41 WER   0%  k:am_echo|en-US-AndrewMultilingualNeural|-14%|-12Hz
+GAL en magic-porridge-pot   gma      granny      F0   181 UTMOS 4.43 WER   0%  k:af_river|en-IE-EmilyNeural|-14%|-26Hz
+GAL en magic-porridge-pot   nei      girl        F0   256 UTMOS 3.30 WER   0%  k:bf_isabella|en-US-AnaNeural|-2%|+19Hz
+GAL en gingerbread-man      gm       boy         F0   197 UTMOS 4.37 WER   0%  k:am_eric|en-GB-MaisieNeural|+4%|-26Hz
+GAL en gingerbread-man      woman    granny      F0   147 UTMOS 4.45 WER   0%  k:af_kore|en-IE-EmilyNeural|-14%|-18Hz
+GAL en gingerbread-man      man      grandpa     F0   105 UTMOS 4.41 WER   0%  k:am_echo|en-US-AndrewMultilingualNeural|-14%|-12Hz
+GAL en gingerbread-man      pig      pig         F0   168 UTMOS 4.09 WER   0%  k:am_puck|en-US-RogerNeural|+2%|+15Hz
+GAL en gingerbread-man      bear     bear        F0   103 UTMOS 4.37 WER   0%  k:am_onyx|en-US-EricNeural|-12%|-15Hz
+GAL en gingerbread-man      fox      fox         F0   130 UTMOS 4.35 WER   0%  k:am_adam|en-GB-RyanNeural|-4%|-30Hz
+SIM en three-little-pigs    mama     (woman) ~ pig1     (pig) cos 0.02
+SIM en three-little-pigs    mama     (woman) ~ pig2     (pig) cos 0.03
+SIM en three-little-pigs    mama     (woman) ~ pig3     (pig) cos 0.03
+SIM en three-little-pigs    mama     (woman) ~ wolf     (wolf) cos 0.08
+SIM en three-little-pigs    pig1     (pig) ~ pig2     (pig) cos -0.06
+SIM en three-little-pigs    pig1     (pig) ~ pig3     (pig) cos -0.02
+SIM en three-little-pigs    pig1     (pig) ~ wolf     (wolf) cos 0.13
+SIM en three-little-pigs    pig2     (pig) ~ pig3     (pig) cos 0.64   <-- alike
+SIM en three-little-pigs    pig2     (pig) ~ wolf     (wolf) cos -0.08
+SIM en three-little-pigs    pig3     (pig) ~ wolf     (wolf) cos -0.04
+SIM en goldilocks           gold     (girl) ~ papa     (bear) cos 0.07
+SIM en goldilocks           gold     (girl) ~ mama     (mamabear) cos 0.01
+SIM en goldilocks           gold     (girl) ~ baby     (baby) cos 0.45
+SIM en goldilocks           papa     (bear) ~ mama     (mamabear) cos 0.17
+SIM en goldilocks           papa     (bear) ~ baby     (baby) cos -0.03
+SIM en goldilocks           mama     (mamabear) ~ baby     (baby) cos -0.01
+SIM en red-riding-hood      red      (girl) ~ mama     (woman) cos 0.13
+SIM en red-riding-hood      red      (girl) ~ granny   (granny) cos 0.00
+SIM en red-riding-hood      red      (girl) ~ wolf     (wolf) cos 0.00
+SIM en red-riding-hood      red      (girl) ~ wolfg    (fakegranny) cos 0.14
+SIM en red-riding-hood      red      (girl) ~ wood     (man) cos -0.00
+SIM en red-riding-hood      mama     (woman) ~ granny   (granny) cos 0.16
+SIM en red-riding-hood      mama     (woman) ~ wolf     (wolf) cos 0.08
+SIM en red-riding-hood      mama     (woman) ~ wolfg    (fakegranny) cos 0.04
+SIM en red-riding-hood      mama     (woman) ~ wood     (man) cos -0.04
+SIM en red-riding-hood      granny   (granny) ~ wolf     (wolf) cos 0.21
+SIM en red-riding-hood      granny   (granny) ~ wolfg    (fakegranny) cos 0.13
+SIM en red-riding-hood      granny   (granny) ~ wood     (man) cos 0.18
+SIM en red-riding-hood      wolf     (wolf) ~ wolfg    (fakegranny) cos 0.04
+SIM en red-riding-hood      wolf     (wolf) ~ wood     (man) cos 0.04
+SIM en red-riding-hood      wolfg    (fakegranny) ~ wood     (man) cos 0.02
+SIM en cinderella           cin      (teen) ~ cing     (teen) cos 1.00   <-- alike
+SIM en cinderella           cin      (teen) ~ sm       (stepmother) cos 0.11
+SIM en cinderella           cin      (teen) ~ s1       (stepsister) cos 0.21
+SIM en cinderella           cin      (teen) ~ s2       (stepsister) cos 0.18
+SIM en cinderella           cin      (teen) ~ fg       (fairy) cos 0.12
+SIM en cinderella           cin      (teen) ~ pr       (prince) cos 0.15
+SIM en cinderella           cing     (teen) ~ sm       (stepmother) cos 0.11
+SIM en cinderella           cing     (teen) ~ s1       (stepsister) cos 0.21
+SIM en cinderella           cing     (teen) ~ s2       (stepsister) cos 0.18
+SIM en cinderella           cing     (teen) ~ fg       (fairy) cos 0.12
+SIM en cinderella           cing     (teen) ~ pr       (prince) cos 0.15
+SIM en cinderella           sm       (stepmother) ~ s1       (stepsister) cos 0.03
+SIM en cinderella           sm       (stepmother) ~ s2       (stepsister) cos -0.01
+SIM en cinderella           sm       (stepmother) ~ fg       (fairy) cos -0.07
+SIM en cinderella           sm       (stepmother) ~ pr       (prince) cos 0.11
+SIM en cinderella           s1       (stepsister) ~ s2       (stepsister) cos 0.14
+SIM en cinderella           s1       (stepsister) ~ fg       (fairy) cos 0.04
+SIM en cinderella           s1       (stepsister) ~ pr       (prince) cos 0.09
+SIM en cinderella           s2       (stepsister) ~ fg       (fairy) cos 0.44
+SIM en cinderella           s2       (stepsister) ~ pr       (prince) cos -0.02
+SIM en cinderella           fg       (fairy) ~ pr       (prince) cos 0.01
+SIM en magic-porridge-pot   kid      (girl) ~ mama     (woman) cos 0.13
+SIM en magic-porridge-pot   kid      (girl) ~ old      (granny) cos 0.00
+SIM en magic-porridge-pot   kid      (girl) ~ gpa      (grandpa) cos 0.04
+SIM en magic-porridge-pot   kid      (girl) ~ gma      (granny) cos -0.03
+SIM en magic-porridge-pot   kid      (girl) ~ nei      (girl) cos 0.59   <-- alike
+SIM en magic-porridge-pot   mama     (woman) ~ old      (granny) cos 0.16
+SIM en magic-porridge-pot   mama     (woman) ~ gpa      (grandpa) cos 0.04
+SIM en magic-porridge-pot   mama     (woman) ~ gma      (granny) cos 0.17
+SIM en magic-porridge-pot   mama     (woman) ~ nei      (girl) cos 0.15
+SIM en magic-porridge-pot   old      (granny) ~ gpa      (grandpa) cos 0.14
+SIM en magic-porridge-pot   old      (granny) ~ gma      (granny) cos 0.26
+SIM en magic-porridge-pot   old      (granny) ~ nei      (girl) cos -0.03
+SIM en magic-porridge-pot   gpa      (grandpa) ~ gma      (granny) cos 0.07
+SIM en magic-porridge-pot   gpa      (grandpa) ~ nei      (girl) cos 0.09
+SIM en magic-porridge-pot   gma      (granny) ~ nei      (girl) cos -0.04
+SIM en gingerbread-man      gm       (boy) ~ woman    (granny) cos 0.10
+SIM en gingerbread-man      gm       (boy) ~ man      (grandpa) cos 0.03
+SIM en gingerbread-man      gm       (boy) ~ pig      (pig) cos 0.18
+SIM en gingerbread-man      gm       (boy) ~ bear     (bear) cos 0.09
+SIM en gingerbread-man      gm       (boy) ~ fox      (fox) cos 0.15
+SIM en gingerbread-man      woman    (granny) ~ man      (grandpa) cos 0.14
+SIM en gingerbread-man      woman    (granny) ~ pig      (pig) cos -0.05
+SIM en gingerbread-man      woman    (granny) ~ bear     (bear) cos 0.11
+SIM en gingerbread-man      woman    (granny) ~ fox      (fox) cos 0.11
+SIM en gingerbread-man      man      (grandpa) ~ pig      (pig) cos 0.01
+SIM en gingerbread-man      man      (grandpa) ~ bear     (bear) cos 0.06
+SIM en gingerbread-man      man      (grandpa) ~ fox      (fox) cos -0.09
+SIM en gingerbread-man      pig      (pig) ~ bear     (bear) cos 0.06
+SIM en gingerbread-man      pig      (pig) ~ fox      (fox) cos 0.02
+SIM en gingerbread-man      bear     (bear) ~ fox      (fox) cos -0.07
+SIMSUM en pairs at or above 0.55: 3
+GALWARN en three-little-pigs: mama (woman) and pig2 (pig) may sound alike: F0 171 and 168 Hz (x1.02)
+GALWARN en red-riding-hood: mama (woman) and wolfg (fakegranny) may sound alike: F0 171 and 166 Hz (x1.03)
+GALWARN en cinderella: cin (teen) and cing (teen) may sound alike: F0 192 and 192 Hz (x1.00), the same voice
+GALWARN en cinderella: cin (teen) and s1 (stepsister) may sound alike: F0 192 and 206 Hz (x1.07)
+GALWARN en cinderella: cing (teen) and s1 (stepsister) may sound alike: F0 192 and 206 Hz (x1.07)
+GALWARN en cinderella: sm (stepmother) and pr (prince) may sound alike: F0 155 and 154 Hz (x1.01)
+GALWARN en cinderella: s2 (stepsister) and fg (fairy) may sound alike: F0 254 and 242 Hz (x1.05)
+GALWARN en magic-porridge-pot: kid (girl) and nei (girl) may sound alike: F0 234 and 256 Hz (x1.10)
+GALWARN en magic-porridge-pot: mama (woman) and gma (granny) may sound alike: F0 171 and 181 Hz (x1.06)
+GALWARN en gingerbread-man: man (grandpa) and bear (bear) may sound alike: F0 105 and 103 Hz (x1.02)
+wrote gallery-en 172.2 s
+   [ktts] 52 of 52 clips made (132 s of speech in 35 s of work)
+   [ktts] 52 of 52 clips made in 37 s; 0 item(s) will use the Edge voice
+---- gallery en-kidsedge: GAL language tale character type F0 UTMOS WER voice
+GAL en-kidsedge three-little-pigs    mama     woman       F0   171 UTMOS 4.41 WER   0%  k:af_sky|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en-kidsedge three-little-pigs    pig1     pig         F0   149 UTMOS 4.15 WER   0%  k:bm_george|en-US-RogerNeural|+2%|+27Hz
+GAL en-kidsedge three-little-pigs    pig2     pig         F0   167 UTMOS 4.10 WER   0%  k:am_puck|en-US-RogerNeural|+2%|+15Hz
+GAL en-kidsedge three-little-pigs    pig3     pig         F0   223 UTMOS 4.39 WER   0%  k:am_eric|en-US-RogerNeural|+2%|+3Hz
+GAL en-kidsedge three-little-pigs    wolf     wolf        F0   105 UTMOS 4.38 WER   0%  k:am_echo|en-US-ChristopherNeural|-10%|-28Hz
+GAL en-kidsedge goldilocks           gold     girl        F0   330 UTMOS 3.51 WER   0%  en-US-AnaNeural
+GAL en-kidsedge goldilocks           papa     bear        F0   103 UTMOS 4.37 WER   0%  k:am_onyx|en-US-EricNeural|-12%|-15Hz
+GAL en-kidsedge goldilocks           mama     mamabear    F0   157 UTMOS 4.47 WER   0%  k:af_kore|en-GB-SoniaNeural|-8%|-22Hz
+GAL en-kidsedge goldilocks           baby     baby        F0   382 UTMOS 2.98 WER   0%  en-GB-MaisieNeural
+GAL en-kidsedge red-riding-hood      red      girl        F0   330 UTMOS 3.51 WER   0%  en-US-AnaNeural
+GAL en-kidsedge red-riding-hood      mama     woman       F0   171 UTMOS 4.41 WER   0%  k:af_sky|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en-kidsedge red-riding-hood      granny   granny      F0   147 UTMOS 4.44 WER   0%  k:af_kore|en-IE-EmilyNeural|-14%|-18Hz
+GAL en-kidsedge red-riding-hood      wolf     wolf        F0   105 UTMOS 4.38 WER   0%  k:am_echo|en-US-ChristopherNeural|-10%|-28Hz
+GAL en-kidsedge red-riding-hood      wolfg    fakegranny  F0   166 UTMOS 4.38 WER   0%  k:am_eric|en-US-AndrewNeural|-8%|+45Hz
+GAL en-kidsedge red-riding-hood      wood     man         F0   126 UTMOS 4.37 WER   0%  k:am_adam|en-US-BrianMultilingualNeural|-6%|+0Hz
+GAL en-kidsedge cinderella           cin      teen        F0   193 UTMOS 4.26 WER   0%  k:af_river|en-GB-LibbyNeural|-2%|+22Hz
+GAL en-kidsedge cinderella           cing     teen        F0   193 UTMOS 4.26 WER   0%  k:af_river|en-GB-LibbyNeural|-2%|+22Hz
+GAL en-kidsedge cinderella           sm       stepmother  F0   155 UTMOS 4.47 WER   0%  k:af_kore|en-US-AvaMultilingualNeural|-12%|-20Hz
+GAL en-kidsedge cinderella           s1       stepsister  F0   206 UTMOS 4.26 WER   0%  k:af_bella|en-CA-ClaraNeural|+6%|+28Hz
+GAL en-kidsedge cinderella           s2       stepsister  F0   256 UTMOS 3.78 WER   0%  k:bf_isabella|en-CA-ClaraNeural|+6%|+20Hz
+GAL en-kidsedge cinderella           fg       fairy       F0   242 UTMOS 3.84 WER   0%  k:af_sarah|en-NZ-MollyNeural|-8%|+30Hz
+GAL en-kidsedge cinderella           pr       prince      F0   153 UTMOS 4.39 WER   0%  k:bm_george|en-GB-ThomasNeural|+0%|+10Hz
+GAL en-kidsedge magic-porridge-pot   kid      girl        F0   330 UTMOS 3.51 WER   0%  en-US-AnaNeural
+GAL en-kidsedge magic-porridge-pot   mama     woman       F0   171 UTMOS 4.41 WER   0%  k:af_sky|en-US-AvaMultilingualNeural|-4%|+12Hz
+GAL en-kidsedge magic-porridge-pot   old      granny      F0   147 UTMOS 4.44 WER   0%  k:af_kore|en-IE-EmilyNeural|-14%|-18Hz
+GAL en-kidsedge magic-porridge-pot   gpa      grandpa     F0   105 UTMOS 4.42 WER   0%  k:am_echo|en-US-AndrewMultilingualNeural|-14%|-12Hz
+GAL en-kidsedge magic-porridge-pot   gma      granny      F0   181 UTMOS 4.44 WER   0%  k:af_river|en-IE-EmilyNeural|-14%|-26Hz
+GAL en-kidsedge magic-porridge-pot   nei      girl        F0   347 UTMOS 2.97 WER   0%  en-US-AnaNeural
+GAL en-kidsedge gingerbread-man      gm       boy         F0   277 UTMOS 3.80 WER   0%  en-GB-MaisieNeural
+GAL en-kidsedge gingerbread-man      woman    granny      F0   147 UTMOS 4.44 WER   0%  k:af_kore|en-IE-EmilyNeural|-14%|-18Hz
+GAL en-kidsedge gingerbread-man      man      grandpa     F0   105 UTMOS 4.42 WER   0%  k:am_echo|en-US-AndrewMultilingualNeural|-14%|-12Hz
+GAL en-kidsedge gingerbread-man      pig      pig         F0   167 UTMOS 4.10 WER   0%  k:am_puck|en-US-RogerNeural|+2%|+15Hz
+GAL en-kidsedge gingerbread-man      bear     bear        F0   103 UTMOS 4.37 WER   0%  k:am_onyx|en-US-EricNeural|-12%|-15Hz
+GAL en-kidsedge gingerbread-man      fox      fox         F0   130 UTMOS 4.35 WER   0%  k:am_adam|en-GB-RyanNeural|-4%|-30Hz
+SIM en-kidsedge three-little-pigs    mama     (woman) ~ pig1     (pig) cos 0.02
+SIM en-kidsedge three-little-pigs    mama     (woman) ~ pig2     (pig) cos 0.03
+SIM en-kidsedge three-little-pigs    mama     (woman) ~ pig3     (pig) cos 0.03
+SIM en-kidsedge three-little-pigs    mama     (woman) ~ wolf     (wolf) cos 0.11
+SIM en-kidsedge three-little-pigs    pig1     (pig) ~ pig2     (pig) cos -0.06
+SIM en-kidsedge three-little-pigs    pig1     (pig) ~ pig3     (pig) cos -0.02
+SIM en-kidsedge three-little-pigs    pig1     (pig) ~ wolf     (wolf) cos 0.12
+SIM en-kidsedge three-little-pigs    pig2     (pig) ~ pig3     (pig) cos 0.64   <-- alike
+SIM en-kidsedge three-little-pigs    pig2     (pig) ~ wolf     (wolf) cos -0.09
+SIM en-kidsedge three-little-pigs    pig3     (pig) ~ wolf     (wolf) cos -0.04
+SIM en-kidsedge goldilocks           gold     (girl) ~ papa     (bear) cos 0.08
+SIM en-kidsedge goldilocks           gold     (girl) ~ mama     (mamabear) cos 0.03
+SIM en-kidsedge goldilocks           gold     (girl) ~ baby     (baby) cos 0.53
+SIM en-kidsedge goldilocks           papa     (bear) ~ mama     (mamabear) cos 0.15
+SIM en-kidsedge goldilocks           papa     (bear) ~ baby     (baby) cos 0.05
+SIM en-kidsedge goldilocks           mama     (mamabear) ~ baby     (baby) cos 0.04
+SIM en-kidsedge red-riding-hood      red      (girl) ~ mama     (woman) cos 0.07
+SIM en-kidsedge red-riding-hood      red      (girl) ~ granny   (granny) cos 0.03
+SIM en-kidsedge red-riding-hood      red      (girl) ~ wolf     (wolf) cos 0.03
+SIM en-kidsedge red-riding-hood      red      (girl) ~ wolfg    (fakegranny) cos 0.06
+SIM en-kidsedge red-riding-hood      red      (girl) ~ wood     (man) cos 0.00
+SIM en-kidsedge red-riding-hood      mama     (woman) ~ granny   (granny) cos 0.17
+SIM en-kidsedge red-riding-hood      mama     (woman) ~ wolf     (wolf) cos 0.11
+SIM en-kidsedge red-riding-hood      mama     (woman) ~ wolfg    (fakegranny) cos 0.03
+SIM en-kidsedge red-riding-hood      mama     (woman) ~ wood     (man) cos -0.04
+SIM en-kidsedge red-riding-hood      granny   (granny) ~ wolf     (wolf) cos 0.22
+SIM en-kidsedge red-riding-hood      granny   (granny) ~ wolfg    (fakegranny) cos 0.14
+SIM en-kidsedge red-riding-hood      granny   (granny) ~ wood     (man) cos 0.19
+SIM en-kidsedge red-riding-hood      wolf     (wolf) ~ wolfg    (fakegranny) cos 0.04
+SIM en-kidsedge red-riding-hood      wolf     (wolf) ~ wood     (man) cos 0.05
+SIM en-kidsedge red-riding-hood      wolfg    (fakegranny) ~ wood     (man) cos 0.03
+SIM en-kidsedge cinderella           cin      (teen) ~ cing     (teen) cos 1.00   <-- alike
+SIM en-kidsedge cinderella           cin      (teen) ~ sm       (stepmother) cos 0.12
+SIM en-kidsedge cinderella           cin      (teen) ~ s1       (stepsister) cos 0.21
+SIM en-kidsedge cinderella           cin      (teen) ~ s2       (stepsister) cos 0.16
+SIM en-kidsedge cinderella           cin      (teen) ~ fg       (fairy) cos 0.13
+SIM en-kidsedge cinderella           cin      (teen) ~ pr       (prince) cos 0.14
+SIM en-kidsedge cinderella           cing     (teen) ~ sm       (stepmother) cos 0.12
+SIM en-kidsedge cinderella           cing     (teen) ~ s1       (stepsister) cos 0.21
+SIM en-kidsedge cinderella           cing     (teen) ~ s2       (stepsister) cos 0.16
+SIM en-kidsedge cinderella           cing     (teen) ~ fg       (fairy) cos 0.13
+SIM en-kidsedge cinderella           cing     (teen) ~ pr       (prince) cos 0.14
+SIM en-kidsedge cinderella           sm       (stepmother) ~ s1       (stepsister) cos 0.04
+SIM en-kidsedge cinderella           sm       (stepmother) ~ s2       (stepsister) cos -0.01
+SIM en-kidsedge cinderella           sm       (stepmother) ~ fg       (fairy) cos -0.06
+SIM en-kidsedge cinderella           sm       (stepmother) ~ pr       (prince) cos 0.11
+SIM en-kidsedge cinderella           s1       (stepsister) ~ s2       (stepsister) cos 0.14
+SIM en-kidsedge cinderella           s1       (stepsister) ~ fg       (fairy) cos 0.02
+SIM en-kidsedge cinderella           s1       (stepsister) ~ pr       (prince) cos 0.10
+SIM en-kidsedge cinderella           s2       (stepsister) ~ fg       (fairy) cos 0.43
+SIM en-kidsedge cinderella           s2       (stepsister) ~ pr       (prince) cos -0.03
+SIM en-kidsedge cinderella           fg       (fairy) ~ pr       (prince) cos -0.00
+SIM en-kidsedge magic-porridge-pot   kid      (girl) ~ mama     (woman) cos 0.07
+SIM en-kidsedge magic-porridge-pot   kid      (girl) ~ old      (granny) cos 0.03
+SIM en-kidsedge magic-porridge-pot   kid      (girl) ~ gpa      (grandpa) cos 0.04
+SIM en-kidsedge magic-porridge-pot   kid      (girl) ~ gma      (granny) cos -0.06
+SIM en-kidsedge magic-porridge-pot   kid      (girl) ~ nei      (girl) cos 0.91   <-- alike
+SIM en-kidsedge magic-porridge-pot   mama     (woman) ~ old      (granny) cos 0.17
+SIM en-kidsedge magic-porridge-pot   mama     (woman) ~ gpa      (grandpa) cos 0.06
+SIM en-kidsedge magic-porridge-pot   mama     (woman) ~ gma      (granny) cos 0.17
+SIM en-kidsedge magic-porridge-pot   mama     (woman) ~ nei      (girl) cos 0.08
+SIM en-kidsedge magic-porridge-pot   old      (granny) ~ gpa      (grandpa) cos 0.15
+SIM en-kidsedge magic-porridge-pot   old      (granny) ~ gma      (granny) cos 0.28
+SIM en-kidsedge magic-porridge-pot   old      (granny) ~ nei      (girl) cos -0.05
+SIM en-kidsedge magic-porridge-pot   gpa      (grandpa) ~ gma      (granny) cos 0.08
+SIM en-kidsedge magic-porridge-pot   gpa      (grandpa) ~ nei      (girl) cos 0.04
+SIM en-kidsedge magic-porridge-pot   gma      (granny) ~ nei      (girl) cos -0.15
+SIM en-kidsedge gingerbread-man      gm       (boy) ~ woman    (granny) cos 0.06
+SIM en-kidsedge gingerbread-man      gm       (boy) ~ man      (grandpa) cos -0.01
+SIM en-kidsedge gingerbread-man      gm       (boy) ~ pig      (pig) cos -0.03
+SIM en-kidsedge gingerbread-man      gm       (boy) ~ bear     (bear) cos 0.01
+SIM en-kidsedge gingerbread-man      gm       (boy) ~ fox      (fox) cos 0.02
+SIM en-kidsedge gingerbread-man      woman    (granny) ~ man      (grandpa) cos 0.15
+SIM en-kidsedge gingerbread-man      woman    (granny) ~ pig      (pig) cos -0.04
+SIM en-kidsedge gingerbread-man      woman    (granny) ~ bear     (bear) cos 0.10
+SIM en-kidsedge gingerbread-man      woman    (granny) ~ fox      (fox) cos 0.10
+SIM en-kidsedge gingerbread-man      man      (grandpa) ~ pig      (pig) cos 0.01
+SIM en-kidsedge gingerbread-man      man      (grandpa) ~ bear     (bear) cos 0.09
+SIM en-kidsedge gingerbread-man      man      (grandpa) ~ fox      (fox) cos -0.10
+SIM en-kidsedge gingerbread-man      pig      (pig) ~ bear     (bear) cos 0.06
+SIM en-kidsedge gingerbread-man      pig      (pig) ~ fox      (fox) cos 0.00
+SIM en-kidsedge gingerbread-man      bear     (bear) ~ fox      (fox) cos -0.06
+SIMSUM en-kidsedge pairs at or above 0.55: 3
+GALWARN en-kidsedge three-little-pigs: mama (woman) and pig2 (pig) may sound alike: F0 171 and 167 Hz (x1.02)
+GALWARN en-kidsedge red-riding-hood: mama (woman) and wolfg (fakegranny) may sound alike: F0 171 and 166 Hz (x1.03)
+GALWARN en-kidsedge cinderella: cin (teen) and cing (teen) may sound alike: F0 193 and 193 Hz (x1.00), the same voice
+GALWARN en-kidsedge cinderella: cin (teen) and s1 (stepsister) may sound alike: F0 193 and 206 Hz (x1.07)
+GALWARN en-kidsedge cinderella: cing (teen) and s1 (stepsister) may sound alike: F0 193 and 206 Hz (x1.07)
+GALWARN en-kidsedge cinderella: sm (stepmother) and pr (prince) may sound alike: F0 155 and 153 Hz (x1.01)
+GALWARN en-kidsedge cinderella: s2 (stepsister) and fg (fairy) may sound alike: F0 256 and 242 Hz (x1.06)
+GALWARN en-kidsedge magic-porridge-pot: kid (girl) and nei (girl) may sound alike: F0 330 and 347 Hz (x1.05), the same voice
+GALWARN en-kidsedge magic-porridge-pot: mama (woman) and gma (granny) may sound alike: F0 171 and 181 Hz (x1.06)
+GALWARN en-kidsedge gingerbread-man: man (grandpa) and bear (bear) may sound alike: F0 105 and 103 Hz (x1.02)
+wrote gallery-en-kidsedge 183.4 s
+   [ktts] 56 of 56 clips made (175 s of speech in 49 s of work)
+   [ktts] 56 of 56 clips made in 50 s; 0 item(s) will use the Edge voice
+---- gallery tr: GAL language tale character type F0 UTMOS WER voice
+GAL tr three-little-pigs    mama     woman       F0   211 UTMOS 4.14 WER  20%  kt:elif=0.6,emre=0.4|tr-TR-EmelNeural|-8%|-18Hz
+GAL tr three-little-pigs    pig1     pig         F0   164 UTMOS 3.96 WER  20%  kt:elif=0.2,emre=0.8|tr-TR-AhmetNeural|+4%|+37Hz
+GAL tr three-little-pigs    pig2     pig         F0   146 UTMOS 3.74 WER   0%  kt:emre|tr-TR-AhmetNeural|+4%|+25Hz
+GAL tr three-little-pigs    pig3     pig         F0   188 UTMOS 3.90 WER  20%  kt:elif=0.4,emre=0.6|tr-TR-AhmetNeural|+4%|+13Hz
+GAL tr three-little-pigs    wolf     wolf        F0    98 UTMOS 3.72 WER   0%  kt:elif=-0.25,emre=1.25|tr-TR-AhmetNeural|-10%|-36Hz
+GAL tr goldilocks           gold     girl        F0   271 UTMOS 3.48 WER  12%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-2%|+55Hz
+GAL tr goldilocks           papa     bear        F0   118 UTMOS 3.72 WER   0%  kt:emre|tr-TR-AhmetNeural|-12%|-38Hz
+GAL tr goldilocks           mama     mamabear    F0   200 UTMOS 4.23 WER   0%  kt:elif=0.6,emre=0.4|tr-TR-EmelNeural|-10%|-26Hz
+GAL tr goldilocks           baby     baby        F0   296 UTMOS 3.44 WER  20%  kt:elif=1.25,emre=-0.25|tr-TR-EmelNeural|+0%|+75Hz
+GAL tr red-riding-hood      red      girl        F0   271 UTMOS 3.48 WER  12%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-2%|+55Hz
+GAL tr red-riding-hood      mama     woman       F0   211 UTMOS 4.14 WER  20%  kt:elif=0.6,emre=0.4|tr-TR-EmelNeural|-8%|-18Hz
+GAL tr red-riding-hood      granny   granny      F0   191 UTMOS 4.20 WER   0%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr red-riding-hood      wolf     wolf        F0    98 UTMOS 3.72 WER   0%  kt:elif=-0.25,emre=1.25|tr-TR-AhmetNeural|-10%|-36Hz
+GAL tr red-riding-hood      wolfg    fakegranny  F0   160 UTMOS 4.31 WER   0%  kt:elif=0.4,emre=0.6|tr-TR-AhmetNeural|-8%|+60Hz
+GAL tr red-riding-hood      wood     man         F0   116 UTMOS 4.15 WER   0%  kt:emre|tr-TR-AhmetNeural|-6%|-8Hz
+GAL tr cinderella           cin      teen        F0   263 UTMOS 3.79 WER  20%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-2%|+15Hz
+GAL tr cinderella           cing     teen        F0   263 UTMOS 3.79 WER  20%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-2%|+15Hz
+GAL tr cinderella           sm       stepmother  F0   164 UTMOS 3.84 WER  14%  kt:elif=0.4,emre=0.6|tr-TR-EmelNeural|-10%|-20Hz
+GAL tr cinderella           s1       stepsister  F0   298 UTMOS 2.98 WER   0%  kt:elif=1.25,emre=-0.25|tr-TR-EmelNeural|+6%|+38Hz
+GAL tr cinderella           s2       stepsister  F0   195 UTMOS 3.78 WER   0%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|+6%|+30Hz
+GAL tr cinderella           fg       fairy       F0   218 UTMOS 3.40 WER  40%  kt:elif=0.6,emre=0.4|tr-TR-EmelNeural|-14%|+0Hz
+GAL tr cinderella           pr       prince      F0   136 UTMOS 4.16 WER   0%  kt:emre|tr-TR-AhmetNeural|-2%|+8Hz
+GAL tr magic-porridge-pot   kid      girl        F0   271 UTMOS 3.48 WER  12%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-2%|+55Hz
+GAL tr magic-porridge-pot   mama     woman       F0   211 UTMOS 4.14 WER  20%  kt:elif=0.6,emre=0.4|tr-TR-EmelNeural|-8%|-18Hz
+GAL tr magic-porridge-pot   old      granny      F0   191 UTMOS 4.20 WER   0%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr magic-porridge-pot   gpa      grandpa     F0   100 UTMOS 4.00 WER   0%  kt:elif=-0.25,emre=1.25|tr-TR-AhmetNeural|-12%|-14Hz
+GAL tr magic-porridge-pot   gma      granny      F0   162 UTMOS 4.26 WER   0%  kt:elif=0.4,emre=0.6|tr-TR-EmelNeural|-14%|-36Hz
+GAL tr magic-porridge-pot   nei      girl        F0   300 UTMOS 3.38 WER  12%  kt:elif=1.25,emre=-0.25|tr-TR-EmelNeural|-2%|+64Hz
+GAL tr gingerbread-man      gm       boy         F0   204 UTMOS 3.88 WER   0%  kt:elif=0.6,emre=0.4|tr-TR-EmelNeural|+4%|+45Hz
+GAL tr gingerbread-man      woman    granny      F0   191 UTMOS 4.20 WER   0%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr gingerbread-man      man      grandpa     F0   100 UTMOS 4.00 WER   0%  kt:elif=-0.25,emre=1.25|tr-TR-AhmetNeural|-12%|-14Hz
+GAL tr gingerbread-man      pig      pig         F0   146 UTMOS 3.74 WER   0%  kt:emre|tr-TR-AhmetNeural|+4%|+25Hz
+GAL tr gingerbread-man      bear     bear        F0   118 UTMOS 3.72 WER   0%  kt:emre|tr-TR-AhmetNeural|-12%|-38Hz
+GAL tr gingerbread-man      fox      fox         F0   129 UTMOS 3.88 WER   0%  kt:elif=-0.25,emre=1.25|tr-TR-AhmetNeural|-4%|+12Hz
+SIM tr three-little-pigs    mama     (woman) ~ pig1     (pig) cos 0.59   <-- alike
+SIM tr three-little-pigs    mama     (woman) ~ pig2     (pig) cos 0.40
+SIM tr three-little-pigs    mama     (woman) ~ pig3     (pig) cos 0.86   <-- alike
+SIM tr three-little-pigs    mama     (woman) ~ wolf     (wolf) cos 0.23
+SIM tr three-little-pigs    pig1     (pig) ~ pig2     (pig) cos 0.80   <-- alike
+SIM tr three-little-pigs    pig1     (pig) ~ pig3     (pig) cos 0.81   <-- alike
+SIM tr three-little-pigs    pig1     (pig) ~ wolf     (wolf) cos 0.31
+SIM tr three-little-pigs    pig2     (pig) ~ pig3     (pig) cos 0.55
+SIM tr three-little-pigs    pig2     (pig) ~ wolf     (wolf) cos 0.23
+SIM tr three-little-pigs    pig3     (pig) ~ wolf     (wolf) cos 0.26
+SIM tr goldilocks           gold     (girl) ~ papa     (bear) cos 0.09
+SIM tr goldilocks           gold     (girl) ~ mama     (mamabear) cos 0.31
+SIM tr goldilocks           gold     (girl) ~ baby     (baby) cos 0.85   <-- alike
+SIM tr goldilocks           papa     (bear) ~ mama     (mamabear) cos 0.26
+SIM tr goldilocks           papa     (bear) ~ baby     (baby) cos 0.08
+SIM tr goldilocks           mama     (mamabear) ~ baby     (baby) cos 0.31
+SIM tr red-riding-hood      red      (girl) ~ mama     (woman) cos 0.51
+SIM tr red-riding-hood      red      (girl) ~ granny   (granny) cos 0.16
+SIM tr red-riding-hood      red      (girl) ~ wolf     (wolf) cos 0.08
+SIM tr red-riding-hood      red      (girl) ~ wolfg    (fakegranny) cos 0.23
+SIM tr red-riding-hood      red      (girl) ~ wood     (man) cos 0.08
+SIM tr red-riding-hood      mama     (woman) ~ granny   (granny) cos 0.31
+SIM tr red-riding-hood      mama     (woman) ~ wolf     (wolf) cos 0.23
+SIM tr red-riding-hood      mama     (woman) ~ wolfg    (fakegranny) cos 0.32
+SIM tr red-riding-hood      mama     (woman) ~ wood     (man) cos 0.22
+SIM tr red-riding-hood      granny   (granny) ~ wolf     (wolf) cos 0.23
+SIM tr red-riding-hood      granny   (granny) ~ wolfg    (fakegranny) cos 0.71   <-- alike
+SIM tr red-riding-hood      granny   (granny) ~ wood     (man) cos 0.32
+SIM tr red-riding-hood      wolf     (wolf) ~ wolfg    (fakegranny) cos 0.26
+SIM tr red-riding-hood      wolf     (wolf) ~ wood     (man) cos 0.70   <-- alike
+SIM tr red-riding-hood      wolfg    (fakegranny) ~ wood     (man) cos 0.40
+SIM tr cinderella           cin      (teen) ~ cing     (teen) cos 1.00   <-- alike
+SIM tr cinderella           cin      (teen) ~ sm       (stepmother) cos 0.23
+SIM tr cinderella           cin      (teen) ~ s1       (stepsister) cos 0.73   <-- alike
+SIM tr cinderella           cin      (teen) ~ s2       (stepsister) cos 0.11
+SIM tr cinderella           cin      (teen) ~ fg       (fairy) cos 0.63   <-- alike
+SIM tr cinderella           cin      (teen) ~ pr       (prince) cos 0.13
+SIM tr cinderella           cing     (teen) ~ sm       (stepmother) cos 0.23
+SIM tr cinderella           cing     (teen) ~ s1       (stepsister) cos 0.73   <-- alike
+SIM tr cinderella           cing     (teen) ~ s2       (stepsister) cos 0.11
+SIM tr cinderella           cing     (teen) ~ fg       (fairy) cos 0.63   <-- alike
+SIM tr cinderella           cing     (teen) ~ pr       (prince) cos 0.13
+SIM tr cinderella           sm       (stepmother) ~ s1       (stepsister) cos 0.20
+SIM tr cinderella           sm       (stepmother) ~ s2       (stepsister) cos 0.51
+SIM tr cinderella           sm       (stepmother) ~ fg       (fairy) cos 0.27
+SIM tr cinderella           sm       (stepmother) ~ pr       (prince) cos 0.40
+SIM tr cinderella           s1       (stepsister) ~ s2       (stepsister) cos 0.09
+SIM tr cinderella           s1       (stepsister) ~ fg       (fairy) cos 0.69   <-- alike
+SIM tr cinderella           s1       (stepsister) ~ pr       (prince) cos 0.08
+SIM tr cinderella           s2       (stepsister) ~ fg       (fairy) cos 0.23
+SIM tr cinderella           s2       (stepsister) ~ pr       (prince) cos 0.27
+SIM tr cinderella           fg       (fairy) ~ pr       (prince) cos 0.19
+SIM tr magic-porridge-pot   kid      (girl) ~ mama     (woman) cos 0.51
+SIM tr magic-porridge-pot   kid      (girl) ~ old      (granny) cos 0.16
+SIM tr magic-porridge-pot   kid      (girl) ~ gpa      (grandpa) cos 0.18
+SIM tr magic-porridge-pot   kid      (girl) ~ gma      (granny) cos 0.10
+SIM tr magic-porridge-pot   kid      (girl) ~ nei      (girl) cos 0.90   <-- alike
+SIM tr magic-porridge-pot   mama     (woman) ~ old      (granny) cos 0.31
+SIM tr magic-porridge-pot   mama     (woman) ~ gpa      (grandpa) cos 0.24
+SIM tr magic-porridge-pot   mama     (woman) ~ gma      (granny) cos 0.23
+SIM tr magic-porridge-pot   mama     (woman) ~ nei      (girl) cos 0.57   <-- alike
+SIM tr magic-porridge-pot   old      (granny) ~ gpa      (grandpa) cos 0.26
+SIM tr magic-porridge-pot   old      (granny) ~ gma      (granny) cos 0.85   <-- alike
+SIM tr magic-porridge-pot   old      (granny) ~ nei      (girl) cos 0.13
+SIM tr magic-porridge-pot   gpa      (grandpa) ~ gma      (granny) cos 0.33
+SIM tr magic-porridge-pot   gpa      (grandpa) ~ nei      (girl) cos 0.14
+SIM tr magic-porridge-pot   gma      (granny) ~ nei      (girl) cos 0.09
+SIM tr gingerbread-man      gm       (boy) ~ woman    (granny) cos 0.30
+SIM tr gingerbread-man      gm       (boy) ~ man      (grandpa) cos 0.26
+SIM tr gingerbread-man      gm       (boy) ~ pig      (pig) cos 0.40
+SIM tr gingerbread-man      gm       (boy) ~ bear     (bear) cos 0.24
+SIM tr gingerbread-man      gm       (boy) ~ fox      (fox) cos 0.31
+SIM tr gingerbread-man      woman    (granny) ~ man      (grandpa) cos 0.26
+SIM tr gingerbread-man      woman    (granny) ~ pig      (pig) cos 0.18
+SIM tr gingerbread-man      woman    (granny) ~ bear     (bear) cos 0.30
+SIM tr gingerbread-man      woman    (granny) ~ fox      (fox) cos 0.12
+SIM tr gingerbread-man      man      (grandpa) ~ pig      (pig) cos 0.31
+SIM tr gingerbread-man      man      (grandpa) ~ bear     (bear) cos 0.65   <-- alike
+SIM tr gingerbread-man      man      (grandpa) ~ fox      (fox) cos 0.21
+SIM tr gingerbread-man      pig      (pig) ~ bear     (bear) cos 0.29
+SIM tr gingerbread-man      pig      (pig) ~ fox      (fox) cos 0.78   <-- alike
+SIM tr gingerbread-man      bear     (bear) ~ fox      (fox) cos 0.18
+SIMSUM tr pairs at or above 0.55: 18
+GALWARN tr goldilocks: gold (girl) and baby (baby) may sound alike: F0 271 and 296 Hz (x1.09)
+GALWARN tr cinderella: cin (teen) and cing (teen) may sound alike: F0 263 and 263 Hz (x1.00), the same voice
+GALWARN tr gingerbread-man: gm (boy) and woman (granny) may sound alike: F0 204 and 191 Hz (x1.07)
+GALWARN tr gingerbread-man: pig (pig) and bear (bear) may sound alike: F0 146 and 118 Hz (x1.24), the same voice
+GALWARN tr gingerbread-man: bear (bear) and fox (fox) may sound alike: F0 118 and 129 Hz (x1.09)
+wrote gallery-tr 250.1 s

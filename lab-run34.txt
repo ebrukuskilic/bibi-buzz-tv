@@ -1,0 +1,361 @@
+==================== main 13:34:08
+python 3.12.16 Linux-7.0.0-1020-azure-x86_64-with-glibc2.43 cpus 4
+   numpy 2.5.5
+   scipy 1.18.1
+   torch 2.15.0+cpu
+   torchaudio 2.11.1+cpu
+   kokoro 0.9.4
+   misaki 0.9.4
+   faster_whisper 1.2.1
+   edge_tts 7.3.1
+edge-tts: 318 voices; Turkish: ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural']
+   en-AU-WilliamMultilingualNeural              en-AU  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   en-US-AndrewMultilingualNeural               en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Warm', 'Confident', 'Authentic', 'Honest']}
+   en-US-AvaMultilingualNeural                  en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Expressive', 'Caring', 'Pleasant', 'Friendly']}
+   en-US-BrianMultilingualNeural                en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Approachable', 'Casual', 'Sincere']}
+   en-US-EmmaMultilingualNeural                 en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Cheerful', 'Clear', 'Conversational']}
+   fr-FR-VivienneMultilingualNeural             fr-FR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   fr-FR-RemyMultilingualNeural                 fr-FR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   it-IT-GiuseppeMultilingualNeural             it-IT  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   ko-KR-HyunsuMultilingualNeural               ko-KR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   pt-BR-ThalitaMultilingualNeural              pt-BR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   [ktts] 56 of 56 clips made (176 s of speech in 91 s of work)
+   [ktts] 56 of 56 clips made in 92 s; 0 item(s) will use the Edge voice
+---- gallery tr-xplant: GAL language tale character type F0 UTMOS WER voice
+GAL tr-xplant three-little-pigs    mama     woman       F0   221 UTMOS 3.61 WER   0%  kt:elif:p=1,af_river:t=1|tr-TR-EmelNeural|-8%|-18Hz
+GAL tr-xplant three-little-pigs    pig1     pig         F0   164 UTMOS 3.93 WER   0%  kt:elif=0.2,emre=0.8|tr-TR-AhmetNeural|+4%|+37Hz
+GAL tr-xplant three-little-pigs    pig2     pig         F0   134 UTMOS 3.78 WER   0%  kt:emre:p=1,emre:t=0.5,am_santa:t=0.5|tr-TR-AhmetNeural|+4%|+25Hz
+GAL tr-xplant three-little-pigs    pig3     pig         F0   164 UTMOS 3.49 WER  20%  kt:emre:p=1,am_adam:t=1|tr-TR-AhmetNeural|+4%|+13Hz
+GAL tr-xplant three-little-pigs    wolf     wolf        F0   119 UTMOS 3.73 WER   0%  kt:emre:p=1,emre:t=0.5,bm_fable:t=0.5|tr-TR-AhmetNeural|-10%|-36Hz
+GAL tr-xplant goldilocks           gold     girl        F0   244 UTMOS 3.82 WER  12%  kt:elif:p=1,bf_emma:t=1|tr-TR-EmelNeural|-2%|+55Hz
+GAL tr-xplant goldilocks           papa     bear        F0   134 UTMOS 3.74 WER   0%  kt:emre:p=1,bm_fable:t=1|tr-TR-AhmetNeural|-12%|-38Hz
+GAL tr-xplant goldilocks           mama     mamabear    F0   193 UTMOS 4.00 WER   0%  kt:elif:p=1,elif:t=0.5,af_bella:t=0.5|tr-TR-EmelNeural|-10%|-26Hz
+GAL tr-xplant goldilocks           baby     baby        F0   292 UTMOS 3.69 WER  40%  kt:elif:p=1,af_heart:t=1|tr-TR-EmelNeural|+0%|+75Hz
+GAL tr-xplant red-riding-hood      red      girl        F0   244 UTMOS 3.82 WER  12%  kt:elif:p=1,bf_emma:t=1|tr-TR-EmelNeural|-2%|+55Hz
+GAL tr-xplant red-riding-hood      mama     woman       F0   221 UTMOS 3.61 WER   0%  kt:elif:p=1,af_river:t=1|tr-TR-EmelNeural|-8%|-18Hz
+GAL tr-xplant red-riding-hood      granny   granny      F0   207 UTMOS 4.28 WER   0%  kt:elif:p=1,elif:t=0.5,bf_isabella:t=0.5|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr-xplant red-riding-hood      wolf     wolf        F0   119 UTMOS 3.73 WER   0%  kt:emre:p=1,emre:t=0.5,bm_fable:t=0.5|tr-TR-AhmetNeural|-10%|-36Hz
+GAL tr-xplant red-riding-hood      wolfg    fakegranny  F0   164 UTMOS 4.36 WER   0%  kt:emre:p=1,am_echo:t=1|tr-TR-AhmetNeural|-8%|+60Hz
+GAL tr-xplant red-riding-hood      wood     man         F0   116 UTMOS 4.01 WER   0%  kt:emre:p=1,am_adam:t=1|tr-TR-AhmetNeural|-6%|-8Hz
+GAL tr-xplant cinderella           cin      teen        F0   263 UTMOS 3.76 WER  20%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-2%|+15Hz
+GAL tr-xplant cinderella           cing     teen        F0   263 UTMOS 3.76 WER  20%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-2%|+15Hz
+GAL tr-xplant cinderella           sm       stepmother  F0   193 UTMOS 4.26 WER  14%  kt:elif:p=1,bf_isabella:t=1|tr-TR-EmelNeural|-10%|-20Hz
+GAL tr-xplant cinderella           s1       stepsister  F0   195 UTMOS 3.17 WER  25%  kt:elif:p=1,af_river:t=1|tr-TR-EmelNeural|+6%|+38Hz
+GAL tr-xplant cinderella           s2       stepsister  F0   195 UTMOS 3.75 WER   0%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|+6%|+30Hz
+GAL tr-xplant cinderella           fg       fairy       F0   221 UTMOS 3.99 WER   0%  kt:elif:p=1,af_alloy:t=1|tr-TR-EmelNeural|-14%|+0Hz
+GAL tr-xplant cinderella           pr       prince      F0   149 UTMOS 4.16 WER   0%  kt:emre:p=1,emre:t=0.5,am_michael:t=0.5|tr-TR-AhmetNeural|-2%|+8Hz
+GAL tr-xplant magic-porridge-pot   kid      girl        F0   244 UTMOS 3.82 WER  12%  kt:elif:p=1,bf_emma:t=1|tr-TR-EmelNeural|-2%|+55Hz
+GAL tr-xplant magic-porridge-pot   mama     woman       F0   221 UTMOS 3.61 WER   0%  kt:elif:p=1,af_river:t=1|tr-TR-EmelNeural|-8%|-18Hz
+GAL tr-xplant magic-porridge-pot   old      granny      F0   207 UTMOS 4.28 WER   0%  kt:elif:p=1,elif:t=0.5,bf_isabella:t=0.5|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr-xplant magic-porridge-pot   gpa      grandpa     F0   118 UTMOS 4.05 WER   0%  kt:emre:p=1,emre:t=0.5,am_michael:t=0.5|tr-TR-AhmetNeural|-12%|-14Hz
+GAL tr-xplant magic-porridge-pot   gma      granny      F0   208 UTMOS 3.63 WER   0%  kt:elif:p=1,af_river:t=1|tr-TR-EmelNeural|-14%|-36Hz
+GAL tr-xplant magic-porridge-pot   nei      girl        F0   289 UTMOS 3.67 WER  12%  kt:elif:p=1,af_heart:t=1|tr-TR-EmelNeural|-2%|+64Hz
+GAL tr-xplant gingerbread-man      gm       boy         F0   161 UTMOS 3.86 WER   0%  kt:emre:p=1,emre:t=0.5,am_adam:t=0.5|tr-TR-EmelNeural|+4%|+45Hz
+GAL tr-xplant gingerbread-man      woman    granny      F0   207 UTMOS 4.28 WER   0%  kt:elif:p=1,elif:t=0.5,bf_isabella:t=0.5|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr-xplant gingerbread-man      man      grandpa     F0   118 UTMOS 4.05 WER   0%  kt:emre:p=1,emre:t=0.5,am_michael:t=0.5|tr-TR-AhmetNeural|-12%|-14Hz
+GAL tr-xplant gingerbread-man      pig      pig         F0   134 UTMOS 3.78 WER   0%  kt:emre:p=1,emre:t=0.5,am_santa:t=0.5|tr-TR-AhmetNeural|+4%|+25Hz
+GAL tr-xplant gingerbread-man      bear     bear        F0   134 UTMOS 3.74 WER   0%  kt:emre:p=1,bm_fable:t=1|tr-TR-AhmetNeural|-12%|-38Hz
+GAL tr-xplant gingerbread-man      fox      fox         F0   151 UTMOS 3.81 WER   0%  kt:emre:p=1,emre:t=0.5,am_liam:t=0.5|tr-TR-AhmetNeural|-4%|+12Hz
+SIM tr-xplant three-little-pigs    mama     (woman) ~ pig1     (pig) cos 0.28
+SIM tr-xplant three-little-pigs    mama     (woman) ~ pig2     (pig) cos 0.30
+SIM tr-xplant three-little-pigs    mama     (woman) ~ pig3     (pig) cos 0.15
+SIM tr-xplant three-little-pigs    mama     (woman) ~ wolf     (wolf) cos 0.27
+SIM tr-xplant three-little-pigs    pig1     (pig) ~ pig2     (pig) cos 0.45
+SIM tr-xplant three-little-pigs    pig1     (pig) ~ pig3     (pig) cos 0.53
+SIM tr-xplant three-little-pigs    pig1     (pig) ~ wolf     (wolf) cos 0.32
+SIM tr-xplant three-little-pigs    pig2     (pig) ~ pig3     (pig) cos 0.26
+SIM tr-xplant three-little-pigs    pig2     (pig) ~ wolf     (wolf) cos 0.44
+SIM tr-xplant three-little-pigs    pig3     (pig) ~ wolf     (wolf) cos 0.08
+SIM tr-xplant goldilocks           gold     (girl) ~ papa     (bear) cos 0.19
+SIM tr-xplant goldilocks           gold     (girl) ~ mama     (mamabear) cos 0.30
+SIM tr-xplant goldilocks           gold     (girl) ~ baby     (baby) cos 0.06
+SIM tr-xplant goldilocks           papa     (bear) ~ mama     (mamabear) cos 0.17
+SIM tr-xplant goldilocks           papa     (bear) ~ baby     (baby) cos 0.09
+SIM tr-xplant goldilocks           mama     (mamabear) ~ baby     (baby) cos 0.12
+SIM tr-xplant red-riding-hood      red      (girl) ~ mama     (woman) cos 0.38
+SIM tr-xplant red-riding-hood      red      (girl) ~ granny   (granny) cos 0.32
+SIM tr-xplant red-riding-hood      red      (girl) ~ wolf     (wolf) cos 0.13
+SIM tr-xplant red-riding-hood      red      (girl) ~ wolfg    (fakegranny) cos 0.13
+SIM tr-xplant red-riding-hood      red      (girl) ~ wood     (man) cos 0.27
+SIM tr-xplant red-riding-hood      mama     (woman) ~ granny   (granny) cos 0.48
+SIM tr-xplant red-riding-hood      mama     (woman) ~ wolf     (wolf) cos 0.27
+SIM tr-xplant red-riding-hood      mama     (woman) ~ wolfg    (fakegranny) cos 0.18
+SIM tr-xplant red-riding-hood      mama     (woman) ~ wood     (man) cos 0.22
+SIM tr-xplant red-riding-hood      granny   (granny) ~ wolf     (wolf) cos 0.25
+SIM tr-xplant red-riding-hood      granny   (granny) ~ wolfg    (fakegranny) cos 0.07
+SIM tr-xplant red-riding-hood      granny   (granny) ~ wood     (man) cos 0.18
+SIM tr-xplant red-riding-hood      wolf     (wolf) ~ wolfg    (fakegranny) cos 0.13
+SIM tr-xplant red-riding-hood      wolf     (wolf) ~ wood     (man) cos 0.39
+SIM tr-xplant red-riding-hood      wolfg    (fakegranny) ~ wood     (man) cos 0.11
+SIM tr-xplant cinderella           cin      (teen) ~ cing     (teen) cos 1.00   <-- alike
+SIM tr-xplant cinderella           cin      (teen) ~ sm       (stepmother) cos 0.12
+SIM tr-xplant cinderella           cin      (teen) ~ s1       (stepsister) cos 0.17
+SIM tr-xplant cinderella           cin      (teen) ~ s2       (stepsister) cos 0.11
+SIM tr-xplant cinderella           cin      (teen) ~ fg       (fairy) cos 0.14
+SIM tr-xplant cinderella           cin      (teen) ~ pr       (prince) cos 0.18
+SIM tr-xplant cinderella           cing     (teen) ~ sm       (stepmother) cos 0.12
+SIM tr-xplant cinderella           cing     (teen) ~ s1       (stepsister) cos 0.17
+SIM tr-xplant cinderella           cing     (teen) ~ s2       (stepsister) cos 0.11
+SIM tr-xplant cinderella           cing     (teen) ~ fg       (fairy) cos 0.14
+SIM tr-xplant cinderella           cing     (teen) ~ pr       (prince) cos 0.18
+SIM tr-xplant cinderella           sm       (stepmother) ~ s1       (stepsister) cos 0.26
+SIM tr-xplant cinderella           sm       (stepmother) ~ s2       (stepsister) cos 0.37
+SIM tr-xplant cinderella           sm       (stepmother) ~ fg       (fairy) cos 0.37
+SIM tr-xplant cinderella           sm       (stepmother) ~ pr       (prince) cos 0.17
+SIM tr-xplant cinderella           s1       (stepsister) ~ s2       (stepsister) cos 0.37
+SIM tr-xplant cinderella           s1       (stepsister) ~ fg       (fairy) cos 0.35
+SIM tr-xplant cinderella           s1       (stepsister) ~ pr       (prince) cos 0.22
+SIM tr-xplant cinderella           s2       (stepsister) ~ fg       (fairy) cos 0.59   <-- alike
+SIM tr-xplant cinderella           s2       (stepsister) ~ pr       (prince) cos 0.21
+SIM tr-xplant cinderella           fg       (fairy) ~ pr       (prince) cos 0.22
+SIM tr-xplant magic-porridge-pot   kid      (girl) ~ mama     (woman) cos 0.38
+SIM tr-xplant magic-porridge-pot   kid      (girl) ~ old      (granny) cos 0.32
+SIM tr-xplant magic-porridge-pot   kid      (girl) ~ gpa      (grandpa) cos 0.27
+SIM tr-xplant magic-porridge-pot   kid      (girl) ~ gma      (granny) cos 0.22
+SIM tr-xplant magic-porridge-pot   kid      (girl) ~ nei      (girl) cos 0.11
+SIM tr-xplant magic-porridge-pot   mama     (woman) ~ old      (granny) cos 0.48
+SIM tr-xplant magic-porridge-pot   mama     (woman) ~ gpa      (grandpa) cos 0.30
+SIM tr-xplant magic-porridge-pot   mama     (woman) ~ gma      (granny) cos 0.40
+SIM tr-xplant magic-porridge-pot   mama     (woman) ~ nei      (girl) cos 0.12
+SIM tr-xplant magic-porridge-pot   old      (granny) ~ gpa      (grandpa) cos 0.23
+SIM tr-xplant magic-porridge-pot   old      (granny) ~ gma      (granny) cos 0.42
+SIM tr-xplant magic-porridge-pot   old      (granny) ~ nei      (girl) cos 0.09
+SIM tr-xplant magic-porridge-pot   gpa      (grandpa) ~ gma      (granny) cos 0.39
+SIM tr-xplant magic-porridge-pot   gpa      (grandpa) ~ nei      (girl) cos 0.07
+SIM tr-xplant magic-porridge-pot   gma      (granny) ~ nei      (girl) cos 0.18
+SIM tr-xplant gingerbread-man      gm       (boy) ~ woman    (granny) cos 0.08
+SIM tr-xplant gingerbread-man      gm       (boy) ~ man      (grandpa) cos 0.14
+SIM tr-xplant gingerbread-man      gm       (boy) ~ pig      (pig) cos 0.31
+SIM tr-xplant gingerbread-man      gm       (boy) ~ bear     (bear) cos 0.23
+SIM tr-xplant gingerbread-man      gm       (boy) ~ fox      (fox) cos 0.43
+SIM tr-xplant gingerbread-man      woman    (granny) ~ man      (grandpa) cos 0.23
+SIM tr-xplant gingerbread-man      woman    (granny) ~ pig      (pig) cos 0.28
+SIM tr-xplant gingerbread-man      woman    (granny) ~ bear     (bear) cos 0.16
+SIM tr-xplant gingerbread-man      woman    (granny) ~ fox      (fox) cos 0.09
+SIM tr-xplant gingerbread-man      man      (grandpa) ~ pig      (pig) cos 0.38
+SIM tr-xplant gingerbread-man      man      (grandpa) ~ bear     (bear) cos 0.22
+SIM tr-xplant gingerbread-man      man      (grandpa) ~ fox      (fox) cos 0.23
+SIM tr-xplant gingerbread-man      pig      (pig) ~ bear     (bear) cos 0.43
+SIM tr-xplant gingerbread-man      pig      (pig) ~ fox      (fox) cos 0.48
+SIM tr-xplant gingerbread-man      bear     (bear) ~ fox      (fox) cos 0.36
+SIMSUM tr-xplant pairs at or above 0.55: 2
+GALWARN tr-xplant three-little-pigs: pig1 (pig) and pig3 (pig) may sound alike: F0 164 and 164 Hz (x1.00)
+GALWARN tr-xplant red-riding-hood: mama (woman) and granny (granny) may sound alike: F0 221 and 207 Hz (x1.07)
+GALWARN tr-xplant red-riding-hood: wolf (wolf) and wood (man) may sound alike: F0 119 and 116 Hz (x1.03)
+GALWARN tr-xplant cinderella: cin (teen) and cing (teen) may sound alike: F0 263 and 263 Hz (x1.00), the same voice
+GALWARN tr-xplant cinderella: sm (stepmother) and s1 (stepsister) may sound alike: F0 193 and 195 Hz (x1.01)
+GALWARN tr-xplant cinderella: sm (stepmother) and s2 (stepsister) may sound alike: F0 193 and 195 Hz (x1.01)
+GALWARN tr-xplant cinderella: s1 (stepsister) and s2 (stepsister) may sound alike: F0 195 and 195 Hz (x1.00)
+GALWARN tr-xplant magic-porridge-pot: mama (woman) and old (granny) may sound alike: F0 221 and 207 Hz (x1.07)
+GALWARN tr-xplant magic-porridge-pot: mama (woman) and gma (granny) may sound alike: F0 221 and 208 Hz (x1.07), the same voice
+GALWARN tr-xplant magic-porridge-pot: old (granny) and gma (granny) may sound alike: F0 207 and 208 Hz (x1.00)
+GALWARN tr-xplant gingerbread-man: gm (boy) and fox (fox) may sound alike: F0 161 and 151 Hz (x1.06)
+GALWARN tr-xplant gingerbread-man: pig (pig) and bear (bear) may sound alike: F0 134 and 134 Hz (x1.00)
+wrote gallery-tr-xplant 246.7 s
+   [ktts] 46 of 46 clips made (156 s of speech in 71 s of work)
+   [ktts] 46 of 46 clips made in 72 s; 0 item(s) will use the Edge voice
+---- gallery tr-xplant-rest: GAL language tale character type F0 UTMOS WER voice
+GAL tr-xplant-rest tortoise-and-hare    hare     hare        F0   169 UTMOS 4.10 WER   0%  kt:emre:p=1,emre:t=0.5,am_michael:t=0.5|tr-TR-AhmetNeural|+8%|+55Hz
+GAL tr-xplant-rest tortoise-and-hare    tort     tortoise    F0   116 UTMOS 4.09 WER   0%  kt:emre:p=1,emre:t=0.5,am_michael:t=0.5|tr-TR-AhmetNeural|-20%|-14Hz
+GAL tr-xplant-rest tortoise-and-hare    bear     bear        F0   134 UTMOS 3.74 WER   0%  kt:emre:p=1,bm_fable:t=1|tr-TR-AhmetNeural|-12%|-38Hz
+GAL tr-xplant-rest tortoise-and-hare    pig1     pig         F0   164 UTMOS 3.93 WER   0%  kt:elif=0.2,emre=0.8|tr-TR-AhmetNeural|+4%|+37Hz
+GAL tr-xplant-rest tortoise-and-hare    pig2     pig         F0   134 UTMOS 3.78 WER   0%  kt:emre:p=1,emre:t=0.5,am_santa:t=0.5|tr-TR-AhmetNeural|+4%|+25Hz
+GAL tr-xplant-rest tortoise-and-hare    pig3     pig         F0   164 UTMOS 3.49 WER  20%  kt:emre:p=1,am_adam:t=1|tr-TR-AhmetNeural|+4%|+13Hz
+GAL tr-xplant-rest three-billy-goats    lit      goat_little F0   179 UTMOS 3.72 WER  14%  kt:emre:p=1,emre:t=0.5,am_echo:t=0.5|tr-TR-EmelNeural|+4%|+60Hz
+GAL tr-xplant-rest three-billy-goats    mid      goat_mid    F0   181 UTMOS 3.85 WER   0%  kt:elif=0.2,emre=0.8|tr-TR-AhmetNeural|+2%|+30Hz
+GAL tr-xplant-rest three-billy-goats    big      goat_big    F0   129 UTMOS 4.18 WER   0%  kt:emre:p=1,emre:t=0.5,bm_fable:t=0.5|tr-TR-AhmetNeural|-10%|-36Hz
+GAL tr-xplant-rest three-billy-goats    troll    troll       F0   101 UTMOS 3.77 WER  33%  kt:elif=-0.25,emre=1.25|tr-TR-AhmetNeural|-16%|-42Hz
+GAL tr-xplant-rest enormous-turnip      gpa      grandpa     F0   118 UTMOS 4.05 WER   0%  kt:emre:p=1,emre:t=0.5,am_michael:t=0.5|tr-TR-AhmetNeural|-12%|-14Hz
+GAL tr-xplant-rest enormous-turnip      gma      granny      F0   207 UTMOS 4.28 WER   0%  kt:elif:p=1,elif:t=0.5,bf_isabella:t=0.5|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr-xplant-rest enormous-turnip      kid      girl        F0   244 UTMOS 3.82 WER  12%  kt:elif:p=1,bf_emma:t=1|tr-TR-EmelNeural|-2%|+55Hz
+GAL tr-xplant-rest enormous-turnip      pig      pig         F0   134 UTMOS 3.78 WER   0%  kt:emre:p=1,emre:t=0.5,am_santa:t=0.5|tr-TR-AhmetNeural|+4%|+25Hz
+GAL tr-xplant-rest enormous-turnip      hare     hare        F0   169 UTMOS 4.10 WER   0%  kt:emre:p=1,emre:t=0.5,am_michael:t=0.5|tr-TR-AhmetNeural|+8%|+55Hz
+GAL tr-xplant-rest enormous-turnip      bear     bear        F0   134 UTMOS 3.74 WER   0%  kt:emre:p=1,bm_fable:t=1|tr-TR-AhmetNeural|-12%|-38Hz
+GAL tr-xplant-rest enormous-turnip      pip      tiny        F0   285 UTMOS 3.96 WER   0%  kt:elif:p=1,elif:t=0.5,af_heart:t=0.5|tr-TR-EmelNeural|+8%|+75Hz
+GAL tr-xplant-rest stone-soup           fox      fox         F0   151 UTMOS 3.81 WER   0%  kt:emre:p=1,emre:t=0.5,am_liam:t=0.5|tr-TR-AhmetNeural|-4%|+12Hz
+GAL tr-xplant-rest stone-soup           hare     hare        F0   169 UTMOS 4.10 WER   0%  kt:emre:p=1,emre:t=0.5,am_michael:t=0.5|tr-TR-AhmetNeural|+8%|+55Hz
+GAL tr-xplant-rest stone-soup           pig      pig         F0   134 UTMOS 3.78 WER   0%  kt:emre:p=1,emre:t=0.5,am_santa:t=0.5|tr-TR-AhmetNeural|+4%|+25Hz
+GAL tr-xplant-rest stone-soup           goat     goat_mid    F0   181 UTMOS 3.85 WER   0%  kt:elif=0.2,emre=0.8|tr-TR-AhmetNeural|+2%|+30Hz
+GAL tr-xplant-rest stone-soup           gma      granny      F0   207 UTMOS 4.28 WER   0%  kt:elif:p=1,elif:t=0.5,bf_isabella:t=0.5|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr-xplant-rest stone-soup           kid      girl        F0   244 UTMOS 3.82 WER  12%  kt:elif:p=1,bf_emma:t=1|tr-TR-EmelNeural|-2%|+55Hz
+GAL tr-xplant-rest snow-white           snow     teen        F0   263 UTMOS 3.76 WER  20%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-2%|+15Hz
+GAL tr-xplant-rest snow-white           queen    queen       F0   232 UTMOS 4.23 WER  14%  kt:elif:p=1,af_river:t=1|tr-TR-EmelNeural|-12%|-22Hz
+GAL tr-xplant-rest snow-white           mir      mirror      F0   121 UTMOS 3.93 WER   0%  kt:emre:p=1,emre:t=0.5,am_fenrir:t=0.5|tr-TR-AhmetNeural|-16%|-10Hz
+GAL tr-xplant-rest snow-white           dw       dwarf       F0   161 UTMOS 3.36 WER   0%  kt:emre:p=1,emre:t=0.5,am_fenrir:t=0.5|tr-TR-AhmetNeural|+8%|+22Hz
+GAL tr-xplant-rest snow-white           old      witch       F0   212 UTMOS 3.15 WER  38%  kt:elif:p=1,elif:t=0.5,af_bella:t=0.5|tr-TR-EmelNeural|-14%|-40Hz
+GAL tr-xplant-rest snow-white           pr       prince      F0   149 UTMOS 4.16 WER   0%  kt:emre:p=1,emre:t=0.5,am_michael:t=0.5|tr-TR-AhmetNeural|-2%|+8Hz
+GAL tr-xplant-rest elves-and-shoemaker  shoe     man         F0   116 UTMOS 4.01 WER   0%  kt:emre:p=1,am_adam:t=1|tr-TR-AhmetNeural|-6%|-8Hz
+GAL tr-xplant-rest elves-and-shoemaker  wife     woman       F0   221 UTMOS 3.61 WER   0%  kt:elif:p=1,af_river:t=1|tr-TR-EmelNeural|-8%|-18Hz
+GAL tr-xplant-rest elves-and-shoemaker  lady     teen        F0   263 UTMOS 3.76 WER  20%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-2%|+15Hz
+GAL tr-xplant-rest elves-and-shoemaker  lord     lord        F0   134 UTMOS 4.25 WER   0%  kt:emre:p=1,emre:t=0.5,bm_fable:t=0.5|tr-TR-AhmetNeural|-10%|-20Hz
+GAL tr-xplant-rest elves-and-shoemaker  e1       elf         F0   178 UTMOS 3.91 WER  20%  kt:emre:p=1,emre:t=0.5,am_santa:t=0.5|tr-TR-AhmetNeural|+10%|+50Hz
+GAL tr-xplant-rest elves-and-shoemaker  e2       elfgirl     F0   294 UTMOS 3.48 WER  14%  kt:elif:p=1,af_heart:t=1|tr-TR-EmelNeural|+10%|+55Hz
+GAL tr-xplant-rest princess-and-pea     prince   prince      F0   149 UTMOS 4.16 WER   0%  kt:emre:p=1,emre:t=0.5,am_michael:t=0.5|tr-TR-AhmetNeural|-2%|+8Hz
+GAL tr-xplant-rest princess-and-pea     king     king        F0   115 UTMOS 4.27 WER   0%  kt:emre:p=1,emre:t=0.5,am_echo:t=0.5|tr-TR-AhmetNeural|-14%|-28Hz
+GAL tr-xplant-rest princess-and-pea     queen    woman       F0   221 UTMOS 3.61 WER   0%  kt:elif:p=1,af_river:t=1|tr-TR-EmelNeural|-8%|-18Hz
+GAL tr-xplant-rest princess-and-pea     prn      teen        F0   263 UTMOS 3.76 WER  20%  kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-2%|+15Hz
+GAL tr-xplant-rest little-red-hen       hen      hen         F0   298 UTMOS 3.53 WER  40%  kt:elif:p=1,elif:t=0.5,af_heart:t=0.5|tr-TR-EmelNeural|+2%|+40Hz
+GAL tr-xplant-rest little-red-hen       pig      pig         F0   134 UTMOS 3.78 WER   0%  kt:emre:p=1,emre:t=0.5,am_santa:t=0.5|tr-TR-AhmetNeural|+4%|+25Hz
+GAL tr-xplant-rest little-red-hen       goat     goat_mid    F0   181 UTMOS 3.85 WER   0%  kt:elif=0.2,emre=0.8|tr-TR-AhmetNeural|+2%|+30Hz
+GAL tr-xplant-rest little-red-hen       hare     hare        F0   169 UTMOS 4.10 WER   0%  kt:emre:p=1,emre:t=0.5,am_michael:t=0.5|tr-TR-AhmetNeural|+8%|+55Hz
+GAL tr-xplant-rest lion-and-mouse       lion     lion        F0    98 UTMOS 3.45 WER  14%  kt:elif=-0.25,emre=1.25|tr-TR-AhmetNeural|-12%|-44Hz
+GAL tr-xplant-rest lion-and-mouse       mouse    tiny        F0   285 UTMOS 3.96 WER   0%  kt:elif:p=1,elif:t=0.5,af_heart:t=0.5|tr-TR-EmelNeural|+8%|+75Hz
+GAL tr-xplant-rest lion-and-mouse       fox      fox         F0   151 UTMOS 3.81 WER   0%  kt:emre:p=1,emre:t=0.5,am_liam:t=0.5|tr-TR-AhmetNeural|-4%|+12Hz
+GAL tr-xplant-rest lion-and-mouse       hare     hare        F0   169 UTMOS 4.10 WER   0%  kt:emre:p=1,emre:t=0.5,am_michael:t=0.5|tr-TR-AhmetNeural|+8%|+55Hz
+GAL tr-xplant-rest lion-and-mouse       bear     bear        F0   134 UTMOS 3.74 WER   0%  kt:emre:p=1,bm_fable:t=1|tr-TR-AhmetNeural|-12%|-38Hz
+GAL tr-xplant-rest boy-who-cried-wolf   boy      boy         F0   160 UTMOS 3.97 WER   0%  kt:emre:p=1,emre:t=0.5,am_adam:t=0.5|tr-TR-EmelNeural|+4%|+36Hz
+GAL tr-xplant-rest boy-who-cried-wolf   farmer   grandpa     F0   118 UTMOS 4.05 WER   0%  kt:emre:p=1,emre:t=0.5,am_michael:t=0.5|tr-TR-AhmetNeural|-12%|-14Hz
+GAL tr-xplant-rest boy-who-cried-wolf   granny   granny      F0   207 UTMOS 4.28 WER   0%  kt:elif:p=1,elif:t=0.5,bf_isabella:t=0.5|tr-TR-EmelNeural|-14%|-28Hz
+GAL tr-xplant-rest boy-who-cried-wolf   mum      woman       F0   221 UTMOS 3.61 WER   0%  kt:elif:p=1,af_river:t=1|tr-TR-EmelNeural|-8%|-18Hz
+SIM tr-xplant-rest tortoise-and-hare    hare     (hare) ~ tort     (tortoise) cos 0.10
+SIM tr-xplant-rest tortoise-and-hare    hare     (hare) ~ bear     (bear) cos 0.12
+SIM tr-xplant-rest tortoise-and-hare    hare     (hare) ~ pig1     (pig) cos 0.33
+SIM tr-xplant-rest tortoise-and-hare    hare     (hare) ~ pig2     (pig) cos 0.15
+SIM tr-xplant-rest tortoise-and-hare    hare     (hare) ~ pig3     (pig) cos 0.54
+SIM tr-xplant-rest tortoise-and-hare    tort     (tortoise) ~ bear     (bear) cos 0.16
+SIM tr-xplant-rest tortoise-and-hare    tort     (tortoise) ~ pig1     (pig) cos 0.31
+SIM tr-xplant-rest tortoise-and-hare    tort     (tortoise) ~ pig2     (pig) cos 0.34
+SIM tr-xplant-rest tortoise-and-hare    tort     (tortoise) ~ pig3     (pig) cos 0.09
+SIM tr-xplant-rest tortoise-and-hare    bear     (bear) ~ pig1     (pig) cos 0.35
+SIM tr-xplant-rest tortoise-and-hare    bear     (bear) ~ pig2     (pig) cos 0.43
+SIM tr-xplant-rest tortoise-and-hare    bear     (bear) ~ pig3     (pig) cos 0.10
+SIM tr-xplant-rest tortoise-and-hare    pig1     (pig) ~ pig2     (pig) cos 0.45
+SIM tr-xplant-rest tortoise-and-hare    pig1     (pig) ~ pig3     (pig) cos 0.53
+SIM tr-xplant-rest tortoise-and-hare    pig2     (pig) ~ pig3     (pig) cos 0.26
+SIM tr-xplant-rest three-billy-goats    lit      (goat_little) ~ mid      (goat_mid) cos 0.44
+SIM tr-xplant-rest three-billy-goats    lit      (goat_little) ~ big      (goat_big) cos 0.16
+SIM tr-xplant-rest three-billy-goats    lit      (goat_little) ~ troll    (troll) cos 0.11
+SIM tr-xplant-rest three-billy-goats    mid      (goat_mid) ~ big      (goat_big) cos 0.28
+SIM tr-xplant-rest three-billy-goats    mid      (goat_mid) ~ troll    (troll) cos 0.24
+SIM tr-xplant-rest three-billy-goats    big      (goat_big) ~ troll    (troll) cos 0.48
+SIM tr-xplant-rest enormous-turnip      gpa      (grandpa) ~ gma      (granny) cos 0.23
+SIM tr-xplant-rest enormous-turnip      gpa      (grandpa) ~ kid      (girl) cos 0.27
+SIM tr-xplant-rest enormous-turnip      gpa      (grandpa) ~ pig      (pig) cos 0.38
+SIM tr-xplant-rest enormous-turnip      gpa      (grandpa) ~ hare     (hare) cos 0.10
+SIM tr-xplant-rest enormous-turnip      gpa      (grandpa) ~ bear     (bear) cos 0.22
+SIM tr-xplant-rest enormous-turnip      gpa      (grandpa) ~ pip      (tiny) cos 0.02
+SIM tr-xplant-rest enormous-turnip      gma      (granny) ~ kid      (girl) cos 0.32
+SIM tr-xplant-rest enormous-turnip      gma      (granny) ~ pig      (pig) cos 0.28
+SIM tr-xplant-rest enormous-turnip      gma      (granny) ~ hare     (hare) cos 0.03
+SIM tr-xplant-rest enormous-turnip      gma      (granny) ~ bear     (bear) cos 0.16
+SIM tr-xplant-rest enormous-turnip      gma      (granny) ~ pip      (tiny) cos 0.00
+SIM tr-xplant-rest enormous-turnip      kid      (girl) ~ pig      (pig) cos 0.23
+SIM tr-xplant-rest enormous-turnip      kid      (girl) ~ hare     (hare) cos 0.10
+SIM tr-xplant-rest enormous-turnip      kid      (girl) ~ bear     (bear) cos 0.19
+SIM tr-xplant-rest enormous-turnip      kid      (girl) ~ pip      (tiny) cos 0.07
+SIM tr-xplant-rest enormous-turnip      pig      (pig) ~ hare     (hare) cos 0.15
+SIM tr-xplant-rest enormous-turnip      pig      (pig) ~ bear     (bear) cos 0.43
+SIM tr-xplant-rest enormous-turnip      pig      (pig) ~ pip      (tiny) cos 0.06
+SIM tr-xplant-rest enormous-turnip      hare     (hare) ~ bear     (bear) cos 0.12
+SIM tr-xplant-rest enormous-turnip      hare     (hare) ~ pip      (tiny) cos 0.31
+SIM tr-xplant-rest enormous-turnip      bear     (bear) ~ pip      (tiny) cos 0.08
+SIM tr-xplant-rest stone-soup           fox      (fox) ~ hare     (hare) cos 0.23
+SIM tr-xplant-rest stone-soup           fox      (fox) ~ pig      (pig) cos 0.48
+SIM tr-xplant-rest stone-soup           fox      (fox) ~ goat     (goat_mid) cos 0.46
+SIM tr-xplant-rest stone-soup           fox      (fox) ~ gma      (granny) cos 0.09
+SIM tr-xplant-rest stone-soup           fox      (fox) ~ kid      (girl) cos 0.27
+SIM tr-xplant-rest stone-soup           hare     (hare) ~ pig      (pig) cos 0.15
+SIM tr-xplant-rest stone-soup           hare     (hare) ~ goat     (goat_mid) cos 0.37
+SIM tr-xplant-rest stone-soup           hare     (hare) ~ gma      (granny) cos 0.03
+SIM tr-xplant-rest stone-soup           hare     (hare) ~ kid      (girl) cos 0.10
+SIM tr-xplant-rest stone-soup           pig      (pig) ~ goat     (goat_mid) cos 0.35
+SIM tr-xplant-rest stone-soup           pig      (pig) ~ gma      (granny) cos 0.28
+SIM tr-xplant-rest stone-soup           pig      (pig) ~ kid      (girl) cos 0.23
+SIM tr-xplant-rest stone-soup           goat     (goat_mid) ~ gma      (granny) cos 0.16
+SIM tr-xplant-rest stone-soup           goat     (goat_mid) ~ kid      (girl) cos 0.26
+SIM tr-xplant-rest stone-soup           gma      (granny) ~ kid      (girl) cos 0.32
+SIM tr-xplant-rest snow-white           snow     (teen) ~ queen    (queen) cos 0.08
+SIM tr-xplant-rest snow-white           snow     (teen) ~ mir      (mirror) cos 0.06
+SIM tr-xplant-rest snow-white           snow     (teen) ~ dw       (dwarf) cos 0.33
+SIM tr-xplant-rest snow-white           snow     (teen) ~ old      (witch) cos 0.12
+SIM tr-xplant-rest snow-white           snow     (teen) ~ pr       (prince) cos 0.18
+SIM tr-xplant-rest snow-white           queen    (queen) ~ mir      (mirror) cos 0.28
+SIM tr-xplant-rest snow-white           queen    (queen) ~ dw       (dwarf) cos 0.10
+SIM tr-xplant-rest snow-white           queen    (queen) ~ old      (witch) cos 0.43
+SIM tr-xplant-rest snow-white           queen    (queen) ~ pr       (prince) cos 0.23
+SIM tr-xplant-rest snow-white           mir      (mirror) ~ dw       (dwarf) cos 0.12
+SIM tr-xplant-rest snow-white           mir      (mirror) ~ old      (witch) cos 0.28
+SIM tr-xplant-rest snow-white           mir      (mirror) ~ pr       (prince) cos 0.23
+SIM tr-xplant-rest snow-white           dw       (dwarf) ~ old      (witch) cos 0.08
+SIM tr-xplant-rest snow-white           dw       (dwarf) ~ pr       (prince) cos 0.33
+SIM tr-xplant-rest snow-white           old      (witch) ~ pr       (prince) cos 0.13
+SIM tr-xplant-rest elves-and-shoemaker  shoe     (man) ~ wife     (woman) cos 0.22
+SIM tr-xplant-rest elves-and-shoemaker  shoe     (man) ~ lady     (teen) cos 0.09
+SIM tr-xplant-rest elves-and-shoemaker  shoe     (man) ~ lord     (lord) cos 0.35
+SIM tr-xplant-rest elves-and-shoemaker  shoe     (man) ~ e1       (elf) cos 0.12
+SIM tr-xplant-rest elves-and-shoemaker  shoe     (man) ~ e2       (elfgirl) cos -0.02
+SIM tr-xplant-rest elves-and-shoemaker  wife     (woman) ~ lady     (teen) cos 0.15
+SIM tr-xplant-rest elves-and-shoemaker  wife     (woman) ~ lord     (lord) cos 0.37
+SIM tr-xplant-rest elves-and-shoemaker  wife     (woman) ~ e1       (elf) cos 0.18
+SIM tr-xplant-rest elves-and-shoemaker  wife     (woman) ~ e2       (elfgirl) cos 0.09
+SIM tr-xplant-rest elves-and-shoemaker  lady     (teen) ~ lord     (lord) cos 0.08
+SIM tr-xplant-rest elves-and-shoemaker  lady     (teen) ~ e1       (elf) cos 0.41
+SIM tr-xplant-rest elves-and-shoemaker  lady     (teen) ~ e2       (elfgirl) cos 0.76   <-- alike
+SIM tr-xplant-rest elves-and-shoemaker  lord     (lord) ~ e1       (elf) cos 0.21
+SIM tr-xplant-rest elves-and-shoemaker  lord     (lord) ~ e2       (elfgirl) cos 0.04
+SIM tr-xplant-rest elves-and-shoemaker  e1       (elf) ~ e2       (elfgirl) cos 0.41
+SIM tr-xplant-rest princess-and-pea     prince   (prince) ~ king     (king) cos 0.29
+SIM tr-xplant-rest princess-and-pea     prince   (prince) ~ queen    (woman) cos 0.27
+SIM tr-xplant-rest princess-and-pea     prince   (prince) ~ prn      (teen) cos 0.18
+SIM tr-xplant-rest princess-and-pea     king     (king) ~ queen    (woman) cos 0.28
+SIM tr-xplant-rest princess-and-pea     king     (king) ~ prn      (teen) cos 0.05
+SIM tr-xplant-rest princess-and-pea     queen    (woman) ~ prn      (teen) cos 0.15
+SIM tr-xplant-rest little-red-hen       hen      (hen) ~ pig      (pig) cos 0.12
+SIM tr-xplant-rest little-red-hen       hen      (hen) ~ goat     (goat_mid) cos 0.34
+SIM tr-xplant-rest little-red-hen       hen      (hen) ~ hare     (hare) cos 0.35
+SIM tr-xplant-rest little-red-hen       pig      (pig) ~ goat     (goat_mid) cos 0.35
+SIM tr-xplant-rest little-red-hen       pig      (pig) ~ hare     (hare) cos 0.15
+SIM tr-xplant-rest little-red-hen       goat     (goat_mid) ~ hare     (hare) cos 0.37
+SIM tr-xplant-rest lion-and-mouse       lion     (lion) ~ mouse    (tiny) cos 0.01
+SIM tr-xplant-rest lion-and-mouse       lion     (lion) ~ fox      (fox) cos 0.25
+SIM tr-xplant-rest lion-and-mouse       lion     (lion) ~ hare     (hare) cos 0.12
+SIM tr-xplant-rest lion-and-mouse       lion     (lion) ~ bear     (bear) cos 0.24
+SIM tr-xplant-rest lion-and-mouse       mouse    (tiny) ~ fox      (fox) cos 0.04
+SIM tr-xplant-rest lion-and-mouse       mouse    (tiny) ~ hare     (hare) cos 0.31
+SIM tr-xplant-rest lion-and-mouse       mouse    (tiny) ~ bear     (bear) cos 0.08
+SIM tr-xplant-rest lion-and-mouse       fox      (fox) ~ hare     (hare) cos 0.23
+SIM tr-xplant-rest lion-and-mouse       fox      (fox) ~ bear     (bear) cos 0.36
+SIM tr-xplant-rest lion-and-mouse       hare     (hare) ~ bear     (bear) cos 0.12
+SIM tr-xplant-rest boy-who-cried-wolf   boy      (boy) ~ farmer   (grandpa) cos 0.14
+SIM tr-xplant-rest boy-who-cried-wolf   boy      (boy) ~ granny   (granny) cos 0.08
+SIM tr-xplant-rest boy-who-cried-wolf   boy      (boy) ~ mum      (woman) cos 0.21
+SIM tr-xplant-rest boy-who-cried-wolf   farmer   (grandpa) ~ granny   (granny) cos 0.23
+SIM tr-xplant-rest boy-who-cried-wolf   farmer   (grandpa) ~ mum      (woman) cos 0.30
+SIM tr-xplant-rest boy-who-cried-wolf   granny   (granny) ~ mum      (woman) cos 0.48
+SIMSUM tr-xplant-rest pairs at or above 0.55: 1
+GALWARN tr-xplant-rest tortoise-and-hare: hare (hare) and pig1 (pig) may sound alike: F0 169 and 164 Hz (x1.03)
+GALWARN tr-xplant-rest tortoise-and-hare: hare (hare) and pig3 (pig) may sound alike: F0 169 and 164 Hz (x1.03)
+GALWARN tr-xplant-rest tortoise-and-hare: bear (bear) and pig2 (pig) may sound alike: F0 134 and 134 Hz (x1.00)
+GALWARN tr-xplant-rest tortoise-and-hare: pig1 (pig) and pig3 (pig) may sound alike: F0 164 and 164 Hz (x1.00)
+GALWARN tr-xplant-rest three-billy-goats: lit (goat_little) and mid (goat_mid) may sound alike: F0 179 and 181 Hz (x1.01)
+GALWARN tr-xplant-rest enormous-turnip: pig (pig) and bear (bear) may sound alike: F0 134 and 134 Hz (x1.00)
+GALWARN tr-xplant-rest stone-soup: hare (hare) and goat (goat_mid) may sound alike: F0 169 and 181 Hz (x1.07)
+GALWARN tr-xplant-rest snow-white: queen (queen) and old (witch) may sound alike: F0 232 and 212 Hz (x1.09)
+GALWARN tr-xplant-rest snow-white: dw (dwarf) and pr (prince) may sound alike: F0 161 and 149 Hz (x1.08)
+GALWARN tr-xplant-rest little-red-hen: goat (goat_mid) and hare (hare) may sound alike: F0 181 and 169 Hz (x1.07)
+GALWARN tr-xplant-rest boy-who-cried-wolf: granny (granny) and mum (woman) may sound alike: F0 207 and 221 Hz (x1.07)
+wrote gallery-tr-xplant-rest 359.1 s
+   [ktts] 47 of 47 clips made (236 s of speech in 99 s of work)
+   [ktts] 47 of 47 clips made in 100 s; 0 item(s) will use the Edge voice
+wrote scene-red-riding-hood-old 231.5 s
+SCENE red-riding-hood old: 47 lines, 231 s, speakers ['granny', 'mama', 'nar', 'red', 'wolf', 'wolfb']
+   [ktts] 47 of 47 clips made (238 s of speech in 96 s of work)
+   [ktts] 47 of 47 clips made in 97 s; 0 item(s) will use the Edge voice
+wrote scene-red-riding-hood-hybrid 233.1 s
+SCENE red-riding-hood hybrid: 47 lines, 233 s, speakers ['granny', 'mama', 'nar', 'red', 'wolf', 'wolfb']
+   [ktts] 23 of 23 clips made (128 s of speech in 53 s of work)
+   [ktts] 23 of 23 clips made in 55 s; 0 item(s) will use the Edge voice
+wrote scene-three-little-pigs-old 130.9 s
+SCENE three-little-pigs old: 24 lines, 131 s, speakers ['mama', 'nar', 'pig1', 'pig2', 'pig3']
+   [ktts] 19 of 19 clips made (112 s of speech in 48 s of work)
+   [ktts] 19 of 19 clips made in 50 s; 0 item(s) will use the Edge voice
+wrote scene-three-little-pigs-hybrid 130.9 s
+SCENE three-little-pigs hybrid: 24 lines, 131 s, speakers ['mama', 'nar', 'pig1', 'pig2', 'pig3']
+   [ktts] 35 of 35 clips made (172 s of speech in 73 s of work)
+   [ktts] 35 of 35 clips made in 75 s; 0 item(s) will use the Edge voice
+wrote scene-cinderella-old 173.8 s
+SCENE cinderella old: 36 lines, 174 s, speakers ['cin', 'cing', 'fg', 'nar', 's1', 's2', 'sm']
+   [ktts] 28 of 28 clips made (148 s of speech in 61 s of work)
+   [ktts] 28 of 28 clips made in 63 s; 0 item(s) will use the Edge voice
+wrote scene-cinderella-hybrid 173.3 s
+SCENE cinderella hybrid: 36 lines, 173 s, speakers ['cin', 'cing', 'fg', 'nar', 's1', 's2', 'sm']

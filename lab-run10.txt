@@ -1,0 +1,427 @@
+==================== main 18:48:16
+python 3.12.16 Linux-7.0.0-1020-azure-x86_64-with-glibc2.43 cpus 4
+   numpy 2.5.5
+   scipy 1.18.1
+   torch 2.15.0+cpu
+   torchaudio 2.11.1+cpu
+   kokoro 0.9.4
+   misaki 0.9.4
+   faster_whisper 1.2.1
+   edge_tts 7.3.1
+edge-tts: 318 voices; Turkish: ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural']
+   en-AU-WilliamMultilingualNeural              en-AU  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   en-US-AndrewMultilingualNeural               en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Warm', 'Confident', 'Authentic', 'Honest']}
+   en-US-AvaMultilingualNeural                  en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Expressive', 'Caring', 'Pleasant', 'Friendly']}
+   en-US-BrianMultilingualNeural                en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Approachable', 'Casual', 'Sincere']}
+   en-US-EmmaMultilingualNeural                 en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Cheerful', 'Clear', 'Conversational']}
+   fr-FR-VivienneMultilingualNeural             fr-FR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   fr-FR-RemyMultilingualNeural                 fr-FR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   it-IT-GiuseppeMultilingualNeural             it-IT  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   ko-KR-HyunsuMultilingualNeural               ko-KR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   pt-BR-ThalitaMultilingualNeural              pt-BR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+---- palette en: PAL language voice factor line F0 UTMOS WER seconds   (factor 1.00 = the voice as it is; the lively line is the one that is moved)
+GALLERY en 1 = af_alloy
+PAL en af_alloy                 x1.00 calm   F0   145 UTMOS 4.42 WER   0% SEC 5.0
+PAL en af_alloy                 x1.00 lively F0   152 UTMOS 4.38 WER   0% SEC 3.6
+PAL en af_alloy                 x0.85 lively F0   129 UTMOS 4.02 WER   0% SEC 3.6
+PAL en af_alloy                 x1.20 lively F0   182 UTMOS 4.42 WER   0% SEC 3.4
+PAL en af_alloy                 x1.40 lively F0   212 UTMOS 4.07 WER   0% SEC 3.6
+GALLERY en 2 = af_aoede
+PAL en af_aoede                 x1.00 calm   F0   181 UTMOS 4.48 WER   0% SEC 4.8
+PAL en af_aoede                 x1.00 lively F0   186 UTMOS 4.41 WER   0% SEC 3.1
+PAL en af_aoede                 x0.85 lively F0   156 UTMOS 4.30 WER   0% SEC 3.3
+PAL en af_aoede                 x1.20 lively F0   221 UTMOS 4.26 WER   0% SEC 2.9
+PAL en af_aoede                 x1.40 lively F0   256 UTMOS 3.87 WER   0% SEC 3.2
+GALLERY en 3 = af_bella
+PAL en af_bella                 x1.00 calm   F0   203 UTMOS 4.35 WER   0% SEC 5.1
+PAL en af_bella                 x1.00 lively F0   205 UTMOS 4.28 WER   0% SEC 3.6
+PAL en af_bella                 x0.85 lively F0   178 UTMOS 4.29 WER   0% SEC 3.8
+PAL en af_bella                 x1.20 lively F0   246 UTMOS 3.83 WER   0% SEC 3.5
+PAL en af_bella                 x1.40 lively F0   281 UTMOS 2.35 WER   0% SEC 3.7
+GALLERY en 4 = af_heart
+PAL en af_heart                 x1.00 calm   F0   196 UTMOS 4.52 WER   0% SEC 4.7
+PAL en af_heart                 x1.00 lively F0   219 UTMOS 4.50 WER   0% SEC 3.2
+PAL en af_heart                 x0.85 lively F0   182 UTMOS 4.45 WER   0% SEC 3.3
+PAL en af_heart                 x1.20 lively F0   251 UTMOS 4.33 WER   0% SEC 3.1
+PAL en af_heart                 x1.40 lively F0   283 UTMOS 3.29 WER   0% SEC 3.3
+GALLERY en 5 = af_jessica
+PAL en af_jessica               x1.00 calm   F0   209 UTMOS 4.47 WER   0% SEC 4.4
+PAL en af_jessica               x1.00 lively F0   218 UTMOS 4.44 WER   0% SEC 3.1
+PAL en af_jessica               x0.85 lively F0   176 UTMOS 4.46 WER   0% SEC 3.1
+PAL en af_jessica               x1.20 lively F0   249 UTMOS 3.90 WER   0% SEC 2.9
+PAL en af_jessica               x1.40 lively F0   298 UTMOS 2.85 WER   0% SEC 3.0
+GALLERY en 6 = af_kore
+PAL en af_kore                  x1.00 calm   F0   153 UTMOS 4.50 WER   0% SEC 4.8
+PAL en af_kore                  x1.00 lively F0   158 UTMOS 4.48 WER   0% SEC 3.0
+PAL en af_kore                  x0.85 lively F0   132 UTMOS 4.43 WER   0% SEC 3.3
+PAL en af_kore                  x1.20 lively F0   189 UTMOS 4.46 WER   0% SEC 3.0
+PAL en af_kore                  x1.40 lively F0   216 UTMOS 4.25 WER   0% SEC 3.2
+GALLERY en 7 = af_nicole
+PAL en af_nicole                x1.00 calm   F0   152 UTMOS 3.08 WER   0% SEC 6.9
+PAL en af_nicole                x1.00 lively F0   157 UTMOS 3.28 WER   0% SEC 4.6
+PAL en af_nicole                x0.85 lively F0   133 UTMOS 3.10 WER   0% SEC 4.7
+PAL en af_nicole                x1.20 lively F0   185 UTMOS 2.82 WER   0% SEC 4.5
+PAL en af_nicole                x1.40 lively F0   218 UTMOS 1.44 WER   0% SEC 4.7
+GALLERY en 8 = af_nova
+PAL en af_nova                  x1.00 calm   F0   161 UTMOS 4.50 WER   0% SEC 4.9
+PAL en af_nova                  x1.00 lively F0   167 UTMOS 4.46 WER   0% SEC 3.5
+PAL en af_nova                  x0.85 lively F0   140 UTMOS 4.35 WER   0% SEC 3.6
+PAL en af_nova                  x1.20 lively F0   204 UTMOS 4.40 WER   0% SEC 3.4
+PAL en af_nova                  x1.40 lively F0   236 UTMOS 3.41 WER   0% SEC 3.5
+GALLERY en 9 = af_river
+PAL en af_river                 x1.00 calm   F0   182 UTMOS 4.47 WER   0% SEC 4.4
+PAL en af_river                 x1.00 lively F0   185 UTMOS 4.46 WER   0% SEC 3.1
+PAL en af_river                 x0.85 lively F0   158 UTMOS 4.39 WER   0% SEC 3.2
+PAL en af_river                 x1.20 lively F0   218 UTMOS 4.40 WER   0% SEC 3.0
+PAL en af_river                 x1.40 lively F0   258 UTMOS 3.88 WER   0% SEC 3.1
+GALLERY en 10 = af_sarah
+PAL en af_sarah                 x1.00 calm   F0   190 UTMOS 4.49 WER   0% SEC 5.0
+PAL en af_sarah                 x1.00 lively F0   192 UTMOS 4.48 WER   0% SEC 3.6
+PAL en af_sarah                 x0.85 lively F0   168 UTMOS 4.47 WER   0% SEC 3.7
+PAL en af_sarah                 x1.20 lively F0   235 UTMOS 4.36 WER   0% SEC 3.4
+PAL en af_sarah                 x1.40 lively F0   272 UTMOS 3.52 WER   0% SEC 3.6
+GALLERY en 11 = af_sky
+PAL en af_sky                   x1.00 calm   F0   160 UTMOS 4.46 WER   0% SEC 4.8
+PAL en af_sky                   x1.00 lively F0   175 UTMOS 4.47 WER   0% SEC 3.5
+PAL en af_sky                   x0.85 lively F0   145 UTMOS 4.43 WER   0% SEC 3.6
+PAL en af_sky                   x1.20 lively F0   207 UTMOS 4.43 WER   0% SEC 3.3
+PAL en af_sky                   x1.40 lively F0   231 UTMOS 3.95 WER   0% SEC 3.4
+GALLERY en 12 = am_adam
+PAL en am_adam                  x1.00 calm   F0   126 UTMOS 4.43 WER   0% SEC 4.8
+PAL en am_adam                  x1.00 lively F0   128 UTMOS 4.37 WER   0% SEC 3.3
+PAL en am_adam                  x0.85 lively F0   113 UTMOS 3.93 WER   0% SEC 3.4
+PAL en am_adam                  x1.20 lively F0   151 UTMOS 4.37 WER   0% SEC 3.1
+PAL en am_adam                  x1.40 lively F0   176 UTMOS 4.13 WER   0% SEC 3.3
+GALLERY en 13 = am_echo
+PAL en am_echo                  x1.00 calm   F0   117 UTMOS 4.45 WER   0% SEC 5.0
+PAL en am_echo                  x1.00 lively F0   114 UTMOS 4.39 WER   0% SEC 3.6
+PAL en am_echo                  x0.85 lively F0   105 UTMOS 4.39 WER   0% SEC 3.7
+PAL en am_echo                  x1.20 lively F0   140 UTMOS 4.39 WER   0% SEC 3.5
+PAL en am_echo                  x1.40 lively F0   160 UTMOS 4.28 WER   0% SEC 3.6
+GALLERY en 14 = am_eric
+PAL en am_eric                  x1.00 calm   F0   159 UTMOS 4.41 WER   0% SEC 4.4
+PAL en am_eric                  x1.00 lively F0   168 UTMOS 4.41 WER   0% SEC 3.0
+PAL en am_eric                  x0.85 lively F0   142 UTMOS 4.30 WER   0% SEC 3.1
+PAL en am_eric                  x1.20 lively F0   204 UTMOS 4.38 WER   0% SEC 2.9
+PAL en am_eric                  x1.40 lively F0   235 UTMOS 4.33 WER   0% SEC 3.0
+GALLERY en 15 = am_fenrir
+PAL en am_fenrir                x1.00 calm   F0   142 UTMOS 4.49 WER   0% SEC 4.7
+PAL en am_fenrir                x1.00 lively F0   147 UTMOS 3.94 WER   0% SEC 2.9
+PAL en am_fenrir                x0.85 lively F0   123 UTMOS 3.89 WER   0% SEC 3.1
+PAL en am_fenrir                x1.20 lively F0   177 UTMOS 4.42 WER   0% SEC 2.9
+PAL en am_fenrir                x1.40 lively F0   203 UTMOS 4.19 WER   0% SEC 3.1
+GALLERY en 16 = am_liam
+PAL en am_liam                  x1.00 calm   F0   128 UTMOS 4.43 WER   0% SEC 4.4
+PAL en am_liam                  x1.00 lively F0   128 UTMOS 4.37 WER   0% SEC 3.0
+PAL en am_liam                  x0.85 lively F0   125 UTMOS 4.17 WER   0% SEC 3.1
+PAL en am_liam                  x1.20 lively F0   149 UTMOS 3.92 WER   0% SEC 2.9
+PAL en am_liam                  x1.40 lively F0   177 UTMOS 4.26 WER   0% SEC 3.1
+GALLERY en 17 = am_michael
+PAL en am_michael               x1.00 calm   F0   124 UTMOS 4.38 WER   0% SEC 5.3
+PAL en am_michael               x1.00 lively F0   130 UTMOS 4.26 WER   0% SEC 3.8
+PAL en am_michael               x0.85 lively F0   113 UTMOS 3.78 WER   0% SEC 3.8
+PAL en am_michael               x1.20 lively F0   151 UTMOS 4.36 WER   0% SEC 3.6
+PAL en am_michael               x1.40 lively F0   170 UTMOS 4.09 WER   0% SEC 3.8
+GALLERY en 18 = am_onyx
+PAL en am_onyx                  x1.00 calm   F0   101 UTMOS 4.32 WER   0% SEC 4.9
+PAL en am_onyx                  x1.00 lively F0   101 UTMOS 4.36 WER   0% SEC 3.6
+PAL en am_onyx                  x0.85 lively F0   379 UTMOS 3.97 WER   0% SEC 3.6
+PAL en am_onyx                  x1.20 lively F0   109 UTMOS 4.34 WER   0% SEC 3.5
+PAL en am_onyx                  x1.40 lively F0   126 UTMOS 4.26 WER   0% SEC 3.6
+GALLERY en 19 = am_puck
+PAL en am_puck                  x1.00 calm   F0   119 UTMOS 4.44 WER   0% SEC 4.6
+PAL en am_puck                  x1.00 lively F0   120 UTMOS 4.20 WER   0% SEC 3.0
+PAL en am_puck                  x0.85 lively F0   112 UTMOS 3.90 WER   0% SEC 3.2
+PAL en am_puck                  x1.20 lively F0   144 UTMOS 4.38 WER   0% SEC 2.8
+PAL en am_puck                  x1.40 lively F0   168 UTMOS 4.35 WER   0% SEC 3.1
+GALLERY en 20 = am_santa
+PAL en am_santa                 x1.00 calm   F0   207 UTMOS 3.91 WER   0% SEC 5.0
+PAL en am_santa                 x1.00 lively F0   207 UTMOS 3.60 WER   0% SEC 3.4
+PAL en am_santa                 x0.85 lively F0   192 UTMOS 3.33 WER   0% SEC 3.6
+PAL en am_santa                 x1.20 lively F0   255 UTMOS 3.67 WER   0% SEC 3.3
+PAL en am_santa                 x1.40 lively F0   304 UTMOS 2.80 WER   0% SEC 3.5
+GALLERY en 21 = bf_alice
+PAL en bf_alice                 x1.00 calm   F0   216 UTMOS 4.43 WER   0% SEC 5.0
+PAL en bf_alice                 x1.00 lively F0   230 UTMOS 4.29 WER   9% SEC 3.3
+PAL en bf_alice                 x0.85 lively F0   198 UTMOS 4.27 WER  18% SEC 3.5
+PAL en bf_alice                 x1.20 lively F0   275 UTMOS 3.86 WER   9% SEC 3.2
+PAL en bf_alice                 x1.40 lively F0   314 UTMOS 2.24 WER   0% SEC 3.4
+GALLERY en 22 = bf_emma
+PAL en bf_emma                  x1.00 calm   F0   179 UTMOS 4.39 WER   0% SEC 4.8
+PAL en bf_emma                  x1.00 lively F0   182 UTMOS 4.30 WER   0% SEC 3.4
+PAL en bf_emma                  x0.85 lively F0   156 UTMOS 4.27 WER   0% SEC 3.5
+PAL en bf_emma                  x1.20 lively F0   221 UTMOS 4.15 WER   0% SEC 3.2
+PAL en bf_emma                  x1.40 lively F0   257 UTMOS 3.28 WER   0% SEC 3.4
+GALLERY en 23 = bf_isabella
+PAL en bf_isabella              x1.00 calm   F0   204 UTMOS 4.45 WER   0% SEC 5.0
+PAL en bf_isabella              x1.00 lively F0   217 UTMOS 4.39 WER   0% SEC 3.5
+PAL en bf_isabella              x0.85 lively F0   183 UTMOS 4.24 WER   0% SEC 3.6
+PAL en bf_isabella              x1.20 lively F0   259 UTMOS 3.93 WER   0% SEC 3.3
+PAL en bf_isabella              x1.40 lively F0   304 UTMOS 3.24 WER   0% SEC 3.5
+GALLERY en 24 = bf_lily
+PAL en bf_lily                  x1.00 calm   F0   179 UTMOS 4.37 WER   0% SEC 4.9
+PAL en bf_lily                  x1.00 lively F0   180 UTMOS 4.09 WER   0% SEC 3.4
+PAL en bf_lily                  x0.85 lively F0   152 UTMOS 3.90 WER   0% SEC 3.5
+PAL en bf_lily                  x1.20 lively F0   225 UTMOS 4.19 WER   0% SEC 3.1
+PAL en bf_lily                  x1.40 lively F0   274 UTMOS 2.91 WER   0% SEC 3.4
+GALLERY en 25 = bm_daniel
+PAL en bm_daniel                x1.00 calm   F0   128 UTMOS 4.30 WER   0% SEC 4.7
+PAL en bm_daniel                x1.00 lively F0   134 UTMOS 4.18 WER   0% SEC 3.3
+PAL en bm_daniel                x0.85 lively F0   117 UTMOS 3.80 WER   0% SEC 3.4
+PAL en bm_daniel                x1.20 lively F0   158 UTMOS 4.10 WER   0% SEC 3.2
+PAL en bm_daniel                x1.40 lively F0   186 UTMOS 3.84 WER   0% SEC 3.3
+GALLERY en 26 = bm_fable
+PAL en bm_fable                 x1.00 calm   F0   128 UTMOS 4.38 WER   0% SEC 5.0
+PAL en bm_fable                 x1.00 lively F0   132 UTMOS 4.21 WER   0% SEC 3.5
+PAL en bm_fable                 x0.85 lively F0   111 UTMOS 4.04 WER   0% SEC 3.7
+PAL en bm_fable                 x1.20 lively F0   149 UTMOS 4.21 WER   0% SEC 3.4
+PAL en bm_fable                 x1.40 lively F0   170 UTMOS 4.08 WER   0% SEC 3.6
+GALLERY en 27 = bm_george
+PAL en bm_george                x1.00 calm   F0   142 UTMOS 4.41 WER   0% SEC 5.5
+PAL en bm_george                x1.00 lively F0   154 UTMOS 4.33 WER   0% SEC 3.7
+PAL en bm_george                x0.85 lively F0   130 UTMOS 3.77 WER   0% SEC 3.9
+PAL en bm_george                x1.20 lively F0   185 UTMOS 4.33 WER   0% SEC 3.6
+PAL en bm_george                x1.40 lively F0   212 UTMOS 3.93 WER   0% SEC 3.8
+GALLERY en 28 = bm_lewis
+PAL en bm_lewis                 x1.00 calm   F0   111 UTMOS 4.17 WER   0% SEC 5.5
+PAL en bm_lewis                 x1.00 lively F0   114 UTMOS 3.99 WER   0% SEC 4.0
+PAL en bm_lewis                 x0.85 lively F0   104 UTMOS 3.52 WER   0% SEC 4.0
+PAL en bm_lewis                 x1.20 lively F0   123 UTMOS 3.40 WER   0% SEC 3.7
+PAL en bm_lewis                 x1.40 lively F0   134 UTMOS 3.25 WER   0% SEC 4.0
+wrote palette-en 212.6 s
+---- palette tr: PAL language voice factor line F0 UTMOS WER seconds   (factor 1.00 = the voice as it is; the lively line is the one that is moved)
+GALLERY tr 1 = elif
+PAL tr elif                     x1.00 calm   F0   242 UTMOS 3.97 WER   0% SEC 6.4
+PAL tr elif                     x1.00 lively F0   233 UTMOS 4.28 WER   0% SEC 5.9
+PAL tr elif                     x0.85 lively F0   200 UTMOS 4.01 WER   0% SEC 6.3
+PAL tr elif                     x0.92 lively F0   217 UTMOS 4.16 WER   0% SEC 6.1
+PAL tr elif                     x1.10 lively F0   257 UTMOS 4.15 WER  12% SEC 5.9
+PAL tr elif                     x1.20 lively F0   284 UTMOS 3.61 WER   0% SEC 6.1
+PAL tr elif                     x1.30 lively F0   308 UTMOS 2.69 WER   0% SEC 6.1
+GALLERY tr 2 = elif=0.8,emre=0.2
+PAL tr elif=0.8,emre=0.2        x1.00 calm   F0   225 UTMOS 4.27 WER   0% SEC 6.2
+PAL tr elif=0.8,emre=0.2        x1.00 lively F0   217 UTMOS 4.27 WER   0% SEC 5.8
+PAL tr elif=0.8,emre=0.2        x0.85 lively F0   186 UTMOS 4.14 WER   0% SEC 6.1
+PAL tr elif=0.8,emre=0.2        x0.92 lively F0   200 UTMOS 4.22 WER   0% SEC 6.1
+PAL tr elif=0.8,emre=0.2        x1.10 lively F0   237 UTMOS 4.22 WER   0% SEC 5.8
+PAL tr elif=0.8,emre=0.2        x1.20 lively F0   264 UTMOS 3.76 WER   0% SEC 6.0
+PAL tr elif=0.8,emre=0.2        x1.30 lively F0   286 UTMOS 2.83 WER   0% SEC 6.0
+GALLERY tr 3 = elif=0.6,emre=0.4
+PAL tr elif=0.6,emre=0.4        x1.00 calm   F0   205 UTMOS 4.28 WER   0% SEC 6.1
+PAL tr elif=0.6,emre=0.4        x1.00 lively F0   197 UTMOS 4.20 WER   0% SEC 5.7
+PAL tr elif=0.6,emre=0.4        x0.85 lively F0   170 UTMOS 4.17 WER   0% SEC 6.1
+PAL tr elif=0.6,emre=0.4        x0.92 lively F0   183 UTMOS 4.22 WER   0% SEC 5.9
+PAL tr elif=0.6,emre=0.4        x1.10 lively F0   217 UTMOS 4.05 WER   0% SEC 5.5
+PAL tr elif=0.6,emre=0.4        x1.20 lively F0   240 UTMOS 3.68 WER   0% SEC 5.9
+PAL tr elif=0.6,emre=0.4        x1.30 lively F0   262 UTMOS 2.96 WER   0% SEC 5.9
+GALLERY tr 4 = elif=0.4,emre=0.6
+PAL tr elif=0.4,emre=0.6        x1.00 calm   F0   183 UTMOS 4.24 WER   0% SEC 5.9
+PAL tr elif=0.4,emre=0.6        x1.00 lively F0   177 UTMOS 4.20 WER   0% SEC 5.5
+PAL tr elif=0.4,emre=0.6        x0.85 lively F0   151 UTMOS 4.07 WER   0% SEC 6.0
+PAL tr elif=0.4,emre=0.6        x0.92 lively F0   163 UTMOS 4.08 WER   0% SEC 5.8
+PAL tr elif=0.4,emre=0.6        x1.10 lively F0   194 UTMOS 4.26 WER   0% SEC 5.4
+PAL tr elif=0.4,emre=0.6        x1.20 lively F0   213 UTMOS 3.90 WER   0% SEC 5.6
+PAL tr elif=0.4,emre=0.6        x1.30 lively F0   232 UTMOS 3.48 WER   0% SEC 5.8
+GALLERY tr 5 = elif=0.2,emre=0.8
+PAL tr elif=0.2,emre=0.8        x1.00 calm   F0   160 UTMOS 4.10 WER   0% SEC 5.8
+PAL tr elif=0.2,emre=0.8        x1.00 lively F0   156 UTMOS 3.93 WER   0% SEC 5.4
+PAL tr elif=0.2,emre=0.8        x0.85 lively F0   134 UTMOS 3.97 WER   0% SEC 5.8
+PAL tr elif=0.2,emre=0.8        x0.92 lively F0   143 UTMOS 4.01 WER   0% SEC 5.8
+PAL tr elif=0.2,emre=0.8        x1.10 lively F0   170 UTMOS 4.12 WER   0% SEC 5.3
+PAL tr elif=0.2,emre=0.8        x1.20 lively F0   187 UTMOS 3.92 WER   0% SEC 5.4
+PAL tr elif=0.2,emre=0.8        x1.30 lively F0   202 UTMOS 3.68 WER   0% SEC 5.7
+GALLERY tr 6 = emre
+PAL tr emre                     x1.00 calm   F0   136 UTMOS 4.00 WER   0% SEC 5.7
+PAL tr emre                     x1.00 lively F0   135 UTMOS 3.90 WER   0% SEC 5.4
+PAL tr emre                     x0.85 lively F0   116 UTMOS 4.05 WER   0% SEC 5.6
+PAL tr emre                     x0.92 lively F0   124 UTMOS 3.86 WER   0% SEC 5.6
+PAL tr emre                     x1.10 lively F0   148 UTMOS 3.78 WER   0% SEC 5.1
+PAL tr emre                     x1.20 lively F0   161 UTMOS 3.71 WER   0% SEC 5.2
+PAL tr emre                     x1.30 lively F0   172 UTMOS 3.70 WER   0% SEC 5.5
+GALLERY tr 7 = elif=1.25,emre=-0.25
+PAL tr elif=1.25,emre=-0.25     x1.00 calm   F0   263 UTMOS 4.12 WER   0% SEC 6.6
+PAL tr elif=1.25,emre=-0.25     x1.00 lively F0   256 UTMOS 4.27 WER   0% SEC 6.2
+PAL tr elif=1.25,emre=-0.25     x0.85 lively F0   216 UTMOS 3.96 WER   0% SEC 6.5
+PAL tr elif=1.25,emre=-0.25     x0.92 lively F0   234 UTMOS 4.21 WER   0% SEC 6.3
+PAL tr elif=1.25,emre=-0.25     x1.10 lively F0   281 UTMOS 4.03 WER   0% SEC 6.1
+PAL tr elif=1.25,emre=-0.25     x1.20 lively F0   307 UTMOS 3.28 WER   0% SEC 6.3
+PAL tr elif=1.25,emre=-0.25     x1.30 lively F0   335 UTMOS 2.55 WER   0% SEC 6.3
+GALLERY tr 8 = elif=-0.25,emre=1.25
+PAL tr elif=-0.25,emre=1.25     x1.00 calm   F0   114 UTMOS 4.02 WER   0% SEC 5.6
+PAL tr elif=-0.25,emre=1.25     x1.00 lively F0   113 UTMOS 3.86 WER   0% SEC 5.2
+PAL tr elif=-0.25,emre=1.25     x0.85 lively F0    99 UTMOS 3.79 WER   0% SEC 5.4
+PAL tr elif=-0.25,emre=1.25     x0.92 lively F0   104 UTMOS 3.91 WER  12% SEC 5.3
+PAL tr elif=-0.25,emre=1.25     x1.10 lively F0   123 UTMOS 3.72 WER   0% SEC 5.0
+PAL tr elif=-0.25,emre=1.25     x1.20 lively F0   134 UTMOS 3.66 WER   0% SEC 5.0
+PAL tr elif=-0.25,emre=1.25     x1.30 lively F0   143 UTMOS 3.45 WER  12% SEC 5.3
+GALLERY tr 9 = af_heart
+PAL tr af_heart                 x1.00 calm   F0   198 UTMOS 4.28 WER   0% SEC 5.5
+PAL tr af_heart                 x1.00 lively F0   197 UTMOS 4.39 WER  12% SEC 4.6
+PAL tr af_heart                 x0.85 lively F0   170 UTMOS 4.26 WER   0% SEC 4.9
+PAL tr af_heart                 x0.92 lively F0   182 UTMOS 4.37 WER  12% SEC 4.8
+PAL tr af_heart                 x1.10 lively F0   221 UTMOS 4.10 WER  12% SEC 4.4
+PAL tr af_heart                 x1.20 lively F0   240 UTMOS 3.77 WER  25% SEC 4.3
+PAL tr af_heart                 x1.30 lively F0   248 UTMOS 2.88 WER  25% SEC 4.8
+GALLERY tr 10 = af_kore
+PAL tr af_kore                  x1.00 calm   F0   142 UTMOS 4.03 WER   0% SEC 5.5
+PAL tr af_kore                  x1.00 lively F0   149 UTMOS 4.26 WER  12% SEC 4.4
+PAL tr af_kore                  x0.85 lively F0   128 UTMOS 4.17 WER  12% SEC 4.6
+PAL tr af_kore                  x0.92 lively F0   138 UTMOS 4.02 WER  12% SEC 4.6
+PAL tr af_kore                  x1.10 lively F0   165 UTMOS 4.16 WER  12% SEC 4.2
+PAL tr af_kore                  x1.20 lively F0   179 UTMOS 4.00 WER  25% SEC 4.2
+PAL tr af_kore                  x1.30 lively F0   190 UTMOS 3.86 WER  25% SEC 4.5
+GALLERY tr 11 = af_aoede
+PAL tr af_aoede                 x1.00 calm   F0   166 UTMOS 4.09 WER   0% SEC 5.5
+PAL tr af_aoede                 x1.00 lively F0   173 UTMOS 4.27 WER  12% SEC 4.6
+PAL tr af_aoede                 x0.85 lively F0   148 UTMOS 3.95 WER  12% SEC 4.8
+PAL tr af_aoede                 x0.92 lively F0   160 UTMOS 4.21 WER  12% SEC 4.8
+PAL tr af_aoede                 x1.10 lively F0   190 UTMOS 4.18 WER  12% SEC 4.5
+PAL tr af_aoede                 x1.20 lively F0   209 UTMOS 3.76 WER  12% SEC 4.4
+PAL tr af_aoede                 x1.30 lively F0   223 UTMOS 3.57 WER  12% SEC 4.8
+GALLERY tr 12 = af_sky
+PAL tr af_sky                   x1.00 calm   F0   153 UTMOS 3.83 WER   0% SEC 5.3
+PAL tr af_sky                   x1.00 lively F0   158 UTMOS 4.32 WER  12% SEC 5.0
+PAL tr af_sky                   x0.85 lively F0   134 UTMOS 4.10 WER   0% SEC 5.2
+PAL tr af_sky                   x0.92 lively F0   145 UTMOS 4.17 WER  12% SEC 5.1
+PAL tr af_sky                   x1.10 lively F0   173 UTMOS 4.19 WER  12% SEC 4.8
+PAL tr af_sky                   x1.20 lively F0   189 UTMOS 3.82 WER  12% SEC 4.8
+PAL tr af_sky                   x1.30 lively F0   205 UTMOS 3.34 WER  12% SEC 5.1
+GALLERY tr 13 = af_sarah
+PAL tr af_sarah                 x1.00 calm   F0   181 UTMOS 4.29 WER   0% SEC 5.5
+PAL tr af_sarah                 x1.00 lively F0   182 UTMOS 4.34 WER  12% SEC 5.1
+PAL tr af_sarah                 x0.85 lively F0   152 UTMOS 4.32 WER  12% SEC 5.4
+PAL tr af_sarah                 x0.92 lively F0   166 UTMOS 4.26 WER  12% SEC 5.3
+PAL tr af_sarah                 x1.10 lively F0   204 UTMOS 4.29 WER  12% SEC 4.8
+PAL tr af_sarah                 x1.20 lively F0   221 UTMOS 3.96 WER  12% SEC 4.7
+PAL tr af_sarah                 x1.30 lively F0   228 UTMOS 3.67 WER  12% SEC 5.2
+GALLERY tr 14 = af_bella
+PAL tr af_bella                 x1.00 calm   F0   200 UTMOS 4.15 WER   0% SEC 5.7
+PAL tr af_bella                 x1.00 lively F0   191 UTMOS 4.20 WER  12% SEC 4.8
+PAL tr af_bella                 x0.85 lively F0   164 UTMOS 3.93 WER  12% SEC 5.0
+PAL tr af_bella                 x0.92 lively F0   177 UTMOS 4.13 WER  12% SEC 5.0
+PAL tr af_bella                 x1.10 lively F0   211 UTMOS 3.84 WER  12% SEC 4.7
+PAL tr af_bella                 x1.20 lively F0   232 UTMOS 3.45 WER  25% SEC 4.6
+PAL tr af_bella                 x1.30 lively F0   246 UTMOS 2.72 WER  25% SEC 5.0
+GALLERY tr 15 = bf_emma
+PAL tr bf_emma                  x1.00 calm   F0   175 UTMOS 3.85 WER   0% SEC 5.3
+PAL tr bf_emma                  x1.00 lively F0   173 UTMOS 4.08 WER  12% SEC 4.9
+PAL tr bf_emma                  x0.85 lively F0   146 UTMOS 3.89 WER  12% SEC 5.1
+PAL tr bf_emma                  x0.92 lively F0   159 UTMOS 4.00 WER  12% SEC 5.1
+PAL tr bf_emma                  x1.10 lively F0   190 UTMOS 3.73 WER  12% SEC 4.7
+PAL tr bf_emma                  x1.20 lively F0   209 UTMOS 3.24 WER  12% SEC 4.7
+PAL tr bf_emma                  x1.30 lively F0   224 UTMOS 2.83 WER  38% SEC 5.0
+GALLERY tr 16 = bf_isabella
+PAL tr bf_isabella              x1.00 calm   F0   198 UTMOS 4.19 WER   0% SEC 5.8
+PAL tr bf_isabella              x1.00 lively F0   197 UTMOS 4.23 WER  12% SEC 5.2
+PAL tr bf_isabella              x0.85 lively F0   167 UTMOS 4.28 WER  12% SEC 5.4
+PAL tr bf_isabella              x0.92 lively F0   181 UTMOS 4.35 WER  12% SEC 5.3
+PAL tr bf_isabella              x1.10 lively F0   216 UTMOS 4.11 WER  12% SEC 5.0
+PAL tr bf_isabella              x1.20 lively F0   237 UTMOS 3.67 WER  12% SEC 5.0
+PAL tr bf_isabella              x1.30 lively F0   257 UTMOS 2.79 WER  25% SEC 5.4
+GALLERY tr 17 = am_michael
+PAL tr am_michael               x1.00 calm   F0   115 UTMOS 3.99 WER   0% SEC 5.5
+PAL tr am_michael               x1.00 lively F0   115 UTMOS 3.80 WER  12% SEC 4.8
+PAL tr am_michael               x0.85 lively F0   101 UTMOS 3.54 WER  12% SEC 4.9
+PAL tr am_michael               x0.92 lively F0   108 UTMOS 3.60 WER  12% SEC 4.9
+PAL tr am_michael               x1.10 lively F0   126 UTMOS 3.95 WER  12% SEC 4.5
+PAL tr am_michael               x1.20 lively F0   134 UTMOS 3.94 WER  12% SEC 4.4
+PAL tr am_michael               x1.30 lively F0   145 UTMOS 3.82 WER  12% SEC 4.8
+GALLERY tr 18 = am_puck
+PAL tr am_puck                  x1.00 calm   F0   116 UTMOS 3.96 WER  23% SEC 5.0
+PAL tr am_puck                  x1.00 lively F0   110 UTMOS 4.13 WER   0% SEC 4.1
+PAL tr am_puck                  x0.85 lively F0    98 UTMOS 3.93 WER  12% SEC 4.2
+PAL tr am_puck                  x0.92 lively F0   104 UTMOS 4.19 WER  12% SEC 4.2
+PAL tr am_puck                  x1.10 lively F0   121 UTMOS 3.75 WER  12% SEC 4.0
+PAL tr am_puck                  x1.20 lively F0   130 UTMOS 3.92 WER  12% SEC 3.9
+PAL tr am_puck                  x1.30 lively F0   141 UTMOS 3.77 WER  12% SEC 4.1
+GALLERY tr 19 = am_fenrir
+PAL tr am_fenrir                x1.00 calm   F0   128 UTMOS 4.14 WER   0% SEC 5.3
+PAL tr am_fenrir                x1.00 lively F0   133 UTMOS 4.29 WER  12% SEC 4.4
+PAL tr am_fenrir                x0.85 lively F0   119 UTMOS 4.14 WER  12% SEC 4.7
+PAL tr am_fenrir                x0.92 lively F0   124 UTMOS 4.24 WER  12% SEC 4.5
+PAL tr am_fenrir                x1.10 lively F0   144 UTMOS 4.29 WER  12% SEC 4.2
+PAL tr am_fenrir                x1.20 lively F0   153 UTMOS 4.17 WER  12% SEC 4.1
+PAL tr am_fenrir                x1.30 lively F0   166 UTMOS 3.87 WER  12% SEC 4.6
+GALLERY tr 20 = bm_fable
+PAL tr bm_fable                 x1.00 calm   F0   119 UTMOS 3.99 WER   0% SEC 4.7
+PAL tr bm_fable                 x1.00 lively F0   114 UTMOS 4.21 WER  25% SEC 4.5
+PAL tr bm_fable                 x0.85 lively F0   106 UTMOS 3.83 WER  25% SEC 4.8
+PAL tr bm_fable                 x0.92 lively F0   113 UTMOS 4.10 WER  12% SEC 4.6
+PAL tr bm_fable                 x1.10 lively F0   124 UTMOS 4.10 WER  25% SEC 4.3
+PAL tr bm_fable                 x1.20 lively F0   133 UTMOS 4.08 WER  12% SEC 4.2
+PAL tr bm_fable                 x1.30 lively F0   141 UTMOS 3.95 WER  12% SEC 4.5
+GALLERY tr 21 = bm_george
+PAL tr bm_george                x1.00 calm   F0   137 UTMOS 3.51 WER   0% SEC 5.8
+PAL tr bm_george                x1.00 lively F0   137 UTMOS 3.43 WER  12% SEC 5.1
+PAL tr bm_george                x0.85 lively F0   118 UTMOS 3.24 WER  12% SEC 5.3
+PAL tr bm_george                x0.92 lively F0   126 UTMOS 3.47 WER  12% SEC 5.3
+PAL tr bm_george                x1.10 lively F0   148 UTMOS 3.48 WER  12% SEC 4.9
+PAL tr bm_george                x1.20 lively F0   163 UTMOS 3.54 WER  25% SEC 4.9
+PAL tr bm_george                x1.30 lively F0   174 UTMOS 2.84 WER  25% SEC 5.2
+GALLERY tr 22 = elif=0.5,af_kore=0.5
+PAL tr elif=0.5,af_kore=0.5     x1.00 calm   F0   189 UTMOS 4.25 WER  15% SEC 5.8
+PAL tr elif=0.5,af_kore=0.5     x1.00 lively F0   203 UTMOS 4.38 WER  12% SEC 5.0
+PAL tr elif=0.5,af_kore=0.5     x0.85 lively F0   173 UTMOS 4.33 WER   0% SEC 5.2
+PAL tr elif=0.5,af_kore=0.5     x0.92 lively F0   187 UTMOS 4.35 WER   0% SEC 5.2
+PAL tr elif=0.5,af_kore=0.5     x1.10 lively F0   222 UTMOS 4.35 WER  12% SEC 4.9
+PAL tr elif=0.5,af_kore=0.5     x1.20 lively F0   240 UTMOS 3.99 WER  38% SEC 4.9
+PAL tr elif=0.5,af_kore=0.5     x1.30 lively F0   254 UTMOS 3.06 WER  38% SEC 5.2
+GALLERY tr 23 = elif=0.5,af_sky=0.5
+PAL tr elif=0.5,af_sky=0.5      x1.00 calm   F0   199 UTMOS 4.33 WER  15% SEC 5.9
+PAL tr elif=0.5,af_sky=0.5      x1.00 lively F0   208 UTMOS 4.43 WER   0% SEC 5.6
+PAL tr elif=0.5,af_sky=0.5      x0.85 lively F0   176 UTMOS 4.30 WER   0% SEC 5.9
+PAL tr elif=0.5,af_sky=0.5      x0.92 lively F0   192 UTMOS 4.41 WER   0% SEC 5.8
+PAL tr elif=0.5,af_sky=0.5      x1.10 lively F0   227 UTMOS 4.17 WER   0% SEC 5.5
+PAL tr elif=0.5,af_sky=0.5      x1.20 lively F0   248 UTMOS 3.94 WER   0% SEC 5.5
+PAL tr elif=0.5,af_sky=0.5      x1.30 lively F0   262 UTMOS 3.42 WER   0% SEC 5.7
+GALLERY tr 24 = emre=0.5,am_michael=0.5
+PAL tr emre=0.5,am_michael=0.5  x1.00 calm   F0   123 UTMOS 4.16 WER   0% SEC 5.6
+PAL tr emre=0.5,am_michael=0.5  x1.00 lively F0   123 UTMOS 4.19 WER  12% SEC 5.0
+PAL tr emre=0.5,am_michael=0.5  x0.85 lively F0   108 UTMOS 4.00 WER  12% SEC 5.3
+PAL tr emre=0.5,am_michael=0.5  x0.92 lively F0   115 UTMOS 4.21 WER  12% SEC 5.2
+PAL tr emre=0.5,am_michael=0.5  x1.10 lively F0   134 UTMOS 4.13 WER  12% SEC 4.8
+PAL tr emre=0.5,am_michael=0.5  x1.20 lively F0   146 UTMOS 3.94 WER   0% SEC 4.9
+PAL tr emre=0.5,am_michael=0.5  x1.30 lively F0   154 UTMOS 3.61 WER  12% SEC 5.2
+GALLERY tr 25 = emre=0.5,bm_fable=0.5
+PAL tr emre=0.5,bm_fable=0.5    x1.00 calm   F0   126 UTMOS 4.17 WER   0% SEC 5.2
+PAL tr emre=0.5,bm_fable=0.5    x1.00 lively F0   125 UTMOS 4.24 WER   0% SEC 5.0
+PAL tr emre=0.5,bm_fable=0.5    x0.85 lively F0   107 UTMOS 4.17 WER  12% SEC 5.1
+PAL tr emre=0.5,bm_fable=0.5    x0.92 lively F0   116 UTMOS 4.28 WER   0% SEC 5.2
+PAL tr emre=0.5,bm_fable=0.5    x1.10 lively F0   135 UTMOS 4.19 WER  12% SEC 4.9
+PAL tr emre=0.5,bm_fable=0.5    x1.20 lively F0   145 UTMOS 4.22 WER  12% SEC 4.8
+PAL tr emre=0.5,bm_fable=0.5    x1.30 lively F0   155 UTMOS 3.93 WER  12% SEC 5.2
+wrote palette-tr 200.7 s
+---- studio en: STUDIO language chain role UTMOS WER (s0 = as it is)
+STUDIO en s0 nar   UTMOS 4.55 WER   0%
+STUDIO en s0 mama  UTMOS 4.34 WER   0%
+STUDIO en s0 pig1  UTMOS 4.38 WER   0%
+STUDIO en s0 wolf  UTMOS 4.31 WER   0%
+STUDIO en s0 MEAN UTMOS 4.39 WER 0%
+STUDIO en s1 nar   UTMOS 4.53 WER   0%
+STUDIO en s1 mama  UTMOS 4.29 WER   0%
+STUDIO en s1 pig1  UTMOS 4.33 WER   0%
+STUDIO en s1 wolf  UTMOS 4.18 WER   0%
+STUDIO en s1 MEAN UTMOS 4.33 WER 0%
+STUDIO en s2 nar   UTMOS 4.52 WER   0%
+STUDIO en s2 mama  UTMOS 4.25 WER   0%
+STUDIO en s2 pig1  UTMOS 4.30 WER   0%
+STUDIO en s2 wolf  UTMOS 4.13 WER   0%
+STUDIO en s2 MEAN UTMOS 4.30 WER 0%
+wrote studio-en 36.4 s
+---- studio tr: STUDIO language chain role UTMOS WER (s0 = as it is)
+STUDIO tr s0 nar   UTMOS 4.15 WER   0%
+STUDIO tr s0 mama  UTMOS 4.34 WER   0%
+STUDIO tr s0 pig1  UTMOS 4.04 WER   0%
+STUDIO tr s0 wolf  UTMOS 3.66 WER   0%
+STUDIO tr s0 MEAN UTMOS 4.05 WER 0%
+STUDIO tr s1 nar   UTMOS 3.94 WER   0%
+STUDIO tr s1 mama  UTMOS 4.22 WER   0%
+STUDIO tr s1 pig1  UTMOS 3.91 WER   0%
+STUDIO tr s1 wolf  UTMOS 3.60 WER   0%
+STUDIO tr s1 MEAN UTMOS 3.92 WER 0%
+STUDIO tr s2 nar   UTMOS 3.87 WER   0%
+STUDIO tr s2 mama  UTMOS 4.12 WER   0%
+STUDIO tr s2 pig1  UTMOS 3.81 WER   0%
+STUDIO tr s2 wolf  UTMOS 3.56 WER   0%
+STUDIO tr s2 MEAN UTMOS 3.84 WER 0%
+wrote studio-tr 52.3 s

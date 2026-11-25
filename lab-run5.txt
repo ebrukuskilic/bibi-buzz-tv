@@ -1,0 +1,310 @@
+==================== main 17:23:23
+python 3.12.16 Linux-7.0.0-1020-azure-x86_64-with-glibc2.43 cpus 4
+   numpy 2.5.5
+   scipy 1.18.1
+   torch 2.15.0+cpu
+   torchaudio 2.11.1+cpu
+   kokoro 0.9.4
+   misaki 0.9.4
+   faster_whisper 1.2.1
+   edge_tts 7.3.1
+edge-tts: 318 voices; Turkish: ['tr-TR-EmelNeural', 'tr-TR-AhmetNeural']
+   en-AU-WilliamMultilingualNeural              en-AU  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   en-US-AndrewMultilingualNeural               en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Warm', 'Confident', 'Authentic', 'Honest']}
+   en-US-AvaMultilingualNeural                  en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Expressive', 'Caring', 'Pleasant', 'Friendly']}
+   en-US-BrianMultilingualNeural                en-US  Male  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Approachable', 'Casual', 'Sincere']}
+   en-US-EmmaMultilingualNeural                 en-US  Female  other languages: {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Cheerful', 'Clear', 'Conversational']}
+   fr-FR-VivienneMultilingualNeural             fr-FR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   fr-FR-RemyMultilingualNeural                 fr-FR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   it-IT-GiuseppeMultilingualNeural             it-IT  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   ko-KR-HyunsuMultilingualNeural               ko-KR  Male  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+   pt-BR-ThalitaMultilingualNeural              pt-BR  Female  other languages: {'ContentCategories': ['General'], 'VoicePersonalities': ['Friendly', 'Positive']}
+---- cast sweep en: type  voice  rate  pitch   seconds  F0 Hz  UTMOS  words wrong   (the best of a type by UTMOS is marked *)
+   nar         af_heart               -8%  +0Hz     5.0 s  F0   196  UTMOS 4.55  wrong   7% 
+   nar         af_heart               -4%  +0Hz     4.9 s  F0   197  UTMOS 4.55  wrong   7% *
+   nar         af_bella               -6%  +0Hz     5.6 s  F0   200  UTMOS 4.39  wrong   0% 
+   girl        af_bella               -2%  +10Hz    3.4 s  F0   226  UTMOS 3.79  wrong   9% 
+   girl        af_aoede               -2%  +14Hz    2.8 s  F0   202  UTMOS 4.36  wrong   9% 
+   girl        af_kore                -2%  +16Hz    2.8 s  F0   181  UTMOS 4.44  wrong   0% *
+   teen        af_kore                -2%  +0Hz     2.2 s  F0   175  UTMOS 4.18  wrong   0% 
+   teen        af_sarah               -2%  +6Hz     2.9 s  F0   200  UTMOS 4.37  wrong   0% *
+   teen        af_aoede               -2%  +0Hz     2.4 s  F0   202  UTMOS 4.07  wrong   0% 
+   boy         am_puck                +4%  +16Hz    2.1 s  F0   148  UTMOS 4.33  wrong   0% 
+   boy         am_puck                +4%  +24Hz    2.1 s  F0   155  UTMOS 4.34  wrong   0% *
+   boy         am_michael             +4%  +30Hz    2.6 s  F0   142  UTMOS 4.27  wrong   0% 
+   baby        af_bella               +0%  +40Hz    2.2 s  F0   257  UTMOS 3.05  wrong   0% 
+   baby        af_aoede               +0%  +38Hz    2.1 s  F0   236  UTMOS 4.37  wrong   0% 
+   baby        af_kore                +0%  +40Hz    2.0 s  F0   205  UTMOS 4.39  wrong   0% *
+   woman       af_bella               -4%  +0Hz     3.5 s  F0   216  UTMOS 4.30  wrong   0% 
+   woman       af_nicole              -4%  +0Hz     4.7 s  F0   152  UTMOS 3.46  wrong   0% 
+   woman       bf_emma                -4%  +0Hz     3.4 s  F0   182  UTMOS 4.45  wrong   0% *
+   granny      bf_emma                -14% -10Hz    3.6 s  F0   172  UTMOS 4.41  wrong   0% 
+   granny      af_nicole              -14% -14Hz    5.1 s  F0   143  UTMOS 2.99  wrong   0% 
+   granny      bf_isabella            -14% -10Hz    3.8 s  F0   199  UTMOS 4.43  wrong   0% *
+   fakegranny  am_michael             -8%  +30Hz    3.5 s  F0   145  UTMOS 4.34  wrong   0% 
+   fakegranny  am_puck                -8%  +16Hz    2.7 s  F0   126  UTMOS 4.39  wrong   0% *
+   man         am_michael             -6%  +0Hz     3.3 s  F0   128  UTMOS 4.26  wrong   0% 
+   man         am_fenrir              -6%  +8Hz     2.5 s  F0   150  UTMOS 4.45  wrong   0% *
+   man         am_puck                -6%  -8Hz     2.6 s  F0   120  UTMOS 4.42  wrong   0% 
+   grandpa     bm_fable               -14% -8Hz     4.0 s  F0   126  UTMOS 4.36  wrong   0% *
+   grandpa     am_michael             -14% -14Hz    4.3 s  F0   116  UTMOS 4.26  wrong   0% 
+   grandpa     bm_george              -14% -8Hz     4.4 s  F0   140  UTMOS 4.36  wrong   0% 
+   prince      am_puck                +0%  +0Hz     2.0 s  F0   139  UTMOS 4.43  wrong   0% *
+   prince      am_michael             +0%  +8Hz     2.4 s  F0   134  UTMOS 4.22  wrong   0% 
+   prince      bm_fable               +0%  +6Hz     2.7 s  F0   136  UTMOS 4.36  wrong   0% 
+   king        bm_george              -14% -12Hz    3.3 s  F0   146  UTMOS 4.04  wrong   0% 
+   king        am_fenrir              -14% -14Hz    2.5 s  F0   133  UTMOS 4.40  wrong   0% *
+   king        bm_fable               -14% -14Hz    3.4 s  F0   136  UTMOS 4.31  wrong   0% 
+   lord        bm_fable               -8%  -4Hz     2.7 s  F0   127  UTMOS 4.38  wrong   0% *
+   lord        bm_george              -8%  -6Hz     2.8 s  F0   149  UTMOS 4.19  wrong   0% 
+   queen       bf_emma                -10% -8Hz     3.2 s  F0   174  UTMOS 4.41  wrong   0% 
+   queen       bf_isabella            -10% -8Hz     3.3 s  F0   205  UTMOS 4.46  wrong   0% *
+   queen       af_nicole              -10% -10Hz    4.4 s  F0   149  UTMOS 2.88  wrong   0% 
+   stepmother  af_nicole              -12% -10Hz    4.4 s  F0   146  UTMOS 3.23  wrong   0% 
+   stepmother  bf_isabella            -12% -12Hz    3.2 s  F0   199  UTMOS 4.39  wrong   0% *
+   stepsister  af_kore                +6%  +12Hz    2.2 s  F0   161  UTMOS 4.45  wrong   0% 
+   stepsister  af_sarah               +6%  +14Hz    2.9 s  F0   217  UTMOS 4.48  wrong   0% *
+   stepsister  af_aoede               +6%  +12Hz    2.2 s  F0   191  UTMOS 4.41  wrong   0% 
+   witch       af_nicole              -14% -20Hz    5.9 s  F0   132  UTMOS 2.31  wrong   0% 
+   witch       bf_emma                -14% -20Hz    3.9 s  F0   156  UTMOS 3.94  wrong  27% *
+   witch       af_nicole              -14% -14Hz    5.8 s  F0   140  UTMOS 2.41  wrong   0% 
+   fairy       af_aoede               -8%  +14Hz    2.9 s  F0   208  UTMOS 4.30  wrong   0% 
+   fairy       af_sarah               -8%  +14Hz    3.5 s  F0   223  UTMOS 4.48  wrong   0% *
+   mirror      bm_fable               -18% -6Hz     3.0 s  F0   144  UTMOS 4.12  wrong   0% 
+   mirror      bm_george              -18% -10Hz    3.1 s  F0   140  UTMOS 4.16  wrong   0% *
+   dwarf       am_michael             +6%  +20Hz    2.9 s  F0   137  UTMOS 4.31  wrong   0% 
+   dwarf       am_puck                +6%  +4Hz     2.3 s  F0   125  UTMOS 4.38  wrong   0% *
+   elf         am_puck                +10% +24Hz    2.0 s  F0   142  UTMOS 4.29  wrong   0% *
+   elf         am_puck                +10% +30Hz    2.0 s  F0   146  UTMOS 4.25  wrong   0% 
+   elfgirl     af_bella               +10% +28Hz    2.8 s  F0   247  UTMOS 3.27  wrong   0% 
+   elfgirl     af_aoede               +10% +28Hz    2.3 s  F0   218  UTMOS 4.16  wrong   0% *
+   troll       am_fenrir              -16% -26Hz    3.1 s  F0   109  UTMOS 4.39  wrong   0% *
+   troll       am_fenrir              -16% -34Hz    3.1 s  F0   107  UTMOS 4.15  wrong   0% 
+   troll       am_onyx                -16% -28Hz    3.9 s  F0    95  UTMOS 3.73  wrong   0% 
+   giant       am_fenrir              -16% -34Hz    3.2 s  F0   108  UTMOS 4.13  wrong  50% *
+   giant       am_onyx                -16% -34Hz    3.8 s  F0   361  UTMOS 2.93  wrong  25% 
+   pig         am_puck                +2%  +12Hz    2.4 s  F0   136  UTMOS 4.32  wrong   0% *
+   pig         am_puck                +2%  +20Hz    2.3 s  F0   141  UTMOS 4.31  wrong   0% 
+   pig         am_michael             +2%  +20Hz    3.0 s  F0   124  UTMOS 4.28  wrong   0% 
+   wolf        am_fenrir              -10% -20Hz    4.1 s  F0   123  UTMOS 4.01  wrong   0% 
+   wolf        am_fenrir              -10% -28Hz    4.2 s  F0   117  UTMOS 4.10  wrong   0% *
+   wolf        bm_george              -10% -22Hz    5.0 s  F0   131  UTMOS 3.41  wrong   0% 
+   hare        am_puck                +8%  +16Hz    2.8 s  F0   127  UTMOS 4.38  wrong   0% 
+   hare        am_puck                +8%  +24Hz    2.8 s  F0   135  UTMOS 4.40  wrong   0% *
+   tortoise    am_michael             -20% -8Hz     3.2 s  F0   121  UTMOS 3.83  wrong   0% 
+   tortoise    bm_fable               -20% -10Hz    3.5 s  F0   112  UTMOS 4.28  wrong   0% *
+   bear        am_fenrir              -12% -12Hz    2.5 s  F0   138  UTMOS 4.44  wrong   0% *
+   bear        am_michael             -12% -18Hz    3.2 s  F0   113  UTMOS 4.11  wrong   0% 
+   mamabear    af_nicole              -8%  -14Hz    3.9 s  F0   138  UTMOS 3.32  wrong   0% 
+   mamabear    bf_emma                -8%  -14Hz    3.0 s  F0   164  UTMOS 4.41  wrong   0% *
+   goat_little am_puck                +4%  +22Hz    2.9 s  F0   139  UTMOS 4.40  wrong  67% 
+   goat_little af_sky                 +4%  +20Hz    3.2 s  F0   191  UTMOS 4.43  wrong   0% *
+   goat_mid    am_michael             +0%  +8Hz     3.4 s  F0   142  UTMOS 4.20  wrong   0% *
+   goat_mid    am_puck                +0%  +0Hz     2.9 s  F0   121  UTMOS 4.37  wrong  50% 
+   goat_big    am_fenrir              -14% -14Hz    3.1 s  F0   135  UTMOS 4.43  wrong   0% *
+   goat_big    am_fenrir              -14% -22Hz    3.2 s  F0   129  UTMOS 4.39  wrong   0% 
+   hen         af_kore                +4%  +10Hz    1.9 s  F0   198  UTMOS 4.38  wrong   0% *
+   hen         af_sarah               +4%  +12Hz    2.4 s  F0   202  UTMOS 4.36  wrong   0% 
+   fox         bm_fable               -4%  +0Hz     3.6 s  F0   135  UTMOS 4.31  wrong   0% 
+   fox         am_puck                -4%  -6Hz     2.9 s  F0   115  UTMOS 4.41  wrong   0% *
+   tiny        af_bella               +8%  +45Hz    2.6 s  F0   271  UTMOS 2.70  wrong   0% 
+   tiny        af_aoede               +8%  +45Hz    2.3 s  F0   233  UTMOS 4.13  wrong   0% 
+   tiny        af_sky                 +8%  +40Hz    2.6 s  F0   223  UTMOS 4.23  wrong   0% *
+   lion        am_fenrir              -12% -28Hz    3.3 s  F0   122  UTMOS 4.43  wrong   0% *
+   lion        am_fenrir              -12% -34Hz    3.3 s  F0   118  UTMOS 4.29  wrong   0% 
+   en: 92 clips, mean UTMOS 4.13, mean words wrong 3%
+wrote cast-en 431.2 s
+---- ladder en: the same voice as a smaller or a bigger person (factor 1.00 = the voice as it is)
+   af_bella   x0.75  F0   155  UTMOS 3.88  wrong   8%
+   af_bella   x0.85  F0   172  UTMOS 4.17  wrong   0%
+   af_bella   x0.92  F0   189  UTMOS 4.25  wrong   0%
+   af_bella   x1.00  F0   204  UTMOS 4.25  wrong   0%
+   af_bella   x1.08  F0   219  UTMOS 4.08  wrong   0%
+   af_bella   x1.16  F0   236  UTMOS 3.79  wrong   0%
+   af_bella   x1.25  F0   254  UTMOS 2.92  wrong   0%
+   af_bella   x1.35  F0   274  UTMOS 2.30  wrong   0%
+   af_bella   x1.45  F0   294  UTMOS 1.81  wrong   0%
+   am_michael x0.75  F0   103  UTMOS 3.05  wrong   8%
+   am_michael x0.85  F0   111  UTMOS 3.89  wrong   0%
+   am_michael x0.92  F0   118  UTMOS 4.22  wrong   0%
+   am_michael x1.00  F0   127  UTMOS 4.34  wrong   0%
+   am_michael x1.08  F0   134  UTMOS 4.29  wrong   0%
+   am_michael x1.16  F0   141  UTMOS 4.28  wrong   0%
+   am_michael x1.25  F0   151  UTMOS 4.31  wrong   0%
+   am_michael x1.35  F0   163  UTMOS 4.23  wrong   0%
+   am_michael x1.45  F0   175  UTMOS 4.10  wrong   0%
+---- the way of the first test (a pitch shifter: ffmpeg rubberband) against the new way (shift_voice) en
+   boy   am_puck    x1.16  rubberband  F0   158  UTMOS 3.13  wrong   0%
+   boy   am_puck    x1.16  shift_voice F0   143  UTMOS 4.29  wrong   0%
+   wolf  am_fenrir  x0.81  rubberband  F0   120  UTMOS 3.31  wrong   0%
+   wolf  am_fenrir  x0.81  shift_voice F0   117  UTMOS 4.13  wrong   0%
+   baby  af_bella   x1.27  rubberband  F0   246  UTMOS 2.27  wrong   0%
+   baby  af_bella   x1.27  shift_voice F0   259  UTMOS 3.06  wrong   0%
+---- cast sweep tr: type  voice  rate  pitch   seconds  F0 Hz  UTMOS  words wrong   (the best of a type by UTMOS is marked *)
+   nar         elif                   -5%  +0Hz     7.2 s  F0   245  UTMOS 4.29  wrong  15% 
+   nar         elif                   -8%  +0Hz     7.3 s  F0   245  UTMOS 4.20  wrong  15% 
+   nar         elif=0.9,emre=0.1      -5%  +0Hz     7.2 s  F0   236  UTMOS 4.31  wrong   0% *
+   girl        elif                   -2%  +15Hz    6.2 s  F0   269  UTMOS 3.71  wrong  12% *
+   girl        elif                   -2%  +24Hz    6.3 s  F0   282  UTMOS 3.41  wrong  12% 
+   girl        elif=0.9,emre=0.1      -2%  +20Hz    6.2 s  F0   266  UTMOS 3.66  wrong  12% 
+   teen        elif                   -2%  +6Hz     3.4 s  F0   248  UTMOS 4.34  wrong  20% *
+   teen        elif                   -2%  +0Hz     3.4 s  F0   236  UTMOS 4.29  wrong  20% 
+   boy         emre                   +4%  +18Hz    3.3 s  F0   149  UTMOS 3.71  wrong   0% 
+   boy         emre                   +4%  +26Hz    3.3 s  F0   154  UTMOS 3.65  wrong   0% 
+   boy         elif=0.3,emre=0.7      +4%  +20Hz    3.4 s  F0   185  UTMOS 3.79  wrong   0% *
+   baby        elif                   +0%  +40Hz    3.2 s  F0   307  UTMOS 3.22  wrong  60% 
+   baby        elif                   +0%  +32Hz    3.1 s  F0   292  UTMOS 3.62  wrong  20% *
+   woman       elif=0.8,emre=0.2      -8%  +0Hz     4.4 s  F0   214  UTMOS 4.22  wrong  20% *
+   woman       elif                   -8%  -4Hz     4.4 s  F0   225  UTMOS 4.11  wrong   0% 
+   granny      elif                   -14% -10Hz    5.8 s  F0   227  UTMOS 4.27  wrong   0% 
+   granny      elif=0.8,emre=0.2      -14% -12Hz    5.8 s  F0   206  UTMOS 4.32  wrong   0% *
+   fakegranny  emre                   -8%  +30Hz    3.4 s  F0   162  UTMOS 4.38  wrong   0% *
+   fakegranny  emre                   -8%  +20Hz    3.2 s  F0   154  UTMOS 4.38  wrong   0% 
+   man         emre                   -6%  +0Hz     4.3 s  F0   135  UTMOS 3.76  wrong  14% 
+   man         elif=0.2,emre=0.8      -6%  +0Hz     4.4 s  F0   160  UTMOS 4.05  wrong   0% *
+   grandpa     emre                   -12% -10Hz    4.4 s  F0   129  UTMOS 4.27  wrong   0% *
+   grandpa     emre                   -12% -14Hz    4.5 s  F0   125  UTMOS 4.23  wrong   0% 
+   prince      emre                   -2%  +6Hz     3.3 s  F0   141  UTMOS 4.25  wrong   0% 
+   prince      elif=0.2,emre=0.8      -2%  +8Hz     3.4 s  F0   165  UTMOS 4.32  wrong   0% *
+   king        emre                   -14% -14Hz    4.3 s  F0   122  UTMOS 4.01  wrong   0% *
+   king        emre                   -14% -20Hz    4.4 s  F0   117  UTMOS 3.94  wrong   0% 
+   lord        emre                   -10% -8Hz     2.7 s  F0   126  UTMOS 4.29  wrong   0% 
+   lord        emre                   -10% -12Hz    2.7 s  F0   124  UTMOS 4.30  wrong   0% *
+   queen       elif                   -12% -10Hz    4.6 s  F0   228  UTMOS 4.19  wrong  14% *
+   queen       elif=0.9,emre=0.1      -12% -12Hz    4.5 s  F0   216  UTMOS 4.20  wrong  29% 
+   stepmother  elif=0.8,emre=0.2      -10% -10Hz    5.5 s  F0   202  UTMOS 4.28  wrong  14% *
+   stepmother  elif                   -10% -12Hz    5.7 s  F0   213  UTMOS 4.25  wrong  43% 
+   stepsister  elif                   +6%  +16Hz    3.1 s  F0   264  UTMOS 3.16  wrong   0% *
+   stepsister  elif                   +6%  +24Hz    3.0 s  F0   276  UTMOS 3.06  wrong   0% 
+   witch       elif                   -14% -20Hz    6.0 s  F0   217  UTMOS 3.64  wrong  62% 
+   witch       elif=0.7,emre=0.3      -14% -22Hz    5.8 s  F0   189  UTMOS 3.69  wrong  50% *
+   fairy       elif                   -14% +8Hz     4.7 s  F0   246  UTMOS 3.73  wrong  60% *
+   fairy       elif                   -14% +14Hz    4.8 s  F0   256  UTMOS 3.67  wrong  60% 
+   mirror      emre                   -16% -8Hz     3.1 s  F0   132  UTMOS 4.32  wrong   0% 
+   mirror      emre                   -16% -12Hz    3.2 s  F0   129  UTMOS 4.35  wrong   0% *
+   dwarf       emre                   +8%  +16Hz    3.4 s  F0   146  UTMOS 3.24  wrong   0% 
+   dwarf       emre                   +8%  +24Hz    3.5 s  F0   153  UTMOS 3.34  wrong   0% *
+   elf         emre                   +10% +26Hz    3.3 s  F0   160  UTMOS 3.88  wrong  20% *
+   elf         emre                   +10% +34Hz    3.3 s  F0   167  UTMOS 3.71  wrong  20% 
+   elfgirl     elif                   +10% +28Hz    3.8 s  F0   286  UTMOS 2.65  wrong  14% *
+   elfgirl     elif                   +10% +34Hz    3.8 s  F0   295  UTMOS 2.37  wrong  14% 
+   troll       emre                   -16% -28Hz    3.7 s  F0   115  UTMOS 3.83  wrong   0% *
+   troll       emre                   -16% -34Hz    3.8 s  F0   111  UTMOS 3.66  wrong   0% 
+   giant       emre                   -18% -38Hz    6.2 s  F0   106  UTMOS 3.37  wrong  50% *
+   giant       emre                   -18% -44Hz    6.2 s  F0   103  UTMOS 2.95  wrong  50% 
+   pig         emre                   +4%  +12Hz    4.0 s  F0   144  UTMOS 3.65  wrong  20% 
+   pig         emre                   +4%  +20Hz    3.9 s  F0   151  UTMOS 3.70  wrong   0% *
+   wolf        emre                   -10% -20Hz    4.0 s  F0   121  UTMOS 3.88  wrong   0% *
+   wolf        emre                   -10% -28Hz    4.1 s  F0   114  UTMOS 3.85  wrong   0% 
+   hare        emre                   +8%  +24Hz    2.7 s  F0   151  UTMOS 4.16  wrong   0% *
+   hare        emre                   +8%  +32Hz    2.7 s  F0   158  UTMOS 4.08  wrong   0% 
+   tortoise    emre                   -20% -8Hz     3.8 s  F0   125  UTMOS 4.23  wrong   0% 
+   tortoise    emre                   -20% -12Hz    3.7 s  F0   124  UTMOS 4.34  wrong   0% *
+   bear        emre                   -12% -20Hz    3.1 s  F0   121  UTMOS 3.95  wrong   0% 
+   bear        emre                   -12% -26Hz    3.2 s  F0   115  UTMOS 3.98  wrong   0% *
+   mamabear    elif                   -10% -14Hz    3.6 s  F0   207  UTMOS 4.28  wrong   0% *
+   mamabear    elif=0.8,emre=0.2      -10% -16Hz    3.6 s  F0   190  UTMOS 4.28  wrong   0% 
+   goat_little elif                   +4%  +28Hz    4.4 s  F0   294  UTMOS 2.87  wrong  43% *
+   goat_little elif                   +4%  +36Hz    4.5 s  F0   310  UTMOS 2.75  wrong  43% 
+   goat_mid    emre                   +2%  +14Hz    4.2 s  F0   156  UTMOS 3.68  wrong   0% 
+   goat_mid    emre                   +2%  +20Hz    4.2 s  F0   162  UTMOS 3.80  wrong  12% *
+   goat_big    emre                   -10% -20Hz    4.1 s  F0   119  UTMOS 4.10  wrong   0% *
+   goat_big    emre                   -10% -28Hz    4.3 s  F0   113  UTMOS 4.00  wrong   0% 
+   hen         elif                   +2%  +20Hz    3.2 s  F0   281  UTMOS 4.10  wrong  40% *
+   hen         elif                   +2%  +28Hz    3.2 s  F0   293  UTMOS 3.87  wrong  40% 
+   fox         emre                   -4%  +6Hz     4.6 s  F0   142  UTMOS 3.93  wrong   0% *
+   fox         emre                   -4%  +12Hz    4.6 s  F0   148  UTMOS 3.91  wrong   0% 
+   tiny        elif                   +8%  +45Hz    3.5 s  F0   308  UTMOS 3.05  wrong   0% 
+   tiny        elif                   +8%  +38Hz    3.5 s  F0   298  UTMOS 3.35  wrong   0% *
+   lion        emre                   -12% -28Hz    5.7 s  F0   111  UTMOS 3.27  wrong  29% *
+   lion        emre                   -12% -34Hz    5.7 s  F0   106  UTMOS 3.27  wrong  29% 
+   tr: 77 clips, mean UTMOS 3.83, mean words wrong 13%
+wrote cast-tr 454.2 s
+---- ladder tr: the same voice as a smaller or a bigger person (factor 1.00 = the voice as it is)
+   elif       x0.75  F0   180  UTMOS 3.87  wrong   0%
+   elif       x0.85  F0   206  UTMOS 4.17  wrong   0%
+   elif       x0.92  F0   223  UTMOS 4.27  wrong   0%
+   elif       x1.00  F0   242  UTMOS 4.34  wrong   0%
+   elif       x1.08  F0   262  UTMOS 4.22  wrong   0%
+   elif       x1.16  F0   278  UTMOS 3.90  wrong   0%
+   elif       x1.25  F0   300  UTMOS 3.45  wrong   0%
+   elif       x1.35  F0   325  UTMOS 3.21  wrong   0%
+   elif       x1.45  F0   344  UTMOS 2.70  wrong   0%
+   emre       x0.75  F0   107  UTMOS 3.48  wrong   0%
+   emre       x0.85  F0   119  UTMOS 3.90  wrong   0%
+   emre       x0.92  F0   127  UTMOS 4.05  wrong   0%
+   emre       x1.00  F0   138  UTMOS 4.13  wrong   0%
+   emre       x1.08  F0   149  UTMOS 4.17  wrong   0%
+   emre       x1.16  F0   158  UTMOS 4.14  wrong   0%
+   emre       x1.25  F0   168  UTMOS 4.07  wrong   0%
+   emre       x1.35  F0   181  UTMOS 3.63  wrong   0%
+   emre       x1.45  F0   192  UTMOS 3.28  wrong  11%
+---- the way of the first test (a pitch shifter: ffmpeg rubberband) against the new way (shift_voice) tr
+   boy   emre       x1.17  rubberband  F0   155  UTMOS 2.27  wrong   0%
+   boy   emre       x1.17  shift_voice F0   157  UTMOS 3.48  wrong   0%
+   wolf  emre       x0.81  rubberband  F0   114  UTMOS 2.17  wrong  25%
+   wolf  emre       x0.81  shift_voice F0   114  UTMOS 3.77  wrong   0%
+   baby  elif       x1.27  rubberband  F0   311  UTMOS 1.79  wrong  80%
+   baby  elif       x1.27  shift_voice F0   307  UTMOS 3.21  wrong  40%
+   production casting: {'mama': 'k:af_bella|en-US-AvaMultilingualNeural|-4%|+12Hz', 'nar': 'k:af_heart|en-US-JennyNeural|-6%|+0Hz', 'pig1': 'k:am_puck|en-US-RogerNeural|+2%|+27Hz', 'pig2': 'k:am_puck|en-US-RogerNeural|+2%|+15Hz', 'pig3': 'k:am_puck|en-US-RogerNeural|+2%|+3Hz', 'wolf': 'k:am_fenrir|en-US-ChristopherNeural|-10%|-28Hz'}
+   [ktts] 63 of 63 clips made (246 s of speech in 132 s of work)
+   [ktts] 63 of 63 clips made in 134 s; 0 item(s) will use the Edge voice
+   66 lines, 206 s of speech, 137 s of work (RTF 0.67, Kokoro model loading included)
+wrote en-full-prod 235.3 s
+   ATTENTION nar    utmos 4.46 words wrong 67%   'Welcome to Bibi Buzz story time!'   heard: 'Welcome to Bib iBuzz Storytime.'
+   per character (en):  lines  seconds  UTMOS  words wrong
+      mama     2     7.0   4.36     0%   voice k:af_bella|en-US-AvaMultilingualNeural|-4%|+12Hz
+      nar     35   129.4   4.48     2%   voice k:af_heart|en-US-JennyNeural|-6%|+0Hz
+      pig1     8    16.7   4.37     0%   voice k:am_puck|en-US-RogerNeural|+2%|+27Hz
+      pig2     7    14.6   4.36     0%   voice k:am_puck|en-US-RogerNeural|+2%|+15Hz
+      pig3     6    15.1   4.33     0%   voice k:am_puck|en-US-RogerNeural|+2%|+3Hz
+      wolf     8    22.8   4.09     5%   voice k:am_fenrir|en-US-ChristopherNeural|-10%|-28Hz
+---- en  4-prod-kokoro
+  nar    5.3 s  utmos 4.53  words wrong   0%   heard: Once upon a time, a mama pig lived in a cozy little house with her three little pigs.
+  mama   3.2 s  utmos 4.39  words wrong   0%   heard: My dear little pigs, it is time to build your own houses.
+  pig1   2.4 s  utmos 4.34  words wrong   0%   heard: Do not worry, mama, I will build my house very fast.
+  nar    4.2 s  utmos 4.49  words wrong   0%   heard: So the little pigs hugged their mama, and off they went down the sunny road.
+  wolf   2.0 s  utmos 4.08  words wrong  12%   heard: Little pig, little pigs, let me come in.
+  pig1   2.0 s  utmos 4.36  words wrong   0%   heard: No, no, not by the hair of my chinny chin chin.
+  wolf   3.4 s  utmos 3.92  words wrong   0%   heard: Then I will huff and I will puff and I will blow your house in.
+  nar    4.9 s  utmos 4.49  words wrong   0%   heard: So the wolf took a big deep breath. He huffed and he puffed and he blew the house down.
+  pig3   3.1 s  utmos 4.46  words wrong   0%   heard: Quick, he is coming down the chimney. Keep the pot of water bubbling.
+  nar    2.0 s  utmos 4.43  words wrong   0%   heard: and they all lived happily ever after.
+wrote en-4-prod-kokoro 37.0 s
+   production casting: {'mama': 'kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-8%|-18Hz', 'nar': 'kt:elif|tr-TR-EmelNeural|-6%|+0Hz', 'pig1': 'kt:emre|tr-TR-AhmetNeural|+4%|+37Hz', 'pig2': 'kt:emre|tr-TR-AhmetNeural|+4%|+25Hz', 'pig3': 'kt:emre|tr-TR-AhmetNeural|+4%|+13Hz', 'wolf': 'kt:emre|tr-TR-AhmetNeural|-10%|-36Hz'}
+   [ktts] 63 of 63 clips made (341 s of speech in 177 s of work)
+   [ktts] 63 of 63 clips made in 178 s; 0 item(s) will use the Edge voice
+   66 lines, 319 s of speech, 182 s of work (RTF 0.57, Kokoro model loading included)
+wrote tr-full-prod 348.5 s
+   ATTENTION nar    utmos 3.83 words wrong 60%   'Bugünün masalı... Üç Küçük Domuz!'   heard: 'Bugün masalı 3 küçük domuzsa.'
+   ATTENTION nar    utmos 3.54 words wrong 50%   'Pat! Saman ev hazırdı.'   heard: 'Pati, Saman, Efe hazırdı.'
+   ATTENTION nar    utmos 3.26 words wrong 100%   'Tak, tak, tak!'   heard: 'Takı takı takı'
+   ATTENTION nar    utmos 4.32 words wrong 27%   'Kurt büyük, derin bir nefes aldı. Üfledi, püfledi ve evi yık'   heard: 'Kurt büyük derin bir nefe saldı. Üfledi, püflediye ve evi yı'
+   ATTENTION pig2   utmos 3.17 words wrong 0%   'Korkma. Evim sağlam. Benimle kal!'   heard: 'Korkma, evim sağlam, benimle kal.'
+   ATTENTION nar    utmos 4.19 words wrong 33%   'Kurt üfledi, püfledi. Biraz daha üfledi, püfledi. Ama tuğla '   heard: 'Kurt üfledi püflede. Biraz daha üfledi püflede. Ama Tula ev '
+   ATTENTION wolf   utmos 3.30 words wrong 27%   'Ah! Çok yoruldum. Ama yeni bir planım var. Bacadan aşağı ine'   heard: "Çok yoruldum ama yeni bir planım var. Baca'dan aşağı ineceği"
+   ATTENTION pig2   utmos 3.62 words wrong 125%   'Su sıcak, sıcak, sıcak!'   heard: 'Asıl secak, secak, secak ya.'
+   ATTENTION nar    utmos 4.24 words wrong 33%   'Aşağı, aşağı, aşağı... Kurt bacadan kaydı ve şlap! Tam tence'   heard: 'aşağlı aşağlı aşağlı. Kurt bacadan kaydı ve şrap. Tam tencer'
+   ATTENTION wolf   utmos 3.01 words wrong 33%   'Ayyy! Çok sıcak!'   heard: 'Ay çok sıcak.'
+   per character (tr):  lines  seconds  UTMOS  words wrong
+      mama     2    10.8   4.35     0%   voice kt:elif=0.8,emre=0.2|tr-TR-EmelNeural|-8%|-18Hz
+      nar     35   186.0   4.15    14%   voice kt:elif|tr-TR-EmelNeural|-6%|+0Hz
+      pig1     8    31.0   3.89     2%   voice kt:emre|tr-TR-AhmetNeural|+4%|+37Hz
+      pig2     7    27.9   3.79    31%   voice kt:emre|tr-TR-AhmetNeural|+4%|+25Hz
+      pig3     6    26.8   3.88     8%   voice kt:emre|tr-TR-AhmetNeural|+4%|+13Hz
+      wolf     8    36.3   3.41    11%   voice kt:emre|tr-TR-AhmetNeural|-10%|-36Hz
+---- tr  6-prod-kokoro
+  nar    9.1 s  utmos 4.06  words wrong   0%   heard: Bir varmış bir yokmuş. Küçük ve sıcacık bir evde üç yavru domuzuyla yaşayan bir anne domuz varmış.
+  mama   4.5 s  utmos 4.30  words wrong   0%   heard: Benim tatlı yavrularım kendi evlerinizi yapma zamanı geldi.
+  pig1   4.2 s  utmos 4.16  words wrong   0%   heard: Merak etme anne. Ben evimi çok çabuk yapacağım.
+  nar    6.1 s  utmos 4.24  words wrong   0%   heard: Küçük domuzlar annelerine sarıldılar ve güneşli yolda yürümeye başladılar.
+  wolf   3.9 s  utmos 3.61  words wrong   0%   heard: Küçük domuz, küçük domuz kapıyı aç içeri gireyim.
+  pig1   4.8 s  utmos 3.56  words wrong  14%   heard: Olmaz, olmaz. Sakalımın terine yemin olsun açmam.
+  wolf   4.1 s  utmos 3.33  words wrong   0%   heard: O zaman üfleyeceğim, püfleyeceğim ve evini yıkacağım.
+  nar    6.1 s  utmos 4.32  words wrong  27%   heard: Kurt büyük derin bir nefe saldı. Üfledi, püflediye ve evi yıktı.
+  pig3   5.1 s  utmos 3.65  words wrong  17%   heard: Eh çabuk, bacadan iniyor. Tencerenin suyunu kaynatın.
+  nar    2.7 s  utmos 4.09  words wrong   0%   heard: ve hepsi mutlu mutlu yaşadılar.
+wrote tr-6-prod-kokoro 55.1 s
+==================== SUMMARY (UTMOS higher is better; words wrong lower is better; RTF = seconds of work per second of speech)
+  en  4-prod-kokoro  UTMOS 4.35   words wrong   1%   RTF 0.67   (10 lines)
+  tr  6-prod-kokoro  UTMOS 3.93   words wrong   6%   RTF 0.57   (10 lines)

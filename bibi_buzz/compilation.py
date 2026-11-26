@@ -11,6 +11,7 @@ import subprocess
 from . import schedule as SCH
 
 W, H, FPS = 1280, 720, 24
+MAX_MB = 88                                                   # (GitHub refuses a file over 100 MB in a push)
 BRAND = "Bibi Buzz TV"
 
 
@@ -42,8 +43,10 @@ def concat(paths, out, ffmpeg="ffmpeg"):
                      f"[{i}:a]aresample=44100,aformat=channel_layouts=stereo[a{i}];")
     fc = "".join(parts) + "".join(f"[v{i}][a{i}]" for i in range(len(paths))) + f"concat=n={len(paths)}:v=1:a=1[v][a]"
     tmp = out[:-4] + ".part.mp4"
+    total = sum(durs)
+    vk = int(max(300, min(4000, MAX_MB * 8192.0 / max(1.0, total) - 160)))     # (the media branch takes no file over 100 MB: the video's rate is capped so the file stays under MAX_MB)
     args += ["-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-preset", "veryfast", "-tune", "animation",
-             "-crf", "23", "-g", str(FPS * 2), "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", tmp]
+             "-crf", "23", "-maxrate", "%dk" % vk, "-bufsize", "%dk" % (2 * vk), "-g", str(FPS * 2), "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", tmp]
     subprocess.run(args, check=True)
     os.replace(tmp, out)
     starts, t = [], 0.0

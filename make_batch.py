@@ -49,6 +49,43 @@ def make_ep1_thumb(out_dir):
     make_thumbnail(make_background(), os.path.join(out_dir, "ep1.png"))
 
 
+WEEKLY_FIRST_DAY = 14                                             # (3 December 2026, then every 7 days: the long video of the week)
+
+
+def weekly_day(day, manifest, out_dir, ffmpeg, failures):
+    """Every 7 days from WEEKLY_FIRST_DAY: the long video of the week (dNNN-W1, bibi_buzz/compilation.weekly) from the compilations (dNNN-C1) and the English songs
+    of the days that are on the media branch next to this one (the last three days) and of this day, oldest first."""
+    import shutil
+    from bibi_buzz import compilation as CO
+    if any(v["id"].endswith("-W1") for v in manifest["videos"]):
+        return
+    root = os.path.dirname(os.path.abspath(out_dir))
+    entries = []
+    for d in sorted(x for x in os.listdir(root) if x[:2] == "20" and os.path.isdir(os.path.join(root, x))):
+        try:
+            m = manifest if os.path.abspath(os.path.join(root, d)) == os.path.abspath(out_dir) else json.load(open(os.path.join(root, d, "manifest.json")))
+        except Exception:
+            continue
+        for v in m.get("videos", []):
+            p = os.path.join(root, d, v["file"])
+            if (v["id"].endswith("-C1") or (v["id"].endswith("-M1") and v.get("lang", "en") == "en")) and os.path.exists(p) and not v.get("parts"):
+                entries.append(dict(v, path=p))
+    if sum(float(e.get("duration") or 0) for e in entries) < 20 * 60:
+        failures.append((f"d{day:03d}-W1", "not enough videos for the long video of the week"))
+        return
+    try:
+        w = CO.weekly(day, entries, out_dir, ffmpeg, CU.SUBSCRIBE_URL, week=(day - WEEKLY_FIRST_DAY) // 7 + 1)
+        src = next((os.path.join(os.path.dirname(e["path"]), e["id"] + ".jpg") for e in entries if e["id"].endswith("-C1")), None)
+        if src and os.path.exists(src):
+            shutil.copyfile(src, os.path.join(out_dir, w["id"] + ".jpg"))
+        manifest["videos"].append(w)
+        manifest["videos"].sort(key=lambda v: v["id"])
+        print(f"== {w['id']}  long  {w['title']}\n   ok  {w['duration']:.1f}s (the long video of the week, {len(entries)} videos, {len(w.get('parts') or [])} parts)", flush=True)
+    except Exception as e:
+        failures.append((f"d{day:03d}-W1", repr(e)))
+        print(f"   long video of the week FAILED: {e!r}", flush=True)
+
+
 def compile_day(day, manifest, out_dir, ffmpeg, failures):
     """From curriculum.MIX_DAY on: the day's lessons (dNNN-L*) leave the upload list (manifest "parts") and are joined, with the
     English tale, into the compilation dNNN-C1 (bibi_buzz/compilation.py), whose cover is the cover of the first lesson."""
@@ -184,6 +221,8 @@ def main():
             manifest["videos"] = [old[k] for k in sorted(old)]
         if day >= CU.MIX_DAY:
             compile_day(day, manifest, a.out, ffmpeg, failures)
+        if day >= WEEKLY_FIRST_DAY and (day - WEEKLY_FIRST_DAY) % 7 == 0:
+            weekly_day(day, manifest, a.out, ffmpeg, failures)
         with open(mpath, "w") as f:
             json.dump(manifest, f, indent=1, ensure_ascii=False)
         print(f"manifest: {len(manifest['videos'])} videos, {len(failures)} failed")

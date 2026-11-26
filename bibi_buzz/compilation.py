@@ -27,7 +27,7 @@ def _topic(title):
     return h.strip()
 
 
-def concat(paths, out, ffmpeg="ffmpeg"):
+def concat(paths, out, ffmpeg="ffmpeg", max_mb=None):
     """Joins the videos (any size / frame rate) into one 1280x720 24 fps video; returns the start time of every part."""
     import json
     durs = []
@@ -44,7 +44,7 @@ def concat(paths, out, ffmpeg="ffmpeg"):
     fc = "".join(parts) + "".join(f"[v{i}][a{i}]" for i in range(len(paths))) + f"concat=n={len(paths)}:v=1:a=1[v][a]"
     tmp = out[:-4] + ".part.mp4"
     total = sum(durs)
-    vk = int(max(300, min(4000, MAX_MB * 8192.0 / max(1.0, total) - 160)))     # (the media branch takes no file over 100 MB: the video's rate is capped so the file stays under MAX_MB)
+    vk = int(max(300, min(4000, (max_mb or MAX_MB) * 8192.0 / max(1.0, total) - 160)))     # (the media branch takes no file over 100 MB: the video's rate is capped so the file stays under MAX_MB)
     args += ["-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-preset", "veryfast", "-tune", "animation",
              "-crf", "23", "-maxrate", "%dk" % vk, "-bufsize", "%dk" % (2 * vk), "-g", str(FPS * 2), "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", tmp]
     subprocess.run(args, check=True)
@@ -106,3 +106,55 @@ def make(day, entries, out_dir, ffmpeg="ffmpeg", subscribe_url=""):
             n += len(tg) + 1
     return dict(id=cid, type="long", lang="en", file=cid + ".mp4", duration=round(total, 1), chapters=chapters,
                 title=title.replace("<", "").replace(">", ""), description="\n".join(lines).replace("<", "").replace(">", "")[:4900], tags=tags)
+
+
+def split(path, part_mb=90):
+    """Cuts a file into parts of under 100 MB (path.part1, path.part2, ...; joined byte for byte they are the file again) and removes it.  Returns the part names."""
+    names, n, size = [], 0, int(part_mb * 1024 * 1024)
+    with open(path, "rb") as f:
+        while True:
+            chunk = f.read(size)
+            if not chunk:
+                break
+            n += 1
+            nm = "%s.part%d" % (os.path.basename(path), n)
+            with open(os.path.join(os.path.dirname(path), nm), "wb") as g:
+                g.write(chunk)
+            names.append(nm)
+    os.remove(path)
+    return names
+
+
+def weekly(day, entries, out_dir, ffmpeg="ffmpeg", subscribe_url="", week=1):
+    """The long video of the week (dNNN-W1): the compilations and the English songs of the last days, one after the other (30-60 minutes).  Kept in parts
+    of under 100 MB (manifest "parts"), which the uploader joins.  Returns the manifest entry."""
+    wid = f"d{day:03d}-W1"
+    out = os.path.join(out_dir, wid + ".mp4")
+    starts, total = concat([e["path"] for e in entries], out, ffmpeg, max_mb=max(200, int(total_guess(entries) / 60.0 * 9)))
+    minutes = max(1, int(round(total / 60.0)))
+    chapters = [(round(s, 2), _head(e["title"]).replace("Learn with Bibi: ", "")) for s, e in zip(starts, entries)]
+    title = f"{minutes} Minutes of Learning, Fairy Tales & Songs for Kids | Week {week} | {BRAND}"
+    lines = [f"{minutes} minutes of learning, fairy tales and songs with Bibi the bee and her friends, without a break! Perfect for toddlers and preschoolers (ages 2-6).", ""]
+    if subscribe_url:
+        lines += ["Subscribe to Bibi Buzz TV: " + subscribe_url, ""]
+    lines += ["Chapters"] + [f"{SCH.fmt_time(t)} {label}" for t, label in chapters] + [""]
+    lines += ["New learning videos and fairy tales for toddlers and preschoolers on Bibi Buzz TV!",
+              "Narrated with text-to-speech voices. All the artwork and music were made for Bibi Buzz TV. Emoji artwork: Google Noto Emoji (Apache License 2.0).", "",
+              "#kidslearning #nurseryrhymes #preschool #toddlers #BibiBuzzTV"]
+    tags, seen, n = [], set(), 0
+    for e in entries:
+        for tg in e.get("tags", []) + ["kids compilation", "1 hour kids videos", "learning videos for toddlers"]:
+            if tg.lower() not in seen and n + len(tg) + 1 <= 450:
+                seen.add(tg.lower())
+                tags.append(tg)
+                n += len(tg) + 1
+    parts = split(out) if os.path.getsize(out) > 95 * 1024 * 1024 else None
+    e = dict(id=wid, type="long", lang="en", file=wid + ".mp4", duration=round(total, 1), chapters=chapters,
+             title=title, description="\n".join(lines)[:4900], tags=tags)
+    if parts:
+        e["parts"] = parts
+    return e
+
+
+def total_guess(entries):
+    return sum(float(e.get("duration") or 0) for e in entries) or 1800.0

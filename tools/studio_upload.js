@@ -87,10 +87,15 @@
     }
     throw new Error('could not open the upload dialog');
   }
-  async function getFile(date, name) {
-    const r = await fetch(BASE + date + '/' + name + '?t=' + Date.now());
-    if (!r.ok) throw new Error('download ' + name + ': HTTP ' + r.status);
-    return new File([await r.blob()], name, { type: 'video/mp4', lastModified: Date.now() });
+  async function getFile(date, name, parts) {
+    // a long video is kept on the media branch in parts of under 100 MB (manifest "parts"): they are joined here, byte for byte, into the one file
+    const blobs = [];
+    for (const p of (parts && parts.length ? parts : [name])) {
+      const r = await fetch(BASE + date + '/' + p + '?t=' + Date.now());
+      if (!r.ok) throw new Error('download ' + p + ': HTTP ' + r.status);
+      blobs.push(await r.blob());
+    }
+    return new File(blobs, name, { type: 'video/mp4', lastModified: Date.now() });
   }
   async function setBox(d, sel, text) {
     const box = $(sel, d);
@@ -149,7 +154,7 @@
     if (d && isOpen() && $('#title-textarea #textbox', d) && txt(d).includes(v.file)) {
       L('resuming the dialog that is already open for ' + v.file);      // e.g. after a failed attempt on the details step
     } else {
-      const file = await getFile(date, v.file);
+      const file = await getFile(date, v.file, v.parts);
       const input = await openUpload();
       const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
       input.dispatchEvent(new Event('change', { bubbles: true }));
